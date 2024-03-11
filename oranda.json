@@ -1,8 +1,11 @@
 {
+  "project": {
+    "name": "rsql"
+  },
+  "build": {
+    "path_prefix": "rsql"
+  },
   "components": {
-    "changelog": {
-      "read_changelog_file": false
-    },
     "artifacts": {
       "package_managers": {
         "preferred": {
