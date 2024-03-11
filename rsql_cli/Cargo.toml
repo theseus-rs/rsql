@@ -1,0 +1,42 @@
+[package]
+authors.workspace = true
+build = "build.rs"
+categories.workspace = true
+description = "rsql command-line interface for PostgreSQL and SQLite3."
+edition.workspace = true
+keywords.workspace = true
+license.workspace = true
+name = "rsql_cli"
+repository.workspace = true
+version.workspace = true
+
+[package.metadata.wix]
+upgrade-guid = "96A50426-D43C-4A40-B2C1-568C75AF4C3D"
+path-guid = "551FFEF3-89DA-490E-BC41-A0E866DEF5EE"
+license = false
+eula = false
+
+[build-dependencies]
+anyhow = { workspace = true }
+
+[target."cfg(windows)".build-dependencies]
+static_vcruntime = { version = "2.0" }
+winres = { version = "0.1" }
+
+[dependencies]
+anyhow = { workspace = true }
+clap = { workspace = true, features = ["derive", "env"] }
+dotenvy = { workspace = true }
+rsql_core = { path = "../rsql_core", version = "0.1.0", features = ["all"] }
+tokio = { workspace = true, features = ["rt", "rt-multi-thread", "macros"] }
+tracing = { workspace = true }
+
+[dev-dependencies]
+criterion = { workspace = true }
+test-log = { workspace = true }
+tokio = { workspace = true }
+
+[[bin]]
+name = "rsql"
+path = "src/main.rs"
+doc = false

@@ -1,0 +1,105 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Checks
+    uses: ./.github/workflows/checks.yml
+
+  build:
+    name: ${{ matrix.platform }}
+    needs: [ checks ]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - linux-x64
+          - macos-arm64
+          - macos-x64
+          - windows-x64
+
+        include:
+          - platform: linux-x64
+            os: ubuntu-22.04
+          - platform: macos-arm64
+            os: macos-14
+          - platform: macos-x64
+            os: macos-13
+          - platform: windows-x64
+            os: windows-2022
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          components: 'llvm-tools-preview'
+          toolchain: stable
+
+      - name: Install grcov
+        uses: taiki-e/install-action@main
+        with:
+          tool: grcov
+
+      - name: Enable caching
+        uses: Swatinem/rust-cache@v2
+
+      - name: Tests
+        env:
+          CARGO_TERM_COLOR: always
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          LLVM_PROFILE_FILE: rsql-%p-%m.profraw
+          RUST_LOG: "info"
+          RUST_LOG_SPAN_EVENTS: full
+          RUSTFLAGS: -Cinstrument-coverage
+          RUSTDOCFLAGS: -Cinstrument-coverage
+        run: |
+          cargo test --workspace --all-features
+
+      - name: Produce coverage info
+        if: ${{ startsWith(matrix.os, 'ubuntu-') }}
+        run: |
+          grcov $(find . -name "rsql-*.profraw" -print) \
+            -s . \
+            --branch \
+            --ignore-not-existing \
+            --ignore='target/*' \
+            --ignore='benches/*' \
+            --ignore='/*' \
+            --binary-path ./target/debug/ \
+            --excl-line='#\[derive' \
+            -t lcov \
+            -o lcov.info
+
+      - name: Upload to codecov.io
+        if: ${{ startsWith(matrix.os, 'ubuntu-') }}
+        uses: codecov/codecov-action@v3
+        with:
+          files: lcov.info
+          fail_ci_if_error: true
+
+      - name: Install benchmarking tools
+        if: ${{ github.ref == 'refs/heads/main' && startsWith(matrix.os, 'ubuntu-') }}
+        uses: bencherdev/bencher@main
+
+      - name: Run benchmarks
+        if: ${{ github.ref == 'refs/heads/main' && startsWith(matrix.os, 'ubuntu-') }}
+        env:
+          BENCHER_API_TOKEN: ${{ secrets.BENCHER_API_TOKEN }}
+          BENCHER_PROJECT: theseus-rs-rsql
+          BENCHER_ADAPTER: rust_criterion
+        run: |
+          bencher run "cargo bench"

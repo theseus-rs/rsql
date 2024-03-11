@@ -1,0 +1,69 @@
+exclude-labels:
+  - skip changelog
+
+name-template: 'v$RESOLVED_VERSION'
+tag-template: 'v$RESOLVED_VERSION'
+
+change-template: '- $TITLE (#$NUMBER)'
+change-title-escapes: '\<*_&'
+replacers:
+  # Remove conventional commits from titles
+  - search: '/- (build|chore|ci|depr|docs|feat|fix|perf|refactor|test)(\(.*\))?(\!)?\: /g'
+    replace: '- '
+
+autolabeler:
+  - label: breaking
+    title:
+      # Example: feat!: ...
+      - '/^(build|chore|ci|depr|docs|feat|fix|perf|refactor|test)(\(.*\))?\!\: /'
+  - label: build
+    title:
+      - '/^build/'
+  - label: internal
+    title:
+      - '/^(chore|ci|refactor|test)/'
+  - label: deprecation
+    title:
+      - '/^depr/'
+  - label: documentation
+    title:
+      - '/^docs/'
+  - label: enhancement
+    title:
+      - '/^feat/'
+  - label: fix
+    title:
+      - '/^fix/'
+  - label: performance
+    title:
+      - '/^perf/'
+
+categories:
+  - title: 🏆 Highlights
+    labels: highlight
+  - title: 💥 Breaking changes
+    labels:
+      - breaking
+  - title: 🚀 Performance improvements
+    labels: performance
+  - title: ✨ Enhancements
+    labels: enhancement
+  - title: 🐞 Bug fixes
+    labels: fix
+  - title: 📖 Documentation
+    labels: documentation
+  - title: 📦 Build system
+    labels: build
+  - title: 🛠️ Other improvements
+    labels:
+      - deprecation
+      - internal
+
+version-resolver:
+  minor:
+    labels:
+      - breaking
+  default: patch
+
+template: |
+  $CHANGES

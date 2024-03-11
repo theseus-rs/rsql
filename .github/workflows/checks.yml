@@ -1,0 +1,104 @@
+name: Fast checks
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: "-D warnings"
+
+on:
+  workflow_call:
+
+jobs:
+  audit:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+      - name: Enable caching
+        uses: Swatinem/rust-cache@v2
+      - name: Install cargo audit
+        run: cargo install cargo-audit
+      - name: Audit dependencies
+        run: cargo audit --ignore RUSTSEC-2023-0071 --ignore RUSTSEC-2023-0081
+
+  check:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+      - name: Enable caching
+        uses: Swatinem/rust-cache@v2
+      - name: Check the project
+        run: |
+          cargo check --workspace --all-targets --all-features
+
+  clippy:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+      - name: Enable caching
+        uses: Swatinem/rust-cache@v2
+      - name: Check lints
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        run: |
+          cargo clippy --workspace --all-features
+
+  deny:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+      - name: Enable caching
+        uses: Swatinem/rust-cache@v2
+      - name: Install cargo deny
+        run: cargo install cargo-deny
+      - name: Check licenses
+        run: cargo deny check --allow duplicate
+
+  doc:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+      - name: Enable caching
+        uses: Swatinem/rust-cache@v2
+      - name: Check documentation
+        env:
+          RUSTDOCFLAGS: -D warnings
+        run: cargo doc --workspace --no-deps --document-private-items --all-features
+
+  fmt:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+          components: rustfmt
+      - name: Enable caching
+        uses: Swatinem/rust-cache@v2
+      - name: Check formatting
+        run: cargo fmt --all --check

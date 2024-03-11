@@ -1,0 +1,83 @@
+[workspace]
+default-members = ["rsql_cli", "rsql_core"]
+members = ["rsql_cli", "rsql_core"]
+resolver = "2"
+
+[workspace.package]
+authors = ["Brian Heineman <brian.heineman@gmail.com>"]
+categories = ["database"]
+edition = "2021"
+keywords = ["postgresql", "postgres", "embedded", "database", "server"]
+license = "Apache-2.0 OR MIT"
+repository = "https://github.com/theseus-rs/rsql"
+version = "0.1.0"
+
+[workspace.dependencies]
+ansi_colours = { version = "1.2" }
+anyhow = { version = "1.0" }
+async-trait = { version = "0.1" }
+base64 = { version = "0.22" }
+chrono = { version = "0.4" }
+clap = { version = "4.5" }
+clearscreen = { version = "2.0" }
+colored = { version = "2.1" }
+config = { version = "0.14" }
+criterion = { version = "0.5" }
+dark-light = { version = "1.0" }
+dirs = { version = "5.0" }
+dotenvy = { version = "0.15" }
+lazy_static = { version = "1.4" }
+num-format = { version = "0.4" }
+os_info = { version = "3.7" }
+prettytable = { version = "0.10" }
+postgresql_archive = { version = "0.6" }
+postgresql_embedded = { version = "0.6" }
+rust_decimal = { version = "1.34" }
+rustyline = { version = "14.0" }
+serde_json = { version = "1.0" }
+sqlx = { version = "0.7" }
+supports-color = { version = "3.0" }
+sys-locale = { version = "0.3" }
+syntect = { version = "5.2" }
+termbg = { version = "0.5" }
+test-log = { version = "0.2" }
+thiserror = { version = "1.0" }
+tokio = { version = "1.36" }
+tracing = { version = "0.1" }
+tracing-appender = { version = "0.2" }
+tracing-subscriber = { version = "0.3" }
+uuid = { version = "1.7" }
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "z"
+panic = "abort"
+strip = true
+
+# The profile that 'cargo dist' will build with
+[profile.dist]
+inherits = "release"
+lto = "thin"
+
+[workspace.metadata.release]
+shared-version = true
+dependent-version = "upgrade"
+tag-name = "v{{version}}"
+
+# Config for 'cargo dist'
+[workspace.metadata.dist]
+# The preferred cargo-dist version to use in CI (Cargo.toml SemVer syntax)
+cargo-dist-version = "0.11.1"
+# CI backends to support
+ci = ["github"]
+# The installers to generate for each app
+installers = ["shell", "powershell", "homebrew", "msi"]
+# A GitHub repo to push Homebrew formulas to
+tap = "theseus-rs/homebrew-rsql"
+# Target platforms to build apps for (Rust target-triple syntax)
+targets = ["aarch64-apple-darwin", "x86_64-apple-darwin", "x86_64-unknown-linux-gnu", "x86_64-unknown-linux-musl", "x86_64-pc-windows-msvc"]
+# Publish jobs to run in CI
+publish-jobs = ["homebrew"]
+# Publish jobs to run in CI
+pr-run-mode = "skip"

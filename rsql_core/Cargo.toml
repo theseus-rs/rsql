@@ -1,0 +1,60 @@
+[package]
+authors.workspace = true
+categories.workspace = true
+description = "rsql core command-line interface for PostgreSQL and SQLite3."
+edition.workspace = true
+keywords.workspace = true
+license.workspace = true
+name = "rsql_core"
+repository.workspace = true
+version.workspace = true
+
+[dependencies]
+ansi_colours = { workspace = true }
+anyhow = { workspace = true }
+async-trait = { workspace = true }
+base64 = { workspace = true }
+chrono = { workspace = true }
+clap = { workspace = true, features = ["derive", "env"] }
+clearscreen = { workspace = true }
+colored = { workspace = true }
+config = { workspace = true }
+dark-light = { workspace = true }
+dirs = { workspace = true }
+lazy_static = { workspace = true }
+num-format = { workspace = true }
+os_info = { workspace = true }
+prettytable = { workspace = true }
+postgresql_archive = { workspace = true, optional = true }
+postgresql_embedded = { workspace = true, optional = true }
+rust_decimal = { workspace = true }
+rustyline = { workspace = true }
+serde_json = { workspace = true }
+sqlx = { workspace = true, features = ["chrono", "json", "macros", "postgres", "runtime-tokio", "rust_decimal", "sqlite", "uuid"] }
+supports-color = { workspace = true }
+sys-locale = { workspace = true }
+syntect = { workspace = true }
+termbg = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true, features = ["rt", "rt-multi-thread", "macros"] }
+tracing = { workspace = true }
+tracing-appender = { workspace = true }
+tracing-subscriber = { workspace = true, features = ["env-filter", "tracing-log"] }
+uuid = { workspace = true }
+
+[dev-dependencies]
+criterion = { workspace = true }
+test-log = { workspace = true }
+tokio = { workspace = true }
+
+[features]
+all = ["postgresql", "sqlite"]
+default = []
+postgresql = [
+    "dep:postgresql_archive",
+    "dep:postgresql_embedded",
+]
+sqlite = []
+
+[lints.clippy]
+unwrap_used = "deny"
