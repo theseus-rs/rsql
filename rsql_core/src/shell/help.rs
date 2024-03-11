@@ -42,3 +42,32 @@ impl ShellCommand for Command {
         Ok(LoopCondition::Continue)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::configuration::Configuration;
+    use crate::engine::MockEngine;
+    use crate::shell::CommandOptions;
+    use crate::shell::LoopCondition;
+    use rustyline::history::DefaultHistory;
+
+    #[tokio::test]
+    async fn test_execute() -> Result<()> {
+        let mut output = Vec::new();
+        let options = CommandOptions {
+            input: vec![".help"],
+            configuration: &mut Configuration::default(),
+            engine: &mut MockEngine::new(),
+            history: &DefaultHistory::new(),
+            output: &mut output,
+        };
+
+        let result = Command.execute(options).await?;
+
+        assert_eq!(result, LoopCondition::Continue);
+        let help = String::from_utf8(output)?;
+        assert!(help.contains(".help"));
+        Ok(())
+    }
+}

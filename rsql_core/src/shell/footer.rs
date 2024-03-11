@@ -30,3 +30,71 @@ impl ShellCommand for Command {
         Ok(LoopCondition::Continue)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::configuration::Configuration;
+    use crate::engine::MockEngine;
+    use crate::shell::CommandOptions;
+    use crate::shell::LoopCondition;
+    use rustyline::history::DefaultHistory;
+    use std::default;
+
+    #[tokio::test]
+    async fn test_execute_set_on() -> Result<()> {
+        let configuration = &mut Configuration {
+            results_footer: false,
+            ..default::Default::default()
+        };
+        let options = CommandOptions {
+            input: vec![".footer", "on"],
+            configuration,
+            engine: &mut MockEngine::new(),
+            history: &DefaultHistory::new(),
+            output: &mut Vec::new(),
+        };
+
+        let result = Command.execute(options).await?;
+
+        assert_eq!(result, LoopCondition::Continue);
+        assert!(configuration.results_footer);
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_execute_set_off() -> Result<()> {
+        let configuration = &mut Configuration {
+            results_footer: true,
+            ..default::Default::default()
+        };
+        let options = CommandOptions {
+            input: vec![".footer", "off"],
+            configuration,
+            engine: &mut MockEngine::new(),
+            history: &DefaultHistory::new(),
+            output: &mut Vec::new(),
+        };
+
+        let result = Command.execute(options).await?;
+
+        assert_eq!(result, LoopCondition::Continue);
+        assert!(!configuration.results_footer);
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_execute_invalid_option() {
+        let options = CommandOptions {
+            input: vec![".footer", "foo"],
+            configuration: &mut Configuration::default(),
+            engine: &mut MockEngine::new(),
+            history: &DefaultHistory::new(),
+            output: &mut Vec::new(),
+        };
+
+        let result = Command.execute(options).await;
+
+        assert!(result.is_err());
+    }
+}

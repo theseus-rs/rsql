@@ -38,6 +38,7 @@ impl Default for ShellArgs {
     }
 }
 
+#[derive(Debug, Eq, PartialEq)]
 pub enum LoopCondition {
     Continue,
     Exit(i32),

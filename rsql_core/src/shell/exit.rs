@@ -19,15 +19,78 @@ impl ShellCommand for Command {
     }
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
-        options.engine.stop().await?;
-
         let exit_code = if options.input.len() == 1 {
             0
         } else {
             options.input[1].parse()?
         };
 
+        options.engine.stop().await?;
         info!("Exiting with code {exit_code}");
         Ok(LoopCondition::Exit(exit_code))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::configuration::Configuration;
+    use crate::engine::MockEngine;
+    use crate::shell::CommandOptions;
+    use crate::shell::LoopCondition;
+    use rustyline::history::DefaultHistory;
+
+    #[tokio::test]
+    async fn test_execute_no_argument() -> Result<()> {
+        let mock_engine = &mut MockEngine::new();
+        mock_engine.expect_stop().returning(|| Ok(()));
+
+        let options = CommandOptions {
+            input: vec![".exit"],
+            configuration: &mut Configuration::default(),
+            engine: mock_engine,
+            history: &DefaultHistory::new(),
+            output: &mut Vec::new(),
+        };
+
+        let result = Command.execute(options).await?;
+
+        assert_eq!(result, LoopCondition::Exit(0));
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_execute_argument() -> Result<()> {
+        let mock_engine = &mut MockEngine::new();
+        mock_engine.expect_stop().returning(|| Ok(()));
+
+        let options = CommandOptions {
+            input: vec![".exit", "1"],
+            configuration: &mut Configuration::default(),
+            engine: mock_engine,
+            history: &DefaultHistory::new(),
+            output: &mut Vec::new(),
+        };
+
+        let result = Command.execute(options).await?;
+
+        assert_eq!(result, LoopCondition::Exit(1));
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_execute_invalid() -> Result<()> {
+        let options = CommandOptions {
+            input: vec![".exit", "foo"],
+            configuration: &mut Configuration::default(),
+            engine: &mut MockEngine::new(),
+            history: &DefaultHistory::new(),
+            output: &mut Vec::new(),
+        };
+
+        let result = Command.execute(options).await;
+
+        assert!(result.is_err());
+        Ok(())
     }
 }
