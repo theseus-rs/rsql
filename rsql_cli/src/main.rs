@@ -51,9 +51,12 @@ pub(crate) async fn execute(args: &Args, output: &mut dyn io::Write) -> Result<(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::env;
 
     #[test]
     fn test_main() {
+        env::set_var("RSQL_LOG_LEVEL", "off");
+
         let result = main();
 
         assert!(result.is_err());
@@ -61,12 +64,13 @@ mod tests {
 
     #[tokio::test]
     async fn test_execute_version() -> Result<()> {
+        env::set_var("RSQL_LOG_LEVEL", "off");
         let args = Args {
             shell_args: ShellArgs::default(),
             version: true,
         };
-
         let mut output = Vec::new();
+
         let result = execute(&args, &mut output).await;
 
         assert!(result.is_ok());

@@ -289,9 +289,11 @@ impl ConfigFile {
         }
 
         let conf_file = configuration_file.to_str().expect("config file");
+        let prefix = program_name.to_uppercase().replace("-", "_");
         let config = Config::builder()
             .add_source(config::File::from_str(DEFAULT_CONFIG, FileFormat::Toml))
             .add_source(config::File::new(conf_file, FileFormat::Toml))
+            .add_source(config::Environment::with_prefix(prefix.as_str()).separator("_"))
             .build()?;
 
         Ok(Self {
