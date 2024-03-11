@@ -18,6 +18,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - { target: aarch64-apple-darwin, os: macos-14 }
           # - { target: aarch64-linux-android, os: ubuntu-latest }
           - { target: aarch64-unknown-linux-gnu, os: ubuntu-latest }
           - { target: aarch64-unknown-linux-musl, os: ubuntu-latest }
@@ -33,11 +34,11 @@ jobs:
           - { target: armv7-unknown-linux-gnueabihf, os: ubuntu-latest }
           - { target: armv7-unknown-linux-musleabi, os: ubuntu-latest }
           - { target: armv7-unknown-linux-musleabihf, os: ubuntu-latest }
-          - { target: i586-unknown-linux-gnu, os: ubuntu-latest }
-          - { target: i586-unknown-linux-musl, os: ubuntu-latest }
+          # - { target: i586-unknown-linux-gnu, os: ubuntu-latest }
+          # - { target: i586-unknown-linux-musl, os: ubuntu-latest }
           - { target: i686-unknown-freebsd, os: ubuntu-latest }
-          - { target: i686-linux-android, os: ubuntu-latest }
-          - { target: i686-pc-windows-gnu, os: windows-latest }
+          # - { target: i686-linux-android, os: ubuntu-latest }
+          # - { target: i686-pc-windows-gnu, os: windows-latest }
           - { target: i686-unknown-linux-gnu, os: ubuntu-latest }
           # - { target: mips-unknown-linux-gnu, os: ubuntu-latest }
           # - { target: mips-unknown-linux-musl, os: ubuntu-latest }
@@ -64,8 +65,10 @@ jobs:
           # - { target: thumbv8m.main-none-eabi, os: ubuntu-latest }
           # - { target: thumbv8m.main-none-eabihf, os: ubuntu-latest }
           # - { target: wasm32-unknown-emscripten, os: ubuntu-latest }
+          - { target: x86_64-apple-darwin, os: macos-12 }
           # - { target: x86_64-linux-android, os: ubuntu-latest }
-          # - { target: x86_64-pc-windows-gnu, os: windows-latest }
+          - { target: x86_64-pc-windows-gnu, os: windows-latest }
+          - { target: x86_64-pc-windows-msvc, os: windows-latest }
           # - { target: x86_64-sun-solaris, os: ubuntu-latest }
           # - { target: x86_64-unknown-freebsd, os: ubuntu-latest }
           # - { target: x86_64-unknown-dragonfly, os: ubuntu-latest }
@@ -81,6 +84,10 @@ jobs:
       - uses: taiki-e/upload-rust-binary-action@v1
         with:
           bin: rsql
+          # (optional) Comma-separated list of algorithms to be used for checksum.
+          # [default value: ]
+          # [possible values: sha256, sha512, sha1, or md5]
+          checksum: sha256
           # (optional) On which platform to distribute the `.tar.gz` file.
           # [default value: unix]
           # [possible values: all, unix, windows, none]
