@@ -58,3 +58,7 @@ sqlite = []
 
 [lints.clippy]
 unwrap_used = "deny"
+
+[[bench]]
+harness = false
+name = "version"

@@ -2,7 +2,6 @@ use anyhow::Result;
 use criterion::{criterion_group, criterion_main, Criterion};
 use rsql_core::configuration::Configuration;
 use rsql_core::version::full_version;
-use std::time::Duration;
 
 fn benchmarks(criterion: &mut Criterion) {
     bench_version(criterion).ok();
@@ -26,9 +25,7 @@ fn version() -> Result<()> {
 
 criterion_group!(
     name = benches;
-    config = Criterion::default()
-        .measurement_time(Duration::from_secs(30))
-        .sample_size(10);
+    config = Criterion::default().sample_size(10);
     targets = benchmarks
 );
 criterion_main!(benches);
