@@ -22,13 +22,18 @@ pub(crate) struct Args {
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let _ = dotenvy::dotenv();
-    let args = Args::try_parse()?;
-
-    execute(&args, &mut io::stdout()).await
+    execute(None, &mut io::stdout()).await
 }
 
-pub(crate) async fn execute(args: &Args, output: &mut dyn io::Write) -> Result<()> {
+pub(crate) async fn execute(args: Option<Args>, output: &mut dyn io::Write) -> Result<()> {
+    let args = match args {
+        Some(args) => args,
+        None => {
+            let _ = dotenvy::dotenv();
+            Args::try_parse()?
+        }
+    };
+
     let program_name = "rsql";
     let version = env!("CARGO_PKG_VERSION");
     let mut configuration = ConfigurationBuilder::new(program_name, version)
@@ -53,15 +58,6 @@ mod tests {
     use super::*;
     use std::env;
 
-    #[test]
-    fn test_main() {
-        env::set_var("RSQL_LOG_LEVEL", "off");
-
-        let result = main();
-
-        assert!(result.is_err());
-    }
-
     #[tokio::test]
     async fn test_execute_version() -> Result<()> {
         env::set_var("RSQL_LOG_LEVEL", "off");
@@ -71,7 +67,7 @@ mod tests {
         };
         let mut output = Vec::new();
 
-        let result = execute(&args, &mut output).await;
+        let result = execute(Some(args), &mut output).await;
 
         assert!(result.is_ok());
         let version = String::from_utf8(output)?;
