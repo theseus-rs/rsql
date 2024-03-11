@@ -1,3 +1,5 @@
+<p align="center"><img width="250" height="250" src="rsql_cli/resources/rsql.png"></p>
+
 # rsql
 
 [![ci](https://github.com/theseus-rs/rsql/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/theseus-rs/rsql/actions/workflows/ci.yml)
