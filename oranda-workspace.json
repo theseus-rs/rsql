@@ -1,0 +1,11 @@
+{
+  "workspace": {
+    "name": "rsql",
+    "members": [
+      {
+        "slug": "rsql_cli",
+        "path": "./rsql_cli"
+      }
+    ]
+  }
+}
