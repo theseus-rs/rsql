@@ -16,10 +16,6 @@ Install `rsql` from https://theseus-rs.github.io/rsql/rsql_cli/
 
 [![asciicast](https://asciinema.org/a/646499.svg)](https://asciinema.org/a/646499)
 
-```shell
-rsql --help
-```
-
 ## Safety
 
 These crates use `#![forbid(unsafe_code)]` to ensure everything is implemented in 100% safe Rust.
