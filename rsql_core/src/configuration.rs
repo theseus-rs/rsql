@@ -289,9 +289,11 @@ impl ConfigFile {
         }
 
         let conf_file = configuration_file.to_str().expect("config file");
+        let prefix = program_name.to_uppercase().replace('-', "_");
         let config = Config::builder()
             .add_source(config::File::from_str(DEFAULT_CONFIG, FileFormat::Toml))
             .add_source(config::File::new(conf_file, FileFormat::Toml))
+            .add_source(config::Environment::with_prefix(prefix.as_str()).separator("_"))
             .build()?;
 
         Ok(Self {
@@ -322,12 +324,6 @@ impl ConfigFile {
             rotation => bail!("Invalid log.rotation: {rotation}"),
         };
         configuration.locale = self.get_locale(config);
-        configuration.color_mode = match config.get::<String>("shell.color_mode")?.as_str() {
-            "disabled" => ColorMode::Disabled,
-            "enabled" => ColorMode::Enabled,
-            "forced" => ColorMode::Forced,
-            mode => bail!("Invalid shell.color_mode: {mode}"),
-        };
         configuration.edit_mode = match config.get::<String>("shell.edit_mode")?.as_str() {
             "emacs" => EditMode::Emacs,
             "vi" => EditMode::Vi,

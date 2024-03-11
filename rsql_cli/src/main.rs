@@ -10,7 +10,7 @@ use std::io;
 use tracing::info;
 
 #[derive(Debug, Parser)]
-struct Args {
+pub(crate) struct Args {
     /// The shell arguments
     #[clap(flatten)]
     pub shell_args: ShellArgs,
@@ -22,8 +22,18 @@ struct Args {
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let _ = dotenvy::dotenv();
-    let args = Args::try_parse()?;
+    execute(None, &mut io::stdout()).await
+}
+
+pub(crate) async fn execute(args: Option<Args>, output: &mut dyn io::Write) -> Result<()> {
+    let args = match args {
+        Some(args) => args,
+        None => {
+            let _ = dotenvy::dotenv();
+            Args::try_parse()?
+        }
+    };
+
     let program_name = "rsql";
     let version = env!("CARGO_PKG_VERSION");
     let mut configuration = ConfigurationBuilder::new(program_name, version)
@@ -34,11 +44,34 @@ async fn main() -> Result<()> {
     info!("{version} initialized");
 
     let result = if args.version {
-        version::execute(&mut configuration, &mut io::stdout()).await
+        version::execute(&mut configuration, output).await
     } else {
         shell::execute(&mut configuration, &args.shell_args).await
     };
 
     info!("{version} completed");
     result
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::env;
+
+    #[tokio::test]
+    async fn test_execute_version() -> Result<()> {
+        env::set_var("RSQL_LOG_LEVEL", "off");
+        let args = Args {
+            shell_args: ShellArgs::default(),
+            version: true,
+        };
+        let mut output = Vec::new();
+
+        let result = execute(Some(args), &mut output).await;
+
+        assert!(result.is_ok());
+        let version = String::from_utf8(output)?;
+        assert!(version.starts_with("rsql/"));
+        Ok(())
+    }
 }
