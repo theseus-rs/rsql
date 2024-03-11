@@ -1,4 +1,4 @@
-# RSQL
+# rsql
 
 [![ci](https://github.com/theseus-rs/rsql/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/theseus-rs/rsql/actions/workflows/ci.yml)
 [![Documentation](https://docs.rs/rsql_cli/badge.svg)](https://docs.rs/rsql_cli)

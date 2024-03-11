@@ -12,8 +12,8 @@
     "artifacts": {
       "package_managers": {
         "preferred": {
-          "linux/mac shell": "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/theseus-rs/rsql/releases/latest/download/rsql_cli-installer.sh | sh",
-          "windows powershell": "powershell -c \"irm https://github.com/theseus-rs/rsql/releases/latest/download/rsql_cli-installer.ps1 | iex\"",
+          "linux / mac": "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/theseus-rs/rsql/releases/latest/download/rsql_cli-installer.sh | sh",
+          "windows": "powershell -c \"irm https://github.com/theseus-rs/rsql/releases/latest/download/rsql_cli-installer.ps1 | iex\"",
           "homebrew": "brew install theseus-rs/homebrew-tap/rsql_cli",
           "cargo": "cargo install rsql_cli",
           "binstall": "cargo binstall rsql_cli"
@@ -22,7 +22,8 @@
     }
   },
   "styles": {
-    "theme": "dark",
-    "logo": "rsql_cli/resources/rsql.jpg"
+    "favicon": "rsql_cli/resources/rsql.ico",
+    "logo": "rsql_cli/resources/rsql.jpg",
+    "theme": "dark"
   }
 }
