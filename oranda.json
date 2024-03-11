@@ -14,7 +14,7 @@
         "preferred": {
           "linux/mac shell": "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/theseus-rs/rsql/releases/latest/download/rsql_cli-installer.sh | sh",
           "windows powershell": "powershell -c \"irm https://github.com/theseus-rs/rsql/releases/latest/download/rsql_cli-installer.ps1 | iex\"",
-          "homebrew": "brew install theseus-rs/homebrew-rsql/rsql_cli",
+          "homebrew": "brew install theseus-rs/homebrew-tap/rsql_cli",
           "cargo": "cargo install rsql_cli",
           "binstall": "cargo binstall rsql_cli"
         }
