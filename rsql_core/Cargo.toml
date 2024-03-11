@@ -44,6 +44,7 @@ uuid = { workspace = true }
 
 [dev-dependencies]
 criterion = { workspace = true }
+mockall = { workspace = true }
 test-log = { workspace = true }
 tokio = { workspace = true }
 

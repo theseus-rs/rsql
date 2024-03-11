@@ -6,6 +6,8 @@ pub(crate) mod sqlite;
 
 use anyhow::{bail, Result};
 use async_trait::async_trait;
+#[cfg(test)]
+use mockall::{automock, predicate::*};
 use sqlx::any::install_default_drivers;
 
 pub(crate) struct QueryResult {
@@ -13,6 +15,7 @@ pub(crate) struct QueryResult {
     pub(crate) rows: Vec<Vec<String>>,
 }
 
+#[cfg_attr(test, automock)]
 #[async_trait]
 pub trait Engine: Send {
     async fn execute(&self, sql: &str) -> Result<u64>;

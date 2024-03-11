@@ -27,6 +27,7 @@ dark-light = { version = "1.0" }
 dirs = { version = "5.0" }
 dotenvy = { version = "0.15" }
 lazy_static = { version = "1.4" }
+mockall = { version = "0.12" }
 num-format = { version = "0.4" }
 os_info = { version = "3.7" }
 prettytable = { version = "0.10" }
