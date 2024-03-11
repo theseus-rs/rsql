@@ -1,7 +1,7 @@
 [package]
 authors.workspace = true
 categories.workspace = true
-description = "rsql core command-line interface for PostgreSQL and SQLite3."
+description = "rsql core command line interface for PostgreSQL and SQLite3."
 edition.workspace = true
 keywords.workspace = true
 license.workspace = true
@@ -58,6 +58,10 @@ sqlite = []
 
 [lints.clippy]
 unwrap_used = "deny"
+
+[package.metadata.docs.rs]
+features = ["all"]
+targets = ["x86_64-unknown-linux-gnu"]
 
 [[bench]]
 harness = false
