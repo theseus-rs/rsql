@@ -2,9 +2,6 @@
   "project": {
     "name": "rsql"
   },
-  "build": {
-    "path_prefix": "rsql"
-  },
   "components": {
     "artifacts": {
       "package_managers": {

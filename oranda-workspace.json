@@ -1,4 +1,7 @@
 {
+  "build": {
+    "path_prefix": "rsql"
+  },
   "workspace": {
     "name": "rsql",
     "members": [
