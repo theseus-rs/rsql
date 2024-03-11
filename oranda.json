@@ -6,7 +6,7 @@
     "path_prefix": "rsql"
   },
   "components": {
-    "changelog": false,
+    "changelog": true,
     "artifacts": {
       "package_managers": {
         "preferred": {
