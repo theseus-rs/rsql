@@ -1,0 +1,94 @@
+name: Publish
+
+on:
+  # Defining workflow_call means that this workflow can be called from
+  # your main workflow job
+  workflow_call:
+    # cargo-dist exposes the plan from the plan step, as a JSON string,
+    # to your job if it needs it
+    inputs:
+      plan:
+        required: true
+        type: string
+
+jobs:
+  upload-assets:
+    strategy:
+      matrix:
+        include:
+          # - { target: aarch64-linux-android, os: ubuntu-latest }
+          - { target: aarch64-unknown-linux-gnu, os: ubuntu-latest }
+          - { target: aarch64-unknown-linux-musl, os: ubuntu-latest }
+          # - { target: arm-linux-androideabi, os: ubuntu-latest }
+          - { target: arm-unknown-linux-gnueabi, os: ubuntu-latest }
+          - { target: arm-unknown-linux-gnueabihf, os: ubuntu-latest }
+          - { target: arm-unknown-linux-musleabi, os: ubuntu-latest }
+          - { target: arm-unknown-linux-musleabihf, os: ubuntu-latest }
+          - { target: armv5te-unknown-linux-gnueabi, os: ubuntu-latest }
+          - { target: armv5te-unknown-linux-musleabi, os: ubuntu-latest }
+          # - { target: armv7-linux-androideabi, os: ubuntu-latest }
+          - { target: armv7-unknown-linux-gnueabi, os: ubuntu-latest }
+          - { target: armv7-unknown-linux-gnueabihf, os: ubuntu-latest }
+          - { target: armv7-unknown-linux-musleabi, os: ubuntu-latest }
+          - { target: armv7-unknown-linux-musleabihf, os: ubuntu-latest }
+          - { target: i586-unknown-linux-gnu, os: ubuntu-latest }
+          - { target: i586-unknown-linux-musl, os: ubuntu-latest }
+          - { target: i686-unknown-freebsd, os: ubuntu-latest }
+          - { target: i686-linux-android, os: ubuntu-latest }
+          - { target: i686-pc-windows-gnu, os: windows-latest }
+          - { target: i686-unknown-linux-gnu, os: ubuntu-latest }
+          # - { target: mips-unknown-linux-gnu, os: ubuntu-latest }
+          # - { target: mips-unknown-linux-musl, os: ubuntu-latest }
+          - { target: mips64-unknown-linux-gnuabi64, os: ubuntu-latest }
+          - { target: mips64-unknown-linux-muslabi64, os: ubuntu-latest }
+          # - { target: mips64el-unknown-linux-gnuabi64, os: ubuntu-latest }
+          # - { target: mips64el-unknown-linux-muslabi64, os: ubuntu-latest }
+          # - { target: mipsel-unknown-linux-gnu, os: ubuntu-latest }
+          # - { target: mipsel-unknown-linux-musl, os: ubuntu-latest }
+          # - { target: powerpc-unknown-linux-gnu, os: ubuntu-latest }
+          # - { target: powerpc64-unknown-linux-gnu, os: ubuntu-latest }
+          - { target: powerpc64le-unknown-linux-gnu, os: ubuntu-latest }
+          # - { target: riscv64gc-unknown-linux-gnu, os: ubuntu-latest }
+          - { target: s390x-unknown-linux-gnu, os: ubuntu-latest }
+          # - { target: sparc64-unknown-linux-gnu, os: ubuntu-latest }
+          # - { target: sparcv9-sun-solaris, os: ubuntu-latest }
+          # - { target: thumbv6m-none-eabi, os: ubuntu-latest }
+          # - { target: thumbv7em-none-eabi, os: ubuntu-latest }
+          # - { target: thumbv7em-none-eabihf, os: ubuntu-latest }
+          # - { target: thumbv7m-none-eabi, os: ubuntu-latest }
+          # - { target: thumbv7neon-linux-androideabi, os: ubuntu-latest }
+          # - { target: thumbv7neon-unknown-linux-gnueabihf, os: ubuntu-latest }
+          # - { target: thumbv8m.base-none-eabi, os: ubuntu-latest }
+          # - { target: thumbv8m.main-none-eabi, os: ubuntu-latest }
+          # - { target: thumbv8m.main-none-eabihf, os: ubuntu-latest }
+          # - { target: wasm32-unknown-emscripten, os: ubuntu-latest }
+          # - { target: x86_64-linux-android, os: ubuntu-latest }
+          # - { target: x86_64-pc-windows-gnu, os: windows-latest }
+          # - { target: x86_64-sun-solaris, os: ubuntu-latest }
+          # - { target: x86_64-unknown-freebsd, os: ubuntu-latest }
+          # - { target: x86_64-unknown-dragonfly, os: ubuntu-latest }
+          # - { target: x86_64-unknown-illumos, os: ubuntu-latest }
+          - { target: x86_64-unknown-linux-gnu, os: ubuntu-latest }
+          - { target: x86_64-unknown-linux-musl, os: ubuntu-latest }
+          # - { target: x86_64-unknown-netbsd, os: ubuntu-latest }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - uses: taiki-e/upload-rust-binary-action@v1
+        with:
+          bin: rsql
+          # (optional) On which platform to distribute the `.tar.gz` file.
+          # [default value: unix]
+          # [possible values: all, unix, windows, none]
+          tar: all
+          # (optional) On which platform to distribute the `.zip` file.
+          # [default value: windows]
+          # [possible values: all, unix, windows, none]
+          zip: windows
+          # (optional) Target triple, default is host triple.
+          target: ${{ matrix.target }}
+        env:
+          # (required)
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
