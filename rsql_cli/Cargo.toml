@@ -2,7 +2,7 @@
 authors.workspace = true
 build = "build.rs"
 categories.workspace = true
-description = "rsql command-line interface for PostgreSQL and SQLite3."
+description = "rsql command line interface for PostgreSQL and SQLite3."
 edition.workspace = true
 keywords.workspace = true
 license.workspace = true
