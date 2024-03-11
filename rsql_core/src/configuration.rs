@@ -322,12 +322,6 @@ impl ConfigFile {
             rotation => bail!("Invalid log.rotation: {rotation}"),
         };
         configuration.locale = self.get_locale(config);
-        configuration.color_mode = match config.get::<String>("shell.color_mode")?.as_str() {
-            "disabled" => ColorMode::Disabled,
-            "enabled" => ColorMode::Enabled,
-            "forced" => ColorMode::Forced,
-            mode => bail!("Invalid shell.color_mode: {mode}"),
-        };
         configuration.edit_mode = match config.get::<String>("shell.edit_mode")?.as_str() {
             "emacs" => EditMode::Emacs,
             "vi" => EditMode::Vi,
