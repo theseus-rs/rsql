@@ -16,7 +16,7 @@
 
 Install `rsql` from https://theseus-rs.github.io/rsql/rsql_cli/
 
-[![asciicast](https://asciinema.org/a/2xcXiCEbh67FMPiRvcB9SB6PR.svg)](https://asciinema.org/a/2xcXiCEbh67FMPiRvcB9SB6PR)
+[![asciicast](https://asciinema.org/a/646499.svg)](https://asciinema.org/a/646499)
 
 ## Safety
 

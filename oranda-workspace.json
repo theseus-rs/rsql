@@ -2,10 +2,6 @@
   "build": {
     "path_prefix": "rsql"
   },
-  "styles": {
-    "logo": "rsql/rsql_cli/resources/rsql.jpg",
-    "theme": "dark"
-  },
   "workspace": {
     "name": "rsql",
     "members": [
