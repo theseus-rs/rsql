@@ -71,6 +71,8 @@ tag-name = "v{{version}}"
 cargo-dist-version = "0.11.1"
 # CI backends to support
 ci = ["github"]
+# Whether cargo-dist should create a Github Release or use an existing draft
+create-release = false
 # The installers to generate for each app
 installers = ["shell", "powershell", "homebrew", "msi"]
 # A GitHub repo to push Homebrew formulas to
