@@ -1,5 +1,5 @@
 use crate::configuration::ResultFormat;
-use crate::shell::{CommandOptions, LoopCondition, Result, ShellCommand};
+use crate::shell::command::{CommandOptions, LoopCondition, Result, ShellCommand};
 use anyhow::bail;
 use async_trait::async_trait;
 
@@ -37,8 +37,8 @@ mod tests {
     use super::*;
     use crate::configuration::Configuration;
     use crate::engine::MockEngine;
-    use crate::shell::CommandOptions;
-    use crate::shell::LoopCondition;
+    use crate::shell::command::LoopCondition;
+    use crate::shell::command::{CommandOptions, Commands};
     use rustyline::history::DefaultHistory;
     use std::default;
 
@@ -49,10 +49,11 @@ mod tests {
             ..default::Default::default()
         };
         let options = CommandOptions {
-            input: vec![".display", "ascii"],
+            commands: &Commands::default(),
             configuration,
             engine: &mut MockEngine::new(),
             history: &DefaultHistory::new(),
+            input: vec![".display", "ascii"],
             output: &mut Vec::new(),
         };
 
@@ -70,10 +71,11 @@ mod tests {
             ..default::Default::default()
         };
         let options = CommandOptions {
-            input: vec![".display", "unicode"],
+            commands: &Commands::default(),
             configuration,
             engine: &mut MockEngine::new(),
             history: &DefaultHistory::new(),
+            input: vec![".display", "unicode"],
             output: &mut Vec::new(),
         };
 
@@ -87,10 +89,11 @@ mod tests {
     #[tokio::test]
     async fn test_execute_invalid_option() {
         let options = CommandOptions {
-            input: vec![".display", "foo"],
+            commands: &Commands::default(),
             configuration: &mut Configuration::default(),
             engine: &mut MockEngine::new(),
             history: &DefaultHistory::new(),
+            input: vec![".display", "foo"],
             output: &mut Vec::new(),
         };
 

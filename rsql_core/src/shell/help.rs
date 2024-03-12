@@ -1,6 +1,6 @@
 extern crate colored;
 
-use crate::shell::{CommandOptions, LoopCondition, Result, ShellCommand, COMMANDS};
+use crate::shell::command::{CommandOptions, LoopCondition, Result, ShellCommand};
 use async_trait::async_trait;
 use colored::*;
 
@@ -18,13 +18,15 @@ impl ShellCommand for Command {
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
         let output = options.output;
-        let width = COMMANDS
+        let commands = options.commands;
+        let width = commands
             .iter()
-            .map(|(name, command)| name.len() + command.args().len() + 1)
+            .map(|command| command.name().len() + command.args().len() + 1)
             .max()
             .unwrap_or_default();
 
-        for (name, command) in COMMANDS.iter() {
+        for command in commands.iter() {
+            let name = command.name();
             let arg_width = width - name.len();
             let args = if command.args().is_empty() {
                 format!("{:arg_width$}", command.args(), arg_width = arg_width)
@@ -48,18 +50,19 @@ mod tests {
     use super::*;
     use crate::configuration::Configuration;
     use crate::engine::MockEngine;
-    use crate::shell::CommandOptions;
-    use crate::shell::LoopCondition;
+    use crate::shell::command::LoopCondition;
+    use crate::shell::command::{CommandOptions, Commands};
     use rustyline::history::DefaultHistory;
 
     #[tokio::test]
     async fn test_execute() -> Result<()> {
         let mut output = Vec::new();
         let options = CommandOptions {
-            input: vec![".help"],
+            commands: &Commands::default(),
             configuration: &mut Configuration::default(),
             engine: &mut MockEngine::new(),
             history: &DefaultHistory::new(),
+            input: vec![".help"],
             output: &mut output,
         };
 

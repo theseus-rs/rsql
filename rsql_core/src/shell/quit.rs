@@ -1,4 +1,4 @@
-use crate::shell::{CommandOptions, LoopCondition, Result, ShellCommand};
+use crate::shell::command::{CommandOptions, LoopCondition, Result, ShellCommand};
 use async_trait::async_trait;
 use tracing::info;
 
@@ -27,8 +27,8 @@ mod tests {
     use super::*;
     use crate::configuration::Configuration;
     use crate::engine::MockEngine;
-    use crate::shell::CommandOptions;
-    use crate::shell::LoopCondition;
+    use crate::shell::command::LoopCondition;
+    use crate::shell::command::{CommandOptions, Commands};
     use rustyline::history::DefaultHistory;
 
     #[tokio::test]
@@ -37,10 +37,11 @@ mod tests {
         mock_engine.expect_stop().returning(|| Ok(()));
 
         let options = CommandOptions {
-            input: vec![".quit"],
+            commands: &Commands::default(),
             configuration: &mut Configuration::default(),
             engine: mock_engine,
             history: &DefaultHistory::new(),
+            input: vec![".quit"],
             output: &mut Vec::new(),
         };
 
