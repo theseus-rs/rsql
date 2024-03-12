@@ -3,7 +3,9 @@ pub(crate) mod postgresql;
 
 #[cfg(feature = "sqlite")]
 pub(crate) mod sqlite;
+mod value;
 
+use crate::engine::value::Value;
 use anyhow::{bail, Result};
 use async_trait::async_trait;
 #[cfg(test)]
@@ -12,7 +14,7 @@ use sqlx::any::install_default_drivers;
 
 pub(crate) struct QueryResult {
     pub(crate) columns: Vec<String>,
-    pub(crate) rows: Vec<Vec<String>>,
+    pub(crate) rows: Vec<Vec<Option<Value>>>,
 }
 
 #[cfg_attr(test, automock)]

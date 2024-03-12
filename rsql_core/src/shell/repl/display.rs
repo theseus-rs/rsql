@@ -95,7 +95,10 @@ fn process_data(
         let mut row_data = Vec::new();
 
         for data in row {
-            let data = data.to_string();
+            let data = match data {
+                Some(data) => data.to_formatted_string(&configuration.locale),
+                None => "NULL".to_string(),
+            };
 
             match configuration.color_mode {
                 ColorMode::Disabled => {

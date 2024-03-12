@@ -8,6 +8,7 @@ mod footer;
 mod header;
 mod help;
 mod history;
+mod locale;
 mod quit;
 mod repl;
 mod tables;

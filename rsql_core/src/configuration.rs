@@ -3,15 +3,14 @@ use config::{Config, FileFormat};
 use dirs::home_dir;
 use num_format::Locale;
 use rustyline::{ColorMode, EditMode};
-use std::env;
 use std::fs::{create_dir_all, OpenOptions};
 use std::io::Write;
 use std::path::PathBuf;
 use std::str::FromStr;
 use std::time::Duration;
-use sys_locale::get_locale;
+use std::{env, fmt};
 use tracing::level_filters::LevelFilter;
-use tracing::warn;
+use tracing::{debug, warn};
 use tracing_appender::rolling::{RollingFileAppender, Rotation};
 
 pub(crate) static DEFAULT_CONFIG: &str =
@@ -21,6 +20,27 @@ pub(crate) static DEFAULT_CONFIG: &str =
 pub enum ResultFormat {
     Ascii,
     Unicode,
+}
+
+impl FromStr for ResultFormat {
+    type Err = anyhow::Error;
+
+    fn from_str(s: &str) -> Result<Self> {
+        match s {
+            "ascii" => Ok(Self::Ascii),
+            "unicode" => Ok(Self::Unicode),
+            format => bail!("Invalid results.format: {format}"),
+        }
+    }
+}
+
+impl fmt::Display for ResultFormat {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Ascii => write!(f, "ascii"),
+            Self::Unicode => write!(f, "unicode"),
+        }
+    }
 }
 
 /// A builder for creating a [Configuration] instance.
@@ -198,6 +218,7 @@ impl ConfigurationBuilder {
     }
 }
 
+/// The configuration for the application.
 #[derive(Clone, Debug)]
 pub struct Configuration {
     pub program_name: String,
@@ -261,6 +282,7 @@ impl Default for Configuration {
     }
 }
 
+/// The configuration file for the application.
 #[derive(Clone, Debug)]
 struct ConfigFile {
     program_name: String,
@@ -289,7 +311,11 @@ impl ConfigFile {
         }
 
         let conf_file = configuration_file.to_str().expect("config file");
+        debug!("Configuration file: {conf_file}");
+
         let prefix = program_name.to_uppercase().replace('-', "_");
+        debug!("Configuration environment prefix: {prefix}");
+
         let config = Config::builder()
             .add_source(config::File::from_str(DEFAULT_CONFIG, FileFormat::Toml))
             .add_source(config::File::new(conf_file, FileFormat::Toml))
@@ -306,15 +332,11 @@ impl ConfigFile {
     fn load_configuration(&self, configuration: &mut Configuration) -> Result<()> {
         let config = &self.config;
         let config_dir = &self.config_dir;
-        configuration.log_level = match config.get::<String>("log.level")?.as_str() {
-            "off" => LevelFilter::OFF,
-            "error" => LevelFilter::ERROR,
-            "warn" => LevelFilter::WARN,
-            "info" => LevelFilter::INFO,
-            "debug" => LevelFilter::DEBUG,
-            "trace" => LevelFilter::TRACE,
-            level => bail!("Invalid log.level: {level}"),
-        };
+
+        if let Ok(log_level) = config.get::<String>("log.level") {
+            configuration.log_level = LevelFilter::from_str(log_level.as_str())?;
+        }
+
         configuration.log_dir = Some(config_dir.join("logs"));
         configuration.log_rotation = match config.get::<String>("log.rotation")?.as_str() {
             "minutely" => Rotation::MINUTELY,
@@ -323,7 +345,8 @@ impl ConfigFile {
             "never" => Rotation::NEVER,
             rotation => bail!("Invalid log.rotation: {rotation}"),
         };
-        configuration.locale = self.get_locale(config);
+
+        configuration.locale = get_locale(config);
         configuration.edit_mode = match config.get::<String>("shell.edit_mode")?.as_str() {
             "emacs" => EditMode::Emacs,
             "vi" => EditMode::Vi,
@@ -336,52 +359,55 @@ impl ConfigFile {
         configuration.history_limit = config.get("shell.history.limit")?;
         configuration.history_ignore_dups = config.get("shell.history.ignore_dups")?;
 
-        configuration.theme = self.theme(config)?;
-        configuration.results_format = match config.get::<String>("results.format")?.as_str() {
-            "ascii" => ResultFormat::Ascii,
-            "unicode" => ResultFormat::Unicode,
-            format => bail!("Invalid results.format: {format}"),
-        };
+        configuration.theme = theme(config)?;
+        if let Ok(results_format) = config.get::<String>("results.format") {
+            configuration.results_format = ResultFormat::from_str(results_format.as_str())?;
+        }
         configuration.results_header = config.get("results.header")?;
         configuration.results_footer = config.get("results.footer")?;
         configuration.results_timer = config.get("results.timer")?;
 
         Ok(())
     }
+}
 
-    fn get_locale(&self, config: &Config) -> Locale {
-        let default_locale = get_locale().unwrap_or_else(|| String::from("en"));
-        let locale = config.get("global.locale").unwrap_or(default_locale);
-        let locale = match Locale::from_str(locale.as_str()) {
-            Ok(locale) => locale,
-            Err(error) => {
-                warn!("Invalid locale: {}. Using en. {:?}", locale, error);
-                Locale::en
-            }
-        };
+fn get_locale(config: &Config) -> Locale {
+    let default_locale = sys_locale::get_locale().unwrap_or_else(|| String::from("en"));
+    let locale = config.get("global.locale").unwrap_or(default_locale);
+    let parts: Vec<&str> = locale
+        .split(|c: char| !c.is_alphanumeric())
+        .filter(|&s| !s.is_empty())
+        .collect();
 
-        locale
-    }
-
-    fn theme(&self, config: &Config) -> Result<String> {
-        if let Ok(theme) = config.get("shell.theme") {
-            return Ok(theme);
+    for i in (0..parts.len()).rev() {
+        let locale = parts[0..=i].join("-");
+        if let Ok(locale) = Locale::from_str(locale.as_str()) {
+            return locale;
         }
-
-        let timeout = Duration::from_millis(20);
-        let mode = match termbg::theme(timeout) {
-            Ok(termbg::Theme::Dark) => dark_light::Mode::Dark,
-            Ok(termbg::Theme::Light) => dark_light::Mode::Light,
-            Err(_) => dark_light::detect(),
-        };
-
-        let config_key = match mode {
-            dark_light::Mode::Dark | dark_light::Mode::Default => "shell.theme.dark",
-            dark_light::Mode::Light => "shell.theme.light",
-        };
-
-        Ok(config.get(config_key)?)
     }
+
+    warn!("Invalid locale: {locale}; defaulting to \"en\"");
+    Locale::en
+}
+
+fn theme(config: &Config) -> Result<String> {
+    if let Ok(theme) = config.get("shell.theme") {
+        return Ok(theme);
+    }
+
+    let timeout = Duration::from_millis(20);
+    let mode = match termbg::theme(timeout) {
+        Ok(termbg::Theme::Dark) => dark_light::Mode::Dark,
+        Ok(termbg::Theme::Light) => dark_light::Mode::Light,
+        Err(_) => dark_light::detect(),
+    };
+
+    let config_key = match mode {
+        dark_light::Mode::Dark | dark_light::Mode::Default => "shell.theme.dark",
+        dark_light::Mode::Light => "shell.theme.light",
+    };
+
+    Ok(config.get(config_key)?)
 }
 
 #[cfg(test)]
@@ -468,5 +494,55 @@ mod test {
         assert_eq!(configuration.results_header, true);
         assert_eq!(configuration.results_footer, true);
         assert_eq!(configuration.results_timer, true);
+    }
+
+    #[test]
+    fn test_results_format_from_str() -> Result<()> {
+        assert_eq!(ResultFormat::from_str("ascii")?, ResultFormat::Ascii);
+        assert_eq!(ResultFormat::from_str("unicode")?, ResultFormat::Unicode);
+        assert!(ResultFormat::from_str("foo").is_err());
+        Ok(())
+    }
+
+    #[test]
+    fn test_results_format_to_string() {
+        assert_eq!(ResultFormat::Ascii.to_string(), "ascii");
+        assert_eq!(ResultFormat::Unicode.to_string(), "unicode");
+    }
+
+    #[test]
+    fn test_get_locale_language() -> Result<()> {
+        let prefix = "LOCALE_LANGUAGE_TEST";
+        env::set_var(format!("{prefix}_GLOBAL_LOCALE"), "de-US.foo");
+        let config = Config::builder()
+            .add_source(config::Environment::with_prefix(prefix).separator("_"))
+            .build()?;
+        let locale = get_locale(&config);
+        assert_eq!(locale, Locale::de);
+        Ok(())
+    }
+
+    #[test]
+    fn test_get_locale_language_and_country() -> Result<()> {
+        let prefix = "LOCALE_LANGUAGE_AND_COUNTRY_TEST";
+        env::set_var(format!("{prefix}_GLOBAL_LOCALE"), "en_GB.foo");
+        let config = Config::builder()
+            .add_source(config::Environment::with_prefix(prefix).separator("_"))
+            .build()?;
+        let locale = get_locale(&config);
+        assert_eq!(locale, Locale::en_GB);
+        Ok(())
+    }
+
+    #[test]
+    fn test_get_locale_default() -> Result<()> {
+        let prefix = "LOCALE_DEFAULT_TEST";
+        env::set_var(format!("{prefix}_GLOBAL_LOCALE"), "foo");
+        let config = Config::builder()
+            .add_source(config::Environment::with_prefix(prefix).separator("_"))
+            .build()?;
+        let locale = get_locale(&config);
+        assert_eq!(locale, Locale::en);
+        Ok(())
     }
 }

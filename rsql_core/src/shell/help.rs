@@ -69,8 +69,8 @@ mod tests {
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        let help = String::from_utf8(output)?;
-        assert!(help.contains(".help"));
+        let help_output = String::from_utf8(output)?;
+        assert!(help_output.contains(".help"));
         Ok(())
     }
 }
