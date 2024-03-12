@@ -19,6 +19,16 @@ impl ShellCommand for Command {
     }
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
+        if options.input.len() <= 1 {
+            let timer = if options.configuration.results_timer {
+                "on"
+            } else {
+                "off"
+            };
+            writeln!(options.output, "Timer: {timer}")?;
+            return Ok(LoopCondition::Continue);
+        }
+
         let timer = match options.input[1].to_lowercase().as_str() {
             "on" => true,
             "off" => false,
@@ -40,6 +50,30 @@ mod tests {
     use crate::shell::command::{CommandOptions, Commands};
     use rustyline::history::DefaultHistory;
     use std::default;
+
+    #[tokio::test]
+    async fn test_execute_no_args() -> Result<()> {
+        let mut output = Vec::new();
+        let configuration = &mut Configuration {
+            results_timer: true,
+            ..default::Default::default()
+        };
+        let options = CommandOptions {
+            commands: &Commands::default(),
+            configuration,
+            engine: &mut MockEngine::new(),
+            history: &DefaultHistory::new(),
+            input: vec![".timer"],
+            output: &mut output,
+        };
+
+        let result = Command.execute(options).await?;
+
+        assert_eq!(result, LoopCondition::Continue);
+        let timer_output = String::from_utf8(output)?;
+        assert_eq!(timer_output, "Timer: on\n");
+        Ok(())
+    }
 
     #[tokio::test]
     async fn test_execute_set_on() -> Result<()> {

@@ -19,6 +19,16 @@ impl ShellCommand for Command {
     }
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
+        if options.input.len() <= 1 {
+            let header = if options.configuration.results_header {
+                "on"
+            } else {
+                "off"
+            };
+            writeln!(options.output, "Header: {header}")?;
+            return Ok(LoopCondition::Continue);
+        }
+
         let header = match options.input[1].to_lowercase().as_str() {
             "on" => true,
             "off" => false,
@@ -40,6 +50,30 @@ mod tests {
     use crate::shell::command::{CommandOptions, Commands};
     use rustyline::history::DefaultHistory;
     use std::default;
+
+    #[tokio::test]
+    async fn test_execute_no_args() -> Result<()> {
+        let mut output = Vec::new();
+        let configuration = &mut Configuration {
+            results_header: true,
+            ..default::Default::default()
+        };
+        let options = CommandOptions {
+            commands: &Commands::default(),
+            configuration,
+            engine: &mut MockEngine::new(),
+            history: &DefaultHistory::new(),
+            input: vec![".header"],
+            output: &mut output,
+        };
+
+        let result = Command.execute(options).await?;
+
+        assert_eq!(result, LoopCondition::Continue);
+        let header_output = String::from_utf8(output)?;
+        assert_eq!(header_output, "Header: on\n");
+        Ok(())
+    }
 
     #[tokio::test]
     async fn test_execute_set_on() -> Result<()> {

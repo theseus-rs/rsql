@@ -1,6 +1,8 @@
 use crate::configuration::Configuration;
 use crate::engine::Engine;
-use crate::shell::{clear, display, exit, footer, header, help, history, quit, tables, timer};
+use crate::shell::{
+    clear, display, exit, footer, header, help, history, locale, quit, tables, timer,
+};
 use async_trait::async_trait;
 use rustyline::history::DefaultHistory;
 use std::collections::BTreeMap;
@@ -90,6 +92,7 @@ impl Default for Commands {
         commands.add(Box::new(header::Command));
         commands.add(Box::new(help::Command));
         commands.add(Box::new(history::Command));
+        commands.add(Box::new(locale::Command));
         commands.add(Box::new(tables::Command));
         commands.add(Box::new(timer::Command));
         commands.add(Box::new(quit::Command));
@@ -126,6 +129,6 @@ mod tests {
     fn test_commands_default() {
         let commands = Commands::default();
 
-        assert_eq!(commands.commands.len(), 10);
+        assert_eq!(commands.commands.len(), 11);
     }
 }

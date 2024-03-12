@@ -1,41 +1,42 @@
-use crate::configuration::ResultFormat;
 use crate::shell::command::{CommandOptions, LoopCondition, Result, ShellCommand};
 use anyhow::bail;
 use async_trait::async_trait;
+use num_format::Locale;
+use std::str::FromStr;
 
 pub(crate) struct Command;
 
 #[async_trait]
 impl ShellCommand for Command {
     fn name(&self) -> &'static str {
-        "display"
+        "locale"
     }
 
     fn args(&self) -> &'static str {
-        "ascii|unicode"
+        "[locale]"
     }
 
     fn description(&self) -> &'static str {
-        "Display results in ASCII or Unicode"
+        "Set the display locale"
     }
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
         if options.input.len() <= 1 {
             writeln!(
                 options.output,
-                "Display mode: {}",
-                options.configuration.results_format
+                "Locale: {}",
+                options.configuration.locale.name()
             )?;
             return Ok(LoopCondition::Continue);
         }
 
-        let results_display = match options.input[1].to_lowercase().as_str() {
-            "ascii" => ResultFormat::Ascii,
-            "unicode" => ResultFormat::Unicode,
-            option => bail!("Invalid display mode option: {option}"),
+        let locale = options.input[1];
+        let locale = match Locale::from_str(locale) {
+            Ok(locale) => locale,
+            Err(_) => bail!("Invalid locale: {locale}"),
         };
 
-        options.configuration.results_format = results_display;
+        options.configuration.locale = locale;
 
         Ok(LoopCondition::Continue)
     }
@@ -55,7 +56,7 @@ mod tests {
     async fn test_execute_no_args() -> Result<()> {
         let mut output = Vec::new();
         let configuration = &mut Configuration {
-            results_format: ResultFormat::Unicode,
+            locale: Locale::en,
             ..default::Default::default()
         };
         let options = CommandOptions {
@@ -63,22 +64,22 @@ mod tests {
             configuration,
             engine: &mut MockEngine::new(),
             history: &DefaultHistory::new(),
-            input: vec![".display"],
+            input: vec![".locale"],
             output: &mut output,
         };
 
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        let display_output = String::from_utf8(output)?;
-        assert_eq!(display_output, "Display mode: unicode\n");
+        let locale_output = String::from_utf8(output)?;
+        assert_eq!(locale_output, "Locale: en\n");
         Ok(())
     }
 
     #[tokio::test]
-    async fn test_execute_set_ascii() -> Result<()> {
+    async fn test_execute_set_on() -> Result<()> {
         let configuration = &mut Configuration {
-            results_format: ResultFormat::Unicode,
+            locale: Locale::en,
             ..default::Default::default()
         };
         let options = CommandOptions {
@@ -86,36 +87,14 @@ mod tests {
             configuration,
             engine: &mut MockEngine::new(),
             history: &DefaultHistory::new(),
-            input: vec![".display", "ascii"],
+            input: vec![".locale", "en-GB"],
             output: &mut Vec::new(),
         };
 
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        assert_eq!(configuration.results_format, ResultFormat::Ascii);
-        Ok(())
-    }
-
-    #[tokio::test]
-    async fn test_execute_set_unicode() -> Result<()> {
-        let configuration = &mut Configuration {
-            results_format: ResultFormat::Ascii,
-            ..default::Default::default()
-        };
-        let options = CommandOptions {
-            commands: &Commands::default(),
-            configuration,
-            engine: &mut MockEngine::new(),
-            history: &DefaultHistory::new(),
-            input: vec![".display", "unicode"],
-            output: &mut Vec::new(),
-        };
-
-        let result = Command.execute(options).await?;
-
-        assert_eq!(result, LoopCondition::Continue);
-        assert_eq!(configuration.results_format, ResultFormat::Unicode);
+        assert_eq!(configuration.locale, Locale::en_GB);
         Ok(())
     }
 
@@ -126,7 +105,7 @@ mod tests {
             configuration: &mut Configuration::default(),
             engine: &mut MockEngine::new(),
             history: &DefaultHistory::new(),
-            input: vec![".display", "foo"],
+            input: vec![".locale", "foo"],
             output: &mut Vec::new(),
         };
 
