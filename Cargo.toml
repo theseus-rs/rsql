@@ -5,7 +5,7 @@ resolver = "2"
 
 [workspace.package]
 authors = ["Brian Heineman <brian.heineman@gmail.com>"]
-categories = ["database"]
+categories = ["database", "sql"]
 edition = "2021"
 keywords = ["postgresql", "postgres", "embedded", "database", "server"]
 license = "Apache-2.0 OR MIT"
