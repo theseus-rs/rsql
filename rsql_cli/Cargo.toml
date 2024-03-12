@@ -3,6 +3,7 @@ authors.workspace = true
 build = "build.rs"
 categories.workspace = true
 description = "rsql command line interface for PostgreSQL and SQLite3."
+documentation = "https://theseus-rs.github.io/rsql/rsql_cli/"
 edition.workspace = true
 keywords.workspace = true
 license.workspace = true
