@@ -3,6 +3,9 @@
     "name": "rsql"
   },
   "components": {
+    "changelog": {
+      "read_changelog_file": false
+    },
     "artifacts": {
       "package_managers": {
         "preferred": {
