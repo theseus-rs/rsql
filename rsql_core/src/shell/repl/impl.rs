@@ -1,8 +1,9 @@
 use crate::configuration::Configuration;
 use crate::engine::{load, Engine, QueryResult};
+use crate::shell::command::{CommandOptions, Commands, LoopCondition};
 use crate::shell::repl::display;
 use crate::shell::repl::helper::ReplHelper;
-use crate::shell::{get_command, CommandOptions, LoopCondition, ShellArgs};
+use crate::shell::ShellArgs;
 use crate::version::full_version;
 use anyhow::Result;
 use colored::Colorize;
@@ -30,16 +31,24 @@ fn welcome_message(configuration: &Configuration) -> Result<()> {
     Ok(())
 }
 
-pub async fn execute(configuration: &mut Configuration, args: &ShellArgs) -> Result<()> {
+pub async fn execute(
+    commands: &Commands,
+    configuration: &mut Configuration,
+    args: &ShellArgs,
+) -> Result<()> {
     let mut binding = load(args.url.as_str()).await?;
     let engine = binding.as_mut();
 
-    repl(configuration, engine).await?;
+    repl(commands, configuration, engine).await?;
 
     engine.stop().await
 }
 
-async fn repl(configuration: &mut Configuration, engine: &mut dyn Engine) -> Result<()> {
+async fn repl(
+    commands: &Commands,
+    configuration: &mut Configuration,
+    engine: &mut dyn Engine,
+) -> Result<()> {
     let helper = ReplHelper::new(configuration);
     let history_file = match configuration.history_file {
         Some(ref file) => String::from(file.to_string_lossy()),
@@ -65,7 +74,7 @@ async fn repl(configuration: &mut Configuration, engine: &mut dyn Engine) -> Res
 
     loop {
         let loop_condition = match editor.readline(&prompt) {
-            Ok(line) => evaluate(configuration, engine, &mut editor, line)
+            Ok(line) => evaluate(commands, configuration, engine, &mut editor, line)
                 .await
                 .unwrap_or_else(|error| {
                     eprintln!("{}: {:?}", "Error".red(), error);
@@ -98,13 +107,14 @@ async fn repl(configuration: &mut Configuration, engine: &mut dyn Engine) -> Res
 }
 
 async fn evaluate(
+    commands: &Commands,
     configuration: &mut Configuration,
     engine: &mut dyn Engine,
     editor: &mut Editor<ReplHelper, DefaultHistory>,
     line: String,
 ) -> Result<LoopCondition> {
     let loop_condition = if line.starts_with('.') {
-        execute_command(configuration, engine, editor, line.as_str()).await?
+        execute_command(commands, configuration, engine, editor, line.as_str()).await?
     } else {
         execute_sql(configuration, engine, line.as_str()).await?
     };
@@ -117,6 +127,7 @@ async fn evaluate(
 }
 
 async fn execute_command(
+    commands: &Commands,
     configuration: &mut Configuration,
     engine: &mut dyn Engine,
     editor: &mut Editor<ReplHelper, DefaultHistory>,
@@ -126,10 +137,11 @@ async fn execute_command(
     let output = &mut io::stdout();
     let command_name = &input[0][1..input[0].len()];
 
-    let loop_condition = match get_command(command_name) {
+    let loop_condition = match commands.get(command_name) {
         Some(command) => {
             let history = editor.history();
             let options = CommandOptions {
+                commands,
                 configuration,
                 engine,
                 history,

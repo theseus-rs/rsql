@@ -3,7 +3,7 @@
 use anyhow::Result;
 use clap::Parser;
 use rsql_core::configuration::ConfigurationBuilder;
-use rsql_core::shell::ShellArgs;
+use rsql_core::shell::{Commands, ShellArgs};
 use rsql_core::version::full_version;
 use rsql_core::{shell, version};
 use std::io;
@@ -46,7 +46,8 @@ pub(crate) async fn execute(args: Option<Args>, output: &mut dyn io::Write) -> R
     let result = if args.version {
         version::execute(&mut configuration, output).await
     } else {
-        shell::execute(&mut configuration, &args.shell_args).await
+        let commands = Commands::default();
+        shell::execute(&commands, &mut configuration, &args.shell_args).await
     };
 
     info!("{version} completed");

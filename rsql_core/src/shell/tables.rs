@@ -1,4 +1,4 @@
-use crate::shell::{CommandOptions, LoopCondition, Result, ShellCommand};
+use crate::shell::command::{CommandOptions, LoopCondition, Result, ShellCommand};
 use async_trait::async_trait;
 
 pub(crate) struct Command;
@@ -30,8 +30,8 @@ mod tests {
     use super::*;
     use crate::configuration::Configuration;
     use crate::engine::MockEngine;
-    use crate::shell::CommandOptions;
-    use crate::shell::LoopCondition;
+    use crate::shell::command::LoopCondition;
+    use crate::shell::command::{CommandOptions, Commands};
     use rustyline::history::DefaultHistory;
 
     #[tokio::test]
@@ -43,10 +43,11 @@ mod tests {
             .returning(|| Ok(vec![table.to_string()]));
         let mut output = Vec::new();
         let options = CommandOptions {
-            input: vec![".tables"],
+            commands: &Commands::default(),
             configuration: &mut Configuration::default(),
             engine: mock_engine,
             history: &DefaultHistory::new(),
+            input: vec![".tables"],
             output: &mut output,
         };
 
