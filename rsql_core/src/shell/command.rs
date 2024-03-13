@@ -23,7 +23,7 @@ pub type Result<T = LoopCondition, E = anyhow::Error> = core::result::Result<T, 
 
 /// Options for shell commands
 pub struct CommandOptions<'a> {
-    pub(crate) commands: &'a Commands,
+    pub(crate) command_manager: &'a CommandManager,
     pub(crate) configuration: &'a mut Configuration,
     pub(crate) engine: &'a mut dyn Engine,
     pub(crate) history: &'a DefaultHistory,
@@ -47,14 +47,14 @@ pub trait ShellCommand: Sync {
 }
 
 /// Manages the active shell commands
-pub struct Commands {
+pub struct CommandManager {
     commands: BTreeMap<&'static str, Box<dyn ShellCommand>>,
 }
 
-impl Commands {
-    /// Create a new instance of the `Commands` struct
+impl CommandManager {
+    /// Create a new instance of the `CommandManager` struct
     pub fn new() -> Self {
-        Commands {
+        CommandManager {
             commands: BTreeMap::new(),
         }
     }
@@ -76,13 +76,13 @@ impl Commands {
     }
 }
 
-/// Default implementation for the `Commands` struct
+/// Default implementation for the `CommandManager` struct
 // .autocomplete on|off      Enable or disable auto-completion
 // .multi on|off             Enable or disable multiline mode
 // .output [mode] [options]  Set output format: csv, json, table or line
-impl Default for Commands {
+impl Default for CommandManager {
     fn default() -> Self {
-        let mut commands = Commands::new();
+        let mut commands = CommandManager::new();
 
         commands.add(Box::new(bail::Command));
         commands.add(Box::new(clear::Command));
@@ -109,26 +109,26 @@ mod tests {
     fn test_commands() {
         let command = help::Command;
         let command_name = command.name();
-        let mut commands = Commands::new();
-        assert_eq!(commands.commands.len(), 0);
+        let mut command_manager = CommandManager::new();
+        assert_eq!(command_manager.commands.len(), 0);
 
-        commands.add(Box::new(help::Command));
+        command_manager.add(Box::new(help::Command));
 
-        assert_eq!(commands.commands.len(), 1);
-        let result = commands.get(command_name);
+        assert_eq!(command_manager.commands.len(), 1);
+        let result = command_manager.get(command_name);
         assert!(result.is_some());
 
         let mut command_count = 0;
-        commands.iter().for_each(|_command| {
+        command_manager.iter().for_each(|_command| {
             command_count += 1;
         });
         assert_eq!(command_count, 1);
     }
 
     #[test]
-    fn test_commands_default() {
-        let commands = Commands::default();
+    fn test_command_manager_default() {
+        let command_manager = CommandManager::default();
 
-        assert_eq!(commands.commands.len(), 12);
+        assert_eq!(command_manager.commands.len(), 12);
     }
 }

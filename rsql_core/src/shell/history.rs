@@ -32,7 +32,7 @@ mod tests {
     use crate::configuration::Configuration;
     use crate::engine::MockEngine;
     use crate::shell::command::LoopCondition;
-    use crate::shell::command::{CommandOptions, Commands};
+    use crate::shell::command::{CommandManager, CommandOptions};
     use rustyline::history::{DefaultHistory, History};
     use std::default::Default;
 
@@ -47,7 +47,7 @@ mod tests {
 
         let mut output = Vec::new();
         let options = CommandOptions {
-            commands: &Commands::default(),
+            command_manager: &CommandManager::default(),
             configuration,
             engine: &mut MockEngine::new(),
             history: &history,
@@ -74,7 +74,7 @@ mod tests {
 
         let mut output = Vec::new();
         let options = CommandOptions {
-            commands: &Commands::default(),
+            command_manager: &CommandManager::default(),
             configuration,
             engine: &mut MockEngine::new(),
             history: &history,

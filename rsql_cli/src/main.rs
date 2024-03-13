@@ -4,7 +4,7 @@ use anyhow::Result;
 use clap::Parser;
 use rsql_core::configuration::ConfigurationBuilder;
 use rsql_core::engine::DriverManager;
-use rsql_core::shell::{Commands, ShellArgs};
+use rsql_core::shell::{CommandManager, ShellArgs};
 use rsql_core::version::full_version;
 use rsql_core::{shell, version};
 use std::io;
@@ -48,10 +48,10 @@ pub(crate) async fn execute(args: Option<Args>, output: &mut dyn io::Write) -> R
         version::execute(&mut configuration, output).await
     } else {
         let driver_manager = DriverManager::default();
-        let commands = Commands::default();
+        let command_manager = CommandManager::default();
         shell::execute(
             driver_manager,
-            &commands,
+            &command_manager,
             &mut configuration,
             &args.shell_args,
         )
