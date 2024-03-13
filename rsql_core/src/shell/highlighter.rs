@@ -1,4 +1,4 @@
-use crate::shell::repl::helper::ReplHelper;
+use crate::shell::helper::ReplHelper;
 use ansi_colours::ansi256_from_rgb;
 use rustyline::highlight::Highlighter;
 use rustyline::ColorMode;

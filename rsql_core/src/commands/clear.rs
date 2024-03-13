@@ -1,4 +1,4 @@
-use crate::shell::command::{CommandOptions, LoopCondition, Result, ShellCommand};
+use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use async_trait::async_trait;
 
 pub(crate) struct Command;

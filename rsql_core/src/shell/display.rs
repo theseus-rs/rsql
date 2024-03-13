@@ -1,137 +1,157 @@
-use crate::configuration::ResultFormat;
-use crate::shell::command::{CommandOptions, LoopCondition, Result, ShellCommand};
-use anyhow::bail;
-use async_trait::async_trait;
+use crate::configuration::{Configuration, ResultFormat};
+use crate::drivers::QueryResult;
+use crate::shell::repl::SqlResult;
+use anyhow::Result;
+use colored::Colorize;
+use lazy_static::lazy_static;
+use num_format::ToFormattedString;
+use prettytable::format::consts::FORMAT_DEFAULT;
+use prettytable::format::{FormatBuilder, LinePosition, LineSeparator, TableFormat};
+use prettytable::Table;
+use rustyline::ColorMode;
+use std::time::Duration;
 
-pub(crate) struct Command;
-
-#[async_trait]
-impl ShellCommand for Command {
-    fn name(&self) -> &'static str {
-        "display"
-    }
-
-    fn args(&self) -> &'static str {
-        "ascii|unicode"
-    }
-
-    fn description(&self) -> &'static str {
-        "Display results in ASCII or Unicode"
-    }
-
-    async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
-        if options.input.len() <= 1 {
-            writeln!(
-                options.output,
-                "Display mode: {}",
-                options.configuration.results_format
-            )?;
-            return Ok(LoopCondition::Continue);
-        }
-
-        let results_display = match options.input[1].to_lowercase().as_str() {
-            "ascii" => ResultFormat::Ascii,
-            "unicode" => ResultFormat::Unicode,
-            option => bail!("Invalid display mode option: {option}"),
-        };
-
-        options.configuration.results_format = results_display;
-
-        Ok(LoopCondition::Continue)
-    }
+lazy_static! {
+    pub static ref FORMAT_UNICODE: TableFormat = FormatBuilder::new()
+        .column_separator('│')
+        .borders('│')
+        .separators(&[LinePosition::Top], LineSeparator::new('─', '┬', '┌', '┐'))
+        .separators(
+            &[LinePosition::Title],
+            LineSeparator::new('═', '╪', '╞', '╡')
+        )
+        .separators(
+            &[LinePosition::Intern],
+            LineSeparator::new('─', '┼', '├', '┤')
+        )
+        .separators(
+            &[LinePosition::Bottom],
+            LineSeparator::new('─', '┴', '└', '┘')
+        )
+        .padding(1, 1)
+        .build();
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::configuration::Configuration;
-    use crate::driver::MockConnection;
-    use crate::shell::command::LoopCondition;
-    use crate::shell::command::{CommandManager, CommandOptions};
-    use rustyline::history::DefaultHistory;
-    use std::default;
+pub(crate) fn table(
+    configuration: &Configuration,
+    sql_result: SqlResult,
+    elapsed: Duration,
+) -> Result<()> {
+    let rows_affected = match sql_result {
+        SqlResult::Execute(rows_affected) => rows_affected,
+        SqlResult::Query(query_result) => {
+            let mut table = Table::new();
 
-    #[tokio::test]
-    async fn test_execute_no_args() -> Result<()> {
-        let mut output = Vec::new();
-        let configuration = &mut Configuration {
-            results_format: ResultFormat::Unicode,
-            ..default::Default::default()
-        };
-        let options = CommandOptions {
-            command_manager: &CommandManager::default(),
-            configuration,
-            connection: &mut MockConnection::new(),
-            history: &DefaultHistory::new(),
-            input: vec![".display"],
-            output: &mut output,
-        };
+            match configuration.results_format {
+                ResultFormat::Ascii => {
+                    table.set_format(*FORMAT_DEFAULT);
+                }
+                ResultFormat::Unicode => {
+                    table.set_format(*FORMAT_UNICODE);
+                }
+            }
 
-        let result = Command.execute(options).await?;
+            if configuration.results_header {
+                process_headers(configuration, &query_result, &mut table);
+            }
 
-        assert_eq!(result, LoopCondition::Continue);
-        let display_output = String::from_utf8(output)?;
-        assert_eq!(display_output, "Display mode: unicode\n");
-        Ok(())
+            process_data(configuration, &query_result, &mut table)?;
+
+            table.printstd();
+            query_result.rows.len() as u64
+        }
+    };
+
+    if configuration.results_footer {
+        display_footer(configuration, rows_affected, elapsed)?;
     }
 
-    #[tokio::test]
-    async fn test_execute_set_ascii() -> Result<()> {
-        let configuration = &mut Configuration {
-            results_format: ResultFormat::Unicode,
-            ..default::Default::default()
-        };
-        let options = CommandOptions {
-            command_manager: &CommandManager::default(),
-            configuration,
-            connection: &mut MockConnection::new(),
-            history: &DefaultHistory::new(),
-            input: vec![".display", "ascii"],
-            output: &mut Vec::new(),
-        };
+    Ok(())
+}
 
-        let result = Command.execute(options).await?;
+fn process_headers(configuration: &Configuration, query_result: &QueryResult, table: &mut Table) {
+    let mut column_names = Vec::new();
 
-        assert_eq!(result, LoopCondition::Continue);
-        assert_eq!(configuration.results_format, ResultFormat::Ascii);
-        Ok(())
+    for column in &query_result.columns {
+        match configuration.color_mode {
+            ColorMode::Disabled => {
+                column_names.push(column.to_string());
+            }
+            _ => {
+                column_names.push(column.green().bold().to_string());
+            }
+        }
     }
 
-    #[tokio::test]
-    async fn test_execute_set_unicode() -> Result<()> {
-        let configuration = &mut Configuration {
-            results_format: ResultFormat::Ascii,
-            ..default::Default::default()
-        };
-        let options = CommandOptions {
-            command_manager: &CommandManager::default(),
-            configuration,
-            connection: &mut MockConnection::new(),
-            history: &DefaultHistory::new(),
-            input: vec![".display", "unicode"],
-            output: &mut Vec::new(),
-        };
+    table.set_titles(prettytable::Row::from(column_names));
+}
 
-        let result = Command.execute(options).await?;
+fn process_data(
+    configuration: &Configuration,
+    query_result: &QueryResult,
+    table: &mut Table,
+) -> Result<()> {
+    for (i, row) in query_result.rows.iter().enumerate() {
+        let mut row_data = Vec::new();
 
-        assert_eq!(result, LoopCondition::Continue);
-        assert_eq!(configuration.results_format, ResultFormat::Unicode);
-        Ok(())
+        for data in row {
+            let data = match data {
+                Some(data) => data.to_formatted_string(&configuration.locale),
+                None => "NULL".to_string(),
+            };
+
+            match configuration.color_mode {
+                ColorMode::Disabled => {
+                    row_data.push(data);
+                }
+                _ => {
+                    if i % 2 == 0 {
+                        row_data.push(data.dimmed().to_string());
+                    } else {
+                        row_data.push(data);
+                    }
+                }
+            }
+        }
+
+        table.add_row(prettytable::Row::from(row_data));
     }
 
-    #[tokio::test]
-    async fn test_execute_invalid_option() {
-        let options = CommandOptions {
-            command_manager: &CommandManager::default(),
-            configuration: &mut Configuration::default(),
-            connection: &mut MockConnection::new(),
-            history: &DefaultHistory::new(),
-            input: vec![".display", "foo"],
-            output: &mut Vec::new(),
-        };
+    Ok(())
+}
 
-        let result = Command.execute(options).await;
+/// Display the footer of the result set.
+/// This includes the number of rows returned and the elapsed time.
+/// If the timing option is enabled, the elapsed time will be displayed.
+/// The number of rows will be formatted based on the locale.
+///
+/// Example: "N,NNN,NNN rows (M.MMMs)"
+pub(crate) fn display_footer(
+    configuration: &Configuration,
+    rows_affected: u64,
+    elapsed: Duration,
+) -> Result<()> {
+    let row_label = if rows_affected == 1 { "row" } else { "rows" };
+    let elapsed_display = if configuration.results_timer {
+        format!("({:?})", elapsed)
+    } else {
+        "".to_string()
+    };
 
-        assert!(result.is_err());
+    match configuration.color_mode {
+        ColorMode::Disabled => println!(
+            "{} {} {}",
+            rows_affected.to_formatted_string(&configuration.locale),
+            row_label,
+            elapsed_display
+        ),
+        _ => println!(
+            "{} {} {}",
+            rows_affected.to_formatted_string(&configuration.locale),
+            row_label,
+            elapsed_display.dimmed()
+        ),
     }
+
+    Ok(())
 }

@@ -1,4 +1,4 @@
-use crate::shell::command::{CommandOptions, LoopCondition, Result, ShellCommand};
+use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use anyhow::bail;
 use async_trait::async_trait;
 
@@ -7,7 +7,7 @@ pub(crate) struct Command;
 #[async_trait]
 impl ShellCommand for Command {
     fn name(&self) -> &'static str {
-        "footer"
+        "header"
     }
 
     fn args(&self) -> &'static str {
@@ -15,27 +15,27 @@ impl ShellCommand for Command {
     }
 
     fn description(&self) -> &'static str {
-        "Enable or disable result footer"
+        "Enable or disable result header"
     }
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
         if options.input.len() <= 1 {
-            let footer = if options.configuration.results_footer {
+            let header = if options.configuration.results_header {
                 "on"
             } else {
                 "off"
             };
-            writeln!(options.output, "Footer: {footer}")?;
+            writeln!(options.output, "Header: {header}")?;
             return Ok(LoopCondition::Continue);
         }
 
-        let footer = match options.input[1].to_lowercase().as_str() {
+        let header = match options.input[1].to_lowercase().as_str() {
             "on" => true,
             "off" => false,
-            option => bail!("Invalid footer option: {option}"),
+            option => bail!("Invalid header option: {option}"),
         };
 
-        options.configuration.results_footer = footer;
+        options.configuration.results_header = header;
 
         Ok(LoopCondition::Continue)
     }
@@ -44,10 +44,10 @@ impl ShellCommand for Command {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::commands::LoopCondition;
+    use crate::commands::{CommandManager, CommandOptions};
     use crate::configuration::Configuration;
-    use crate::driver::MockConnection;
-    use crate::shell::command::LoopCondition;
-    use crate::shell::command::{CommandManager, CommandOptions};
+    use crate::drivers::MockConnection;
     use rustyline::history::DefaultHistory;
     use std::default;
 
@@ -55,7 +55,7 @@ mod tests {
     async fn test_execute_no_args() -> Result<()> {
         let mut output = Vec::new();
         let configuration = &mut Configuration {
-            results_footer: true,
+            results_header: true,
             ..default::Default::default()
         };
         let options = CommandOptions {
@@ -63,22 +63,22 @@ mod tests {
             configuration,
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".footer"],
+            input: vec![".header"],
             output: &mut output,
         };
 
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        let footer_output = String::from_utf8(output)?;
-        assert_eq!(footer_output, "Footer: on\n");
+        let header_output = String::from_utf8(output)?;
+        assert_eq!(header_output, "Header: on\n");
         Ok(())
     }
 
     #[tokio::test]
     async fn test_execute_set_on() -> Result<()> {
         let configuration = &mut Configuration {
-            results_footer: false,
+            results_header: false,
             ..default::Default::default()
         };
         let options = CommandOptions {
@@ -86,21 +86,21 @@ mod tests {
             configuration,
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".footer", "on"],
+            input: vec![".header", "on"],
             output: &mut Vec::new(),
         };
 
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        assert!(configuration.results_footer);
+        assert!(configuration.results_header);
         Ok(())
     }
 
     #[tokio::test]
     async fn test_execute_set_off() -> Result<()> {
         let configuration = &mut Configuration {
-            results_footer: true,
+            results_header: true,
             ..default::Default::default()
         };
         let options = CommandOptions {
@@ -108,14 +108,14 @@ mod tests {
             configuration,
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".footer", "off"],
+            input: vec![".header", "off"],
             output: &mut Vec::new(),
         };
 
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        assert!(!configuration.results_footer);
+        assert!(!configuration.results_header);
         Ok(())
     }
 
@@ -126,7 +126,7 @@ mod tests {
             configuration: &mut Configuration::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".footer", "foo"],
+            input: vec![".header", "foo"],
             output: &mut Vec::new(),
         };
 

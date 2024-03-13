@@ -1,42 +1,41 @@
-use crate::shell::command::{CommandOptions, LoopCondition, Result, ShellCommand};
+use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
+use crate::configuration::ResultFormat;
 use anyhow::bail;
 use async_trait::async_trait;
-use num_format::Locale;
-use std::str::FromStr;
 
 pub(crate) struct Command;
 
 #[async_trait]
 impl ShellCommand for Command {
     fn name(&self) -> &'static str {
-        "locale"
+        "display"
     }
 
     fn args(&self) -> &'static str {
-        "[locale]"
+        "ascii|unicode"
     }
 
     fn description(&self) -> &'static str {
-        "Set the display locale"
+        "Display results in ASCII or Unicode"
     }
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
         if options.input.len() <= 1 {
             writeln!(
                 options.output,
-                "Locale: {}",
-                options.configuration.locale.name()
+                "Display mode: {}",
+                options.configuration.results_format
             )?;
             return Ok(LoopCondition::Continue);
         }
 
-        let locale = options.input[1];
-        let locale = match Locale::from_str(locale) {
-            Ok(locale) => locale,
-            Err(_) => bail!("Invalid locale: {locale}"),
+        let results_display = match options.input[1].to_lowercase().as_str() {
+            "ascii" => ResultFormat::Ascii,
+            "unicode" => ResultFormat::Unicode,
+            option => bail!("Invalid display mode option: {option}"),
         };
 
-        options.configuration.locale = locale;
+        options.configuration.results_format = results_display;
 
         Ok(LoopCondition::Continue)
     }
@@ -45,10 +44,10 @@ impl ShellCommand for Command {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::commands::LoopCondition;
+    use crate::commands::{CommandManager, CommandOptions};
     use crate::configuration::Configuration;
-    use crate::driver::MockConnection;
-    use crate::shell::command::LoopCondition;
-    use crate::shell::command::{CommandManager, CommandOptions};
+    use crate::drivers::MockConnection;
     use rustyline::history::DefaultHistory;
     use std::default;
 
@@ -56,7 +55,7 @@ mod tests {
     async fn test_execute_no_args() -> Result<()> {
         let mut output = Vec::new();
         let configuration = &mut Configuration {
-            locale: Locale::en,
+            results_format: ResultFormat::Unicode,
             ..default::Default::default()
         };
         let options = CommandOptions {
@@ -64,22 +63,22 @@ mod tests {
             configuration,
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".locale"],
+            input: vec![".display"],
             output: &mut output,
         };
 
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        let locale_output = String::from_utf8(output)?;
-        assert_eq!(locale_output, "Locale: en\n");
+        let display_output = String::from_utf8(output)?;
+        assert_eq!(display_output, "Display mode: unicode\n");
         Ok(())
     }
 
     #[tokio::test]
-    async fn test_execute_set_on() -> Result<()> {
+    async fn test_execute_set_ascii() -> Result<()> {
         let configuration = &mut Configuration {
-            locale: Locale::en,
+            results_format: ResultFormat::Unicode,
             ..default::Default::default()
         };
         let options = CommandOptions {
@@ -87,14 +86,36 @@ mod tests {
             configuration,
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".locale", "en-GB"],
+            input: vec![".display", "ascii"],
             output: &mut Vec::new(),
         };
 
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        assert_eq!(configuration.locale, Locale::en_GB);
+        assert_eq!(configuration.results_format, ResultFormat::Ascii);
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_execute_set_unicode() -> Result<()> {
+        let configuration = &mut Configuration {
+            results_format: ResultFormat::Ascii,
+            ..default::Default::default()
+        };
+        let options = CommandOptions {
+            command_manager: &CommandManager::default(),
+            configuration,
+            connection: &mut MockConnection::new(),
+            history: &DefaultHistory::new(),
+            input: vec![".display", "unicode"],
+            output: &mut Vec::new(),
+        };
+
+        let result = Command.execute(options).await?;
+
+        assert_eq!(result, LoopCondition::Continue);
+        assert_eq!(configuration.results_format, ResultFormat::Unicode);
         Ok(())
     }
 
@@ -105,7 +126,7 @@ mod tests {
             configuration: &mut Configuration::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".locale", "foo"],
+            input: vec![".display", "foo"],
             output: &mut Vec::new(),
         };
 

@@ -1,4 +1,4 @@
-use crate::shell::command::{CommandOptions, LoopCondition, Result, ShellCommand};
+use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use anyhow::bail;
 use async_trait::async_trait;
 
@@ -7,7 +7,7 @@ pub(crate) struct Command;
 #[async_trait]
 impl ShellCommand for Command {
     fn name(&self) -> &'static str {
-        "header"
+        "bail"
     }
 
     fn args(&self) -> &'static str {
@@ -15,27 +15,27 @@ impl ShellCommand for Command {
     }
 
     fn description(&self) -> &'static str {
-        "Enable or disable result header"
+        "Stop after an error occurs"
     }
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
         if options.input.len() <= 1 {
-            let header = if options.configuration.results_header {
+            let bail_on_error = if options.configuration.bail_on_error {
                 "on"
             } else {
                 "off"
             };
-            writeln!(options.output, "Header: {header}")?;
+            writeln!(options.output, "Bail on error: {bail_on_error}")?;
             return Ok(LoopCondition::Continue);
         }
 
-        let header = match options.input[1].to_lowercase().as_str() {
+        let bail_on_error = match options.input[1].to_lowercase().as_str() {
             "on" => true,
             "off" => false,
-            option => bail!("Invalid header option: {option}"),
+            option => bail!("Invalid bail option: {option}"),
         };
 
-        options.configuration.results_header = header;
+        options.configuration.bail_on_error = bail_on_error;
 
         Ok(LoopCondition::Continue)
     }
@@ -44,10 +44,9 @@ impl ShellCommand for Command {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::commands::{CommandManager, CommandOptions, LoopCondition};
     use crate::configuration::Configuration;
-    use crate::driver::MockConnection;
-    use crate::shell::command::LoopCondition;
-    use crate::shell::command::{CommandManager, CommandOptions};
+    use crate::drivers::MockConnection;
     use rustyline::history::DefaultHistory;
     use std::default;
 
@@ -55,7 +54,7 @@ mod tests {
     async fn test_execute_no_args() -> Result<()> {
         let mut output = Vec::new();
         let configuration = &mut Configuration {
-            results_header: true,
+            bail_on_error: true,
             ..default::Default::default()
         };
         let options = CommandOptions {
@@ -63,22 +62,22 @@ mod tests {
             configuration,
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".header"],
+            input: vec![".bail"],
             output: &mut output,
         };
 
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        let header_output = String::from_utf8(output)?;
-        assert_eq!(header_output, "Header: on\n");
+        let bail_output = String::from_utf8(output)?;
+        assert_eq!(bail_output, "Bail on error: on\n");
         Ok(())
     }
 
     #[tokio::test]
     async fn test_execute_set_on() -> Result<()> {
         let configuration = &mut Configuration {
-            results_header: false,
+            bail_on_error: false,
             ..default::Default::default()
         };
         let options = CommandOptions {
@@ -86,21 +85,21 @@ mod tests {
             configuration,
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".header", "on"],
+            input: vec![".bail", "on"],
             output: &mut Vec::new(),
         };
 
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        assert!(configuration.results_header);
+        assert!(configuration.bail_on_error);
         Ok(())
     }
 
     #[tokio::test]
     async fn test_execute_set_off() -> Result<()> {
         let configuration = &mut Configuration {
-            results_header: true,
+            bail_on_error: true,
             ..default::Default::default()
         };
         let options = CommandOptions {
@@ -108,14 +107,14 @@ mod tests {
             configuration,
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".header", "off"],
+            input: vec![".bail", "off"],
             output: &mut Vec::new(),
         };
 
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        assert!(!configuration.results_header);
+        assert!(!configuration.bail_on_error);
         Ok(())
     }
 
@@ -126,7 +125,7 @@ mod tests {
             configuration: &mut Configuration::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".header", "foo"],
+            input: vec![".bail", "foo"],
             output: &mut Vec::new(),
         };
 

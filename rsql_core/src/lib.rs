@@ -1,7 +1,8 @@
 #![forbid(unsafe_code)]
 
+pub mod commands;
 pub mod configuration;
-pub mod driver;
+pub mod drivers;
 pub mod shell;
 pub mod version;
 

@@ -1,8 +1,8 @@
-use crate::configuration::Configuration;
-use crate::driver::Connection;
-use crate::shell::{
+use crate::commands::{
     bail, clear, display, exit, footer, header, help, history, locale, quit, tables, timer,
 };
+use crate::configuration::Configuration;
+use crate::drivers::Connection;
 use async_trait::async_trait;
 use rustyline::history::DefaultHistory;
 use std::collections::BTreeMap;

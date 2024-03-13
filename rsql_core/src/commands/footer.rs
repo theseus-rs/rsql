@@ -1,4 +1,4 @@
-use crate::shell::command::{CommandOptions, LoopCondition, Result, ShellCommand};
+use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use anyhow::bail;
 use async_trait::async_trait;
 
@@ -7,7 +7,7 @@ pub(crate) struct Command;
 #[async_trait]
 impl ShellCommand for Command {
     fn name(&self) -> &'static str {
-        "bail"
+        "footer"
     }
 
     fn args(&self) -> &'static str {
@@ -15,27 +15,27 @@ impl ShellCommand for Command {
     }
 
     fn description(&self) -> &'static str {
-        "Stop after an error occurs"
+        "Enable or disable result footer"
     }
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
         if options.input.len() <= 1 {
-            let bail_on_error = if options.configuration.bail_on_error {
+            let footer = if options.configuration.results_footer {
                 "on"
             } else {
                 "off"
             };
-            writeln!(options.output, "Bail on error: {bail_on_error}")?;
+            writeln!(options.output, "Footer: {footer}")?;
             return Ok(LoopCondition::Continue);
         }
 
-        let bail_on_error = match options.input[1].to_lowercase().as_str() {
+        let footer = match options.input[1].to_lowercase().as_str() {
             "on" => true,
             "off" => false,
-            option => bail!("Invalid bail option: {option}"),
+            option => bail!("Invalid footer option: {option}"),
         };
 
-        options.configuration.bail_on_error = bail_on_error;
+        options.configuration.results_footer = footer;
 
         Ok(LoopCondition::Continue)
     }
@@ -44,10 +44,10 @@ impl ShellCommand for Command {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::commands::LoopCondition;
+    use crate::commands::{CommandManager, CommandOptions};
     use crate::configuration::Configuration;
-    use crate::driver::MockConnection;
-    use crate::shell::command::LoopCondition;
-    use crate::shell::command::{CommandManager, CommandOptions};
+    use crate::drivers::MockConnection;
     use rustyline::history::DefaultHistory;
     use std::default;
 
@@ -55,7 +55,7 @@ mod tests {
     async fn test_execute_no_args() -> Result<()> {
         let mut output = Vec::new();
         let configuration = &mut Configuration {
-            bail_on_error: true,
+            results_footer: true,
             ..default::Default::default()
         };
         let options = CommandOptions {
@@ -63,22 +63,22 @@ mod tests {
             configuration,
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".bail"],
+            input: vec![".footer"],
             output: &mut output,
         };
 
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        let bail_output = String::from_utf8(output)?;
-        assert_eq!(bail_output, "Bail on error: on\n");
+        let footer_output = String::from_utf8(output)?;
+        assert_eq!(footer_output, "Footer: on\n");
         Ok(())
     }
 
     #[tokio::test]
     async fn test_execute_set_on() -> Result<()> {
         let configuration = &mut Configuration {
-            bail_on_error: false,
+            results_footer: false,
             ..default::Default::default()
         };
         let options = CommandOptions {
@@ -86,21 +86,21 @@ mod tests {
             configuration,
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".bail", "on"],
+            input: vec![".footer", "on"],
             output: &mut Vec::new(),
         };
 
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        assert!(configuration.bail_on_error);
+        assert!(configuration.results_footer);
         Ok(())
     }
 
     #[tokio::test]
     async fn test_execute_set_off() -> Result<()> {
         let configuration = &mut Configuration {
-            bail_on_error: true,
+            results_footer: true,
             ..default::Default::default()
         };
         let options = CommandOptions {
@@ -108,14 +108,14 @@ mod tests {
             configuration,
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".bail", "off"],
+            input: vec![".footer", "off"],
             output: &mut Vec::new(),
         };
 
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        assert!(!configuration.bail_on_error);
+        assert!(!configuration.results_footer);
         Ok(())
     }
 
@@ -126,7 +126,7 @@ mod tests {
             configuration: &mut Configuration::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".bail", "foo"],
+            input: vec![".footer", "foo"],
             output: &mut Vec::new(),
         };
 

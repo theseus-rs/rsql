@@ -1,10 +1,8 @@
+use crate::commands::{CommandManager, CommandOptions, LoopCondition};
 use crate::configuration::Configuration;
-use crate::driver::QueryResult;
-use crate::driver::{Connection, DriverManager};
-use crate::shell::command::{CommandManager, CommandOptions, LoopCondition};
-use crate::shell::repl::display;
-use crate::shell::repl::helper::ReplHelper;
-use crate::shell::ShellArgs;
+use crate::drivers::{Connection, DriverManager, QueryResult};
+use crate::shell::helper::ReplHelper;
+use crate::shell::{display, ShellArgs};
 use crate::version::full_version;
 use anyhow::Result;
 use colored::Colorize;

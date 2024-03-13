@@ -1,4 +1,4 @@
-use crate::shell::repl::helper::ReplHelper;
+use crate::shell::helper::ReplHelper;
 use lazy_static::lazy_static;
 use rustyline::completion::{Candidate, Completer, Pair};
 use rustyline::Context;

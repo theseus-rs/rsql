@@ -1,4 +1,4 @@
-use crate::shell::command::{CommandOptions, LoopCondition, Result, ShellCommand};
+use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use async_trait::async_trait;
 use tracing::info;
 
@@ -25,10 +25,10 @@ impl ShellCommand for Command {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::commands::LoopCondition;
+    use crate::commands::{CommandManager, CommandOptions};
     use crate::configuration::Configuration;
-    use crate::driver::MockConnection;
-    use crate::shell::command::LoopCondition;
-    use crate::shell::command::{CommandManager, CommandOptions};
+    use crate::drivers::MockConnection;
     use rustyline::history::DefaultHistory;
 
     #[tokio::test]
