@@ -1,5 +1,5 @@
 use crate::configuration::Configuration;
-use crate::engine::Engine;
+use crate::driver::Connection;
 use crate::shell::{
     bail, clear, display, exit, footer, header, help, history, locale, quit, tables, timer,
 };
@@ -25,7 +25,7 @@ pub type Result<T = LoopCondition, E = anyhow::Error> = core::result::Result<T, 
 pub struct CommandOptions<'a> {
     pub(crate) command_manager: &'a CommandManager,
     pub(crate) configuration: &'a mut Configuration,
-    pub(crate) engine: &'a mut dyn Engine,
+    pub(crate) connection: &'a mut dyn Connection,
     pub(crate) history: &'a DefaultHistory,
     pub(crate) input: Vec<&'a str>,
     pub(crate) output: &'a mut (dyn io::Write + Send),

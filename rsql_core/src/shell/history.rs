@@ -30,7 +30,7 @@ impl ShellCommand for Command {
 mod tests {
     use super::*;
     use crate::configuration::Configuration;
-    use crate::engine::MockEngine;
+    use crate::driver::MockConnection;
     use crate::shell::command::LoopCondition;
     use crate::shell::command::{CommandManager, CommandOptions};
     use rustyline::history::{DefaultHistory, History};
@@ -49,7 +49,7 @@ mod tests {
         let options = CommandOptions {
             command_manager: &CommandManager::default(),
             configuration,
-            engine: &mut MockEngine::new(),
+            connection: &mut MockConnection::new(),
             history: &history,
             input: vec![".history"],
             output: &mut output,
@@ -76,7 +76,7 @@ mod tests {
         let options = CommandOptions {
             command_manager: &CommandManager::default(),
             configuration,
-            engine: &mut MockEngine::new(),
+            connection: &mut MockConnection::new(),
             history: &history,
             input: vec![".history"],
             output: &mut output,

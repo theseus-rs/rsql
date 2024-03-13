@@ -1,5 +1,5 @@
 use crate::configuration::{Configuration, ResultFormat};
-use crate::engine::QueryResult;
+use crate::driver::QueryResult;
 use crate::shell::repl::r#impl::SqlResult;
 use anyhow::Result;
 use colored::Colorize;

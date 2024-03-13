@@ -1,5 +1,6 @@
 use crate::configuration::Configuration;
-use crate::engine::{DriverManager, Engine, QueryResult};
+use crate::driver::QueryResult;
+use crate::driver::{Connection, DriverManager};
 use crate::shell::command::{CommandManager, CommandOptions, LoopCondition};
 use crate::shell::repl::display;
 use crate::shell::repl::helper::ReplHelper;
@@ -38,17 +39,17 @@ pub async fn execute(
     args: &ShellArgs,
 ) -> Result<()> {
     let mut binding = driver_manager.connect(args.url.as_str()).await?;
-    let engine = binding.as_mut();
+    let connection = binding.as_mut();
 
-    repl(command_manager, configuration, engine).await?;
+    repl(command_manager, configuration, connection).await?;
 
-    engine.stop().await
+    connection.stop().await
 }
 
 async fn repl(
     command_manager: &CommandManager,
     configuration: &mut Configuration,
-    engine: &mut dyn Engine,
+    connection: &mut dyn Connection,
 ) -> Result<()> {
     let helper = ReplHelper::new(configuration);
     let history_file = match configuration.history_file {
@@ -75,20 +76,26 @@ async fn repl(
 
     loop {
         let loop_condition = match editor.readline(&prompt) {
-            Ok(line) => evaluate(command_manager, configuration, engine, &mut editor, line)
-                .await
-                .unwrap_or_else(|error| {
-                    eprintln!("{}: {:?}", "Error".red(), error);
-                    if configuration.bail_on_error {
-                        LoopCondition::Exit(1)
-                    } else {
-                        LoopCondition::Continue
-                    }
-                }),
+            Ok(line) => evaluate(
+                command_manager,
+                configuration,
+                connection,
+                &mut editor,
+                line,
+            )
+            .await
+            .unwrap_or_else(|error| {
+                eprintln!("{}: {:?}", "Error".red(), error);
+                if configuration.bail_on_error {
+                    LoopCondition::Exit(1)
+                } else {
+                    LoopCondition::Continue
+                }
+            }),
             Err(ReadlineError::Interrupted) => {
                 eprintln!("{}", "Program interrupted".red());
                 error!("{}", "Program interrupted".red());
-                engine.stop().await?;
+                connection.stop().await?;
                 LoopCondition::Exit(1)
             }
             Err(error) => {
@@ -114,7 +121,7 @@ async fn repl(
 async fn evaluate(
     command_manager: &CommandManager,
     configuration: &mut Configuration,
-    engine: &mut dyn Engine,
+    connection: &mut dyn Connection,
     editor: &mut Editor<ReplHelper, DefaultHistory>,
     line: String,
 ) -> Result<LoopCondition> {
@@ -122,13 +129,13 @@ async fn evaluate(
         execute_command(
             command_manager,
             configuration,
-            engine,
+            connection,
             editor,
             line.as_str(),
         )
         .await?
     } else {
-        execute_sql(configuration, engine, line.as_str()).await?
+        execute_sql(configuration, connection, line.as_str()).await?
     };
 
     if configuration.history {
@@ -141,7 +148,7 @@ async fn evaluate(
 async fn execute_command(
     command_manager: &CommandManager,
     configuration: &mut Configuration,
-    engine: &mut dyn Engine,
+    connection: &mut dyn Connection,
     editor: &mut Editor<ReplHelper, DefaultHistory>,
     line: &str,
 ) -> Result<LoopCondition> {
@@ -155,7 +162,7 @@ async fn execute_command(
             let options = CommandOptions {
                 command_manager,
                 configuration,
-                engine,
+                connection,
                 history,
                 input,
                 output,
@@ -177,7 +184,7 @@ async fn execute_command(
 
 async fn execute_sql(
     configuration: &mut Configuration,
-    engine: &mut dyn Engine,
+    connection: &mut dyn Connection,
     line: &str,
 ) -> Result<LoopCondition> {
     let start = std::time::Instant::now();
@@ -185,9 +192,9 @@ async fn execute_sql(
     let command = if sql.len() > 6 { &sql[..6] } else { "" }.trim();
 
     let sql_result = if command.to_lowercase() == "select" {
-        SqlResult::Query(engine.query(sql).await?)
+        SqlResult::Query(connection.query(sql).await?)
     } else {
-        SqlResult::Execute(engine.execute(sql).await?)
+        SqlResult::Execute(connection.execute(sql).await?)
     };
 
     let elapsed = start.elapsed();
