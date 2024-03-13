@@ -6,6 +6,7 @@ use postgresql_archive::Version;
 use postgresql_embedded::{PostgreSQL, Settings};
 use sqlx::postgres::{PgColumn, PgConnectOptions, PgRow};
 use sqlx::{Column, PgPool, Row};
+use std::ops::Deref;
 use std::str::FromStr;
 use std::string::ToString;
 
@@ -167,11 +168,15 @@ impl Connection {
             Ok(value.map(Value::Json))
         } else {
             let column_type = column.type_info();
-            bail!(
-                "column type [{:?}] not supported for column [{}]",
-                column_type,
-                column_name
-            );
+            let type_name = format!("{:?}", column_type.deref());
+            match type_name.as_str() {
+                "Void" => Ok(None), // pg_sleep() returns void
+                _ => bail!(
+                    "column type [{:?}] not supported for column [{}]",
+                    column_type,
+                    column_name
+                ),
+            }
         }
     }
 }
