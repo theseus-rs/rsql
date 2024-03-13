@@ -1,5 +1,5 @@
 use crate::configuration::Configuration;
-use crate::engine::{load, Engine, QueryResult};
+use crate::engine::{DriverManager, Engine, QueryResult};
 use crate::shell::command::{CommandOptions, Commands, LoopCondition};
 use crate::shell::repl::display;
 use crate::shell::repl::helper::ReplHelper;
@@ -32,11 +32,12 @@ fn welcome_message(configuration: &Configuration) -> Result<()> {
 }
 
 pub async fn execute(
+    driver_manager: DriverManager,
     commands: &Commands,
     configuration: &mut Configuration,
     args: &ShellArgs,
 ) -> Result<()> {
-    let mut binding = load(args.url.as_str()).await?;
+    let mut binding = driver_manager.connect(args.url.as_str()).await?;
     let engine = binding.as_mut();
 
     repl(commands, configuration, engine).await?;

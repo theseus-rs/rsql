@@ -11,6 +11,20 @@ use std::string::ToString;
 
 const POSTGRESQL_EMBEDDED_VERSION: &str = "16.2.3";
 
+pub struct Driver;
+
+#[async_trait]
+impl crate::engine::Driver for Driver {
+    fn identifier(&self) -> &'static str {
+        "postgresql"
+    }
+
+    async fn connect(&self, url: &str) -> Result<Box<dyn crate::engine::Engine>> {
+        let engine = Engine::new(url).await?;
+        Ok(Box::new(engine))
+    }
+}
+
 pub(crate) struct Engine {
     postgresql: Option<PostgreSQL>,
     pool: PgPool,
