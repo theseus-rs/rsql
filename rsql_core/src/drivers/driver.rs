@@ -1,4 +1,4 @@
-use crate::driver::Connection;
+use crate::drivers::Connection;
 use anyhow::bail;
 use async_trait::async_trait;
 use sqlx::any::install_default_drivers;
@@ -24,13 +24,13 @@ impl DriverManager {
         }
     }
 
-    /// Add a new driver to the list of available drivers
+    /// Add a new drivers to the list of available drivers
     fn add(&mut self, driver: Box<dyn Driver>) {
         let identifier = driver.identifier();
         let _ = &self.drivers.insert(identifier, driver);
     }
 
-    /// Get a driver by name
+    /// Get a drivers by name
     pub fn get(&self, identifier: &str) -> Option<&dyn Driver> {
         self.drivers.get(identifier).map(|driver| driver.as_ref())
     }
@@ -65,9 +65,9 @@ impl Default for DriverManager {
         install_default_drivers();
 
         #[cfg(feature = "postgresql")]
-        drivers.add(Box::new(crate::driver::postgresql::Driver));
+        drivers.add(Box::new(crate::drivers::postgresql::Driver));
         #[cfg(feature = "sqlite")]
-        drivers.add(Box::new(crate::driver::sqlite::Driver));
+        drivers.add(Box::new(crate::drivers::sqlite::Driver));
 
         drivers
     }

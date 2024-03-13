@@ -1,41 +1,42 @@
-use crate::shell::command::{CommandOptions, LoopCondition, Result, ShellCommand};
+use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use anyhow::bail;
 use async_trait::async_trait;
+use num_format::Locale;
+use std::str::FromStr;
 
 pub(crate) struct Command;
 
 #[async_trait]
 impl ShellCommand for Command {
     fn name(&self) -> &'static str {
-        "timer"
+        "locale"
     }
 
     fn args(&self) -> &'static str {
-        "on|off"
+        "[locale]"
     }
 
     fn description(&self) -> &'static str {
-        "Enable or disable query execution timer"
+        "Set the display locale"
     }
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
         if options.input.len() <= 1 {
-            let timer = if options.configuration.results_timer {
-                "on"
-            } else {
-                "off"
-            };
-            writeln!(options.output, "Timer: {timer}")?;
+            writeln!(
+                options.output,
+                "Locale: {}",
+                options.configuration.locale.name()
+            )?;
             return Ok(LoopCondition::Continue);
         }
 
-        let timer = match options.input[1].to_lowercase().as_str() {
-            "on" => true,
-            "off" => false,
-            option => bail!("Invalid timing option: {option}"),
+        let locale = options.input[1];
+        let locale = match Locale::from_str(locale) {
+            Ok(locale) => locale,
+            Err(_) => bail!("Invalid locale: {locale}"),
         };
 
-        options.configuration.results_timer = timer;
+        options.configuration.locale = locale;
 
         Ok(LoopCondition::Continue)
     }
@@ -44,10 +45,10 @@ impl ShellCommand for Command {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::commands::LoopCondition;
+    use crate::commands::{CommandManager, CommandOptions};
     use crate::configuration::Configuration;
-    use crate::driver::MockConnection;
-    use crate::shell::command::LoopCondition;
-    use crate::shell::command::{CommandManager, CommandOptions};
+    use crate::drivers::MockConnection;
     use rustyline::history::DefaultHistory;
     use std::default;
 
@@ -55,7 +56,7 @@ mod tests {
     async fn test_execute_no_args() -> Result<()> {
         let mut output = Vec::new();
         let configuration = &mut Configuration {
-            results_timer: true,
+            locale: Locale::en,
             ..default::Default::default()
         };
         let options = CommandOptions {
@@ -63,22 +64,22 @@ mod tests {
             configuration,
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".timer"],
+            input: vec![".locale"],
             output: &mut output,
         };
 
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        let timer_output = String::from_utf8(output)?;
-        assert_eq!(timer_output, "Timer: on\n");
+        let locale_output = String::from_utf8(output)?;
+        assert_eq!(locale_output, "Locale: en\n");
         Ok(())
     }
 
     #[tokio::test]
     async fn test_execute_set_on() -> Result<()> {
         let configuration = &mut Configuration {
-            results_timer: false,
+            locale: Locale::en,
             ..default::Default::default()
         };
         let options = CommandOptions {
@@ -86,36 +87,14 @@ mod tests {
             configuration,
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".timer", "on"],
+            input: vec![".locale", "en-GB"],
             output: &mut Vec::new(),
         };
 
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        assert!(configuration.results_timer);
-        Ok(())
-    }
-
-    #[tokio::test]
-    async fn test_execute_set_off() -> Result<()> {
-        let configuration = &mut Configuration {
-            results_timer: true,
-            ..default::Default::default()
-        };
-        let options = CommandOptions {
-            command_manager: &CommandManager::default(),
-            configuration,
-            connection: &mut MockConnection::new(),
-            history: &DefaultHistory::new(),
-            input: vec![".timer", "off"],
-            output: &mut Vec::new(),
-        };
-
-        let result = Command.execute(options).await?;
-
-        assert_eq!(result, LoopCondition::Continue);
-        assert!(!configuration.results_timer);
+        assert_eq!(configuration.locale, Locale::en_GB);
         Ok(())
     }
 
@@ -126,7 +105,7 @@ mod tests {
             configuration: &mut Configuration::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".timer", "foo"],
+            input: vec![".locale", "foo"],
             output: &mut Vec::new(),
         };
 

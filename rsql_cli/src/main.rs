@@ -2,9 +2,10 @@
 
 use anyhow::Result;
 use clap::Parser;
+use rsql_core::commands::CommandManager;
 use rsql_core::configuration::ConfigurationBuilder;
-use rsql_core::driver::DriverManager;
-use rsql_core::shell::{CommandManager, ShellArgs};
+use rsql_core::drivers::DriverManager;
+use rsql_core::shell::ShellArgs;
 use rsql_core::version::full_version;
 use rsql_core::{shell, version};
 use std::io;

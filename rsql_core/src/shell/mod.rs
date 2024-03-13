@@ -1,23 +1,13 @@
 extern crate colored;
 
-mod bail;
-mod clear;
-mod command;
+mod completer;
 mod display;
-mod exit;
-mod footer;
-mod header;
-mod help;
-mod history;
-mod locale;
-mod quit;
+mod helper;
+mod highlighter;
 mod repl;
-mod tables;
-mod timer;
 
 use clap::Parser;
 
-pub use crate::shell::command::CommandManager;
 pub use repl::execute;
 
 #[cfg(feature = "sqlite")]

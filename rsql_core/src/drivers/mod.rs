@@ -2,7 +2,7 @@
 pub(crate) mod postgresql;
 
 mod connection;
-mod drivers;
+mod driver;
 #[cfg(feature = "sqlite")]
 pub(crate) mod sqlite;
 mod value;
@@ -10,4 +10,4 @@ mod value;
 #[cfg(test)]
 pub use connection::MockConnection;
 pub use connection::{Connection, QueryResult};
-pub use drivers::{Driver, DriverManager};
+pub use driver::{Driver, DriverManager};
