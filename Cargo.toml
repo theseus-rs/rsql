@@ -10,7 +10,7 @@ edition = "2021"
 keywords = ["postgresql", "postgres", "embedded", "database", "server"]
 license = "Apache-2.0 OR MIT"
 repository = "https://github.com/theseus-rs/rsql"
-version = "0.1.4"
+version = "0.2.0"
 
 [workspace.dependencies]
 ansi_colours = { version = "1.2" }
