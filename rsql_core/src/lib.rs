@@ -1,7 +1,7 @@
 #![forbid(unsafe_code)]
 
 pub mod configuration;
-mod engine;
+pub mod engine;
 pub mod shell;
 pub mod version;
 

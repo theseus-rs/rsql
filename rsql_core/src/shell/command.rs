@@ -62,7 +62,6 @@ impl Commands {
     /// Add a new command to the list of available commands
     fn add(&mut self, command: Box<dyn ShellCommand>) {
         let name = command.name();
-
         let _ = &self.commands.insert(name, command);
     }
 

@@ -6,6 +6,20 @@ use sqlx::sqlite::{SqliteAutoVacuum, SqliteColumn, SqliteConnectOptions, SqliteR
 use sqlx::{Column, Row, SqlitePool};
 use std::str::FromStr;
 
+pub struct Driver;
+
+#[async_trait]
+impl crate::engine::Driver for Driver {
+    fn identifier(&self) -> &'static str {
+        "sqlite"
+    }
+
+    async fn connect(&self, url: &str) -> Result<Box<dyn crate::engine::Engine>> {
+        let engine = Engine::new(url).await?;
+        Ok(Box::new(engine))
+    }
+}
+
 pub(crate) struct Engine {
     pool: SqlitePool,
 }

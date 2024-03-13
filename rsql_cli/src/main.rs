@@ -3,6 +3,7 @@
 use anyhow::Result;
 use clap::Parser;
 use rsql_core::configuration::ConfigurationBuilder;
+use rsql_core::engine::DriverManager;
 use rsql_core::shell::{Commands, ShellArgs};
 use rsql_core::version::full_version;
 use rsql_core::{shell, version};
@@ -46,8 +47,15 @@ pub(crate) async fn execute(args: Option<Args>, output: &mut dyn io::Write) -> R
     let result = if args.version {
         version::execute(&mut configuration, output).await
     } else {
+        let driver_manager = DriverManager::default();
         let commands = Commands::default();
-        shell::execute(&commands, &mut configuration, &args.shell_args).await
+        shell::execute(
+            driver_manager,
+            &commands,
+            &mut configuration,
+            &args.shell_args,
+        )
+        .await
     };
 
     info!("{version} completed");
