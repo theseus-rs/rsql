@@ -3,9 +3,6 @@
     "name": "rsql"
   },
   "components": {
-    "changelog": {
-      "read_changelog_file": false
-    },
     "artifacts": {
       "package_managers": {
         "preferred": {
@@ -13,6 +10,12 @@
           "binstall": "cargo binstall rsql_cli"
         }
       }
+    },
+    "changelog": {
+      "read_changelog_file": false
+    },
+    "mdbook": {
+      "path": "./docs"
     }
   },
   "styles": {
