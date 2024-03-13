@@ -1,5 +1,6 @@
 extern crate colored;
 
+mod bail;
 mod clear;
 mod command;
 mod display;

@@ -1,7 +1,7 @@
 use crate::configuration::Configuration;
 use crate::engine::Engine;
 use crate::shell::{
-    clear, display, exit, footer, header, help, history, locale, quit, tables, timer,
+    bail, clear, display, exit, footer, header, help, history, locale, quit, tables, timer,
 };
 use async_trait::async_trait;
 use rustyline::history::DefaultHistory;
@@ -85,6 +85,7 @@ impl Default for Commands {
     fn default() -> Self {
         let mut commands = Commands::new();
 
+        commands.add(Box::new(bail::Command));
         commands.add(Box::new(clear::Command));
         commands.add(Box::new(display::Command));
         commands.add(Box::new(exit::Command));
@@ -129,6 +130,6 @@ mod tests {
     fn test_commands_default() {
         let commands = Commands::default();
 
-        assert_eq!(commands.commands.len(), 11);
+        assert_eq!(commands.commands.len(), 12);
     }
 }

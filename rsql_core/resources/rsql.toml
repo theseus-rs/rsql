@@ -4,6 +4,13 @@
 # if that fails, the default "en" (US English) locale will be used.
 #locale = "en"
 
+# Indicate if the program should exit after the first error occurs.
+#
+# Possible values:
+#   true - exit after the first error
+#   false - continue processing after the first error
+bail_on_error = false
+
 [log]
 
 # The log level to use.

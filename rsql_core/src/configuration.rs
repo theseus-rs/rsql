@@ -90,6 +90,13 @@ impl ConfigurationBuilder {
         self
     }
 
+    /// Set the bail on error to use.
+    #[allow(dead_code)]
+    pub fn with_bail_on_error(mut self, bail_on_error: bool) -> Self {
+        self.configuration.bail_on_error = bail_on_error;
+        self
+    }
+
     /// Set the log level to use.
     #[allow(dead_code)]
     pub fn with_log_level(mut self, log_level: LevelFilter) -> Self {
@@ -223,6 +230,7 @@ impl ConfigurationBuilder {
 pub struct Configuration {
     pub program_name: String,
     pub version: String,
+    pub bail_on_error: bool,
     pub log_level: LevelFilter,
     pub log_dir: Option<PathBuf>,
     pub log_rotation: Rotation,
@@ -242,42 +250,25 @@ pub struct Configuration {
 
 impl Default for Configuration {
     fn default() -> Self {
-        let program_name = String::new();
-        let version = String::new();
-        let log_level = LevelFilter::OFF;
-        let log_dir = None;
-        let log_rotation = Rotation::DAILY;
-        let locale = Locale::en;
-        let color_mode = ColorMode::Forced;
-        let edit_mode = EditMode::Emacs;
-        let history = false;
-        let history_file = None;
-        let history_limit = 1000;
-        let history_ignore_dups = true;
-        let theme = "Solarized (dark)".to_string();
-        let results_format = ResultFormat::Unicode;
-        let results_header = true;
-        let results_footer = true;
-        let results_timer = true;
-
         Self {
-            program_name,
-            version,
-            log_level,
-            log_dir,
-            log_rotation,
-            locale,
-            color_mode,
-            edit_mode,
-            history,
-            history_file,
-            history_limit,
-            history_ignore_dups,
-            theme,
-            results_format,
-            results_header,
-            results_footer,
-            results_timer,
+            program_name: String::new(),
+            version: String::new(),
+            bail_on_error: false,
+            log_level: LevelFilter::OFF,
+            log_dir: None,
+            log_rotation: Rotation::DAILY,
+            locale: Locale::en,
+            color_mode: ColorMode::Forced,
+            edit_mode: EditMode::Emacs,
+            history: false,
+            history_file: None,
+            history_limit: 1000,
+            history_ignore_dups: true,
+            theme: "Solarized (dark)".to_string(),
+            results_format: ResultFormat::Unicode,
+            results_header: true,
+            results_footer: true,
+            results_timer: true,
         }
     }
 }
@@ -333,11 +324,16 @@ impl ConfigFile {
         let config = &self.config;
         let config_dir = &self.config_dir;
 
+        if let Ok(bail_on_error) = config.get::<bool>("general.bail_on_error") {
+            configuration.bail_on_error = bail_on_error;
+        }
+
         if let Ok(log_level) = config.get::<String>("log.level") {
             configuration.log_level = LevelFilter::from_str(log_level.as_str())?;
         }
 
         configuration.log_dir = Some(config_dir.join("logs"));
+
         configuration.log_rotation = match config.get::<String>("log.rotation")?.as_str() {
             "minutely" => Rotation::MINUTELY,
             "hourly" => Rotation::HOURLY,
@@ -347,25 +343,39 @@ impl ConfigFile {
         };
 
         configuration.locale = get_locale(config);
+
         configuration.edit_mode = match config.get::<String>("shell.edit_mode")?.as_str() {
             "emacs" => EditMode::Emacs,
             "vi" => EditMode::Vi,
             mode => bail!("Invalid shell.edit_mode: {mode}"),
         };
 
-        configuration.history = config.get("shell.history.enabled")?;
+        if let Ok(history) = config.get("shell.history.enabled") {
+            configuration.history = history;
+        }
         let history_file = config_dir.join(format!("{}.history", &self.program_name));
         configuration.history_file = Some(history_file);
-        configuration.history_limit = config.get("shell.history.limit")?;
-        configuration.history_ignore_dups = config.get("shell.history.ignore_dups")?;
+        if let Ok(history_limit) = config.get("shell.history.limit") {
+            configuration.history_limit = history_limit;
+        }
+        if let Ok(history_ignore_dups) = config.get("shell.history.ignore_dups") {
+            configuration.history_ignore_dups = history_ignore_dups;
+        }
 
         configuration.theme = theme(config)?;
+
         if let Ok(results_format) = config.get::<String>("results.format") {
             configuration.results_format = ResultFormat::from_str(results_format.as_str())?;
         }
-        configuration.results_header = config.get("results.header")?;
-        configuration.results_footer = config.get("results.footer")?;
-        configuration.results_timer = config.get("results.timer")?;
+        if let Ok(results_header) = config.get::<bool>("results.header") {
+            configuration.results_header = results_header;
+        }
+        if let Ok(results_footer) = config.get::<bool>("results.footer") {
+            configuration.results_footer = results_footer;
+        }
+        if let Ok(results_timer) = config.get::<bool>("results.timer") {
+            configuration.results_timer = results_timer;
+        }
 
         Ok(())
     }
@@ -418,6 +428,7 @@ mod test {
     fn test_configuration_builder() {
         let program_name = "test";
         let version = "1.2.3";
+        let bail_on_error = true;
         let log_level = LevelFilter::OFF;
         let log_dir = "/logs";
         let log_rotation = Rotation::MINUTELY;
@@ -435,6 +446,7 @@ mod test {
         let results_timer = false;
 
         let configuration = ConfigurationBuilder::new(program_name, version)
+            .with_bail_on_error(bail_on_error)
             .with_log_level(log_level)
             .with_log_dir(log_dir)
             .with_log_rotation(log_rotation.clone())
@@ -454,6 +466,7 @@ mod test {
 
         assert_eq!(configuration.program_name, program_name);
         assert_eq!(configuration.version, version);
+        assert_eq!(configuration.bail_on_error, bail_on_error);
         assert_eq!(configuration.log_level, log_level);
         assert_eq!(configuration.log_dir.unwrap().to_string_lossy(), log_dir);
         assert_eq!(configuration.log_rotation, log_rotation);
@@ -479,6 +492,7 @@ mod test {
         let configuration = Configuration::default();
         assert!(configuration.program_name.is_empty());
         assert!(configuration.version.is_empty());
+        assert_eq!(configuration.bail_on_error, false);
         assert_eq!(configuration.log_level, LevelFilter::OFF);
         assert_eq!(configuration.log_dir, None);
         assert_eq!(configuration.log_rotation, Rotation::DAILY);
