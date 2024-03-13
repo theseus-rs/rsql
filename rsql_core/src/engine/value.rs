@@ -1,3 +1,5 @@
+use base64::engine::general_purpose::STANDARD;
+use base64::Engine;
 use num_format::{Locale, ToFormattedString};
 
 pub(crate) enum Value {
@@ -27,7 +29,7 @@ pub(crate) enum Value {
 impl Value {
     pub(crate) fn to_formatted_string(&self, locale: &Locale) -> String {
         match self {
-            Value::Bytes(bytes) => format!("{:?}", bytes),
+            Value::Bytes(bytes) => STANDARD.encode(bytes),
             Value::I8(value) => value.to_formatted_string(locale),
             Value::I16(value) => value.to_formatted_string(locale),
             Value::I32(value) => value.to_formatted_string(locale),
@@ -51,12 +53,17 @@ impl Value {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use anyhow::Result;
+    use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
+    use serde_json::json;
+    use std::str::FromStr;
+    use uuid::Uuid;
 
     #[test]
     fn test_bytes() {
         assert_eq!(
-            Value::Bytes(vec![42]).to_formatted_string(&Locale::en),
-            "[42]"
+            Value::Bytes(vec![114, 117, 115, 116]).to_formatted_string(&Locale::en),
+            "cnVzdA=="
         );
     }
 
@@ -151,5 +158,54 @@ mod tests {
             Value::String("foo".to_string()).to_formatted_string(&Locale::en),
             "foo"
         );
+    }
+
+    #[test]
+    fn test_date() {
+        let date = NaiveDate::from_ymd_opt(2000, 12, 31).unwrap();
+        assert_eq!(
+            Value::Date(date).to_formatted_string(&Locale::en),
+            "2000-12-31"
+        );
+    }
+
+    #[test]
+    fn test_time() {
+        let time = NaiveTime::from_hms_milli_opt(12, 13, 14, 15).unwrap();
+        assert_eq!(
+            Value::Time(time).to_formatted_string(&Locale::en),
+            "12:13:14.015"
+        );
+    }
+
+    #[test]
+    fn test_datetime() {
+        let date = NaiveDate::from_ymd_opt(2000, 12, 31).unwrap();
+        let time = NaiveTime::from_hms_milli_opt(12, 13, 14, 15).unwrap();
+        let datetime = NaiveDateTime::new(date, time);
+        assert_eq!(
+            Value::DateTime(datetime).to_formatted_string(&Locale::en),
+            "2000-12-31 12:13:14.015"
+        );
+    }
+
+    #[test]
+    fn test_uuid() -> Result<()> {
+        let uuid = "acf5b3e3-4099-4f34-81c7-5803cbc87a2d";
+        assert_eq!(
+            Value::Uuid(Uuid::from_str(uuid)?).to_formatted_string(&Locale::en),
+            uuid
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn test_json() -> Result<()> {
+        let original_json = json!({"foo": "bar", "baz": 123});
+        assert_eq!(
+            Value::Json(original_json).to_formatted_string(&Locale::en),
+            r#"{"foo":"bar","baz":123}"#
+        );
+        Ok(())
     }
 }
