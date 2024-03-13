@@ -14,7 +14,7 @@ ansi_colours = { workspace = true }
 anyhow = { workspace = true }
 async-trait = { workspace = true }
 base64 = { workspace = true }
-chrono = { workspace = true }
+chrono = { workspace = true, features = ["serde"] }
 clap = { workspace = true, features = ["derive", "env"] }
 clearscreen = { workspace = true }
 colored = { workspace = true }
@@ -29,7 +29,7 @@ postgresql_archive = { workspace = true, optional = true }
 postgresql_embedded = { workspace = true, optional = true }
 rust_decimal = { workspace = true }
 rustyline = { workspace = true }
-serde_json = { workspace = true }
+serde_json = { workspace = true, features = ["preserve_order"] }
 sqlx = { workspace = true, features = ["chrono", "json", "macros", "postgres", "runtime-tokio", "rust_decimal", "sqlite", "uuid"] }
 supports-color = { workspace = true }
 sys-locale = { workspace = true }
@@ -40,7 +40,7 @@ tokio = { workspace = true, features = ["rt", "rt-multi-thread", "macros"] }
 tracing = { workspace = true }
 tracing-appender = { workspace = true }
 tracing-subscriber = { workspace = true, features = ["env-filter", "tracing-log"] }
-uuid = { workspace = true }
+uuid = { workspace = true, features = ["v4"] }
 
 [dev-dependencies]
 criterion = { workspace = true }
