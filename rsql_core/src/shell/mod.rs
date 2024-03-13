@@ -17,7 +17,7 @@ mod timer;
 
 use clap::Parser;
 
-pub use crate::shell::command::Commands;
+pub use crate::shell::command::CommandManager;
 pub use repl::execute;
 
 #[cfg(feature = "sqlite")]

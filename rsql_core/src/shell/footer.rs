@@ -47,7 +47,7 @@ mod tests {
     use crate::configuration::Configuration;
     use crate::engine::MockEngine;
     use crate::shell::command::LoopCondition;
-    use crate::shell::command::{CommandOptions, Commands};
+    use crate::shell::command::{CommandManager, CommandOptions};
     use rustyline::history::DefaultHistory;
     use std::default;
 
@@ -59,7 +59,7 @@ mod tests {
             ..default::Default::default()
         };
         let options = CommandOptions {
-            commands: &Commands::default(),
+            command_manager: &CommandManager::default(),
             configuration,
             engine: &mut MockEngine::new(),
             history: &DefaultHistory::new(),
@@ -82,7 +82,7 @@ mod tests {
             ..default::Default::default()
         };
         let options = CommandOptions {
-            commands: &Commands::default(),
+            command_manager: &CommandManager::default(),
             configuration,
             engine: &mut MockEngine::new(),
             history: &DefaultHistory::new(),
@@ -104,7 +104,7 @@ mod tests {
             ..default::Default::default()
         };
         let options = CommandOptions {
-            commands: &Commands::default(),
+            command_manager: &CommandManager::default(),
             configuration,
             engine: &mut MockEngine::new(),
             history: &DefaultHistory::new(),
@@ -122,7 +122,7 @@ mod tests {
     #[tokio::test]
     async fn test_execute_invalid_option() {
         let options = CommandOptions {
-            commands: &Commands::default(),
+            command_manager: &CommandManager::default(),
             configuration: &mut Configuration::default(),
             engine: &mut MockEngine::new(),
             history: &DefaultHistory::new(),

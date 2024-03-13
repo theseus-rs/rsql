@@ -1,6 +1,6 @@
 use crate::configuration::Configuration;
 use crate::engine::{DriverManager, Engine, QueryResult};
-use crate::shell::command::{CommandOptions, Commands, LoopCondition};
+use crate::shell::command::{CommandManager, CommandOptions, LoopCondition};
 use crate::shell::repl::display;
 use crate::shell::repl::helper::ReplHelper;
 use crate::shell::ShellArgs;
@@ -33,20 +33,20 @@ fn welcome_message(configuration: &Configuration) -> Result<()> {
 
 pub async fn execute(
     driver_manager: DriverManager,
-    commands: &Commands,
+    command_manager: &CommandManager,
     configuration: &mut Configuration,
     args: &ShellArgs,
 ) -> Result<()> {
     let mut binding = driver_manager.connect(args.url.as_str()).await?;
     let engine = binding.as_mut();
 
-    repl(commands, configuration, engine).await?;
+    repl(command_manager, configuration, engine).await?;
 
     engine.stop().await
 }
 
 async fn repl(
-    commands: &Commands,
+    command_manager: &CommandManager,
     configuration: &mut Configuration,
     engine: &mut dyn Engine,
 ) -> Result<()> {
@@ -75,7 +75,7 @@ async fn repl(
 
     loop {
         let loop_condition = match editor.readline(&prompt) {
-            Ok(line) => evaluate(commands, configuration, engine, &mut editor, line)
+            Ok(line) => evaluate(command_manager, configuration, engine, &mut editor, line)
                 .await
                 .unwrap_or_else(|error| {
                     eprintln!("{}: {:?}", "Error".red(), error);
@@ -112,14 +112,21 @@ async fn repl(
 }
 
 async fn evaluate(
-    commands: &Commands,
+    command_manager: &CommandManager,
     configuration: &mut Configuration,
     engine: &mut dyn Engine,
     editor: &mut Editor<ReplHelper, DefaultHistory>,
     line: String,
 ) -> Result<LoopCondition> {
     let loop_condition = if line.starts_with('.') {
-        execute_command(commands, configuration, engine, editor, line.as_str()).await?
+        execute_command(
+            command_manager,
+            configuration,
+            engine,
+            editor,
+            line.as_str(),
+        )
+        .await?
     } else {
         execute_sql(configuration, engine, line.as_str()).await?
     };
@@ -132,7 +139,7 @@ async fn evaluate(
 }
 
 async fn execute_command(
-    commands: &Commands,
+    command_manager: &CommandManager,
     configuration: &mut Configuration,
     engine: &mut dyn Engine,
     editor: &mut Editor<ReplHelper, DefaultHistory>,
@@ -142,11 +149,11 @@ async fn execute_command(
     let output = &mut io::stdout();
     let command_name = &input[0][1..input[0].len()];
 
-    let loop_condition = match commands.get(command_name) {
+    let loop_condition = match command_manager.get(command_name) {
         Some(command) => {
             let history = editor.history();
             let options = CommandOptions {
-                commands,
+                command_manager,
                 configuration,
                 engine,
                 history,

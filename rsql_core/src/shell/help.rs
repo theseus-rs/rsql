@@ -18,14 +18,14 @@ impl ShellCommand for Command {
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
         let output = options.output;
-        let commands = options.commands;
-        let width = commands
+        let command_manager = options.command_manager;
+        let width = command_manager
             .iter()
             .map(|command| command.name().len() + command.args().len() + 1)
             .max()
             .unwrap_or_default();
 
-        for command in commands.iter() {
+        for command in command_manager.iter() {
             let name = command.name();
             let arg_width = width - name.len();
             let args = if command.args().is_empty() {
@@ -51,14 +51,14 @@ mod tests {
     use crate::configuration::Configuration;
     use crate::engine::MockEngine;
     use crate::shell::command::LoopCondition;
-    use crate::shell::command::{CommandOptions, Commands};
+    use crate::shell::command::{CommandManager, CommandOptions};
     use rustyline::history::DefaultHistory;
 
     #[tokio::test]
     async fn test_execute() -> Result<()> {
         let mut output = Vec::new();
         let options = CommandOptions {
-            commands: &Commands::default(),
+            command_manager: &CommandManager::default(),
             configuration: &mut Configuration::default(),
             engine: &mut MockEngine::new(),
             history: &DefaultHistory::new(),
