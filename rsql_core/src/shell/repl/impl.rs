@@ -78,7 +78,11 @@ async fn repl(
                 .await
                 .unwrap_or_else(|error| {
                     eprintln!("{}: {:?}", "Error".red(), error);
-                    LoopCondition::Continue
+                    if configuration.bail_on_error {
+                        LoopCondition::Exit(1)
+                    } else {
+                        LoopCondition::Continue
+                    }
                 }),
             Err(ReadlineError::Interrupted) => {
                 eprintln!("{}", "Program interrupted".red());
@@ -152,7 +156,11 @@ async fn execute_command(
         }
         None => {
             eprintln!("{}: .{command_name}", "Unrecognized command".red());
-            LoopCondition::Continue
+            if configuration.bail_on_error {
+                LoopCondition::Exit(1)
+            } else {
+                LoopCondition::Continue
+            }
         }
     };
 
