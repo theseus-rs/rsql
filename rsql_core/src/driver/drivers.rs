@@ -1,4 +1,4 @@
-use crate::engine::Engine;
+use crate::driver::Connection;
 use anyhow::bail;
 use async_trait::async_trait;
 use sqlx::any::install_default_drivers;
@@ -8,7 +8,7 @@ use std::collections::BTreeMap;
 #[async_trait]
 pub trait Driver: Send {
     fn identifier(&self) -> &'static str;
-    async fn connect(&self, url: &str) -> anyhow::Result<Box<dyn Engine>>;
+    async fn connect(&self, url: &str) -> anyhow::Result<Box<dyn Connection>>;
 }
 
 /// Manages available drivers
@@ -43,7 +43,7 @@ impl DriverManager {
     /// Connect to a database
     /// url = "postgresql::embdeded:"
     /// url = "sqlite::memory:"
-    pub async fn connect(&self, url: &str) -> anyhow::Result<Box<dyn Engine>> {
+    pub async fn connect(&self, url: &str) -> anyhow::Result<Box<dyn Connection>> {
         let identifier = match url.split_once(':') {
             Some((before, _)) => before,
             None => "",
@@ -65,9 +65,9 @@ impl Default for DriverManager {
         install_default_drivers();
 
         #[cfg(feature = "postgresql")]
-        drivers.add(Box::new(crate::engine::postgresql::Driver));
+        drivers.add(Box::new(crate::driver::postgresql::Driver));
         #[cfg(feature = "sqlite")]
-        drivers.add(Box::new(crate::engine::sqlite::Driver));
+        drivers.add(Box::new(crate::driver::sqlite::Driver));
 
         drivers
     }

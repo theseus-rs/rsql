@@ -15,7 +15,7 @@ impl ShellCommand for Command {
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
         let output = options.output;
-        let tables = options.engine.tables().await?;
+        let tables = options.connection.tables().await?;
 
         for table in tables {
             writeln!(output, "{}", table)?;
@@ -29,7 +29,7 @@ impl ShellCommand for Command {
 mod tests {
     use super::*;
     use crate::configuration::Configuration;
-    use crate::engine::MockEngine;
+    use crate::driver::MockConnection;
     use crate::shell::command::LoopCondition;
     use crate::shell::command::{CommandManager, CommandOptions};
     use rustyline::history::DefaultHistory;
@@ -37,15 +37,15 @@ mod tests {
     #[tokio::test]
     async fn test_execute() -> Result<()> {
         let table = "table1";
-        let mock_engine = &mut MockEngine::new();
-        mock_engine
+        let mock_connection = &mut MockConnection::new();
+        mock_connection
             .expect_tables()
             .returning(|| Ok(vec![table.to_string()]));
         let mut output = Vec::new();
         let options = CommandOptions {
             command_manager: &CommandManager::default(),
             configuration: &mut Configuration::default(),
-            engine: mock_engine,
+            connection: mock_connection,
             history: &DefaultHistory::new(),
             input: vec![".tables"],
             output: &mut output,

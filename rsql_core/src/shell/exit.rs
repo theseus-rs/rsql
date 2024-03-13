@@ -25,7 +25,7 @@ impl ShellCommand for Command {
             options.input[1].parse()?
         };
 
-        options.engine.stop().await?;
+        options.connection.stop().await?;
         info!("Exiting with code {exit_code}");
         Ok(LoopCondition::Exit(exit_code))
     }
@@ -35,20 +35,20 @@ impl ShellCommand for Command {
 mod tests {
     use super::*;
     use crate::configuration::Configuration;
-    use crate::engine::MockEngine;
+    use crate::driver::MockConnection;
     use crate::shell::command::LoopCondition;
     use crate::shell::command::{CommandManager, CommandOptions};
     use rustyline::history::DefaultHistory;
 
     #[tokio::test]
     async fn test_execute_no_argument() -> Result<()> {
-        let mock_engine = &mut MockEngine::new();
-        mock_engine.expect_stop().returning(|| Ok(()));
+        let mock_connection = &mut MockConnection::new();
+        mock_connection.expect_stop().returning(|| Ok(()));
 
         let options = CommandOptions {
             command_manager: &CommandManager::default(),
             configuration: &mut Configuration::default(),
-            engine: mock_engine,
+            connection: mock_connection,
             history: &DefaultHistory::new(),
             input: vec![".exit"],
             output: &mut Vec::new(),
@@ -62,13 +62,13 @@ mod tests {
 
     #[tokio::test]
     async fn test_execute_argument() -> Result<()> {
-        let mock_engine = &mut MockEngine::new();
-        mock_engine.expect_stop().returning(|| Ok(()));
+        let mock_connection = &mut MockConnection::new();
+        mock_connection.expect_stop().returning(|| Ok(()));
 
         let options = CommandOptions {
             command_manager: &CommandManager::default(),
             configuration: &mut Configuration::default(),
-            engine: mock_engine,
+            connection: mock_connection,
             history: &DefaultHistory::new(),
             input: vec![".exit", "1"],
             output: &mut Vec::new(),
@@ -85,7 +85,7 @@ mod tests {
         let options = CommandOptions {
             command_manager: &CommandManager::default(),
             configuration: &mut Configuration::default(),
-            engine: &mut MockEngine::new(),
+            connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
             input: vec![".exit", "foo"],
             output: &mut Vec::new(),

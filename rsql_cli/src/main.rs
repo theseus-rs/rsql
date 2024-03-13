@@ -3,7 +3,7 @@
 use anyhow::Result;
 use clap::Parser;
 use rsql_core::configuration::ConfigurationBuilder;
-use rsql_core::engine::DriverManager;
+use rsql_core::driver::DriverManager;
 use rsql_core::shell::{CommandManager, ShellArgs};
 use rsql_core::version::full_version;
 use rsql_core::{shell, version};

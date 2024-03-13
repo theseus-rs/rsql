@@ -45,7 +45,7 @@ impl ShellCommand for Command {
 mod tests {
     use super::*;
     use crate::configuration::Configuration;
-    use crate::engine::MockEngine;
+    use crate::driver::MockConnection;
     use crate::shell::command::LoopCondition;
     use crate::shell::command::{CommandManager, CommandOptions};
     use rustyline::history::DefaultHistory;
@@ -61,7 +61,7 @@ mod tests {
         let options = CommandOptions {
             command_manager: &CommandManager::default(),
             configuration,
-            engine: &mut MockEngine::new(),
+            connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
             input: vec![".bail"],
             output: &mut output,
@@ -84,7 +84,7 @@ mod tests {
         let options = CommandOptions {
             command_manager: &CommandManager::default(),
             configuration,
-            engine: &mut MockEngine::new(),
+            connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
             input: vec![".bail", "on"],
             output: &mut Vec::new(),
@@ -106,7 +106,7 @@ mod tests {
         let options = CommandOptions {
             command_manager: &CommandManager::default(),
             configuration,
-            engine: &mut MockEngine::new(),
+            connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
             input: vec![".bail", "off"],
             output: &mut Vec::new(),
@@ -124,7 +124,7 @@ mod tests {
         let options = CommandOptions {
             command_manager: &CommandManager::default(),
             configuration: &mut Configuration::default(),
-            engine: &mut MockEngine::new(),
+            connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
             input: vec![".bail", "foo"],
             output: &mut Vec::new(),

@@ -1,43 +1,63 @@
-use crate::engine::value::Value;
-use crate::engine::QueryResult;
+use crate::driver::connection::QueryResult;
+use crate::driver::value::Value;
 use anyhow::{bail, Result};
 use async_trait::async_trait;
-use sqlx::sqlite::{SqliteAutoVacuum, SqliteColumn, SqliteConnectOptions, SqliteRow};
-use sqlx::{Column, Row, SqlitePool};
+use postgresql_archive::Version;
+use postgresql_embedded::{PostgreSQL, Settings};
+use sqlx::postgres::{PgColumn, PgConnectOptions, PgRow};
+use sqlx::{Column, PgPool, Row};
 use std::str::FromStr;
+use std::string::ToString;
+
+const POSTGRESQL_EMBEDDED_VERSION: &str = "16.2.3";
 
 pub struct Driver;
 
 #[async_trait]
-impl crate::engine::Driver for Driver {
+impl crate::driver::Driver for Driver {
     fn identifier(&self) -> &'static str {
-        "sqlite"
+        "postgresql"
     }
 
-    async fn connect(&self, url: &str) -> Result<Box<dyn crate::engine::Engine>> {
-        let engine = Engine::new(url).await?;
-        Ok(Box::new(engine))
+    async fn connect(&self, url: &str) -> Result<Box<dyn crate::driver::Connection>> {
+        let connection = Connection::new(url).await?;
+        Ok(Box::new(connection))
     }
 }
 
-pub(crate) struct Engine {
-    pool: SqlitePool,
+pub(crate) struct Connection {
+    postgresql: Option<PostgreSQL>,
+    pool: PgPool,
 }
 
-impl Engine {
-    pub(crate) async fn new(url: &str) -> Result<Engine> {
-        let options = SqliteConnectOptions::from_str(url)?
-            .auto_vacuum(SqliteAutoVacuum::None)
-            .create_if_missing(true);
-        let pool = SqlitePool::connect_with(options).await?;
-        let engine = Engine { pool };
+impl Connection {
+    pub(crate) async fn new(url: &str) -> Result<Connection> {
+        let mut database_url = url.to_string();
+        let postgresql = if url.starts_with("postgresql::embedded:") {
+            let version = Version::from_str(POSTGRESQL_EMBEDDED_VERSION)?;
+            let mut postgresql = PostgreSQL::new(version, Settings::default());
+            postgresql.setup().await?;
+            postgresql.start().await?;
 
-        Ok(engine)
+            let database_name = "embedded";
+            postgresql.create_database(database_name).await?;
+            let settings = postgresql.settings();
+            database_url = settings.url(database_name);
+            Some(postgresql)
+        } else {
+            None
+        };
+
+        let options = PgConnectOptions::from_str(database_url.as_str())?;
+        let pool = PgPool::connect_with(options).await?;
+        let connection = Connection { postgresql, pool };
+
+        Ok(connection)
     }
 }
 
 #[async_trait]
-impl crate::engine::Engine for Engine {
+impl crate::driver::Connection for Connection {
     async fn execute(&self, sql: &str) -> Result<u64> {
         Ok(sqlx::query(sql).execute(&self.pool).await?.rows_affected())
     }
@@ -67,7 +87,8 @@ impl crate::engine::Engine for Engine {
     }
 
     async fn tables(&mut self) -> Result<Vec<String>> {
-        let sql = "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name";
+        let sql = "SELECT table_name FROM information_schema.tables \
+            WHERE table_schema = 'public' ORDER BY table_name";
         let rows = sqlx::query(sql).fetch_all(&self.pool).await?;
         let mut tables = Vec::new();
 
@@ -83,13 +104,22 @@ impl crate::engine::Engine for Engine {
 
     async fn stop(&mut self) -> Result<()> {
         self.pool.close().await;
-        Ok(())
+
+        if let Some(postgresql) = &self.postgresql {
+            match postgresql.stop().await {
+                Ok(_) => Ok(()),
+                Err(error) => bail!("Error stopping driver: {:?}", error),
+            }
+        } else {
+            Ok(())
+        }
     }
 }
 
-impl Engine {
-    fn convert_to_value(&self, row: &SqliteRow, column: &SqliteColumn) -> Result<Option<Value>> {
+impl Connection {
+    fn convert_to_value(&self, row: &PgRow, column: &PgColumn) -> Result<Option<Value>> {
         let column_name = column.name();
+
         if let Ok(value) = row.try_get(column_name) {
             let value: Option<Vec<u8>> = value;
             Ok(value.map(Value::Bytes))
@@ -117,6 +147,9 @@ impl Engine {
         } else if let Ok(value) = row.try_get(column_name) {
             let value: Option<f64> = value;
             Ok(value.map(Value::F64))
+        } else if let Ok(value) = row.try_get(column_name) {
+            let value: Option<rust_decimal::Decimal> = value;
+            Ok(value.map(|v| Value::String(v.to_string())))
         } else if let Ok(value) = row.try_get(column_name) {
             let value: Option<chrono::NaiveDate> = value;
             Ok(value.map(Value::Date))
