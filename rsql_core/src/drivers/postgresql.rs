@@ -1,4 +1,4 @@
-use crate::drivers::connection::QueryResult;
+use crate::drivers::connection::{QueryResult, Results};
 use crate::drivers::value::Value;
 use anyhow::{bail, Result};
 use async_trait::async_trait;
@@ -59,11 +59,12 @@ impl Connection {
 
 #[async_trait]
 impl crate::drivers::Connection for Connection {
-    async fn execute(&self, sql: &str) -> Result<u64> {
-        Ok(sqlx::query(sql).execute(&self.pool).await?.rows_affected())
+    async fn execute(&self, sql: &str) -> Result<Results> {
+        let rows = sqlx::query(sql).execute(&self.pool).await?.rows_affected();
+        Ok(Results::Execute(rows))
     }
 
-    async fn query(&self, sql: &str) -> Result<QueryResult> {
+    async fn query(&self, sql: &str) -> Result<Results> {
         let query_rows = sqlx::query(sql).fetch_all(&self.pool).await?;
         let columns = if let Some(row) = query_rows.first() {
             row.columns()
@@ -84,7 +85,8 @@ impl crate::drivers::Connection for Connection {
             rows.push(row_data);
         }
 
-        Ok(QueryResult { columns, rows })
+        let query_result = QueryResult { columns, rows };
+        Ok(Results::Query(query_result))
     }
 
     async fn tables(&mut self) -> Result<Vec<String>> {

@@ -1,6 +1,5 @@
 use crate::configuration::{Configuration, ResultFormat};
-use crate::drivers::QueryResult;
-use crate::shell::repl::SqlResult;
+use crate::drivers::{QueryResult, Results};
 use anyhow::Result;
 use colored::Colorize;
 use lazy_static::lazy_static;
@@ -34,12 +33,12 @@ lazy_static! {
 
 pub(crate) fn table(
     configuration: &Configuration,
-    sql_result: SqlResult,
+    results: Results,
     elapsed: Duration,
 ) -> Result<()> {
-    let rows_affected = match sql_result {
-        SqlResult::Execute(rows_affected) => rows_affected,
-        SqlResult::Query(query_result) => {
+    let rows_affected = match results {
+        Results::Execute(rows_affected) => rows_affected,
+        Results::Query(query_result) => {
             let mut table = Table::new();
 
             match configuration.results_format {

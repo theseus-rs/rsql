@@ -1,6 +1,6 @@
 use crate::commands::{CommandManager, CommandOptions, LoopCondition};
 use crate::configuration::Configuration;
-use crate::drivers::{Connection, DriverManager, QueryResult};
+use crate::drivers::{Connection, DriverManager};
 use crate::shell::helper::ReplHelper;
 use crate::shell::{display, ShellArgs};
 use crate::version::full_version;
@@ -12,11 +12,6 @@ use rustyline::history::{DefaultHistory, FileHistory};
 use rustyline::Editor;
 use std::io;
 use tracing::error;
-
-pub(crate) enum SqlResult {
-    Query(QueryResult),
-    Execute(u64),
-}
 
 fn welcome_message(configuration: &Configuration) -> Result<()> {
     let version = full_version(configuration)?;
@@ -189,13 +184,13 @@ async fn execute_sql(
     let sql = line.trim();
     let command = if sql.len() > 6 { &sql[..6] } else { "" }.trim();
 
-    let sql_result = if command.to_lowercase() == "select" {
-        SqlResult::Query(connection.query(sql).await?)
+    let results = if command.to_lowercase() == "select" {
+        connection.query(sql).await?
     } else {
-        SqlResult::Execute(connection.execute(sql).await?)
+        connection.execute(sql).await?
     };
 
     let elapsed = start.elapsed();
-    display::table(configuration, sql_result, elapsed)?;
+    display::table(configuration, results, elapsed)?;
     Ok(LoopCondition::Continue)
 }
