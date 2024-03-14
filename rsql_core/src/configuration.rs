@@ -3,45 +3,18 @@ use config::{Config, FileFormat};
 use dirs::home_dir;
 use num_format::Locale;
 use rustyline::{ColorMode, EditMode};
+use std::env;
 use std::fs::{create_dir_all, OpenOptions};
 use std::io::Write;
 use std::path::PathBuf;
 use std::str::FromStr;
 use std::time::Duration;
-use std::{env, fmt};
 use tracing::level_filters::LevelFilter;
 use tracing::{debug, warn};
 use tracing_appender::rolling::{RollingFileAppender, Rotation};
 
 pub(crate) static DEFAULT_CONFIG: &str =
     include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/resources/rsql.toml"));
-
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum ResultFormat {
-    Ascii,
-    Unicode,
-}
-
-impl FromStr for ResultFormat {
-    type Err = anyhow::Error;
-
-    fn from_str(s: &str) -> Result<Self> {
-        match s {
-            "ascii" => Ok(Self::Ascii),
-            "unicode" => Ok(Self::Unicode),
-            format => bail!("Invalid results.format: {format}"),
-        }
-    }
-}
-
-impl fmt::Display for ResultFormat {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Ascii => write!(f, "ascii"),
-            Self::Unicode => write!(f, "unicode"),
-        }
-    }
-}
 
 /// A builder for creating a [Configuration] instance.
 #[derive(Clone, Debug, Default)]
@@ -176,8 +149,8 @@ impl ConfigurationBuilder {
 
     /// Set the results format to use.
     #[allow(dead_code)]
-    pub fn with_results_format(mut self, results_format: ResultFormat) -> Self {
-        self.configuration.results_format = results_format;
+    pub fn with_results_format<S: Into<String>>(mut self, results_format: S) -> Self {
+        self.configuration.results_format = results_format.into();
         self
     }
 
@@ -242,7 +215,7 @@ pub struct Configuration {
     pub history_limit: usize,
     pub history_ignore_dups: bool,
     pub theme: String,
-    pub results_format: ResultFormat,
+    pub results_format: String,
     pub results_header: bool,
     pub results_footer: bool,
     pub results_timer: bool,
@@ -265,7 +238,7 @@ impl Default for Configuration {
             history_limit: 1000,
             history_ignore_dups: true,
             theme: "Solarized (dark)".to_string(),
-            results_format: ResultFormat::Unicode,
+            results_format: "unicode".to_string(),
             results_header: true,
             results_footer: true,
             results_timer: true,
@@ -365,7 +338,7 @@ impl ConfigFile {
         configuration.theme = theme(config)?;
 
         if let Ok(results_format) = config.get::<String>("results.format") {
-            configuration.results_format = ResultFormat::from_str(results_format.as_str())?;
+            configuration.results_format = results_format;
         }
         if let Ok(results_header) = config.get::<bool>("results.header") {
             configuration.results_header = results_header;
@@ -440,7 +413,7 @@ mod test {
         let history_limit = 42;
         let history_ignore_dups = false;
         let theme = "Solarized (light)";
-        let results_format = ResultFormat::Ascii;
+        let results_format = "unicode".to_string();
         let results_header = false;
         let results_footer = false;
         let results_timer = false;
@@ -458,7 +431,7 @@ mod test {
             .with_history_limit(history_limit)
             .with_history_ignore_dups(history_ignore_dups)
             .with_theme(theme)
-            .with_results_format(results_format)
+            .with_results_format(results_format.clone())
             .with_results_header(results_header)
             .with_results_footer(results_footer)
             .with_results_timer(results_timer)
@@ -504,24 +477,10 @@ mod test {
         assert_eq!(configuration.history_limit, 1000);
         assert_eq!(configuration.history_ignore_dups, true);
         assert_eq!(configuration.theme, "Solarized (dark)");
-        assert_eq!(configuration.results_format, ResultFormat::Unicode);
+        assert_eq!(configuration.results_format, "unicode".to_string());
         assert_eq!(configuration.results_header, true);
         assert_eq!(configuration.results_footer, true);
         assert_eq!(configuration.results_timer, true);
-    }
-
-    #[test]
-    fn test_results_format_from_str() -> Result<()> {
-        assert_eq!(ResultFormat::from_str("ascii")?, ResultFormat::Ascii);
-        assert_eq!(ResultFormat::from_str("unicode")?, ResultFormat::Unicode);
-        assert!(ResultFormat::from_str("foo").is_err());
-        Ok(())
-    }
-
-    #[test]
-    fn test_results_format_to_string() {
-        assert_eq!(ResultFormat::Ascii.to_string(), "ascii");
-        assert_eq!(ResultFormat::Unicode.to_string(), "unicode");
     }
 
     #[test]

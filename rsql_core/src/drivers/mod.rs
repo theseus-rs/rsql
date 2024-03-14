@@ -11,3 +11,4 @@ mod value;
 pub use connection::MockConnection;
 pub use connection::{Connection, QueryResult, Results};
 pub use driver::{Driver, DriverManager};
+pub use value::Value;

@@ -1,10 +1,11 @@
 use crate::commands::{CommandManager, CommandOptions, LoopCondition};
 use crate::configuration::Configuration;
 use crate::drivers::{Connection, DriverManager};
+use crate::formatters::{FormatterManager, FormatterOptions};
 use crate::shell::helper::ReplHelper;
-use crate::shell::{display, ShellArgs};
+use crate::shell::ShellArgs;
 use crate::version::full_version;
-use anyhow::Result;
+use anyhow::{bail, Result};
 use colored::Colorize;
 use rustyline::config::Configurer;
 use rustyline::error::ReadlineError;
@@ -27,7 +28,7 @@ fn welcome_message(configuration: &Configuration) -> Result<()> {
 
 pub async fn execute(
     driver_manager: DriverManager,
-    command_manager: &CommandManager,
+    command_manager: CommandManager,
     configuration: &mut Configuration,
     args: &ShellArgs,
 ) -> Result<()> {
@@ -40,7 +41,7 @@ pub async fn execute(
 }
 
 async fn repl(
-    command_manager: &CommandManager,
+    command_manager: CommandManager,
     configuration: &mut Configuration,
     connection: &mut dyn Connection,
 ) -> Result<()> {
@@ -70,7 +71,7 @@ async fn repl(
     loop {
         let loop_condition = match editor.readline(&prompt) {
             Ok(line) => evaluate(
-                command_manager,
+                &command_manager,
                 configuration,
                 connection,
                 &mut editor,
@@ -190,7 +191,18 @@ async fn execute_sql(
         connection.execute(sql).await?
     };
 
-    let elapsed = start.elapsed();
-    display::table(configuration, results, elapsed)?;
+    let formatter_manager = FormatterManager::default();
+    let result_format = &configuration.results_format;
+    let formatter = match formatter_manager.get(result_format) {
+        Some(formatter) => formatter,
+        None => bail!("{}: {}", "Error".red(), "Invalid format"),
+    };
+    let mut options = FormatterOptions {
+        configuration,
+        results: &results,
+        elapsed: &start.elapsed(),
+        output: &mut io::stdout(),
+    };
+    formatter.format(&mut options).await?;
     Ok(LoopCondition::Continue)
 }

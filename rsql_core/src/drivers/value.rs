@@ -2,7 +2,7 @@ use base64::engine::general_purpose::STANDARD;
 use base64::Engine;
 use num_format::{Locale, ToFormattedString};
 
-pub(crate) enum Value {
+pub enum Value {
     Bytes(Vec<u8>),
     I8(i8),
     I16(i16),
