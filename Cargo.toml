@@ -5,7 +5,7 @@ resolver = "2"
 
 [workspace.package]
 authors = ["Brian Heineman <brian.heineman@gmail.com>"]
-categories = ["database", "sql"]
+categories = ["database"]
 edition = "2021"
 keywords = ["database", "postgresql", "sql", "sqlite"]
 license = "Apache-2.0 OR MIT"
