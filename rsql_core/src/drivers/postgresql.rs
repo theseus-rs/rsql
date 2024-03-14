@@ -183,16 +183,18 @@ impl Connection {
     }
 }
 
-// postgresql::embedded::Postgres is not function on Windows yet
+// postgresql::embedded::Postgres is not functioning on Windows yet
 #[cfg(not(target_os = "windows"))]
 #[cfg(test)]
 mod test {
     use crate::drivers::{DriverManager, Results, Value};
     use anyhow::Result;
+    use serial_test::serial;
 
     const DATABASE_URL: &str = "postgresql::embedded:";
 
     #[tokio::test]
+    #[serial]
     async fn test_driver_connect() -> Result<()> {
         let drivers = DriverManager::default();
         let mut connection = drivers.connect(DATABASE_URL).await?;
@@ -201,6 +203,7 @@ mod test {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_connection_interface() -> Result<()> {
         let drivers = DriverManager::default();
         let mut connection = drivers.connect(DATABASE_URL).await?;
