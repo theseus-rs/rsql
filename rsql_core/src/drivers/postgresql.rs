@@ -182,3 +182,71 @@ impl Connection {
         }
     }
 }
+
+// postgresql::embedded::Postgres is not functioning on Windows yet
+#[cfg(not(target_os = "windows"))]
+#[cfg(test)]
+mod test {
+    use crate::drivers::{DriverManager, Results, Value};
+    use anyhow::Result;
+    use serial_test::serial;
+
+    const DATABASE_URL: &str = "postgresql::embedded:";
+
+    #[tokio::test]
+    #[serial]
+    async fn test_driver_connect() -> Result<()> {
+        let drivers = DriverManager::default();
+        let mut connection = drivers.connect(DATABASE_URL).await?;
+        connection.stop().await?;
+        Ok(())
+    }
+
+    #[tokio::test]
+    #[serial]
+    async fn test_connection_interface() -> Result<()> {
+        let drivers = DriverManager::default();
+        let mut connection = drivers.connect(DATABASE_URL).await?;
+
+        let _ = connection
+            .execute("CREATE TABLE person (id INTEGER, name VARCHAR(20))")
+            .await?;
+
+        let execute_results = connection
+            .execute("INSERT INTO person (id, name) VALUES (1, 'foo')")
+            .await?;
+        if let Results::Execute(rows) = execute_results {
+            assert_eq!(rows, 1);
+        }
+
+        let results = connection.query("SELECT id, name FROM person").await?;
+        if let Results::Query(query_result) = results {
+            assert_eq!(query_result.columns, vec!["id", "name"]);
+            assert_eq!(query_result.rows.len(), 1);
+            match query_result.rows.get(0) {
+                Some(row) => {
+                    assert_eq!(row.len(), 2);
+
+                    if let Some(Value::I32(id)) = &row[0] {
+                        assert_eq!(*id, 1);
+                    } else {
+                        assert!(false);
+                    }
+
+                    if let Some(Value::String(name)) = &row[1] {
+                        assert_eq!(name, "foo");
+                    } else {
+                        assert!(false);
+                    }
+                }
+                None => assert!(false),
+            }
+        }
+
+        let tables = connection.tables().await?;
+        assert_eq!(tables, vec!["person"]);
+
+        connection.stop().await?;
+        Ok(())
+    }
+}

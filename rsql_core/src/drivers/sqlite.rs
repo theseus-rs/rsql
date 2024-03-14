@@ -3,7 +3,7 @@ use crate::drivers::value::Value;
 use anyhow::{bail, Result};
 use async_trait::async_trait;
 use sqlx::sqlite::{SqliteAutoVacuum, SqliteColumn, SqliteConnectOptions, SqliteRow};
-use sqlx::{Column, Row, SqlitePool};
+use sqlx::{Column, Row, SqlitePool, TypeInfo};
 use std::str::FromStr;
 
 pub struct Driver;
@@ -92,6 +92,49 @@ impl crate::drivers::Connection for Connection {
 impl Connection {
     fn convert_to_value(&self, row: &SqliteRow, column: &SqliteColumn) -> Result<Option<Value>> {
         let column_name = column.name();
+        let column_type = column.type_info();
+        let column_type_name = column_type.name();
+
+        match column_type_name {
+            "TEXT" => {
+                let value: Option<String> = row.try_get(column_name)?;
+                return Ok(value.map(Value::String));
+            }
+            "REAL" => {
+                let value: Option<f64> = row.try_get(column_name)?;
+                return Ok(value.map(Value::F64));
+            }
+            "BLOB" => {
+                let value: Option<Vec<u8>> = row.try_get(column_name)?;
+                return Ok(value.map(Value::Bytes));
+            }
+            "INTEGER" => {
+                let value: Option<i64> = row.try_get(column_name)?;
+                return Ok(value.map(Value::I64));
+            }
+            "NUMERIC" => {
+                let value: Option<String> = row.try_get(column_name)?;
+                return Ok(value.map(Value::String));
+            }
+            "BOOLEAN" => {
+                let value: Option<bool> = row.try_get(column_name)?;
+                return Ok(value.map(Value::Bool));
+            }
+            "DATE" => {
+                let value: Option<chrono::NaiveDate> = row.try_get(column_name)?;
+                return Ok(value.map(Value::Date));
+            }
+            "TIME" => {
+                let value: Option<chrono::NaiveTime> = row.try_get(column_name)?;
+                return Ok(value.map(Value::Time));
+            }
+            "DATETIME" => {
+                let value: Option<chrono::NaiveDateTime> = row.try_get(column_name)?;
+                return Ok(value.map(Value::DateTime));
+            }
+            _ => {}
+        }
+
         if let Ok(value) = row.try_get(column_name) {
             let value: Option<Vec<u8>> = value;
             Ok(value.map(Value::Bytes))
@@ -142,5 +185,68 @@ impl Connection {
                 column_name
             );
         }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::drivers::{DriverManager, Results, Value};
+    use anyhow::Result;
+
+    const DATABASE_URL: &str = "sqlite::memory:";
+
+    #[tokio::test]
+    async fn test_driver_connect() -> Result<()> {
+        let drivers = DriverManager::default();
+        let mut connection = drivers.connect(DATABASE_URL).await?;
+        connection.stop().await?;
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_connection_interface() -> Result<()> {
+        let drivers = DriverManager::default();
+        let mut connection = drivers.connect(DATABASE_URL).await?;
+
+        let _ = connection
+            .execute("CREATE TABLE person (id INTEGER, name TEXT)")
+            .await?;
+
+        let execute_results = connection
+            .execute("INSERT INTO person (id, name) VALUES (1, 'foo')")
+            .await?;
+        if let Results::Execute(rows) = execute_results {
+            assert_eq!(rows, 1);
+        }
+
+        let results = connection.query("SELECT id, name FROM person").await?;
+        if let Results::Query(query_result) = results {
+            assert_eq!(query_result.columns, vec!["id", "name"]);
+            assert_eq!(query_result.rows.len(), 1);
+            match query_result.rows.get(0) {
+                Some(row) => {
+                    assert_eq!(row.len(), 2);
+
+                    if let Some(Value::I64(id)) = &row[0] {
+                        assert_eq!(*id, 1);
+                    } else {
+                        assert!(false);
+                    }
+
+                    if let Some(Value::String(name)) = &row[1] {
+                        assert_eq!(name, "foo");
+                    } else {
+                        assert!(false);
+                    }
+                }
+                None => assert!(false),
+            }
+        }
+
+        let tables = connection.tables().await?;
+        assert_eq!(tables, vec!["person"]);
+
+        connection.stop().await?;
+        Ok(())
     }
 }
