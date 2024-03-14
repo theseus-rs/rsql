@@ -7,7 +7,7 @@ mod repl;
 
 use clap::Parser;
 
-pub use repl::execute;
+pub use repl::{Shell, ShellBuilder};
 
 #[cfg(feature = "sqlite")]
 const DEFAULT_URL: &str = "sqlite::memory:";

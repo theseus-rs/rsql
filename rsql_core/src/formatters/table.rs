@@ -161,6 +161,15 @@ mod tests {
         Results::Query(query_result)
     }
 
+    fn query_result_two_rows() -> Results {
+        let query_result = QueryResult {
+            columns: vec![COLUMN_HEADER.to_string()],
+            rows: vec![vec![None], vec![Some(Value::I64(12345))]],
+        };
+
+        Results::Query(query_result)
+    }
+
     async fn test_format(configuration: &mut Configuration, results: &Results) -> Result<String> {
         let elapsed = Duration::from_nanos(9);
         let output = &mut Vec::new();
@@ -224,34 +233,35 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_query_format_one_row_without_color() -> Result<()> {
+    async fn test_query_format_two_rows_without_color() -> Result<()> {
         let mut configuration = Configuration {
             locale: Locale::en,
             color_mode: ColorMode::Disabled,
             ..Default::default()
         };
-        let results = query_result_one_row();
+        let results = query_result_two_rows();
 
         let output = test_format(&mut configuration, &results).await?;
         let expected_output =
-            "+--------+\n| id     |\n+========+\n| 12,345 |\n+--------+\n1 row (9ns)\n";
+            "+--------+\n| id     |\n+========+\n| NULL   |\n+--------+\n| 12,345 |\n+--------+\n2 rows (9ns)\n";
         assert_eq!(output, expected_output);
         Ok(())
     }
 
     #[tokio::test]
-    async fn test_query_format_one_row_with_color() -> Result<()> {
+    async fn test_query_format_two_rows_with_color() -> Result<()> {
         let mut configuration = Configuration {
             locale: Locale::en,
             color_mode: ColorMode::Forced,
             ..Default::default()
         };
-        let results = query_result_one_row();
+        let results = query_result_two_rows();
 
         let output = test_format(&mut configuration, &results).await?;
         assert!(output.contains("id"));
+        assert!(output.contains("NULL"));
         assert!(output.contains("12,345"));
-        assert!(output.contains("1 row"));
+        assert!(output.contains("2 rows"));
         assert!(output.contains("(9ns)"));
         Ok(())
     }
@@ -269,25 +279,6 @@ mod tests {
 
         let output = test_format(&mut configuration, &results).await?;
         let expected_output = "+--------+\n| 12,345 |\n+--------+\n";
-        assert_eq!(output, expected_output);
-        Ok(())
-    }
-
-    #[tokio::test]
-    async fn test_query_format_two_rows() -> Result<()> {
-        let mut configuration = Configuration {
-            locale: Locale::en,
-            color_mode: ColorMode::Disabled,
-            ..Default::default()
-        };
-        let query_result = QueryResult {
-            columns: vec![COLUMN_HEADER.to_string()],
-            rows: vec![vec![Some(Value::I64(12345))], vec![Some(Value::I64(56789))]],
-        };
-        let results = Results::Query(query_result);
-
-        let output = test_format(&mut configuration, &results).await?;
-        let expected_output = "+--------+\n| id     |\n+========+\n| 12,345 |\n+--------+\n| 56,789 |\n+--------+\n2 rows (9ns)\n";
         assert_eq!(output, expected_output);
         Ok(())
     }
