@@ -2,12 +2,10 @@
 
 use anyhow::Result;
 use clap::Parser;
-use rsql_core::commands::CommandManager;
 use rsql_core::configuration::ConfigurationBuilder;
-use rsql_core::drivers::DriverManager;
-use rsql_core::shell::ShellArgs;
+use rsql_core::shell::{ShellArgs, ShellBuilder};
+use rsql_core::version;
 use rsql_core::version::full_version;
-use rsql_core::{shell, version};
 use std::io;
 use tracing::info;
 
@@ -48,15 +46,10 @@ pub(crate) async fn execute(args: Option<Args>, output: &mut dyn io::Write) -> R
     let result = if args.version {
         version::execute(&mut configuration, output).await
     } else {
-        let driver_manager = DriverManager::default();
-        let command_manager = CommandManager::default();
-        shell::execute(
-            driver_manager,
-            command_manager,
-            &mut configuration,
-            &args.shell_args,
-        )
-        .await
+        let mut shell = ShellBuilder::default()
+            .with_configuration(configuration)
+            .build();
+        shell.execute(&args.shell_args).await
     };
 
     info!("{version} completed");

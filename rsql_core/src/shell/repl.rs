@@ -14,6 +14,174 @@ use rustyline::Editor;
 use std::io;
 use tracing::error;
 
+/// A builder for creating a [Shell].
+pub struct ShellBuilder {
+    shell: Shell,
+}
+
+/// A shell for interacting with a database.
+impl ShellBuilder {
+    pub fn new() -> Self {
+        Self {
+            shell: Shell::default(),
+        }
+    }
+
+    /// Set the driver manager for the shell.
+    pub fn with_driver_manager(mut self, driver_manager: DriverManager) -> Self {
+        self.shell.driver_manager = driver_manager;
+        self
+    }
+
+    /// Set the command manager for the shell.
+    pub fn with_command_manager(mut self, command_manager: CommandManager) -> Self {
+        self.shell.command_manager = command_manager;
+        self
+    }
+
+    /// Set the formatter manager for the shell.
+    pub fn with_formatter_manager(mut self, formatter_manager: FormatterManager) -> Self {
+        self.shell.formatter_manager = formatter_manager;
+        self
+    }
+
+    /// Set the configuration for the shell.
+    pub fn with_configuration(mut self, configuration: Configuration) -> Self {
+        self.shell.configuration = configuration;
+        self
+    }
+
+    /// Build the shell.
+    pub fn build(self) -> Shell {
+        self.shell
+    }
+}
+
+/// Default implementation for [ShellBuilder].
+impl Default for ShellBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// A shell for interacting with a database.
+pub struct Shell {
+    pub driver_manager: DriverManager,
+    pub command_manager: CommandManager,
+    pub formatter_manager: FormatterManager,
+    pub configuration: Configuration,
+}
+
+/// Shell implementation.
+impl Shell {
+    fn new(
+        driver_manager: DriverManager,
+        command_manager: CommandManager,
+        formatter_manager: FormatterManager,
+        configuration: Configuration,
+    ) -> Self {
+        Self {
+            driver_manager,
+            command_manager,
+            formatter_manager,
+            configuration,
+        }
+    }
+
+    /// Execute the shell with the provided arguments.
+    pub async fn execute(&mut self, args: &ShellArgs) -> Result<()> {
+        let mut binding = self.driver_manager.connect(args.url.as_str()).await?;
+        let connection = binding.as_mut();
+
+        self.repl(connection).await?;
+
+        connection.stop().await
+    }
+
+    /// Run the Read-Eval-Print Loop (REPL) for the shell.
+    async fn repl(&mut self, connection: &mut dyn Connection) -> Result<()> {
+        let configuration = &mut self.configuration;
+        let helper = ReplHelper::new(configuration);
+        let history_file = match configuration.history_file {
+            Some(ref file) => String::from(file.to_string_lossy()),
+            None => String::new(),
+        };
+        let mut editor = rustyline::Editor::<ReplHelper, FileHistory>::new()?;
+        editor.set_color_mode(configuration.color_mode);
+        editor.set_edit_mode(configuration.edit_mode);
+        editor.set_completion_type(rustyline::CompletionType::Circular);
+        editor.set_helper(Some(helper));
+
+        if configuration.history {
+            let _ = editor.load_history(history_file.as_str());
+            editor.set_history_ignore_dups(configuration.history_ignore_dups)?;
+
+            if configuration.history_limit > 0 {
+                editor.set_max_history_size(configuration.history_limit)?;
+            }
+        }
+
+        welcome_message(configuration)?;
+        let prompt = format!("{}> ", configuration.program_name);
+
+        loop {
+            let loop_condition = match editor.readline(&prompt) {
+                Ok(line) => evaluate(
+                    &self.command_manager,
+                    configuration,
+                    connection,
+                    &mut editor,
+                    line,
+                )
+                .await
+                .unwrap_or_else(|error| {
+                    eprintln!("{}: {:?}", "Error".red(), error);
+                    if configuration.bail_on_error {
+                        LoopCondition::Exit(1)
+                    } else {
+                        LoopCondition::Continue
+                    }
+                }),
+                Err(ReadlineError::Interrupted) => {
+                    eprintln!("{}", "Program interrupted".red());
+                    error!("{}", "Program interrupted".red());
+                    connection.stop().await?;
+                    LoopCondition::Exit(1)
+                }
+                Err(error) => {
+                    eprintln!("{}: {:?}", "Error".red(), error);
+                    error!("{}: {:?}", "Error".red(), error);
+                    LoopCondition::Exit(1)
+                }
+            };
+
+            match loop_condition {
+                LoopCondition::Continue => {}
+                LoopCondition::Exit(exit_code) => {
+                    if configuration.history {
+                        editor.save_history(history_file.as_str())?;
+                    }
+
+                    std::process::exit(exit_code);
+                }
+            }
+        }
+    }
+}
+
+/// Default implementation for [Shell].
+impl Default for Shell {
+    fn default() -> Self {
+        Self::new(
+            DriverManager::default(),
+            CommandManager::default(),
+            FormatterManager::default(),
+            Configuration::default(),
+        )
+    }
+}
+
+/// Display the welcome message.
 fn welcome_message(configuration: &Configuration) -> Result<()> {
     let version = full_version(configuration)?;
 
@@ -26,92 +194,7 @@ fn welcome_message(configuration: &Configuration) -> Result<()> {
     Ok(())
 }
 
-pub async fn execute(
-    driver_manager: DriverManager,
-    command_manager: CommandManager,
-    configuration: &mut Configuration,
-    args: &ShellArgs,
-) -> Result<()> {
-    let mut binding = driver_manager.connect(args.url.as_str()).await?;
-    let connection = binding.as_mut();
-
-    repl(command_manager, configuration, connection).await?;
-
-    connection.stop().await
-}
-
-async fn repl(
-    command_manager: CommandManager,
-    configuration: &mut Configuration,
-    connection: &mut dyn Connection,
-) -> Result<()> {
-    let helper = ReplHelper::new(configuration);
-    let history_file = match configuration.history_file {
-        Some(ref file) => String::from(file.to_string_lossy()),
-        None => String::new(),
-    };
-    let mut editor = rustyline::Editor::<ReplHelper, FileHistory>::new()?;
-    editor.set_color_mode(configuration.color_mode);
-    editor.set_edit_mode(configuration.edit_mode);
-    editor.set_completion_type(rustyline::CompletionType::Circular);
-    editor.set_helper(Some(helper));
-
-    if configuration.history {
-        let _ = editor.load_history(history_file.as_str());
-        editor.set_history_ignore_dups(configuration.history_ignore_dups)?;
-
-        if configuration.history_limit > 0 {
-            editor.set_max_history_size(configuration.history_limit)?;
-        }
-    }
-
-    welcome_message(configuration)?;
-    let prompt = format!("{}> ", configuration.program_name);
-
-    loop {
-        let loop_condition = match editor.readline(&prompt) {
-            Ok(line) => evaluate(
-                &command_manager,
-                configuration,
-                connection,
-                &mut editor,
-                line,
-            )
-            .await
-            .unwrap_or_else(|error| {
-                eprintln!("{}: {:?}", "Error".red(), error);
-                if configuration.bail_on_error {
-                    LoopCondition::Exit(1)
-                } else {
-                    LoopCondition::Continue
-                }
-            }),
-            Err(ReadlineError::Interrupted) => {
-                eprintln!("{}", "Program interrupted".red());
-                error!("{}", "Program interrupted".red());
-                connection.stop().await?;
-                LoopCondition::Exit(1)
-            }
-            Err(error) => {
-                eprintln!("{}: {:?}", "Error".red(), error);
-                error!("{}: {:?}", "Error".red(), error);
-                LoopCondition::Exit(1)
-            }
-        };
-
-        match loop_condition {
-            LoopCondition::Continue => {}
-            LoopCondition::Exit(exit_code) => {
-                if configuration.history {
-                    editor.save_history(history_file.as_str())?;
-                }
-
-                std::process::exit(exit_code);
-            }
-        }
-    }
-}
-
+/// Evaluate the input line and return the loop condition.
 async fn evaluate(
     command_manager: &CommandManager,
     configuration: &mut Configuration,
@@ -139,6 +222,7 @@ async fn evaluate(
     Ok(loop_condition)
 }
 
+/// Execute the command and return the loop condition.
 async fn execute_command(
     command_manager: &CommandManager,
     configuration: &mut Configuration,
@@ -176,6 +260,7 @@ async fn execute_command(
     Ok(loop_condition)
 }
 
+/// Execute SQL and return the loop condition.
 async fn execute_sql(
     configuration: &mut Configuration,
     connection: &mut dyn Connection,
