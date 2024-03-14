@@ -45,6 +45,7 @@ mod tests {
     use crate::configuration::Configuration;
     use crate::drivers::{QueryResult, Results, Value};
     use crate::formatters::Formatter;
+    use rustyline::ColorMode;
     use std::time::Duration;
 
     fn query_result() -> Results {
@@ -58,7 +59,10 @@ mod tests {
 
     #[tokio::test]
     async fn test_format() -> Result<()> {
-        let mut configuration = Configuration::default();
+        let mut configuration = Configuration {
+            color_mode: ColorMode::Disabled,
+            ..Default::default()
+        };
         let results = query_result();
         let elapsed = Duration::from_nanos(5678);
         let output = &mut Vec::new();
@@ -72,11 +76,10 @@ mod tests {
 
         formatter.format(&mut options).await?;
 
-        let ascii_output = String::from_utf8(output.clone())?;
-        assert!(ascii_output.contains("┌────────┐"));
-        assert!(ascii_output.contains("╞════════╡"));
-        assert!(ascii_output.contains("└────────┘"));
-        assert!(ascii_output.contains("12,345"));
+        let unicode_output = String::from_utf8(output.clone())?.replace("\r\n", "\n");
+        let expected_output =
+            "┌────────┐\n│ id     │\n╞════════╡\n│ 12,345 │\n└────────┘\n1 row (5.678µs)\n";
+        assert_eq!(unicode_output, expected_output);
         Ok(())
     }
 }
