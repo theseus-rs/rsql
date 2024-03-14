@@ -141,7 +141,7 @@ mod tests {
     use prettytable::format::consts::FORMAT_DEFAULT;
     use std::time::Duration;
 
-    const COLUMN_HEADER: &str = "column 1";
+    const COLUMN_HEADER: &str = "id";
 
     fn query_result_no_rows() -> Results {
         let query_result = QueryResult {
@@ -161,7 +161,7 @@ mod tests {
         Results::Query(query_result)
     }
 
-    async fn test_format(configuration: &mut Configuration, results: &Results) -> Result<Vec<u8>> {
+    async fn test_format(configuration: &mut Configuration, results: &Results) -> Result<String> {
         let elapsed = Duration::from_nanos(9);
         let output = &mut Vec::new();
         let mut options = FormatterOptions {
@@ -173,45 +173,21 @@ mod tests {
 
         format(*FORMAT_DEFAULT, &mut options).await?;
 
-        let ascii_output = String::from_utf8(output.clone())?;
-        match results {
-            Results::Execute(_) => {
-                assert!(!ascii_output.contains("+-"));
-                assert!(!ascii_output.contains("-+"));
-                assert!(!ascii_output.contains(COLUMN_HEADER));
-                assert!(!ascii_output.contains("+="));
-                assert!(!ascii_output.contains("=+"));
-            }
-            Results::Query(_) => {
-                assert!(ascii_output.contains("+-"));
-                assert!(ascii_output.contains("-+"));
-
-                if configuration.results_header {
-                    assert!(ascii_output.contains("+="));
-                    assert!(ascii_output.contains("=+"));
-                    assert!(ascii_output.contains(COLUMN_HEADER));
-                }
-            }
-        }
-
-        if configuration.results_footer && configuration.results_timer {
-            assert!(ascii_output.contains("(9ns)"));
-        }
-
-        Ok(output.clone())
+        Ok(String::from_utf8(output.clone())?.replace("\r\n", "\n"))
     }
 
     #[tokio::test]
     async fn test_execute_format() -> Result<()> {
         let mut configuration = Configuration {
             locale: Locale::en,
+            color_mode: ColorMode::Disabled,
             ..Default::default()
         };
         let results = Results::Execute(42);
 
         let output = test_format(&mut configuration, &results).await?;
-        let ascii_output = String::from_utf8(output.clone())?;
-        assert!(ascii_output.contains("42 rows"));
+        let expected_output = "42 rows (9ns)\n";
+        assert_eq!(output, expected_output);
         Ok(())
     }
 
@@ -219,28 +195,64 @@ mod tests {
     async fn test_query_format_no_rows() -> Result<()> {
         let mut configuration = Configuration {
             locale: Locale::en,
+            color_mode: ColorMode::Disabled,
             ..Default::default()
         };
         let results = query_result_no_rows();
 
         let output = test_format(&mut configuration, &results).await?;
-        let ascii_output = String::from_utf8(output.clone())?;
-        assert!(ascii_output.contains("0 rows"));
+        let expected_output = "+----+\n| id |\n+====+\n+----+\n0 rows (9ns)\n";
+        assert_eq!(output, expected_output);
         Ok(())
     }
 
     #[tokio::test]
-    async fn test_query_format_one_row() -> Result<()> {
+    async fn test_query_format_footer_no_timer() -> Result<()> {
         let mut configuration = Configuration {
             locale: Locale::en,
+            color_mode: ColorMode::Disabled,
+            results_footer: true,
+            results_timer: false,
+            ..Default::default()
+        };
+        let results = query_result_no_rows();
+
+        let output = test_format(&mut configuration, &results).await?;
+        let expected_output = "+----+\n| id |\n+====+\n+----+\n0 rows \n";
+        assert_eq!(output, expected_output);
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_query_format_one_row_without_color() -> Result<()> {
+        let mut configuration = Configuration {
+            locale: Locale::en,
+            color_mode: ColorMode::Disabled,
             ..Default::default()
         };
         let results = query_result_one_row();
 
         let output = test_format(&mut configuration, &results).await?;
-        let ascii_output = String::from_utf8(output.clone())?;
-        assert!(ascii_output.contains("12,345"));
-        assert!(ascii_output.contains("1 row"));
+        let expected_output =
+            "+--------+\n| id     |\n+========+\n| 12,345 |\n+--------+\n1 row (9ns)\n";
+        assert_eq!(output, expected_output);
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_query_format_one_row_with_color() -> Result<()> {
+        let mut configuration = Configuration {
+            locale: Locale::en,
+            color_mode: ColorMode::Forced,
+            ..Default::default()
+        };
+        let results = query_result_one_row();
+
+        let output = test_format(&mut configuration, &results).await?;
+        assert!(output.contains("id"));
+        assert!(output.contains("12,345"));
+        assert!(output.contains("1 row"));
+        assert!(output.contains("(9ns)"));
         Ok(())
     }
 
@@ -248,6 +260,7 @@ mod tests {
     async fn test_query_format_no_header_and_no_footer() -> Result<()> {
         let mut configuration = Configuration {
             locale: Locale::en,
+            color_mode: ColorMode::Disabled,
             results_header: false,
             results_footer: false,
             ..Default::default()
@@ -255,9 +268,27 @@ mod tests {
         let results = query_result_one_row();
 
         let output = test_format(&mut configuration, &results).await?;
-        let ascii_output = String::from_utf8(output.clone())?;
-        assert!(ascii_output.contains("12,345"));
-        assert!(!ascii_output.contains("1 row"));
+        let expected_output = "+--------+\n| 12,345 |\n+--------+\n";
+        assert_eq!(output, expected_output);
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_query_format_two_rows() -> Result<()> {
+        let mut configuration = Configuration {
+            locale: Locale::en,
+            color_mode: ColorMode::Disabled,
+            ..Default::default()
+        };
+        let query_result = QueryResult {
+            columns: vec![COLUMN_HEADER.to_string()],
+            rows: vec![vec![Some(Value::I64(12345))], vec![Some(Value::I64(56789))]],
+        };
+        let results = Results::Query(query_result);
+
+        let output = test_format(&mut configuration, &results).await?;
+        let expected_output = "+--------+\n| id     |\n+========+\n| 12,345 |\n+--------+\n| 56,789 |\n+--------+\n2 rows (9ns)\n";
+        assert_eq!(output, expected_output);
         Ok(())
     }
 }
