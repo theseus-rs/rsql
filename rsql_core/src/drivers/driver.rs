@@ -41,8 +41,6 @@ impl DriverManager {
     }
 
     /// Connect to a database
-    /// url = "postgresql::embdeded:"
-    /// url = "sqlite::memory:"
     pub async fn connect(&self, url: &str) -> anyhow::Result<Box<dyn Connection>> {
         let identifier = match url.split_once(':') {
             Some((before, _)) => before,
@@ -76,6 +74,7 @@ impl Default for DriverManager {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use anyhow::Result;
 
     #[test]
     fn test_driver_manager() {
@@ -111,5 +110,20 @@ mod tests {
         let driver_count = driver_count + 1;
 
         assert_eq!(drivers.drivers.len(), driver_count);
+    }
+
+    #[tokio::test]
+    async fn test_driver_manager_connect() -> Result<()> {
+        let drivers = DriverManager::default();
+        let mut connection = drivers.connect("sqlite::memory:").await?;
+        connection.stop().await?;
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_driver_manager_connect_error() {
+        let drivers = DriverManager::default();
+        let result = drivers.connect("foo").await;
+        assert!(result.is_err());
     }
 }

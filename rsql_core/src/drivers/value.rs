@@ -3,6 +3,7 @@ use base64::Engine;
 use num_format::{Locale, ToFormattedString};
 
 pub enum Value {
+    Bool(bool),
     Bytes(Vec<u8>),
     I8(i8),
     I16(i16),
@@ -29,6 +30,7 @@ pub enum Value {
 impl Value {
     pub(crate) fn to_formatted_string(&self, locale: &Locale) -> String {
         match self {
+            Value::Bool(value) => value.to_string(),
             Value::Bytes(bytes) => STANDARD.encode(bytes),
             Value::I8(value) => value.to_formatted_string(locale),
             Value::I16(value) => value.to_formatted_string(locale),
@@ -58,6 +60,11 @@ mod tests {
     use serde_json::json;
     use std::str::FromStr;
     use uuid::Uuid;
+
+    #[test]
+    fn test_bool() {
+        assert_eq!(Value::Bool(true).to_formatted_string(&Locale::en), "true");
+    }
 
     #[test]
     fn test_bytes() {
