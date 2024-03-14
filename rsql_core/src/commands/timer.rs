@@ -51,11 +51,10 @@ mod tests {
     use rustyline::history::DefaultHistory;
     use std::default;
 
-    #[tokio::test]
-    async fn test_execute_no_args() -> Result<()> {
+    async fn test_execute_no_args(timer: bool) -> Result<()> {
         let mut output = Vec::new();
         let configuration = &mut Configuration {
-            results_timer: true,
+            results_timer: timer,
             ..default::Default::default()
         };
         let options = CommandOptions {
@@ -71,8 +70,22 @@ mod tests {
 
         assert_eq!(result, LoopCondition::Continue);
         let timer_output = String::from_utf8(output)?;
-        assert_eq!(timer_output, "Timer: on\n");
+        if timer {
+            assert_eq!(timer_output, "Timer: on\n");
+        } else {
+            assert_eq!(timer_output, "Timer: off\n");
+        }
         Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_execute_no_args_on() -> Result<()> {
+        test_execute_no_args(true).await
+    }
+
+    #[tokio::test]
+    async fn test_execute_no_args_off() -> Result<()> {
+        test_execute_no_args(false).await
     }
 
     #[tokio::test]
