@@ -183,6 +183,8 @@ impl Connection {
     }
 }
 
+// postgresql::embedded::Postgres is not function on Windows yet
+#[cfg(not(target_os = "windows"))]
 #[cfg(test)]
 mod test {
     use crate::drivers::{DriverManager, Results, Value};
