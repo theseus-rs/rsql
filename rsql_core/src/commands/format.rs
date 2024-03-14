@@ -1,5 +1,5 @@
 use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
-use crate::configuration::ResultFormat;
+use crate::formatters::FormatterManager;
 use anyhow::bail;
 use async_trait::async_trait;
 
@@ -8,7 +8,7 @@ pub(crate) struct Command;
 #[async_trait]
 impl ShellCommand for Command {
     fn name(&self) -> &'static str {
-        "display"
+        "format"
     }
 
     fn args(&self) -> &'static str {
@@ -16,26 +16,25 @@ impl ShellCommand for Command {
     }
 
     fn description(&self) -> &'static str {
-        "Display results in ASCII or Unicode"
+        "format results in ASCII or Unicode"
     }
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
         if options.input.len() <= 1 {
             writeln!(
                 options.output,
-                "Display mode: {}",
+                "Format: {}",
                 options.configuration.results_format
             )?;
             return Ok(LoopCondition::Continue);
         }
 
-        let results_display = match options.input[1].to_lowercase().as_str() {
-            "ascii" => ResultFormat::Ascii,
-            "unicode" => ResultFormat::Unicode,
-            option => bail!("Invalid display mode option: {option}"),
+        let formatter_manager = FormatterManager::default();
+        let formatter_identifier = options.input[1].to_lowercase();
+        match formatter_manager.get(formatter_identifier.as_str()) {
+            Some(_) => options.configuration.results_format = formatter_identifier,
+            None => bail!("Invalid format mode option: {formatter_identifier}"),
         };
-
-        options.configuration.results_format = results_display;
 
         Ok(LoopCondition::Continue)
     }
@@ -55,7 +54,7 @@ mod tests {
     async fn test_execute_no_args() -> Result<()> {
         let mut output = Vec::new();
         let configuration = &mut Configuration {
-            results_format: ResultFormat::Unicode,
+            results_format: "unicode".to_string(),
             ..default::Default::default()
         };
         let options = CommandOptions {
@@ -63,22 +62,22 @@ mod tests {
             configuration,
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".display"],
+            input: vec![".format"],
             output: &mut output,
         };
 
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        let display_output = String::from_utf8(output)?;
-        assert_eq!(display_output, "Display mode: unicode\n");
+        let format_output = String::from_utf8(output)?;
+        assert_eq!(format_output, "Format: unicode\n");
         Ok(())
     }
 
     #[tokio::test]
     async fn test_execute_set_ascii() -> Result<()> {
         let configuration = &mut Configuration {
-            results_format: ResultFormat::Unicode,
+            results_format: "unicode".to_string(),
             ..default::Default::default()
         };
         let options = CommandOptions {
@@ -86,21 +85,21 @@ mod tests {
             configuration,
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".display", "ascii"],
+            input: vec![".format", "ascii"],
             output: &mut Vec::new(),
         };
 
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        assert_eq!(configuration.results_format, ResultFormat::Ascii);
+        assert_eq!(configuration.results_format, "ascii".to_string());
         Ok(())
     }
 
     #[tokio::test]
     async fn test_execute_set_unicode() -> Result<()> {
         let configuration = &mut Configuration {
-            results_format: ResultFormat::Ascii,
+            results_format: "ascii".to_string(),
             ..default::Default::default()
         };
         let options = CommandOptions {
@@ -108,14 +107,14 @@ mod tests {
             configuration,
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".display", "unicode"],
+            input: vec![".format", "unicode"],
             output: &mut Vec::new(),
         };
 
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        assert_eq!(configuration.results_format, ResultFormat::Unicode);
+        assert_eq!(configuration.results_format, "unicode".to_string());
         Ok(())
     }
 
@@ -126,7 +125,7 @@ mod tests {
             configuration: &mut Configuration::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".display", "foo"],
+            input: vec![".format", "foo"],
             output: &mut Vec::new(),
         };
 

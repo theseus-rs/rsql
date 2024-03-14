@@ -52,7 +52,7 @@ pub(crate) async fn execute(args: Option<Args>, output: &mut dyn io::Write) -> R
         let command_manager = CommandManager::default();
         shell::execute(
             driver_manager,
-            &command_manager,
+            command_manager,
             &mut configuration,
             &args.shell_args,
         )

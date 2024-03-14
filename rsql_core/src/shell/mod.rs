@@ -1,7 +1,6 @@
 extern crate colored;
 
 mod completer;
-mod display;
 mod helper;
 mod highlighter;
 mod repl;

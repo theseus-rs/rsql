@@ -24,7 +24,7 @@ impl DriverManager {
         }
     }
 
-    /// Add a new drivers to the list of available drivers
+    /// Add a new driver to the list of available drivers
     fn add(&mut self, driver: Box<dyn Driver>) {
         let identifier = driver.identifier();
         let _ = &self.drivers.insert(identifier, driver);

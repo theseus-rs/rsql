@@ -1,5 +1,5 @@
 use crate::commands::{
-    bail, clear, display, exit, footer, header, help, history, locale, quit, tables, timer,
+    bail, clear, exit, footer, format, header, help, history, locale, quit, tables, timer,
 };
 use crate::configuration::Configuration;
 use crate::drivers::Connection;
@@ -23,12 +23,12 @@ pub type Result<T = LoopCondition, E = anyhow::Error> = core::result::Result<T, 
 
 /// Options for shell commands
 pub struct CommandOptions<'a> {
-    pub(crate) command_manager: &'a CommandManager,
-    pub(crate) configuration: &'a mut Configuration,
-    pub(crate) connection: &'a mut dyn Connection,
-    pub(crate) history: &'a DefaultHistory,
-    pub(crate) input: Vec<&'a str>,
-    pub(crate) output: &'a mut (dyn io::Write + Send),
+    pub command_manager: &'a CommandManager,
+    pub configuration: &'a mut Configuration,
+    pub connection: &'a mut dyn Connection,
+    pub history: &'a DefaultHistory,
+    pub input: Vec<&'a str>,
+    pub output: &'a mut (dyn io::Write + Send + Sync),
 }
 
 /// Trait that defines a shell command
@@ -86,9 +86,9 @@ impl Default for CommandManager {
 
         commands.add(Box::new(bail::Command));
         commands.add(Box::new(clear::Command));
-        commands.add(Box::new(display::Command));
         commands.add(Box::new(exit::Command));
         commands.add(Box::new(footer::Command));
+        commands.add(Box::new(format::Command));
         commands.add(Box::new(header::Command));
         commands.add(Box::new(help::Command));
         commands.add(Box::new(history::Command));

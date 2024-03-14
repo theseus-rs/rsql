@@ -81,8 +81,8 @@ theme.dark = "Solarized (dark)"
 # The format to use for results.
 #
 # Possible values:
-#   "ascii" - Use ASCII characters to draw the table.
-#   "unicode" - Use Unicode characters to draw the table.
+#   "ascii" - Use ASCII characters to draw a table.
+#   "unicode" - Use Unicode characters to draw a table.
 format = "unicode"
 
 # Indicate if header should be displayed when displaying results.

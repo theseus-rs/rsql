@@ -1,9 +1,9 @@
 mod bail;
 mod clear;
 mod command;
-mod display;
 mod exit;
 mod footer;
+mod format;
 mod header;
 mod help;
 mod history;
