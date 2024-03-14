@@ -76,7 +76,7 @@ mod tests {
 
         formatter.format(&mut options).await?;
 
-        let unicode_output = String::from_utf8(output.clone())?;
+        let unicode_output = String::from_utf8(output.clone())?.replace("\r\n", "\n");
         let expected_output =
             "┌────────┐\n│ id     │\n╞════════╡\n│ 12,345 │\n└────────┘\n1 row (5.678µs)\n";
         assert_eq!(unicode_output, expected_output);
