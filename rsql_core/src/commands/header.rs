@@ -51,11 +51,10 @@ mod tests {
     use rustyline::history::DefaultHistory;
     use std::default;
 
-    #[tokio::test]
-    async fn test_execute_no_args() -> Result<()> {
+    async fn test_execute_no_args(header: bool) -> Result<()> {
         let mut output = Vec::new();
         let configuration = &mut Configuration {
-            results_header: true,
+            results_header: header,
             ..default::Default::default()
         };
         let options = CommandOptions {
@@ -71,8 +70,23 @@ mod tests {
 
         assert_eq!(result, LoopCondition::Continue);
         let header_output = String::from_utf8(output)?;
-        assert_eq!(header_output, "Header: on\n");
+
+        if header {
+            assert_eq!(header_output, "Header: on\n");
+        } else {
+            assert_eq!(header_output, "Header: off\n");
+        }
         Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_execute_no_args_on() -> Result<()> {
+        test_execute_no_args(true).await
+    }
+
+    #[tokio::test]
+    async fn test_execute_no_args_off() -> Result<()> {
+        test_execute_no_args(false).await
     }
 
     #[tokio::test]

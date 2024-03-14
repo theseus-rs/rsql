@@ -50,11 +50,10 @@ mod tests {
     use rustyline::history::DefaultHistory;
     use std::default;
 
-    #[tokio::test]
-    async fn test_execute_no_args() -> Result<()> {
+    async fn test_execute_no_args(bail: bool) -> Result<()> {
         let mut output = Vec::new();
         let configuration = &mut Configuration {
-            bail_on_error: true,
+            bail_on_error: bail,
             ..default::Default::default()
         };
         let options = CommandOptions {
@@ -70,8 +69,23 @@ mod tests {
 
         assert_eq!(result, LoopCondition::Continue);
         let bail_output = String::from_utf8(output)?;
-        assert_eq!(bail_output, "Bail on error: on\n");
+
+        if bail {
+            assert_eq!(bail_output, "Bail on error: on\n");
+        } else {
+            assert_eq!(bail_output, "Bail on error: off\n");
+        }
         Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_execute_no_args_on() -> Result<()> {
+        test_execute_no_args(true).await
+    }
+
+    #[tokio::test]
+    async fn test_execute_no_args_off() -> Result<()> {
+        test_execute_no_args(false).await
     }
 
     #[tokio::test]
