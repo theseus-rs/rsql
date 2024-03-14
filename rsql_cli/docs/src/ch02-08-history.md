@@ -2,7 +2,7 @@
 
 ### Usage
 
-```bash
+```text
 .history
 ```
 
@@ -14,6 +14,6 @@ The history command displays the command history for the CLI.
 
 Show the command history:
 
-```bash
+```text
 .history
 ```
