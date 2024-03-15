@@ -11,6 +11,9 @@ on:
 permissions:
   contents: read
 
+env:
+  RUST_LOG: rsql_cli=debug,rsql_core=debug,postgresql_embedded=debug,postgresql_archive=debug
+
 jobs:
   checks:
     name: Checks
