@@ -100,6 +100,15 @@ impl Connection {
                 let value: Option<String> = row.try_get(column_name)?;
                 return Ok(value.map(Value::String));
             }
+            // Not currently supported by sqlx
+            // "NUMERIC" => {
+            //     let value: Option<String> = row.try_get(column_name)?;
+            //     return Ok(value.map(Value::String));
+            // }
+            "INTEGER" => {
+                let value: Option<i64> = row.try_get(column_name)?;
+                return Ok(value.map(Value::I64));
+            }
             "REAL" => {
                 let value: Option<f64> = row.try_get(column_name)?;
                 return Ok(value.map(Value::F64));
@@ -108,42 +117,15 @@ impl Connection {
                 let value: Option<Vec<u8>> = row.try_get(column_name)?;
                 return Ok(value.map(Value::Bytes));
             }
-            "INTEGER" => {
-                let value: Option<i64> = row.try_get(column_name)?;
-                return Ok(value.map(Value::I64));
-            }
-            "NUMERIC" => {
-                let value: Option<String> = row.try_get(column_name)?;
-                return Ok(value.map(Value::String));
-            }
-            "BOOLEAN" => {
-                let value: Option<bool> = row.try_get(column_name)?;
-                return Ok(value.map(Value::Bool));
-            }
-            "DATE" => {
-                let value: Option<chrono::NaiveDate> = row.try_get(column_name)?;
-                return Ok(value.map(Value::Date));
-            }
-            "TIME" => {
-                let value: Option<chrono::NaiveTime> = row.try_get(column_name)?;
-                return Ok(value.map(Value::Time));
-            }
-            "DATETIME" => {
-                let value: Option<chrono::NaiveDateTime> = row.try_get(column_name)?;
-                return Ok(value.map(Value::DateTime));
-            }
             _ => {}
         }
 
         if let Ok(value) = row.try_get(column_name) {
-            let value: Option<Vec<u8>> = value;
-            Ok(value.map(Value::Bytes))
-        } else if let Ok(value) = row.try_get(column_name) {
             let value: Option<String> = value;
             Ok(value.map(Value::String))
         } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<&str> = value;
-            Ok(value.map(|v| Value::String(v.to_string())))
+            let value: Option<Vec<u8>> = value;
+            Ok(value.map(Value::Bytes))
         } else if let Ok(value) = row.try_get(column_name) {
             let value: Option<i8> = value;
             Ok(value.map(Value::I8))
@@ -154,29 +136,8 @@ impl Connection {
             let value: Option<i32> = value;
             Ok(value.map(Value::I32))
         } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<i64> = value;
-            Ok(value.map(Value::I64))
-        } else if let Ok(value) = row.try_get(column_name) {
             let value: Option<f32> = value;
             Ok(value.map(Value::F32))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<f64> = value;
-            Ok(value.map(Value::F64))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<chrono::NaiveDate> = value;
-            Ok(value.map(Value::Date))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<chrono::NaiveTime> = value;
-            Ok(value.map(Value::Time))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<chrono::NaiveDateTime> = value;
-            Ok(value.map(Value::DateTime))
-        } else if let Ok(value) = row.try_get(column.name()) {
-            let value: Option<uuid::Uuid> = value;
-            Ok(value.map(Value::Uuid))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<serde_json::Value> = value;
-            Ok(value.map(Value::Json))
         } else {
             let column_type = column.type_info();
             bail!(
@@ -247,6 +208,145 @@ mod test {
         assert_eq!(tables, vec!["person"]);
 
         connection.stop().await?;
+        Ok(())
+    }
+
+    /// Ref: https://www.sqlite.org/datatype3.html
+    #[tokio::test]
+    async fn test_table_data_types() -> Result<()> {
+        let drivers = DriverManager::default();
+        let mut connection = drivers.connect(DATABASE_URL).await?;
+
+        let _ = connection
+            .execute("CREATE TABLE t1(t TEXT, nu NUMERIC, i INTEGER, r REAL, no BLOB)")
+            .await?;
+
+        let execute_results = connection
+            .execute("INSERT INTO t1 (t, nu, i, r, no) VALUES ('foo', 123, 456, 789.123, x'2a')")
+            .await?;
+        if let Results::Execute(rows) = execute_results {
+            assert_eq!(rows, 1);
+        }
+
+        let results = connection.query("SELECT t, nu, i, r, no FROM t1").await?;
+        if let Results::Query(query_result) = results {
+            assert_eq!(query_result.columns, vec!["t", "nu", "i", "r", "no"]);
+            assert_eq!(query_result.rows.len(), 1);
+            match query_result.rows.get(0) {
+                Some(row) => {
+                    assert_eq!(row.len(), 5);
+
+                    if let Some(Value::String(value)) = &row[0] {
+                        assert_eq!(value, "foo");
+                    } else {
+                        assert!(false);
+                    }
+
+                    if let Some(Value::I8(value)) = &row[1] {
+                        assert_eq!(*value, 123);
+                    } else {
+                        assert!(false);
+                    }
+
+                    if let Some(Value::I64(value)) = &row[2] {
+                        assert_eq!(*value, 456);
+                    } else {
+                        assert!(false);
+                    }
+
+                    if let Some(Value::F64(value)) = &row[3] {
+                        assert_eq!(*value, 789.123);
+                    } else {
+                        assert!(false);
+                    }
+
+                    if let Some(Value::Bytes(value)) = &row[4] {
+                        assert_eq!(*value, vec![42]);
+                    } else {
+                        assert!(false);
+                    }
+                }
+                None => assert!(false),
+            }
+        }
+
+        connection.stop().await?;
+        Ok(())
+    }
+
+    async fn test_data_type(sql: &str) -> Result<Option<Value>> {
+        let drivers = DriverManager::default();
+        let mut connection = drivers.connect(DATABASE_URL).await?;
+
+        let results = connection.query(sql).await?;
+        let mut value: Option<Value> = None;
+
+        if let Results::Query(query_result) = results {
+            assert_eq!(query_result.columns.len(), 1);
+            assert_eq!(query_result.rows.len(), 1);
+
+            if let Some(row) = query_result.rows.get(0) {
+                assert_eq!(row.len(), 1);
+
+                value = row[0].clone();
+            }
+        }
+
+        connection.stop().await?;
+        Ok(value)
+    }
+
+    #[tokio::test]
+    async fn test_data_type_bytes() -> Result<()> {
+        match test_data_type("SELECT x'2a'").await? {
+            Some(value) => assert_eq!(value, Value::Bytes(vec![42])),
+            _ => assert!(false),
+        }
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_data_type_i8() -> Result<()> {
+        match test_data_type("SELECT 127").await? {
+            Some(value) => assert_eq!(value, Value::I8(127)),
+            _ => assert!(false),
+        }
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_data_type_i16() -> Result<()> {
+        match test_data_type("SELECT 32767").await? {
+            Some(value) => assert_eq!(value, Value::I16(32_767)),
+            _ => assert!(false),
+        }
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_data_type_i32() -> Result<()> {
+        match test_data_type("SELECT 2147483647").await? {
+            Some(value) => assert_eq!(value, Value::I32(2_147_483_647)),
+            _ => assert!(false),
+        }
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_data_type_f32() -> Result<()> {
+        match test_data_type("SELECT 12345.67890").await? {
+            Some(value) => assert_eq!(value, Value::F32(12_345.67890)),
+            _ => assert!(false),
+        }
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_data_type_string() -> Result<()> {
+        match test_data_type("SELECT 'foo'").await? {
+            Some(value) => assert_eq!(value, Value::String("foo".to_string())),
+            _ => assert!(false),
+        }
         Ok(())
     }
 }

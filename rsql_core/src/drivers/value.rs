@@ -2,6 +2,7 @@ use base64::engine::general_purpose::STANDARD;
 use base64::Engine;
 use num_format::{Locale, ToFormattedString};
 
+#[derive(Clone, Debug, PartialEq)]
 pub enum Value {
     Bool(bool),
     Bytes(Vec<u8>),
