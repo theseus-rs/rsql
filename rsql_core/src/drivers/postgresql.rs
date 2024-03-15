@@ -189,12 +189,10 @@ impl Connection {
 mod test {
     use crate::drivers::{DriverManager, Results, Value};
     use anyhow::Result;
-    use serial_test::serial;
 
     const DATABASE_URL: &str = "postgresql::embedded:";
 
     #[tokio::test]
-    #[serial]
     async fn test_driver_connect() -> Result<()> {
         let drivers = DriverManager::default();
         let mut connection = drivers.connect(DATABASE_URL).await?;
@@ -203,7 +201,6 @@ mod test {
     }
 
     #[tokio::test]
-    #[serial]
     async fn test_connection_interface() -> Result<()> {
         let drivers = DriverManager::default();
         let mut connection = drivers.connect(DATABASE_URL).await?;

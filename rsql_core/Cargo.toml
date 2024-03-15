@@ -30,7 +30,6 @@ postgresql_embedded = { workspace = true, optional = true }
 rust_decimal = { workspace = true }
 rustyline = { workspace = true }
 serde_json = { workspace = true, features = ["preserve_order"] }
-serial_test = { workspace = true }
 sqlx = { workspace = true, features = ["chrono", "json", "macros", "postgres", "runtime-tokio", "rust_decimal", "sqlite", "uuid"] }
 supports-color = { workspace = true }
 sys-locale = { workspace = true }
