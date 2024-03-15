@@ -2615,9 +2615,9 @@ dependencies = [
 
 [[package]]
 name = "postgresql_archive"
-version = "0.7.0"
+version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9c3ea99f9a5f5dd1dcb08314c97160ef9c15de7b4f72acea5ff3d1aaefc716b6"
+checksum = "0e49a189299495f798926b8b6d054e2f09f96c633f54a051ac2a4fa5850c5274"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -2645,9 +2645,9 @@ dependencies = [
 
 [[package]]
 name = "postgresql_embedded"
-version = "0.7.0"
+version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "741a0593f723f6c9ead9bdae793b924611c0d20edbb2811e6d77da10d6bb42a0"
+checksum = "ce9f03775a2ac68ecda77ba833f649e14e99101877ad3c05f0ba79334a1f3644"
 dependencies = [
  "anyhow",
  "bytes",
