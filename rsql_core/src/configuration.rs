@@ -208,9 +208,11 @@ impl ConfigurationBuilder {
                 .with(indicatif_layer)
                 .init();
         } else {
-            let indicatif_layer = IndicatifLayer::new().with_progress_style(progress_style);
-
-            registry.with(indicatif_layer).init();
+            #[cfg(not(test))]
+            {
+                let indicatif_layer = IndicatifLayer::new().with_progress_style(progress_style);
+                registry.with(indicatif_layer).init();
+            }
         }
 
         self.configuration
