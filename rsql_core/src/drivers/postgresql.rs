@@ -1,3 +1,4 @@
+use crate::configuration::Configuration;
 use crate::drivers::connection::{QueryResult, Results};
 use crate::drivers::value::Value;
 use anyhow::{bail, Result};
@@ -20,8 +21,12 @@ impl crate::drivers::Driver for Driver {
         "postgresql"
     }
 
-    async fn connect(&self, url: &str) -> Result<Box<dyn crate::drivers::Connection>> {
-        let connection = Connection::new(url).await?;
+    async fn connect(
+        &self,
+        configuration: &Configuration,
+        url: &str,
+    ) -> Result<Box<dyn crate::drivers::Connection>> {
+        let connection = Connection::new(configuration, url).await?;
         Ok(Box::new(connection))
     }
 }
@@ -32,11 +37,20 @@ pub(crate) struct Connection {
 }
 
 impl Connection {
-    pub(crate) async fn new(url: &str) -> Result<Connection> {
+    pub(crate) async fn new(configuration: &Configuration, url: &str) -> Result<Connection> {
         let mut database_url = url.to_string();
         let postgresql = if url.starts_with("postgresql::embedded:") {
             let version = Version::from_str(POSTGRESQL_EMBEDDED_VERSION)?;
-            let mut postgresql = PostgreSQL::new(version, Settings::default());
+            let settings = if let Some(config_dir) = &configuration.config_dir {
+                Settings {
+                    installation_dir: config_dir.join("postgresql"),
+                    ..Default::default()
+                }
+            } else {
+                Settings::default()
+            };
+
+            let mut postgresql = PostgreSQL::new(version, settings);
             postgresql.setup().await?;
             postgresql.start().await?;
 
@@ -187,6 +201,7 @@ impl Connection {
 #[cfg(not(target_os = "windows"))]
 #[cfg(test)]
 mod test {
+    use crate::configuration::Configuration;
     use crate::drivers::{DriverManager, Results, Value};
     use anyhow::Result;
 
@@ -194,16 +209,18 @@ mod test {
 
     #[tokio::test]
     async fn test_driver_connect() -> Result<()> {
+        let configuration = Configuration::default();
         let drivers = DriverManager::default();
-        let mut connection = drivers.connect(DATABASE_URL).await?;
+        let mut connection = drivers.connect(&configuration, DATABASE_URL).await?;
         connection.stop().await?;
         Ok(())
     }
 
     #[tokio::test]
     async fn test_connection_interface() -> Result<()> {
+        let configuration = Configuration::default();
         let drivers = DriverManager::default();
-        let mut connection = drivers.connect(DATABASE_URL).await?;
+        let mut connection = drivers.connect(&configuration, DATABASE_URL).await?;
 
         let _ = connection
             .execute("CREATE TABLE person (id INTEGER, name VARCHAR(20))")

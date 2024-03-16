@@ -62,6 +62,7 @@ jobs:
           CARGO_TERM_COLOR: always
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
           LLVM_PROFILE_FILE: rsql-%p-%m.profraw
+          RUST_BACKTRACE: 1
           RUST_LOG: "info"
           RUST_LOG_SPAN_EVENTS: full
           RUSTFLAGS: -Cinstrument-coverage

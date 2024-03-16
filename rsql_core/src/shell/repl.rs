@@ -90,7 +90,10 @@ impl Shell {
 
     /// Execute the shell with the provided arguments.
     pub async fn execute(&mut self, args: &ShellArgs) -> Result<()> {
-        let mut binding = self.driver_manager.connect(args.url.as_str()).await?;
+        let mut binding = self
+            .driver_manager
+            .connect(&self.configuration, args.url.as_str())
+            .await?;
         let connection = binding.as_mut();
 
         self.repl(connection).await?;
