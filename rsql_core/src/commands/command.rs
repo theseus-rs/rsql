@@ -6,6 +6,7 @@ use crate::drivers::Connection;
 use async_trait::async_trait;
 use rustyline::history::DefaultHistory;
 use std::collections::BTreeMap;
+use std::fmt::Debug;
 use std::io;
 
 /// Loop condition for shell commands
@@ -31,9 +32,20 @@ pub struct CommandOptions<'a> {
     pub output: &'a mut (dyn io::Write + Send + Sync),
 }
 
+impl Debug for CommandOptions<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("CommandOptions")
+            .field("command_manager", &self.command_manager)
+            .field("configuration", &self.configuration)
+            .field("connection", &self.connection)
+            .field("input", &self.input)
+            .finish()
+    }
+}
+
 /// Trait that defines a shell command
 #[async_trait]
-pub trait ShellCommand: Sync {
+pub trait ShellCommand: Debug + Sync {
     /// Get the name of the command
     fn name(&self) -> &'static str;
     /// Get the arguments for the command
@@ -47,6 +59,7 @@ pub trait ShellCommand: Sync {
 }
 
 /// Manages the active shell commands
+#[derive(Debug)]
 pub struct CommandManager {
     commands: BTreeMap<&'static str, Box<dyn ShellCommand>>,
 }
@@ -77,9 +90,6 @@ impl CommandManager {
 }
 
 /// Default implementation for the `CommandManager` struct
-// .autocomplete on|off      Enable or disable auto-completion
-// .multi on|off             Enable or disable multiline mode
-// .output [mode] [options]  Set output format: csv, json, table or line
 impl Default for CommandManager {
     fn default() -> Self {
         let mut commands = CommandManager::new();

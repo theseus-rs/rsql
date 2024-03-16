@@ -2,6 +2,8 @@ use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use async_trait::async_trait;
 use tracing::info;
 
+/// Quit the application
+#[derive(Debug, Default)]
 pub(crate) struct Command;
 
 #[async_trait]

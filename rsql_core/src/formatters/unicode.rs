@@ -26,6 +26,8 @@ lazy_static! {
         .build();
 }
 
+/// A formatter for Unicode tables
+#[derive(Debug, Default)]
 pub(crate) struct Formatter;
 
 #[async_trait]
