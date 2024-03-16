@@ -55,8 +55,10 @@ impl ConfigurationBuilder {
     ///
     /// If the configuration file does not exist, it is created with the default configuration.
     pub fn with_config_dir<P: Into<PathBuf>>(mut self, config_dir: P) -> Self {
+        let config_dir = config_dir.into();
+        self.configuration.config_dir = Some(config_dir.clone());
         let config_file =
-            ConfigFile::new(&self.configuration.program_name, config_dir).expect("config file");
+            ConfigFile::new(&self.configuration.program_name, &config_dir).expect("config file");
         config_file
             .load_configuration(&mut self.configuration)
             .expect("load configuration");
@@ -203,6 +205,7 @@ impl ConfigurationBuilder {
 pub struct Configuration {
     pub program_name: String,
     pub version: String,
+    pub config_dir: Option<PathBuf>,
     pub bail_on_error: bool,
     pub log_level: LevelFilter,
     pub log_dir: Option<PathBuf>,
@@ -226,6 +229,7 @@ impl Default for Configuration {
         Self {
             program_name: String::new(),
             version: String::new(),
+            config_dir: None,
             bail_on_error: false,
             log_level: LevelFilter::OFF,
             log_dir: None,
@@ -401,15 +405,16 @@ mod test {
     fn test_configuration_builder() {
         let program_name = "test";
         let version = "1.2.3";
+        let config_dir = "/.rsql";
         let bail_on_error = true;
         let log_level = LevelFilter::OFF;
-        let log_dir = "/logs";
+        let log_dir = "/.rsql/logs";
         let log_rotation = Rotation::MINUTELY;
         let locale = Locale::es;
         let color_mode = ColorMode::Disabled;
         let edit_mode = EditMode::Vi;
         let history = true;
-        let history_file = "/history.txt";
+        let history_file = "/.rsql/history.txt";
         let history_limit = 42;
         let history_ignore_dups = false;
         let theme = "Solarized (light)";
@@ -419,6 +424,7 @@ mod test {
         let results_timer = false;
 
         let configuration = ConfigurationBuilder::new(program_name, version)
+            .with_config_dir(config_dir)
             .with_bail_on_error(bail_on_error)
             .with_log_level(log_level)
             .with_log_dir(log_dir)
@@ -439,6 +445,10 @@ mod test {
 
         assert_eq!(configuration.program_name, program_name);
         assert_eq!(configuration.version, version);
+        assert_eq!(
+            configuration.config_dir.unwrap().to_string_lossy(),
+            config_dir
+        );
         assert_eq!(configuration.bail_on_error, bail_on_error);
         assert_eq!(configuration.log_level, log_level);
         assert_eq!(configuration.log_dir.unwrap().to_string_lossy(), log_dir);
@@ -465,6 +475,7 @@ mod test {
         let configuration = Configuration::default();
         assert!(configuration.program_name.is_empty());
         assert!(configuration.version.is_empty());
+        assert_eq!(configuration.config_dir, None);
         assert_eq!(configuration.bail_on_error, false);
         assert_eq!(configuration.log_level, LevelFilter::OFF);
         assert_eq!(configuration.log_dir, None);

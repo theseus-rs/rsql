@@ -1,3 +1,4 @@
+use crate::configuration::Configuration;
 use crate::drivers::Connection;
 use anyhow::bail;
 use async_trait::async_trait;
@@ -8,7 +9,11 @@ use std::collections::BTreeMap;
 #[async_trait]
 pub trait Driver: Send {
     fn identifier(&self) -> &'static str;
-    async fn connect(&self, url: &str) -> anyhow::Result<Box<dyn Connection>>;
+    async fn connect(
+        &self,
+        configuration: &Configuration,
+        url: &str,
+    ) -> anyhow::Result<Box<dyn Connection>>;
 }
 
 /// Manages available drivers
@@ -41,14 +46,18 @@ impl DriverManager {
     }
 
     /// Connect to a database
-    pub async fn connect(&self, url: &str) -> anyhow::Result<Box<dyn Connection>> {
+    pub async fn connect(
+        &self,
+        configuration: &Configuration,
+        url: &str,
+    ) -> anyhow::Result<Box<dyn Connection>> {
         let identifier = match url.split_once(':') {
             Some((before, _)) => before,
             None => "",
         };
 
         match &self.get(identifier) {
-            Some(driver) => driver.connect(url).await,
+            Some(driver) => driver.connect(configuration, url).await,
             None => bail!("Invalid database url: {url}"),
         }
     }
@@ -114,16 +123,18 @@ mod tests {
 
     #[tokio::test]
     async fn test_driver_manager_connect() -> Result<()> {
+        let configuration = Configuration::default();
         let drivers = DriverManager::default();
-        let mut connection = drivers.connect("sqlite::memory:").await?;
+        let mut connection = drivers.connect(&configuration, "sqlite::memory:").await?;
         connection.stop().await?;
         Ok(())
     }
 
     #[tokio::test]
     async fn test_driver_manager_connect_error() {
+        let configuration = Configuration::default();
         let drivers = DriverManager::default();
-        let result = drivers.connect("foo").await;
+        let result = drivers.connect(&configuration, "foo").await;
         assert!(result.is_err());
     }
 }

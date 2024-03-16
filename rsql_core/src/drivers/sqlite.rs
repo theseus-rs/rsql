@@ -1,3 +1,4 @@
+use crate::configuration::Configuration;
 use crate::drivers::connection::{QueryResult, Results};
 use crate::drivers::value::Value;
 use anyhow::{bail, Result};
@@ -14,8 +15,12 @@ impl crate::drivers::Driver for Driver {
         "sqlite"
     }
 
-    async fn connect(&self, url: &str) -> Result<Box<dyn crate::drivers::Connection>> {
-        let connection = Connection::new(url).await?;
+    async fn connect(
+        &self,
+        configuration: &Configuration,
+        url: &str,
+    ) -> Result<Box<dyn crate::drivers::Connection>> {
+        let connection = Connection::new(configuration, url).await?;
         Ok(Box::new(connection))
     }
 }
@@ -25,7 +30,7 @@ pub(crate) struct Connection {
 }
 
 impl Connection {
-    pub(crate) async fn new(url: &str) -> Result<Connection> {
+    pub(crate) async fn new(_configuration: &Configuration, url: &str) -> Result<Connection> {
         let options = SqliteConnectOptions::from_str(url)?
             .auto_vacuum(SqliteAutoVacuum::None)
             .create_if_missing(true);
@@ -151,6 +156,7 @@ impl Connection {
 
 #[cfg(test)]
 mod test {
+    use crate::configuration::Configuration;
     use crate::drivers::{DriverManager, Results, Value};
     use anyhow::Result;
 
@@ -158,16 +164,18 @@ mod test {
 
     #[tokio::test]
     async fn test_driver_connect() -> Result<()> {
+        let configuration = Configuration::default();
         let drivers = DriverManager::default();
-        let mut connection = drivers.connect(DATABASE_URL).await?;
+        let mut connection = drivers.connect(&configuration, DATABASE_URL).await?;
         connection.stop().await?;
         Ok(())
     }
 
     #[tokio::test]
     async fn test_connection_interface() -> Result<()> {
+        let configuration = &Configuration::default();
         let drivers = DriverManager::default();
-        let mut connection = drivers.connect(DATABASE_URL).await?;
+        let mut connection = drivers.connect(&configuration, DATABASE_URL).await?;
 
         let _ = connection
             .execute("CREATE TABLE person (id INTEGER, name TEXT)")
@@ -214,8 +222,9 @@ mod test {
     /// Ref: https://www.sqlite.org/datatype3.html
     #[tokio::test]
     async fn test_table_data_types() -> Result<()> {
+        let configuration = &Configuration::default();
         let drivers = DriverManager::default();
-        let mut connection = drivers.connect(DATABASE_URL).await?;
+        let mut connection = drivers.connect(&configuration, DATABASE_URL).await?;
 
         let _ = connection
             .execute("CREATE TABLE t1(t TEXT, nu NUMERIC, i INTEGER, r REAL, no BLOB)")
@@ -275,8 +284,9 @@ mod test {
     }
 
     async fn test_data_type(sql: &str) -> Result<Option<Value>> {
+        let configuration = Configuration::default();
         let drivers = DriverManager::default();
-        let mut connection = drivers.connect(DATABASE_URL).await?;
+        let mut connection = drivers.connect(&configuration, DATABASE_URL).await?;
 
         let results = connection.query(sql).await?;
         let mut value: Option<Value> = None;
