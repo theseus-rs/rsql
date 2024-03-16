@@ -4,6 +4,7 @@ use crate::formatters::{ascii, unicode};
 use anyhow::Result;
 use async_trait::async_trait;
 use std::collections::BTreeMap;
+use std::fmt::Debug;
 use std::io;
 use std::time::Duration;
 
@@ -15,13 +16,24 @@ pub struct FormatterOptions<'a> {
     pub output: &'a mut (dyn io::Write + Send + Sync),
 }
 
+impl Debug for FormatterOptions<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("FormatterOptions")
+            .field("configuration", &self.configuration)
+            .field("results", &self.results)
+            .field("elapsed", &self.elapsed)
+            .finish()
+    }
+}
+
 #[async_trait]
-pub trait Formatter: Send {
+pub trait Formatter: Debug + Send {
     fn identifier(&self) -> &'static str;
     async fn format<'a>(&self, options: &mut FormatterOptions<'a>) -> Result<()>;
 }
 
 /// Manages available formatters
+#[derive(Debug)]
 pub struct FormatterManager {
     formats: BTreeMap<&'static str, Box<dyn Formatter>>,
 }

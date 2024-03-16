@@ -7,6 +7,7 @@ use sqlx::sqlite::{SqliteAutoVacuum, SqliteColumn, SqliteConnectOptions, SqliteR
 use sqlx::{Column, Row, SqlitePool, TypeInfo};
 use std::str::FromStr;
 
+#[derive(Debug)]
 pub struct Driver;
 
 #[async_trait]
@@ -25,6 +26,7 @@ impl crate::drivers::Driver for Driver {
     }
 }
 
+#[derive(Debug)]
 pub(crate) struct Connection {
     pool: SqlitePool,
 }

@@ -4,6 +4,8 @@ use anyhow::Result;
 use async_trait::async_trait;
 use prettytable::format::consts::FORMAT_DEFAULT;
 
+/// A formatter for ASCII tables
+#[derive(Debug, Default)]
 pub struct Formatter;
 
 #[async_trait]

@@ -13,6 +13,7 @@ use std::string::ToString;
 
 const POSTGRESQL_EMBEDDED_VERSION: &str = "16.2.3";
 
+#[derive(Debug)]
 pub struct Driver;
 
 #[async_trait]
@@ -31,6 +32,7 @@ impl crate::drivers::Driver for Driver {
     }
 }
 
+#[derive(Debug)]
 pub(crate) struct Connection {
     postgresql: Option<PostgreSQL>,
     pool: PgPool,

@@ -4,6 +4,8 @@ use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use async_trait::async_trait;
 use colored::*;
 
+/// Show the help message
+#[derive(Debug, Default)]
 pub(crate) struct Command;
 
 #[async_trait]

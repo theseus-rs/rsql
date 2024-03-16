@@ -1,6 +1,7 @@
 use anyhow::{bail, Result};
 use config::{Config, FileFormat};
 use dirs::home_dir;
+use indicatif::ProgressStyle;
 use num_format::Locale;
 use rustyline::{ColorMode, EditMode};
 use std::env;
@@ -12,6 +13,10 @@ use std::time::Duration;
 use tracing::level_filters::LevelFilter;
 use tracing::{debug, warn};
 use tracing_appender::rolling::{RollingFileAppender, Rotation};
+use tracing_indicatif::IndicatifLayer;
+use tracing_subscriber::fmt::writer::MakeWriterExt;
+use tracing_subscriber::layer::SubscriberExt;
+use tracing_subscriber::util::SubscriberInitExt;
 
 pub(crate) static DEFAULT_CONFIG: &str =
     include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/resources/rsql.toml"));
@@ -181,19 +186,31 @@ impl ConfigurationBuilder {
     pub fn build(self) -> Configuration {
         let configuration = &self.configuration;
         let log_level = configuration.log_level;
+        let registry = tracing_subscriber::registry();
+        let progress_style =
+            ProgressStyle::with_template("{span_child_prefix}{spinner} {span_name}")
+                .expect("progress style");
 
         if log_level != LevelFilter::OFF {
             let log_dir = configuration.log_dir.clone().unwrap_or_default();
             let log_rotation = configuration.log_rotation.clone();
+            let level = log_level.into_level().unwrap();
             let file_appender = RollingFileAppender::builder()
                 .rotation(log_rotation)
                 .filename_prefix(&configuration.program_name)
                 .build(log_dir)
-                .expect("log file appender");
-            tracing_subscriber::fmt()
-                .with_max_level(log_level)
-                .with_writer(file_appender)
+                .expect("log file appender")
+                .with_max_level(level);
+            let indicatif_layer = IndicatifLayer::new().with_progress_style(progress_style);
+
+            registry
+                .with(tracing_subscriber::fmt::layer().with_writer(file_appender))
+                .with(indicatif_layer)
                 .init();
+        } else {
+            let indicatif_layer = IndicatifLayer::new().with_progress_style(progress_style);
+
+            registry.with(indicatif_layer).init();
         }
 
         self.configuration

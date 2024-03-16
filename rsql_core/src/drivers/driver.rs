@@ -4,10 +4,12 @@ use anyhow::bail;
 use async_trait::async_trait;
 use sqlx::any::install_default_drivers;
 use std::collections::BTreeMap;
+use std::fmt::Debug;
+use tracing::instrument;
 
 #[cfg_attr(test, mockall::automock)]
 #[async_trait]
-pub trait Driver: Send {
+pub trait Driver: Debug + Send {
     fn identifier(&self) -> &'static str;
     async fn connect(
         &self,
@@ -17,6 +19,7 @@ pub trait Driver: Send {
 }
 
 /// Manages available drivers
+#[derive(Debug)]
 pub struct DriverManager {
     drivers: BTreeMap<&'static str, Box<dyn Driver>>,
 }
@@ -46,6 +49,7 @@ impl DriverManager {
     }
 
     /// Connect to a database
+    #[instrument(name = "connect", level = "info", skip(configuration, url))]
     pub async fn connect(
         &self,
         configuration: &Configuration,

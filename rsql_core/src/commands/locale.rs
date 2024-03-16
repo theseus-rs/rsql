@@ -4,6 +4,8 @@ use async_trait::async_trait;
 use num_format::Locale;
 use std::str::FromStr;
 
+/// A shell command to set the display locale
+#[derive(Debug, Default)]
 pub(crate) struct Command;
 
 #[async_trait]

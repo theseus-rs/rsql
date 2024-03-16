@@ -2,6 +2,8 @@ use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use anyhow::bail;
 use async_trait::async_trait;
 
+/// A shell command to enable or disable result header
+#[derive(Debug, Default)]
 pub(crate) struct Command;
 
 #[async_trait]

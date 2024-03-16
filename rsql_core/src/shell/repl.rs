@@ -1,18 +1,20 @@
 use crate::commands::{CommandManager, CommandOptions, LoopCondition};
 use crate::configuration::Configuration;
-use crate::drivers::{Connection, DriverManager};
+use crate::drivers::{Connection, DriverManager, Results};
 use crate::formatters::{FormatterManager, FormatterOptions};
 use crate::shell::helper::ReplHelper;
 use crate::shell::ShellArgs;
 use crate::version::full_version;
 use anyhow::{bail, Result};
 use colored::Colorize;
+use indicatif::ProgressStyle;
 use rustyline::config::Configurer;
 use rustyline::error::ReadlineError;
 use rustyline::history::{DefaultHistory, FileHistory};
 use rustyline::Editor;
 use std::io;
-use tracing::error;
+use tracing::{error, instrument, Span};
+use tracing_indicatif::span_ext::IndicatifSpanExt;
 
 /// A builder for creating a [Shell].
 pub struct ShellBuilder {
@@ -273,11 +275,7 @@ async fn execute_sql(
     let sql = line.trim();
     let command = if sql.len() > 6 { &sql[..6] } else { "" }.trim();
 
-    let results = if command.to_lowercase() == "select" {
-        connection.query(sql).await?
-    } else {
-        connection.execute(sql).await?
-    };
+    let results = execute(connection, sql, command).await?;
 
     let formatter_manager = FormatterManager::default();
     let result_format = &configuration.results_format;
@@ -293,4 +291,18 @@ async fn execute_sql(
     };
     formatter.format(&mut options).await?;
     Ok(LoopCondition::Continue)
+}
+
+/// Execute the SQL and return the results.
+#[instrument(skip(connection))]
+async fn execute(connection: &mut dyn Connection, sql: &str, command: &str) -> Result<Results> {
+    Span::current().pb_set_style(&ProgressStyle::with_template(
+        "{span_child_prefix}{spinner}",
+    )?);
+
+    if command.to_lowercase() == "select" {
+        connection.query(sql).await
+    } else {
+        connection.execute(sql).await
+    }
 }
