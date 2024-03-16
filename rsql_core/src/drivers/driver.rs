@@ -2,7 +2,6 @@ use crate::configuration::Configuration;
 use crate::drivers::Connection;
 use anyhow::bail;
 use async_trait::async_trait;
-use sqlx::any::install_default_drivers;
 use std::collections::BTreeMap;
 use std::fmt::Debug;
 use tracing::instrument;
@@ -73,7 +72,7 @@ impl Default for DriverManager {
         let mut drivers = DriverManager::new();
 
         #[cfg(any(feature = "postgresql", feature = "sqlite"))]
-        install_default_drivers();
+        sqlx::any::install_default_drivers();
 
         #[cfg(feature = "postgresql")]
         drivers.add(Box::new(crate::drivers::postgresql::Driver));
