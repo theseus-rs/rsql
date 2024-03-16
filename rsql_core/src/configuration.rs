@@ -194,7 +194,7 @@ impl ConfigurationBuilder {
         if log_level != LevelFilter::OFF {
             let log_dir = configuration.log_dir.clone().unwrap_or_default();
             let log_rotation = configuration.log_rotation.clone();
-            let level = log_level.into_level().unwrap();
+            let level = log_level.into_level().expect("log level");
             let file_appender = RollingFileAppender::builder()
                 .rotation(log_rotation)
                 .filename_prefix(&configuration.program_name)
