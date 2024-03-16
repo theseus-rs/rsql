@@ -83,6 +83,7 @@ impl Default for DriverManager {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::drivers::MockConnection;
     use anyhow::Result;
 
     #[test]
@@ -123,18 +124,27 @@ mod tests {
 
     #[tokio::test]
     async fn test_driver_manager_connect() -> Result<()> {
+        let identifier = "test";
+        let mut mock_driver = MockDriver::new();
+        let mut mock_connection = MockConnection::new();
+        mock_driver.expect_identifier().returning(|| identifier);
+        mock_driver
+            .expect_connect()
+            .returning(|_, _| Ok(Box::new(MockConnection::new())));
+
+        let mut driver_manager = DriverManager::new();
+        driver_manager.add(Box::new(mock_driver));
+
         let configuration = Configuration::default();
-        let drivers = DriverManager::default();
-        let mut connection = drivers.connect(&configuration, "sqlite::memory:").await?;
-        connection.stop().await?;
+        let _ = driver_manager.connect(&configuration, "test::").await?;
         Ok(())
     }
 
     #[tokio::test]
     async fn test_driver_manager_connect_error() {
         let configuration = Configuration::default();
-        let drivers = DriverManager::default();
-        let result = drivers.connect(&configuration, "foo").await;
+        let driver_manager = DriverManager::default();
+        let result = driver_manager.connect(&configuration, "foo").await;
         assert!(result.is_err());
     }
 }
