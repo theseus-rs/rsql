@@ -405,16 +405,15 @@ mod test {
     fn test_configuration_builder() {
         let program_name = "test";
         let version = "1.2.3";
-        let config_dir = "/.rsql";
         let bail_on_error = true;
         let log_level = LevelFilter::OFF;
-        let log_dir = "/.rsql/logs";
+        let log_dir = ".rsql/logs";
         let log_rotation = Rotation::MINUTELY;
         let locale = Locale::es;
         let color_mode = ColorMode::Disabled;
         let edit_mode = EditMode::Vi;
         let history = true;
-        let history_file = "/.rsql/history.txt";
+        let history_file = ".rsql/history.txt";
         let history_limit = 42;
         let history_ignore_dups = false;
         let theme = "Solarized (light)";
@@ -424,7 +423,6 @@ mod test {
         let results_timer = false;
 
         let configuration = ConfigurationBuilder::new(program_name, version)
-            .with_config_dir(config_dir)
             .with_bail_on_error(bail_on_error)
             .with_log_level(log_level)
             .with_log_dir(log_dir)
@@ -445,10 +443,6 @@ mod test {
 
         assert_eq!(configuration.program_name, program_name);
         assert_eq!(configuration.version, version);
-        assert_eq!(
-            configuration.config_dir.unwrap().to_string_lossy(),
-            config_dir
-        );
         assert_eq!(configuration.bail_on_error, bail_on_error);
         assert_eq!(configuration.log_level, log_level);
         assert_eq!(configuration.log_dir.unwrap().to_string_lossy(), log_dir);
