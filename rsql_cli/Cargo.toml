@@ -28,7 +28,7 @@ winres = { version = "0.1" }
 anyhow = { workspace = true }
 clap = { workspace = true, features = ["derive", "env"] }
 dotenvy = { workspace = true }
-rsql_core = { path = "../rsql_core", version = "0.4.1", features = ["all"] }
+rsql_core = { path = "../rsql_core", version = "0.4.2", features = ["all"] }
 tokio = { workspace = true, features = ["rt", "rt-multi-thread", "macros"] }
 tracing = { workspace = true }
 
