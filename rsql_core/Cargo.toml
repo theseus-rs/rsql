@@ -30,7 +30,7 @@ postgresql_embedded = { workspace = true, optional = true }
 rust_decimal = { workspace = true }
 rustyline = { workspace = true }
 serde_json = { workspace = true, features = ["preserve_order"] }
-sqlx = { workspace = true, features = ["chrono", "json", "macros", "postgres", "runtime-tokio", "rust_decimal", "sqlite", "uuid"] }
+sqlx = { workspace = true, features = ["chrono", "json", "macros", "runtime-tokio", "rust_decimal", "uuid"], optional = true }
 supports-color = { workspace = true }
 sys-locale = { workspace = true }
 syntect = { workspace = true }
@@ -54,8 +54,13 @@ default = []
 postgresql = [
     "dep:postgresql_archive",
     "dep:postgresql_embedded",
+    "dep:sqlx",
+    "sqlx/postgres",
 ]
-sqlite = []
+sqlite = [
+    "dep:sqlx",
+    "sqlx/sqlite",
+]
 
 [lints.clippy]
 unwrap_used = "deny"
