@@ -126,7 +126,6 @@ mod tests {
     async fn test_driver_manager_connect() -> Result<()> {
         let identifier = "test";
         let mut mock_driver = MockDriver::new();
-        let mut mock_connection = MockConnection::new();
         mock_driver.expect_identifier().returning(|| identifier);
         mock_driver
             .expect_connect()
