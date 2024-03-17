@@ -178,6 +178,9 @@ impl Connection {
         } else if let Ok(value) = row.try_get(column_name) {
             let value: Option<chrono::NaiveDateTime> = value;
             Ok(value.map(Value::DateTime))
+        } else if let Ok(value) = row.try_get(column_name) {
+            let value: Option<chrono::DateTime<chrono::Utc>> = value;
+            Ok(value.map(|v| Value::DateTime(v.naive_utc())))
         } else if let Ok(value) = row.try_get(column.name()) {
             let value: Option<uuid::Uuid> = value;
             Ok(value.map(Value::Uuid))
@@ -187,8 +190,8 @@ impl Connection {
         } else {
             let column_type = column.type_info();
             let type_name = format!("{:?}", column_type.deref());
-            match type_name.as_str() {
-                "Void" => Ok(None), // pg_sleep() returns void
+            match type_name.to_lowercase().as_str() {
+                "void" => Ok(None), // pg_sleep() returns void
                 _ => bail!(
                     "column type [{:?}] not supported for column [{}]",
                     column_type,

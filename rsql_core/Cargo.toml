@@ -19,6 +19,7 @@ clap = { workspace = true, features = ["derive", "env"] }
 clearscreen = { workspace = true }
 colored = { workspace = true }
 config = { workspace = true }
+csv = { workspace = true }
 dark-light = { workspace = true }
 dirs = { workspace = true }
 indicatif = { workspace = true }

@@ -1,14 +1,13 @@
 use crate::configuration::Configuration;
-use crate::drivers::{QueryResult, Results};
+use crate::drivers::QueryResult;
+use crate::drivers::Results::Query;
+use crate::formatters::error::Result;
+use crate::formatters::footer::write_footer;
 use crate::formatters::formatter::FormatterOptions;
-use anyhow::Result;
 use colored::Colorize;
-use num_format::ToFormattedString;
 use prettytable::format::TableFormat;
 use prettytable::Table;
 use rustyline::ColorMode;
-use std::io::Write;
-use std::time::Duration;
 
 /// Format the results of a query into a table and write to the output.
 pub async fn format<'a>(
@@ -17,28 +16,21 @@ pub async fn format<'a>(
 ) -> Result<()> {
     let configuration = &options.configuration;
     let output = &mut options.output;
-    let rows_affected = match options.results {
-        Results::Execute(rows_affected) => *rows_affected,
-        Results::Query(query_result) => {
-            let mut table = Table::new();
-            table.set_format(table_format);
 
-            if configuration.results_header {
-                process_headers(query_result, &mut table);
-            }
+    if let Query(query_result) = &options.results {
+        let mut table = Table::new();
+        table.set_format(table_format);
 
-            process_data(configuration, query_result, &mut table)?;
-
-            table.print(output)?;
-            query_result.rows.len() as u64
+        if configuration.results_header {
+            process_headers(query_result, &mut table);
         }
-    };
 
-    if configuration.results_footer {
-        let elapsed = options.elapsed;
-        display_footer(output, configuration, rows_affected, elapsed)?;
+        process_data(configuration, query_result, &mut table)?;
+
+        table.print(output)?;
     }
 
+    write_footer(options)?;
     Ok(())
 }
 
@@ -86,49 +78,11 @@ fn process_data(
     Ok(())
 }
 
-/// Display the footer of the result set.
-/// This includes the number of rows returned and the elapsed time.
-/// If the timing option is enabled, the elapsed time will be displayed.
-/// The number of rows will be formatted based on the locale.
-///
-/// Example: "N,NNN,NNN rows (M.MMMs)"
-pub(crate) fn display_footer(
-    output: &mut dyn Write,
-    configuration: &Configuration,
-    rows_affected: u64,
-    elapsed: &Duration,
-) -> Result<()> {
-    let row_label = if rows_affected == 1 { "row" } else { "rows" };
-    let elapsed_display = if configuration.results_timer {
-        format!("({:?})", elapsed)
-    } else {
-        "".to_string()
-    };
-
-    match configuration.color_mode {
-        ColorMode::Disabled => writeln!(
-            output,
-            "{} {} {}",
-            rows_affected.to_formatted_string(&configuration.locale),
-            row_label,
-            elapsed_display
-        )?,
-        _ => writeln!(
-            output,
-            "{} {} {}",
-            rows_affected.to_formatted_string(&configuration.locale),
-            row_label,
-            elapsed_display.dimmed()
-        )?,
-    }
-
-    Ok(())
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::configuration::Configuration;
+    use crate::drivers::Results::{Execute, Query};
     use crate::drivers::{QueryResult, Results, Value};
     use num_format::Locale;
     use prettytable::format::consts::FORMAT_DEFAULT;
@@ -142,7 +96,7 @@ mod tests {
             rows: vec![],
         };
 
-        Results::Query(query_result)
+        Query(query_result)
     }
 
     fn query_result_one_row() -> Results {
@@ -151,7 +105,7 @@ mod tests {
             rows: vec![vec![Some(Value::I64(12345))]],
         };
 
-        Results::Query(query_result)
+        Query(query_result)
     }
 
     fn query_result_two_rows() -> Results {
@@ -160,10 +114,13 @@ mod tests {
             rows: vec![vec![None], vec![Some(Value::I64(12345))]],
         };
 
-        Results::Query(query_result)
+        Query(query_result)
     }
 
-    async fn test_format(configuration: &mut Configuration, results: &Results) -> Result<String> {
+    async fn test_format(
+        configuration: &mut Configuration,
+        results: &Results,
+    ) -> anyhow::Result<String> {
         let elapsed = Duration::from_nanos(9);
         let output = &mut Vec::new();
         let mut options = FormatterOptions {
@@ -179,13 +136,13 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_execute_format() -> Result<()> {
+    async fn test_execute_format() -> anyhow::Result<()> {
         let mut configuration = Configuration {
             locale: Locale::en,
             color_mode: ColorMode::Disabled,
             ..Default::default()
         };
-        let results = Results::Execute(42);
+        let results = Execute(42);
 
         let output = test_format(&mut configuration, &results).await?;
         let expected_output = "42 rows (9ns)\n";
@@ -194,7 +151,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_query_format_no_rows() -> Result<()> {
+    async fn test_query_format_no_rows() -> anyhow::Result<()> {
         let mut configuration = Configuration {
             locale: Locale::en,
             color_mode: ColorMode::Disabled,
@@ -209,7 +166,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_query_format_footer_no_timer() -> Result<()> {
+    async fn test_query_format_footer_no_timer() -> anyhow::Result<()> {
         let mut configuration = Configuration {
             locale: Locale::en,
             color_mode: ColorMode::Disabled,
@@ -226,7 +183,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_query_format_two_rows_without_color() -> Result<()> {
+    async fn test_query_format_two_rows_without_color() -> anyhow::Result<()> {
         let mut configuration = Configuration {
             locale: Locale::en,
             color_mode: ColorMode::Disabled,
@@ -242,7 +199,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_query_format_two_rows_with_color() -> Result<()> {
+    async fn test_query_format_two_rows_with_color() -> anyhow::Result<()> {
         let mut configuration = Configuration {
             locale: Locale::en,
             color_mode: ColorMode::Forced,
@@ -260,7 +217,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_query_format_no_header_and_no_footer() -> Result<()> {
+    async fn test_query_format_no_header_and_no_footer() -> anyhow::Result<()> {
         let mut configuration = Configuration {
             locale: Locale::en,
             color_mode: ColorMode::Disabled,
