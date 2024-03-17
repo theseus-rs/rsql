@@ -1,3 +1,4 @@
+use crate::drivers::error::Result;
 use crate::drivers::value::Value;
 use async_trait::async_trait;
 use std::fmt::Debug;
@@ -20,8 +21,8 @@ pub struct QueryResult {
 #[cfg_attr(test, mockall::automock)]
 #[async_trait]
 pub trait Connection: Debug + Send {
-    async fn execute(&self, sql: &str) -> anyhow::Result<Results>;
-    async fn query(&self, sql: &str) -> anyhow::Result<Results>;
-    async fn tables(&mut self) -> anyhow::Result<Vec<String>>;
-    async fn stop(&mut self) -> anyhow::Result<()>;
+    async fn execute(&self, sql: &str) -> Result<Results>;
+    async fn query(&self, sql: &str) -> Result<Results>;
+    async fn tables(&mut self) -> Result<Vec<String>>;
+    async fn stop(&mut self) -> Result<()>;
 }

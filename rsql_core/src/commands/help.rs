@@ -57,7 +57,7 @@ mod tests {
     use rustyline::history::DefaultHistory;
 
     #[tokio::test]
-    async fn test_execute() -> Result<()> {
+    async fn test_execute() -> anyhow::Result<()> {
         let mut output = Vec::new();
         let options = CommandOptions {
             command_manager: &CommandManager::default(),

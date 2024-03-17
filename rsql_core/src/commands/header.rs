@@ -1,5 +1,5 @@
+use crate::commands::Error::InvalidOption;
 use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
-use anyhow::bail;
 use async_trait::async_trait;
 
 /// A shell command to enable or disable result header
@@ -34,7 +34,12 @@ impl ShellCommand for Command {
         let header = match options.input[1].to_lowercase().as_str() {
             "on" => true,
             "off" => false,
-            option => bail!("Invalid header option: {option}"),
+            option => {
+                return Err(InvalidOption {
+                    command_name: self.name().to_string(),
+                    option: option.to_string(),
+                })
+            }
         };
 
         options.configuration.results_header = header;
@@ -53,7 +58,7 @@ mod tests {
     use rustyline::history::DefaultHistory;
     use std::default;
 
-    async fn test_execute_no_args(header: bool) -> Result<()> {
+    async fn test_execute_no_args(header: bool) -> anyhow::Result<()> {
         let mut output = Vec::new();
         let configuration = &mut Configuration {
             results_header: header,
@@ -82,17 +87,17 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_execute_no_args_on() -> Result<()> {
+    async fn test_execute_no_args_on() -> anyhow::Result<()> {
         test_execute_no_args(true).await
     }
 
     #[tokio::test]
-    async fn test_execute_no_args_off() -> Result<()> {
+    async fn test_execute_no_args_off() -> anyhow::Result<()> {
         test_execute_no_args(false).await
     }
 
     #[tokio::test]
-    async fn test_execute_set_on() -> Result<()> {
+    async fn test_execute_set_on() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
             results_header: false,
             ..default::Default::default()
@@ -114,7 +119,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_execute_set_off() -> Result<()> {
+    async fn test_execute_set_off() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
             results_header: true,
             ..default::Default::default()

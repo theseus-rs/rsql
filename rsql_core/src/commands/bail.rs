@@ -1,6 +1,7 @@
-use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
-use anyhow::bail;
 use async_trait::async_trait;
+
+use crate::commands::Error::InvalidOption;
+use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 
 /// A shell command to stop after an error occurs
 #[derive(Debug, Default)]
@@ -34,7 +35,12 @@ impl ShellCommand for Command {
         let bail_on_error = match options.input[1].to_lowercase().as_str() {
             "on" => true,
             "off" => false,
-            option => bail!("Invalid bail option: {option}"),
+            option => {
+                return Err(InvalidOption {
+                    command_name: self.name().to_string(),
+                    option: option.to_string(),
+                })
+            }
         };
 
         options.configuration.bail_on_error = bail_on_error;
@@ -45,14 +51,17 @@ impl ShellCommand for Command {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use std::default;
+
+    use rustyline::history::DefaultHistory;
+
     use crate::commands::{CommandManager, CommandOptions, LoopCondition};
     use crate::configuration::Configuration;
     use crate::drivers::MockConnection;
-    use rustyline::history::DefaultHistory;
-    use std::default;
 
-    async fn test_execute_no_args(bail: bool) -> Result<()> {
+    use super::*;
+
+    async fn test_execute_no_args(bail: bool) -> anyhow::Result<()> {
         let mut output = Vec::new();
         let configuration = &mut Configuration {
             bail_on_error: bail,
@@ -81,17 +90,17 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_execute_no_args_on() -> Result<()> {
+    async fn test_execute_no_args_on() -> anyhow::Result<()> {
         test_execute_no_args(true).await
     }
 
     #[tokio::test]
-    async fn test_execute_no_args_off() -> Result<()> {
+    async fn test_execute_no_args_off() -> anyhow::Result<()> {
         test_execute_no_args(false).await
     }
 
     #[tokio::test]
-    async fn test_execute_set_on() -> Result<()> {
+    async fn test_execute_set_on() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
             bail_on_error: false,
             ..default::Default::default()
@@ -113,7 +122,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_execute_set_off() -> Result<()> {
+    async fn test_execute_set_off() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
             bail_on_error: true,
             ..default::Default::default()
