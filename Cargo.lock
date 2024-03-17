@@ -3217,6 +3217,7 @@ dependencies = [
  "colored",
  "config",
  "criterion",
+ "csv",
  "dark-light",
  "dirs 5.0.1",
  "indicatif",

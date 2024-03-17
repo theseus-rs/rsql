@@ -1,6 +1,7 @@
 use base64::engine::general_purpose::STANDARD;
 use base64::Engine;
 use num_format::{Locale, ToFormattedString};
+use std::fmt;
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Value {
@@ -53,6 +54,32 @@ impl Value {
     }
 }
 
+impl fmt::Display for Value {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let string_value = match self {
+            Value::Bool(value) => value.to_string(),
+            Value::Bytes(bytes) => STANDARD.encode(bytes),
+            Value::I8(value) => value.to_string(),
+            Value::I16(value) => value.to_string(),
+            Value::I32(value) => value.to_string(),
+            Value::I64(value) => value.to_string(),
+            Value::U8(value) => value.to_string(),
+            Value::U16(value) => value.to_string(),
+            Value::U32(value) => value.to_string(),
+            Value::U64(value) => value.to_string(),
+            Value::F32(value) => value.to_string(),
+            Value::F64(value) => value.to_string(),
+            Value::String(value) => value.to_string(),
+            Value::Date(value) => value.to_string(),
+            Value::Time(value) => value.to_string(),
+            Value::DateTime(value) => value.to_string(),
+            Value::Uuid(value) => value.to_string(),
+            Value::Json(value) => value.to_string(),
+        };
+        write!(f, "{}", string_value)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -65,6 +92,7 @@ mod tests {
     #[test]
     fn test_bool() {
         assert_eq!(Value::Bool(true).to_formatted_string(&Locale::en), "true");
+        assert_eq!(Value::Bool(true).to_string(), "true");
     }
 
     #[test]
@@ -73,12 +101,19 @@ mod tests {
             Value::Bytes(vec![114, 117, 115, 116]).to_formatted_string(&Locale::en),
             "cnVzdA=="
         );
+        assert_eq!(
+            Value::Bytes(vec![114, 117, 115, 116]).to_string(),
+            "cnVzdA=="
+        );
     }
 
     #[test]
     fn test_i8() {
         assert_eq!(Value::I8(-128).to_formatted_string(&Locale::en), "-128");
         assert_eq!(Value::I8(127).to_formatted_string(&Locale::en), "127");
+
+        assert_eq!(Value::I8(-128).to_string(), "-128");
+        assert_eq!(Value::I8(127).to_string(), "127");
     }
 
     #[test]
@@ -91,6 +126,9 @@ mod tests {
             Value::I16(32_767).to_formatted_string(&Locale::en),
             "32,767"
         );
+
+        assert_eq!(Value::I16(-32_768).to_string(), "-32768");
+        assert_eq!(Value::I16(32_767).to_string(), "32767");
     }
 
     #[test]
@@ -103,6 +141,9 @@ mod tests {
             Value::I32(2_147_483_647).to_formatted_string(&Locale::en),
             "2,147,483,647"
         );
+
+        assert_eq!(Value::I32(-2_147_483_648).to_string(), "-2147483648");
+        assert_eq!(Value::I32(2_147_483_647).to_string(), "2147483647");
     }
 
     #[test]
@@ -115,11 +156,21 @@ mod tests {
             Value::I64(9_223_372_036_854_775_807).to_formatted_string(&Locale::en),
             "9,223,372,036,854,775,807"
         );
+
+        assert_eq!(
+            Value::I64(-9_223_372_036_854_775_808).to_string(),
+            "-9223372036854775808"
+        );
+        assert_eq!(
+            Value::I64(9_223_372_036_854_775_807).to_string(),
+            "9223372036854775807"
+        );
     }
 
     #[test]
     fn test_u8() {
         assert_eq!(Value::U8(255).to_formatted_string(&Locale::en), "255");
+        assert_eq!(Value::U8(255).to_string(), "255");
     }
 
     #[test]
@@ -128,6 +179,7 @@ mod tests {
             Value::U16(65_535).to_formatted_string(&Locale::en),
             "65,535"
         );
+        assert_eq!(Value::U16(65_535).to_string(), "65535");
     }
 
     #[test]
@@ -136,6 +188,7 @@ mod tests {
             Value::U32(4_294_967_295).to_formatted_string(&Locale::en),
             "4,294,967,295"
         );
+        assert_eq!(Value::U32(4_294_967_295).to_string(), "4294967295");
     }
 
     #[test]
@@ -144,6 +197,10 @@ mod tests {
             Value::U64(18_446_744_073_709_551_615).to_formatted_string(&Locale::en),
             "18,446,744,073,709,551,615"
         );
+        assert_eq!(
+            Value::U64(18_446_744_073_709_551_615).to_string(),
+            "18446744073709551615"
+        );
     }
 
     #[test]
@@ -151,6 +208,7 @@ mod tests {
         assert!(Value::F32(12_345.67890)
             .to_formatted_string(&Locale::en)
             .starts_with("12345."));
+        assert!(Value::F32(12_345.67890).to_string().starts_with("12345."));
     }
 
     #[test]
@@ -158,6 +216,7 @@ mod tests {
         assert!(Value::F64(12_345.67890)
             .to_formatted_string(&Locale::en)
             .starts_with("12345."));
+        assert!(Value::F64(12_345.67890).to_string().starts_with("12345."));
     }
 
     #[test]
@@ -166,6 +225,7 @@ mod tests {
             Value::String("foo".to_string()).to_formatted_string(&Locale::en),
             "foo"
         );
+        assert_eq!(Value::String("foo".to_string()).to_string(), "foo");
     }
 
     #[test]
@@ -175,6 +235,7 @@ mod tests {
             Value::Date(date).to_formatted_string(&Locale::en),
             "2000-12-31"
         );
+        assert_eq!(Value::Date(date).to_string(), "2000-12-31");
     }
 
     #[test]
@@ -184,6 +245,7 @@ mod tests {
             Value::Time(time).to_formatted_string(&Locale::en),
             "12:13:14.015"
         );
+        assert_eq!(Value::Time(time).to_string(), "12:13:14.015");
     }
 
     #[test]
@@ -195,6 +257,10 @@ mod tests {
             Value::DateTime(datetime).to_formatted_string(&Locale::en),
             "2000-12-31 12:13:14.015"
         );
+        assert_eq!(
+            Value::DateTime(datetime).to_string(),
+            "2000-12-31 12:13:14.015"
+        );
     }
 
     #[test]
@@ -204,6 +270,7 @@ mod tests {
             Value::Uuid(Uuid::from_str(uuid)?).to_formatted_string(&Locale::en),
             uuid
         );
+        assert_eq!(Value::Uuid(Uuid::from_str(uuid)?).to_string(), uuid);
         Ok(())
     }
 
@@ -211,7 +278,11 @@ mod tests {
     fn test_json() -> Result<()> {
         let original_json = json!({"foo": "bar", "baz": 123});
         assert_eq!(
-            Value::Json(original_json).to_formatted_string(&Locale::en),
+            Value::Json(original_json.clone()).to_formatted_string(&Locale::en),
+            r#"{"foo":"bar","baz":123}"#
+        );
+        assert_eq!(
+            Value::Json(original_json.clone()).to_string(),
             r#"{"foo":"bar","baz":123}"#
         );
         Ok(())

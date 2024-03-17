@@ -1,6 +1,6 @@
+use crate::formatters::error::Result;
 use crate::formatters::formatter::FormatterOptions;
 use crate::formatters::table;
-use anyhow::Result;
 use async_trait::async_trait;
 use lazy_static::lazy_static;
 use prettytable::format::{FormatBuilder, LinePosition, LineSeparator, TableFormat};
@@ -60,7 +60,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_format() -> Result<()> {
+    async fn test_format() -> anyhow::Result<()> {
         let mut configuration = Configuration {
             color_mode: ColorMode::Disabled,
             ..Default::default()

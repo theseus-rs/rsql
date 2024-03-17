@@ -82,6 +82,7 @@ theme.dark = "Solarized (dark)"
 #
 # Possible values:
 #   "ascii" - Use ASCII characters to draw a table.
+#   "csv" - Use CSV format to display results.
 #   "unicode" - Use Unicode characters to draw a table.
 format = "unicode"
 

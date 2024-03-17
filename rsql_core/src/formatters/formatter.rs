@@ -1,7 +1,6 @@
 use crate::configuration::Configuration;
 use crate::drivers::Results;
-use crate::formatters::{ascii, unicode};
-use anyhow::Result;
+use crate::formatters::error::Result;
 use async_trait::async_trait;
 use std::collections::BTreeMap;
 use std::fmt::Debug;
@@ -68,8 +67,9 @@ impl Default for FormatterManager {
     fn default() -> Self {
         let mut formatter_manager = FormatterManager::new();
 
-        formatter_manager.add(Box::new(ascii::Formatter));
-        formatter_manager.add(Box::new(unicode::Formatter));
+        formatter_manager.add(Box::new(crate::formatters::ascii::Formatter));
+        formatter_manager.add(Box::new(crate::formatters::csv::Formatter));
+        formatter_manager.add(Box::new(crate::formatters::unicode::Formatter));
 
         formatter_manager
     }
@@ -81,7 +81,7 @@ mod tests {
 
     #[test]
     fn test_format_manager() {
-        let formatter = unicode::Formatter;
+        let formatter = crate::formatters::unicode::Formatter;
 
         let mut formatter_manager = FormatterManager::new();
         assert_eq!(formatter_manager.formats.len(), 0);
@@ -102,6 +102,6 @@ mod tests {
     #[test]
     fn test_format_manager_default() {
         let formatters = FormatterManager::default();
-        assert_eq!(formatters.formats.len(), 2);
+        assert_eq!(formatters.formats.len(), 3);
     }
 }
