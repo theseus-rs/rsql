@@ -24,7 +24,7 @@ pub async fn format<'a>(
             table.set_format(table_format);
 
             if configuration.results_header {
-                process_headers(configuration, query_result, &mut table);
+                process_headers(query_result, &mut table);
             }
 
             process_data(configuration, query_result, &mut table)?;
@@ -42,18 +42,11 @@ pub async fn format<'a>(
     Ok(())
 }
 
-fn process_headers(configuration: &Configuration, query_result: &QueryResult, table: &mut Table) {
+fn process_headers(query_result: &QueryResult, table: &mut Table) {
     let mut column_names = Vec::new();
 
     for column in &query_result.columns {
-        match configuration.color_mode {
-            ColorMode::Disabled => {
-                column_names.push(column.to_string());
-            }
-            _ => {
-                column_names.push(column.green().bold().to_string());
-            }
-        }
+        column_names.push(column.to_string());
     }
 
     table.set_titles(prettytable::Row::from(column_names));
