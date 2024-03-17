@@ -34,7 +34,7 @@ mod tests {
     use rustyline::history::DefaultHistory;
 
     #[tokio::test]
-    async fn test_execute() -> Result<()> {
+    async fn test_execute() -> anyhow::Result<()> {
         let mock_connection = &mut MockConnection::new();
         mock_connection.expect_stop().returning(|| Ok(()));
 

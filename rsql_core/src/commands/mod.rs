@@ -1,6 +1,7 @@
 mod bail;
 mod clear;
 mod command;
+mod error;
 mod exit;
 mod footer;
 mod format;
@@ -12,4 +13,5 @@ mod quit;
 mod tables;
 mod timer;
 
-pub use command::{CommandManager, CommandOptions, LoopCondition, Result, ShellCommand};
+pub use command::{CommandManager, CommandOptions, LoopCondition, ShellCommand};
+pub use error::{Error, Result};

@@ -1,5 +1,5 @@
+use crate::commands::Error::InvalidOption;
 use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
-use anyhow::bail;
 use async_trait::async_trait;
 use num_format::Locale;
 use std::str::FromStr;
@@ -35,7 +35,12 @@ impl ShellCommand for Command {
         let locale = options.input[1];
         let locale = match Locale::from_str(locale) {
             Ok(locale) => locale,
-            Err(_) => bail!("Invalid locale: {locale}"),
+            Err(_) => {
+                return Err(InvalidOption {
+                    command_name: self.name().to_string(),
+                    option: locale.to_string(),
+                })
+            }
         };
 
         options.configuration.locale = locale;
@@ -55,7 +60,7 @@ mod tests {
     use std::default;
 
     #[tokio::test]
-    async fn test_execute_no_args() -> Result<()> {
+    async fn test_execute_no_args() -> anyhow::Result<()> {
         let mut output = Vec::new();
         let configuration = &mut Configuration {
             locale: Locale::en,
@@ -79,7 +84,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_execute_set_on() -> Result<()> {
+    async fn test_execute_set_on() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
             locale: Locale::en,
             ..default::Default::default()

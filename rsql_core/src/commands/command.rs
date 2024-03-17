@@ -1,3 +1,4 @@
+use crate::commands::error::Result;
 use crate::commands::{
     bail, clear, exit, footer, format, header, help, history, locale, quit, tables, timer,
 };
@@ -18,9 +19,6 @@ pub enum LoopCondition {
     Continue,
     Exit(i32),
 }
-
-/// Result type for shell commands
-pub type Result<T = LoopCondition, E = anyhow::Error> = core::result::Result<T, E>;
 
 /// Options for shell commands
 pub struct CommandOptions<'a> {

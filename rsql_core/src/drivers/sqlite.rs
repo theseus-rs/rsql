@@ -1,7 +1,8 @@
 use crate::configuration::Configuration;
 use crate::drivers::connection::{QueryResult, Results};
+use crate::drivers::error::Result;
 use crate::drivers::value::Value;
-use anyhow::{bail, Result};
+use crate::drivers::Error::UnsupportedColumnType;
 use async_trait::async_trait;
 use sqlx::sqlite::{SqliteAutoVacuum, SqliteColumn, SqliteConnectOptions, SqliteRow};
 use sqlx::{Column, Row, SqlitePool, TypeInfo};
@@ -83,7 +84,7 @@ impl crate::drivers::Connection for Connection {
         for row in rows {
             match row.try_get::<String, _>(0) {
                 Ok(table_name) => tables.push(table_name),
-                Err(error) => bail!("Error: {:?}", error),
+                Err(error) => return Err(error.into()),
             }
         }
 
@@ -147,11 +148,12 @@ impl Connection {
             Ok(value.map(Value::F32))
         } else {
             let column_type = column.type_info();
-            bail!(
-                "column type [{:?}] not supported for column [{}]",
-                column_type,
-                column_name
-            );
+            let type_name = format!("{:?}", column_type);
+
+            Err(UnsupportedColumnType {
+                column_name: column_name.to_string(),
+                column_type: type_name,
+            })
         }
     }
 }
@@ -160,12 +162,11 @@ impl Connection {
 mod test {
     use crate::configuration::Configuration;
     use crate::drivers::{DriverManager, Results, Value};
-    use anyhow::Result;
 
     const DATABASE_URL: &str = "sqlite::memory:";
 
     #[tokio::test]
-    async fn test_driver_connect() -> Result<()> {
+    async fn test_driver_connect() -> anyhow::Result<()> {
         let configuration = Configuration::default();
         let drivers = DriverManager::default();
         let mut connection = drivers.connect(&configuration, DATABASE_URL).await?;
@@ -174,7 +175,7 @@ mod test {
     }
 
     #[tokio::test]
-    async fn test_connection_interface() -> Result<()> {
+    async fn test_connection_interface() -> anyhow::Result<()> {
         let configuration = &Configuration::default();
         let drivers = DriverManager::default();
         let mut connection = drivers.connect(&configuration, DATABASE_URL).await?;
@@ -223,7 +224,7 @@ mod test {
 
     /// Ref: https://www.sqlite.org/datatype3.html
     #[tokio::test]
-    async fn test_table_data_types() -> Result<()> {
+    async fn test_table_data_types() -> anyhow::Result<()> {
         let configuration = &Configuration::default();
         let drivers = DriverManager::default();
         let mut connection = drivers.connect(&configuration, DATABASE_URL).await?;
@@ -285,7 +286,7 @@ mod test {
         Ok(())
     }
 
-    async fn test_data_type(sql: &str) -> Result<Option<Value>> {
+    async fn test_data_type(sql: &str) -> anyhow::Result<Option<Value>> {
         let configuration = Configuration::default();
         let drivers = DriverManager::default();
         let mut connection = drivers.connect(&configuration, DATABASE_URL).await?;
@@ -309,7 +310,7 @@ mod test {
     }
 
     #[tokio::test]
-    async fn test_data_type_bytes() -> Result<()> {
+    async fn test_data_type_bytes() -> anyhow::Result<()> {
         match test_data_type("SELECT x'2a'").await? {
             Some(value) => assert_eq!(value, Value::Bytes(vec![42])),
             _ => assert!(false),
@@ -318,7 +319,7 @@ mod test {
     }
 
     #[tokio::test]
-    async fn test_data_type_i8() -> Result<()> {
+    async fn test_data_type_i8() -> anyhow::Result<()> {
         match test_data_type("SELECT 127").await? {
             Some(value) => assert_eq!(value, Value::I8(127)),
             _ => assert!(false),
@@ -327,7 +328,7 @@ mod test {
     }
 
     #[tokio::test]
-    async fn test_data_type_i16() -> Result<()> {
+    async fn test_data_type_i16() -> anyhow::Result<()> {
         match test_data_type("SELECT 32767").await? {
             Some(value) => assert_eq!(value, Value::I16(32_767)),
             _ => assert!(false),
@@ -336,7 +337,7 @@ mod test {
     }
 
     #[tokio::test]
-    async fn test_data_type_i32() -> Result<()> {
+    async fn test_data_type_i32() -> anyhow::Result<()> {
         match test_data_type("SELECT 2147483647").await? {
             Some(value) => assert_eq!(value, Value::I32(2_147_483_647)),
             _ => assert!(false),
@@ -345,7 +346,7 @@ mod test {
     }
 
     #[tokio::test]
-    async fn test_data_type_f32() -> Result<()> {
+    async fn test_data_type_f32() -> anyhow::Result<()> {
         match test_data_type("SELECT 12345.67890").await? {
             Some(value) => assert_eq!(value, Value::F32(12_345.67890)),
             _ => assert!(false),
@@ -354,7 +355,7 @@ mod test {
     }
 
     #[tokio::test]
-    async fn test_data_type_string() -> Result<()> {
+    async fn test_data_type_string() -> anyhow::Result<()> {
         match test_data_type("SELECT 'foo'").await? {
             Some(value) => assert_eq!(value, Value::String("foo".to_string())),
             _ => assert!(false),

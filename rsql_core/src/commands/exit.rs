@@ -43,7 +43,7 @@ mod tests {
     use rustyline::history::DefaultHistory;
 
     #[tokio::test]
-    async fn test_execute_no_argument() -> Result<()> {
+    async fn test_execute_no_argument() -> anyhow::Result<()> {
         let mock_connection = &mut MockConnection::new();
         mock_connection.expect_stop().returning(|| Ok(()));
 
@@ -63,7 +63,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_execute_argument() -> Result<()> {
+    async fn test_execute_argument() -> anyhow::Result<()> {
         let mock_connection = &mut MockConnection::new();
         mock_connection.expect_stop().returning(|| Ok(()));
 
@@ -83,7 +83,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_execute_invalid() -> Result<()> {
+    async fn test_execute_invalid() -> anyhow::Result<()> {
         let options = CommandOptions {
             command_manager: &CommandManager::default(),
             configuration: &mut Configuration::default(),

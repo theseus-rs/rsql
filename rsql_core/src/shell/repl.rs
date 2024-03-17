@@ -1,11 +1,12 @@
 use crate::commands::{CommandManager, CommandOptions, LoopCondition};
 use crate::configuration::Configuration;
 use crate::drivers::{Connection, DriverManager, Results};
+use crate::formatters;
 use crate::formatters::{FormatterManager, FormatterOptions};
 use crate::shell::helper::ReplHelper;
+use crate::shell::Result;
 use crate::shell::ShellArgs;
 use crate::version::full_version;
-use anyhow::{bail, Result};
 use colored::Colorize;
 use indicatif::ProgressStyle;
 use rustyline::config::Configurer;
@@ -99,8 +100,8 @@ impl Shell {
         let connection = binding.as_mut();
 
         self.repl(connection).await?;
-
-        connection.stop().await
+        connection.stop().await?;
+        Ok(())
     }
 
     /// Run the Read-Eval-Print Loop (REPL) for the shell.
@@ -126,7 +127,12 @@ impl Shell {
             }
         }
 
-        welcome_message(configuration)?;
+        eprintln!("{}", full_version(configuration));
+        eprintln!(
+            "Type '{}' for help, '{}' to exit.",
+            ".help".bold(),
+            ".quit".bold()
+        );
         let prompt = format!("{}> ", configuration.program_name);
 
         loop {
@@ -184,19 +190,6 @@ impl Default for Shell {
             Configuration::default(),
         )
     }
-}
-
-/// Display the welcome message.
-fn welcome_message(configuration: &Configuration) -> Result<()> {
-    let version = full_version(configuration)?;
-
-    eprintln!("{}", version);
-    eprintln!(
-        "Type '{}' for help, '{}' to exit.",
-        ".help".bold(),
-        ".quit".bold()
-    );
-    Ok(())
 }
 
 /// Evaluate the input line and return the loop condition.
@@ -281,7 +274,12 @@ async fn execute_sql(
     let result_format = &configuration.results_format;
     let formatter = match formatter_manager.get(result_format) {
         Some(formatter) => formatter,
-        None => bail!("{}: {}", "Error".red(), "Invalid format"),
+        None => {
+            return Err(formatters::Error::UnknownFormat {
+                format: result_format.to_string(),
+            }
+            .into())
+        }
     };
     let mut options = FormatterOptions {
         configuration,
@@ -300,9 +298,11 @@ async fn execute(connection: &mut dyn Connection, sql: &str, command: &str) -> R
         "{span_child_prefix}{spinner}",
     )?);
 
-    if command.to_lowercase() == "select" {
-        connection.query(sql).await
+    let results = if command.to_lowercase() == "select" {
+        connection.query(sql).await?
     } else {
-        connection.execute(sql).await
-    }
+        connection.execute(sql).await?
+    };
+
+    Ok(results)
 }

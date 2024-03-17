@@ -1,12 +1,14 @@
 extern crate colored;
 
 mod completer;
+mod error;
 mod helper;
 mod highlighter;
 mod repl;
 
 use clap::Parser;
 
+pub use error::{Error, Result};
 pub use repl::{Shell, ShellBuilder};
 
 #[cfg(feature = "sqlite")]

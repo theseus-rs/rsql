@@ -5,6 +5,9 @@ pub enum Error {
     /// IO error
     #[error(transparent)]
     IoError(anyhow::Error),
+    /// Error an unknown format is specified
+    #[error("unknown format [{format}]")]
+    UnknownFormat { format: String },
 }
 
 /// Converts a [`csv::Error`] into an [`IoError`](Error::IoError)

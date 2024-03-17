@@ -19,7 +19,7 @@ fn bench_version(criterion: &mut Criterion) -> Result<()> {
 
 fn version() -> Result<()> {
     let configuration = Configuration::default();
-    let _ = full_version(&configuration)?;
+    let _ = full_version(&configuration);
     Ok(())
 }
 

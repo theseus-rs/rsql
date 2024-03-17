@@ -11,7 +11,7 @@ fn test_full_version() -> Result<()> {
     configuration.program_name = TEST_PROGRAM_NAME.to_string();
     configuration.version = TEST_VERSION.to_string();
     let version_prefix = format!("{TEST_PROGRAM_NAME}/{TEST_VERSION}");
-    let version = full_version(&configuration)?;
+    let version = full_version(&configuration);
     assert!(version.starts_with(version_prefix.as_str()));
     Ok(())
 }

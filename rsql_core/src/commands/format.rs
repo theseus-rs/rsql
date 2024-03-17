@@ -1,6 +1,6 @@
+use crate::commands::Error::InvalidOption;
 use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use crate::formatters::FormatterManager;
-use anyhow::bail;
 use async_trait::async_trait;
 
 /// A shell command to set the results format
@@ -35,7 +35,12 @@ impl ShellCommand for Command {
         let formatter_identifier = options.input[1].to_lowercase();
         match formatter_manager.get(formatter_identifier.as_str()) {
             Some(_) => options.configuration.results_format = formatter_identifier,
-            None => bail!("Invalid format mode option: {formatter_identifier}"),
+            None => {
+                return Err(InvalidOption {
+                    command_name: self.name().to_string(),
+                    option: formatter_identifier.to_string(),
+                })
+            }
         };
 
         Ok(LoopCondition::Continue)
@@ -53,7 +58,7 @@ mod tests {
     use std::default;
 
     #[tokio::test]
-    async fn test_execute_no_args() -> Result<()> {
+    async fn test_execute_no_args() -> anyhow::Result<()> {
         let mut output = Vec::new();
         let configuration = &mut Configuration {
             results_format: "unicode".to_string(),
@@ -77,7 +82,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_execute_set_ascii() -> Result<()> {
+    async fn test_execute_set_ascii() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
             results_format: "unicode".to_string(),
             ..default::Default::default()
@@ -99,7 +104,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_execute_set_unicode() -> Result<()> {
+    async fn test_execute_set_unicode() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
             results_format: "ascii".to_string(),
             ..default::Default::default()

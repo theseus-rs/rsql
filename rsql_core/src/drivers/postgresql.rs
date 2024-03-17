@@ -1,7 +1,8 @@
 use crate::configuration::Configuration;
 use crate::drivers::connection::{QueryResult, Results};
+use crate::drivers::error::Result;
 use crate::drivers::value::Value;
-use anyhow::{bail, Result};
+use crate::drivers::Error::UnsupportedColumnType;
 use async_trait::async_trait;
 use postgresql_archive::Version;
 use postgresql_embedded::{PostgreSQL, Settings};
@@ -114,7 +115,7 @@ impl crate::drivers::Connection for Connection {
         for row in rows {
             match row.try_get::<String, _>(0) {
                 Ok(table_name) => tables.push(table_name),
-                Err(error) => bail!("Error: {:?}", error),
+                Err(error) => return Err(error.into()),
             }
         }
 
@@ -127,7 +128,7 @@ impl crate::drivers::Connection for Connection {
         if let Some(postgresql) = &self.postgresql {
             match postgresql.stop().await {
                 Ok(_) => Ok(()),
-                Err(error) => bail!("Error stopping drivers: {:?}", error),
+                Err(error) => Err(error.into()),
             }
         } else {
             Ok(())
@@ -192,11 +193,10 @@ impl Connection {
             let type_name = format!("{:?}", column_type.deref());
             match type_name.to_lowercase().as_str() {
                 "void" => Ok(None), // pg_sleep() returns void
-                _ => bail!(
-                    "column type [{:?}] not supported for column [{}]",
-                    column_type,
-                    column_name
-                ),
+                _ => Err(UnsupportedColumnType {
+                    column_name: column_name.to_string(),
+                    column_type: type_name,
+                }),
             }
         }
     }
@@ -208,12 +208,11 @@ impl Connection {
 mod test {
     use crate::configuration::Configuration;
     use crate::drivers::{DriverManager, Results, Value};
-    use anyhow::Result;
 
     const DATABASE_URL: &str = "postgresql::embedded:";
 
     #[tokio::test]
-    async fn test_driver_connect() -> Result<()> {
+    async fn test_driver_connect() -> anyhow::Result<()> {
         let configuration = Configuration::default();
         let drivers = DriverManager::default();
         let mut connection = drivers.connect(&configuration, DATABASE_URL).await?;
@@ -222,7 +221,7 @@ mod test {
     }
 
     #[tokio::test]
-    async fn test_connection_interface() -> Result<()> {
+    async fn test_connection_interface() -> anyhow::Result<()> {
         let configuration = Configuration::default();
         let drivers = DriverManager::default();
         let mut connection = drivers.connect(&configuration, DATABASE_URL).await?;

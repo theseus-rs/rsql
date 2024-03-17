@@ -39,7 +39,7 @@ pub(crate) async fn execute(args: Option<Args>, output: &mut dyn io::Write) -> R
     let mut configuration = ConfigurationBuilder::new(program_name, version)
         .with_config()
         .build();
-    let version = full_version(&configuration)?;
+    let version = full_version(&configuration);
 
     info!("{version} initialized");
 
@@ -53,7 +53,11 @@ pub(crate) async fn execute(args: Option<Args>, output: &mut dyn io::Write) -> R
     };
 
     info!("{version} completed");
-    result
+
+    match result {
+        Ok(_) => Ok(()),
+        Err(error) => Err(error.into()),
+    }
 }
 
 #[cfg(test)]

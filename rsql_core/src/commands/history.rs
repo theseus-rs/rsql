@@ -39,7 +39,7 @@ mod tests {
     use std::default::Default;
 
     #[tokio::test]
-    async fn test_execute_history_disabled() -> Result<()> {
+    async fn test_execute_history_disabled() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
             history: false,
             ..Default::default()
@@ -66,7 +66,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_execute_history_enabled() -> Result<()> {
+    async fn test_execute_history_enabled() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
             history: true,
             ..Default::default()

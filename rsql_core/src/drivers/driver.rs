@@ -1,6 +1,7 @@
 use crate::configuration::Configuration;
+use crate::drivers::error::Result;
 use crate::drivers::Connection;
-use anyhow::bail;
+use crate::drivers::Error::DriverNotFound;
 use async_trait::async_trait;
 use std::collections::BTreeMap;
 use std::fmt::Debug;
@@ -14,7 +15,7 @@ pub trait Driver: Debug + Send {
         &self,
         configuration: &Configuration,
         url: &str,
-    ) -> anyhow::Result<Box<dyn Connection>>;
+    ) -> Result<Box<dyn Connection>>;
 }
 
 /// Manages available drivers
@@ -53,7 +54,7 @@ impl DriverManager {
         &self,
         configuration: &Configuration,
         url: &str,
-    ) -> anyhow::Result<Box<dyn Connection>> {
+    ) -> Result<Box<dyn Connection>> {
         let identifier = match url.split_once(':') {
             Some((before, _)) => before,
             None => "",
@@ -61,7 +62,9 @@ impl DriverManager {
 
         match &self.get(identifier) {
             Some(driver) => driver.connect(configuration, url).await,
-            None => bail!("Invalid database url: {url}"),
+            None => Err(DriverNotFound {
+                identifier: identifier.to_string(),
+            }),
         }
     }
 }
@@ -87,7 +90,6 @@ impl Default for DriverManager {
 mod tests {
     use super::*;
     use crate::drivers::MockConnection;
-    use anyhow::Result;
 
     #[test]
     fn test_driver_manager() {
@@ -126,7 +128,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_driver_manager_connect() -> Result<()> {
+    async fn test_driver_manager_connect() -> anyhow::Result<()> {
         let identifier = "test";
         let mut mock_driver = MockDriver::new();
         mock_driver.expect_identifier().returning(|| identifier);
