@@ -1,7 +1,7 @@
+use crate::formatters::delimited::format_delimited;
 use crate::formatters::error::Result;
 use crate::formatters::formatter::FormatterOptions;
 use async_trait::async_trait;
-use crate::formatters::delimited::format_delimited;
 
 /// A formatter for Column Separated Values (CSV)
 #[derive(Debug, Default)]
