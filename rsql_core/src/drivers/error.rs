@@ -39,3 +39,33 @@ impl From<sqlx::Error> for Error {
         Error::IoError(error.into())
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_archive_error() {
+        let error = postgresql_archive::Error::Unexpected("test".to_string());
+        let io_error = Error::from(error);
+
+        assert_eq!(io_error.to_string(), "test");
+    }
+
+    #[test]
+    fn test_embedded_error() {
+        let archive_error = postgresql_archive::Error::Unexpected("test".to_string());
+        let error = postgresql_embedded::Error::ArchiveError(archive_error);
+        let io_error = Error::from(error);
+
+        assert_eq!(io_error.to_string(), "test");
+    }
+
+    #[test]
+    fn test_sqlx_error() {
+        let error = sqlx::Error::RowNotFound;
+        let io_error = Error::from(error);
+
+        assert!(io_error.to_string().contains("no rows returned"));
+    }
+}

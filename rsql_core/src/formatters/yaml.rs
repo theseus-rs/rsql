@@ -23,7 +23,7 @@ impl crate::formatters::Formatter for Formatter {
 pub(crate) async fn format_yaml(options: &mut FormatterOptions<'_>) -> Result<()> {
     let query_result = match options.results {
         crate::drivers::Results::Query(query_result) => query_result,
-        _ => return Ok(()),
+        _ => return write_footer(options),
     };
 
     let mut yaml_rows: Vec<IndexMap<&String, Option<Value>>> = Vec::new();
@@ -53,7 +53,6 @@ pub(crate) async fn format_yaml(options: &mut FormatterOptions<'_>) -> Result<()
 
     let yaml = serde_yaml::to_string(&yaml_rows)?;
     write!(options.output, "{}", yaml)?;
-    writeln!(options.output)?;
 
     write_footer(options)
 }
@@ -63,7 +62,7 @@ mod test {
     use super::*;
     use crate::configuration::Configuration;
     use crate::drivers::QueryResult;
-    use crate::drivers::Results::Query;
+    use crate::drivers::Results::{Execute, Query};
     use crate::drivers::Value;
     use crate::formatters::formatter::FormatterOptions;
     use crate::formatters::Formatter;
@@ -71,7 +70,30 @@ mod test {
     use std::io::Cursor;
 
     #[tokio::test]
-    async fn test_format() -> anyhow::Result<()> {
+    async fn test_format_execute() -> anyhow::Result<()> {
+        let configuration = &mut Configuration {
+            color_mode: ColorMode::Disabled,
+            ..Default::default()
+        };
+        let output = &mut Cursor::new(Vec::new());
+        let mut options = FormatterOptions {
+            configuration,
+            results: &Execute(1),
+            elapsed: &std::time::Duration::from_nanos(9),
+            output,
+        };
+
+        let formatter = Formatter;
+        formatter.format(&mut options).await.unwrap();
+
+        let output = String::from_utf8(output.get_ref().to_vec())?.replace("\r\n", "\n");
+        let expected = "1 row (9ns)\n";
+        assert_eq!(output, expected);
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_format_query() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
             color_mode: ColorMode::Disabled,
             ..Default::default()
@@ -96,7 +118,7 @@ mod test {
         formatter.format(&mut options).await.unwrap();
 
         let output = String::from_utf8(output.get_ref().to_vec())?.replace("\r\n", "\n");
-        let expected = "- id: 1\n  data: Ynl0ZXM=\n- id: 2\n  data: foo\n- id: 3\n  data: null\n\n3 rows (9ns)\n";
+        let expected = "- id: 1\n  data: Ynl0ZXM=\n- id: 2\n  data: foo\n- id: 3\n  data: null\n3 rows (9ns)\n";
         assert_eq!(output, expected);
         Ok(())
     }
