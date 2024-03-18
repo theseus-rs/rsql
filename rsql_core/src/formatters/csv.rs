@@ -27,6 +27,7 @@ mod test {
     use crate::drivers::Value;
     use crate::formatters::formatter::FormatterOptions;
     use crate::formatters::Formatter;
+    use indoc::indoc;
     use rustyline::ColorMode;
     use std::io::Cursor;
 
@@ -56,7 +57,13 @@ mod test {
         formatter.format(&mut options).await.unwrap();
 
         let output = String::from_utf8(output.get_ref().to_vec())?.replace("\r\n", "\n");
-        let expected = "\"id\",\"data\"\n1,\"Ynl0ZXM=\"\n2,\"foo\"\n3,\"\"\n3 rows (9ns)\n";
+        let expected = indoc! {r#"
+            "id","data"
+            1,"Ynl0ZXM="
+            2,"foo"
+            3,""
+            3 rows (9ns)
+        "#};
         assert_eq!(output, expected);
         Ok(())
     }
