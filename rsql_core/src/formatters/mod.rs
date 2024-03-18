@@ -9,6 +9,7 @@ mod jsonl;
 mod table;
 mod tsv;
 mod unicode;
+mod xml;
 mod yaml;
 
 pub use error::{Error, Result};

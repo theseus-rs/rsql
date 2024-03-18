@@ -17,6 +17,13 @@ impl From<csv::Error> for Error {
     }
 }
 
+/// Converts a [`quick_xml::Error`] into an [`IoError`](Error::IoError)
+impl From<quick_xml::Error> for Error {
+    fn from(error: quick_xml::Error) -> Self {
+        Error::IoError(error.into())
+    }
+}
+
 /// Converts a [`serde_yaml::Error`] into an [`IoError`](Error::IoError)
 impl From<serde_yaml::Error> for Error {
     fn from(error: serde_yaml::Error) -> Self {
@@ -43,6 +50,14 @@ mod tests {
         let io_error = Error::from(csv_error);
 
         assert_eq!(io_error.to_string(), "test");
+    }
+
+    #[test]
+    fn test_quick_xml_error() {
+        let error = quick_xml::Error::UnexpectedToken("test".to_string());
+        let io_error = Error::from(error);
+
+        assert_eq!(io_error.to_string(), "Unexpected token 'test'");
     }
 
     #[test]

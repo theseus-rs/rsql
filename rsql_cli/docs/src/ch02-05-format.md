@@ -18,6 +18,7 @@ The format command sets the format mode for the CLI. The default format mode is 
 | `jsonl`   | [JSON Lines (JSONL)](https://jsonlines.org/)                                       |
 | `tsv`     | [Tab Separated Values (TSV)](https://en.wikipedia.org/wiki/Tab-separated_values)   |
 | `unicode` | Unicode characters to draw a table                                                 |
+| `xml`     | [Extensible Markup Language (XML)](https://www.w3.org/TR/xml11/)                   |
 | `yaml`    | [YAML Ain’t Markup Language (YAML)](https://yaml.org/spec/1.2.2/)                  |
 
 ### Examples
