@@ -32,6 +32,7 @@ postgresql_archive = { workspace = true, optional = true }
 postgresql_embedded = { workspace = true, optional = true }
 rust_decimal = { workspace = true }
 rustyline = { workspace = true }
+quick-xml = { workspace = true, features = ["serialize"] }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true, features = ["preserve_order"] }
 serde_yaml = { workspace = true }
