@@ -18,7 +18,7 @@ impl ShellCommand for Command {
     }
 
     fn description(&self) -> &'static str {
-        "format results in ascii, csv, or unicode"
+        "format results in ascii, csv, tsv or unicode"
     }
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
