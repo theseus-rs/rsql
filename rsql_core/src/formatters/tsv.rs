@@ -3,18 +3,18 @@ use crate::formatters::error::Result;
 use crate::formatters::formatter::FormatterOptions;
 use async_trait::async_trait;
 
-/// A formatter for Column Separated Values (CSV)
+/// A formatter for Tab Separated Values (TSV)
 #[derive(Debug, Default)]
 pub struct Formatter;
 
 #[async_trait]
 impl crate::formatters::Formatter for Formatter {
     fn identifier(&self) -> &'static str {
-        "csv"
+        "tsv"
     }
 
     async fn format<'a>(&self, options: &mut FormatterOptions<'a>) -> Result<()> {
-        format_delimited(options, b',').await
+        format_delimited(options, b'\t').await
     }
 }
 
@@ -56,7 +56,7 @@ mod test {
         formatter.format(&mut options).await.unwrap();
 
         let output = String::from_utf8(output.get_ref().to_vec())?.replace("\r\n", "\n");
-        let expected = "\"id\",\"data\"\n1,\"Ynl0ZXM=\"\n2,\"foo\"\n3,\"\"\n3 rows (9ns)\n";
+        let expected = "\"id\"\t\"data\"\n1\t\"Ynl0ZXM=\"\n2\t\"foo\"\n3\t\"\"\n3 rows (9ns)\n";
         assert_eq!(output, expected);
         Ok(())
     }
