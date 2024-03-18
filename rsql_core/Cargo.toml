@@ -22,6 +22,7 @@ config = { workspace = true }
 csv = { workspace = true }
 dark-light = { workspace = true }
 dirs = { workspace = true }
+indexmap = { workspace = true, features = ["serde"] }
 indicatif = { workspace = true }
 lazy_static = { workspace = true }
 num-format = { workspace = true }

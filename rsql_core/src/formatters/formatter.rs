@@ -69,6 +69,8 @@ impl Default for FormatterManager {
 
         formatter_manager.add(Box::new(crate::formatters::ascii::Formatter));
         formatter_manager.add(Box::new(crate::formatters::csv::Formatter));
+        formatter_manager.add(Box::new(crate::formatters::json::Formatter));
+        formatter_manager.add(Box::new(crate::formatters::jsonl::Formatter));
         formatter_manager.add(Box::new(crate::formatters::tsv::Formatter));
         formatter_manager.add(Box::new(crate::formatters::unicode::Formatter));
 
@@ -103,6 +105,6 @@ mod tests {
     #[test]
     fn test_format_manager_default() {
         let formatters = FormatterManager::default();
-        assert_eq!(formatters.formats.len(), 4);
+        assert_eq!(formatters.formats.len(), 6);
     }
 }
