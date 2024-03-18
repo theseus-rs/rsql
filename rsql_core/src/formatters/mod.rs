@@ -9,6 +9,7 @@ mod jsonl;
 mod table;
 mod tsv;
 mod unicode;
+mod yaml;
 
 pub use error::{Error, Result};
 pub use formatter::{Formatter, FormatterManager, FormatterOptions};

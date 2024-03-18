@@ -81,12 +81,12 @@ theme.dark = "Solarized (dark)"
 # The format to use for results.
 #
 # Possible values:
-#   "ascii" - Use ASCII characters to draw a table.
-#   "csv" - Use Comma Separated Values (CSV) format to output results.
-#   "json" - Use JSON format to output results.
-#   "jsonl" - Use JSONL format to output results.
-#   "tsv" - Use Tab Separated Values (TSV) format to output results.
-#   "unicode" - Use Unicode characters to draw a table.
+#   "ascii" - ASCII characters to draw a table.
+#   "csv" - Comma Separated Values (CSV) format to output results.
+#   "json" - JSON format to output results.
+#   "jsonl" - JSONL format to output results.
+#   "tsv" - Tab Separated Values (TSV) format to output results.
+#   "unicode" - Unicode characters to draw a table.
 format = "unicode"
 
 # Indicate if header should be displayed when displaying results.

@@ -32,7 +32,9 @@ postgresql_archive = { workspace = true, optional = true }
 postgresql_embedded = { workspace = true, optional = true }
 rust_decimal = { workspace = true }
 rustyline = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true, features = ["preserve_order"] }
+serde_yaml = { workspace = true }
 sqlx = { workspace = true, features = ["chrono", "json", "macros", "runtime-tokio", "rust_decimal", "uuid"], optional = true }
 supports-color = { workspace = true }
 sys-locale = { workspace = true }
@@ -44,7 +46,7 @@ tracing = { workspace = true }
 tracing-appender = { workspace = true }
 tracing-indicatif = { workspace = true }
 tracing-subscriber = { workspace = true, features = ["env-filter", "tracing-log"] }
-uuid = { workspace = true, features = ["v4"] }
+uuid = { workspace = true, features = ["serde", "v4"] }
 
 [dev-dependencies]
 criterion = { workspace = true }
