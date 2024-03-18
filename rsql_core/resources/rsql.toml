@@ -83,6 +83,7 @@ theme.dark = "Solarized (dark)"
 # Possible values:
 #   "ascii" - ASCII characters to draw a table.
 #   "csv" - Comma Separated Values (CSV)
+#   "html" - HyperText Markup Language (HTML)
 #   "json" - JavaScript Object Notation (JSON)
 #   "jsonl" - JSON Lines (JSONL)
 #   "tsv" - Tab Separated Values (TSV)

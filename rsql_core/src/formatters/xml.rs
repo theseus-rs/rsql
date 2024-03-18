@@ -61,7 +61,7 @@ pub(crate) async fn format_xml(options: &mut FormatterOptions<'_>) -> Result<()>
     }
 
     writer.write_event(Event::End(BytesEnd::new("results")))?;
-    writeln!(options.output)?;
+    writeln!(writer.get_mut())?;
 
     write_footer(options)
 }
@@ -75,6 +75,7 @@ mod test {
     use crate::drivers::Value;
     use crate::formatters::formatter::FormatterOptions;
     use crate::formatters::Formatter;
+    use indoc::indoc;
     use rustyline::ColorMode;
     use std::io::Cursor;
 
@@ -127,7 +128,14 @@ mod test {
         formatter.format(&mut options).await.unwrap();
 
         let output = String::from_utf8(output.get_ref().to_vec())?.replace("\r\n", "\n");
-        let expected = "<results>\n<row><id>1</id><data>Ynl0ZXM=</data></row>\n<row><id>2</id><data>foo</data></row>\n<row><id>3</id><data></data></row>\n</results>\n3 rows (9ns)\n".to_string();
+        let expected = indoc! {r#"
+            <results>
+            <row><id>1</id><data>Ynl0ZXM=</data></row>
+            <row><id>2</id><data>foo</data></row>
+            <row><id>3</id><data></data></row>
+            </results>
+            3 rows (9ns)
+        "#};
         assert_eq!(output, expected);
         Ok(())
     }

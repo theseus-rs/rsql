@@ -4,6 +4,7 @@ mod delimited;
 mod error;
 mod footer;
 mod formatter;
+mod html;
 mod json;
 mod jsonl;
 mod table;

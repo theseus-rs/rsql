@@ -51,6 +51,7 @@ uuid = { workspace = true, features = ["serde", "v4"] }
 
 [dev-dependencies]
 criterion = { workspace = true }
+indoc = { workspace = true }
 mockall = { workspace = true }
 test-log = { workspace = true }
 tokio = { workspace = true }

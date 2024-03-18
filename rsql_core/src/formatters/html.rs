@@ -3,56 +3,87 @@ use crate::formatters::error::Result;
 use crate::formatters::footer::write_footer;
 use crate::formatters::formatter::FormatterOptions;
 use async_trait::async_trait;
-use indexmap::IndexMap;
+use quick_xml::events::{BytesEnd, BytesStart, BytesText, Event};
+use quick_xml::Writer;
 
-/// A formatter for YAML
+/// A formatter for HTML
 #[derive(Debug, Default)]
 pub struct Formatter;
 
 #[async_trait]
 impl crate::formatters::Formatter for Formatter {
     fn identifier(&self) -> &'static str {
-        "yaml"
+        "html"
     }
 
     async fn format<'a>(&self, options: &mut FormatterOptions<'a>) -> Result<()> {
-        format_yaml(options).await
+        format_xml(options).await
     }
 }
 
-pub(crate) async fn format_yaml(options: &mut FormatterOptions<'_>) -> Result<()> {
+pub(crate) async fn format_xml(options: &mut FormatterOptions<'_>) -> Result<()> {
     let query_result = match options.results {
         crate::drivers::Results::Query(query_result) => query_result,
         _ => return write_footer(options),
     };
 
-    let mut yaml_rows: Vec<IndexMap<&String, Option<Value>>> = Vec::new();
-    let columns: Vec<String> = query_result.columns.iter().map(|c| c.to_string()).collect();
-    for row in &query_result.rows {
-        let mut yaml_row: IndexMap<&String, Option<Value>> = IndexMap::new();
+    let mut writer = Writer::new(&mut options.output);
 
-        for (c, data) in row.iter().enumerate() {
-            let column = columns.get(c).expect("column not found");
+    writer.write_event(Event::Start(BytesStart::new("table")))?;
+    writeln!(writer.get_mut())?;
+
+    write!(writer.get_mut(), "  ")?;
+    writer.write_event(Event::Start(BytesStart::new("thead")))?;
+    writeln!(writer.get_mut())?;
+    write!(writer.get_mut(), "    ")?;
+    writer.write_event(Event::Start(BytesStart::new("tr")))?;
+    for column in &query_result.columns {
+        writer.write_event(Event::Start(BytesStart::new("th")))?;
+        writer.write_event(Event::Text(BytesText::new(column.as_str())))?;
+        writer.write_event(Event::End(BytesEnd::new("th")))?;
+    }
+    writer.write_event(Event::End(BytesEnd::new("tr")))?;
+    writeln!(writer.get_mut())?;
+    write!(writer.get_mut(), "  ")?;
+    writer.write_event(Event::End(BytesEnd::new("thead")))?;
+    writeln!(writer.get_mut())?;
+
+    write!(writer.get_mut(), "  ")?;
+    writer.write_event(Event::Start(BytesStart::new("tbody")))?;
+    writeln!(writer.get_mut())?;
+
+    for row in &query_result.rows {
+        write!(writer.get_mut(), "    ")?;
+        writer.write_event(Event::Start(BytesStart::new("tr")))?;
+
+        for data in row.iter() {
+            writer.write_event(Event::Start(BytesStart::new("td")))?;
             match data {
                 Some(value) => {
-                    if let Value::Bytes(_bytes) = value {
+                    let string_value = if let Value::Bytes(_bytes) = value {
                         let value = Value::String(value.to_string());
-                        yaml_row.insert(column, Some(value));
+                        value.to_string()
                     } else {
-                        yaml_row.insert(column, Some(value.clone()));
-                    }
+                        value.to_string()
+                    };
+                    writer.write_event(Event::Text(BytesText::new(string_value.as_str())))?;
                 }
-                None => {
-                    yaml_row.insert(column, None);
-                }
+                None => {}
             }
+
+            writer.write_event(Event::End(BytesEnd::new("td")))?;
         }
 
-        yaml_rows.push(yaml_row);
+        writer.write_event(Event::End(BytesEnd::new("tr")))?;
+        writeln!(writer.get_mut())?;
     }
 
-    let yaml = serde_yaml::to_string(&yaml_rows)?;
-    write!(options.output, "{}", yaml)?;
+    write!(writer.get_mut(), "  ")?;
+    writer.write_event(Event::End(BytesEnd::new("tbody")))?;
+    writeln!(writer.get_mut())?;
+
+    writer.write_event(Event::End(BytesEnd::new("table")))?;
+    writeln!(writer.get_mut())?;
 
     write_footer(options)
 }
@@ -120,12 +151,16 @@ mod test {
 
         let output = String::from_utf8(output.get_ref().to_vec())?.replace("\r\n", "\n");
         let expected = indoc! {r#"
-            - id: 1
-              data: Ynl0ZXM=
-            - id: 2
-              data: foo
-            - id: 3
-              data: null
+            <table>
+              <thead>
+                <tr><th>id</th><th>data</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>1</td><td>Ynl0ZXM=</td></tr>
+                <tr><td>2</td><td>foo</td></tr>
+                <tr><td>3</td><td></td></tr>
+              </tbody>
+            </table>
             3 rows (9ns)
         "#};
         assert_eq!(output, expected);

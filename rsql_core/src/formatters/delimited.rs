@@ -55,11 +55,12 @@ mod test {
     use crate::drivers::Results::Query;
     use crate::drivers::Value;
     use crate::formatters::formatter::FormatterOptions;
+    use indoc::indoc;
     use rustyline::ColorMode;
     use std::io::Cursor;
 
     #[tokio::test]
-    async fn test_format() -> anyhow::Result<()> {
+    async fn test_format_query() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
             color_mode: ColorMode::Disabled,
             ..Default::default()
@@ -83,7 +84,13 @@ mod test {
         format_delimited(&mut options, b',').await.unwrap();
 
         let output = String::from_utf8(output.get_ref().to_vec())?.replace("\r\n", "\n");
-        let expected = "\"id\",\"data\"\n1,\"Ynl0ZXM=\"\n2,\"foo\"\n3,\"\"\n3 rows (9ns)\n";
+        let expected = indoc! {r#"
+            "id","data"
+            1,"Ynl0ZXM="
+            2,"foo"
+            3,""
+            3 rows (9ns)
+        "#};
         assert_eq!(output, expected);
         Ok(())
     }

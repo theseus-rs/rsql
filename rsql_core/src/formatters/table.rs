@@ -84,6 +84,7 @@ mod tests {
     use crate::configuration::Configuration;
     use crate::drivers::Results::{Execute, Query};
     use crate::drivers::{QueryResult, Results, Value};
+    use indoc::indoc;
     use num_format::Locale;
     use prettytable::format::consts::FORMAT_DEFAULT;
     use std::time::Duration;
@@ -145,8 +146,8 @@ mod tests {
         let results = Execute(42);
 
         let output = test_format(&mut configuration, &results).await?;
-        let expected_output = "42 rows (9ns)\n";
-        assert_eq!(output, expected_output);
+        let expected = "42 rows (9ns)\n";
+        assert_eq!(output, expected);
         Ok(())
     }
 
@@ -160,8 +161,14 @@ mod tests {
         let results = query_result_no_rows();
 
         let output = test_format(&mut configuration, &results).await?;
-        let expected_output = "+----+\n| id |\n+====+\n+----+\n0 rows (9ns)\n";
-        assert_eq!(output, expected_output);
+        let expected = indoc! {r#"
+            +----+
+            | id |
+            +====+
+            +----+
+            0 rows (9ns)
+        "#};
+        assert_eq!(output, expected);
         Ok(())
     }
 
@@ -177,8 +184,14 @@ mod tests {
         let results = query_result_no_rows();
 
         let output = test_format(&mut configuration, &results).await?;
-        let expected_output = "+----+\n| id |\n+====+\n+----+\n0 rows \n";
-        assert_eq!(output, expected_output);
+        let expected = indoc! {r#"
+            +----+
+            | id |
+            +====+
+            +----+
+            0 rows 
+        "#};
+        assert_eq!(output, expected);
         Ok(())
     }
 
@@ -192,9 +205,17 @@ mod tests {
         let results = query_result_two_rows();
 
         let output = test_format(&mut configuration, &results).await?;
-        let expected_output =
-            "+--------+\n| id     |\n+========+\n| NULL   |\n+--------+\n| 12,345 |\n+--------+\n2 rows (9ns)\n";
-        assert_eq!(output, expected_output);
+        let expected = indoc! {r#"
+            +--------+
+            | id     |
+            +========+
+            | NULL   |
+            +--------+
+            | 12,345 |
+            +--------+
+            2 rows (9ns)
+        "#};
+        assert_eq!(output, expected);
         Ok(())
     }
 
@@ -228,8 +249,12 @@ mod tests {
         let results = query_result_one_row();
 
         let output = test_format(&mut configuration, &results).await?;
-        let expected_output = "+--------+\n| 12,345 |\n+--------+\n";
-        assert_eq!(output, expected_output);
+        let expected = indoc! {r#"
+            +--------+
+            | 12,345 |
+            +--------+
+        "#};
+        assert_eq!(output, expected);
         Ok(())
     }
 }
