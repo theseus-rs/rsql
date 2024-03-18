@@ -4,44 +4,32 @@ use crate::formatters::footer::write_footer;
 use crate::formatters::formatter::FormatterOptions;
 use async_trait::async_trait;
 use indexmap::IndexMap;
-use serde_json::json;
 
-/// A formatter for JSON
+/// A formatter for YAML
 #[derive(Debug, Default)]
 pub struct Formatter;
 
 #[async_trait]
 impl crate::formatters::Formatter for Formatter {
     fn identifier(&self) -> &'static str {
-        "json"
+        "yaml"
     }
 
     async fn format<'a>(&self, options: &mut FormatterOptions<'a>) -> Result<()> {
-        format_json(options, false).await
+        format_yaml(options).await
     }
 }
 
-pub(crate) async fn format_json(options: &mut FormatterOptions<'_>, jsonl: bool) -> Result<()> {
+pub(crate) async fn format_yaml(options: &mut FormatterOptions<'_>) -> Result<()> {
     let query_result = match options.results {
         crate::drivers::Results::Query(query_result) => query_result,
         _ => return Ok(()),
     };
 
-    if !jsonl {
-        writeln!(options.output, "[")?;
-    }
-
+    let mut yaml_rows: Vec<IndexMap<&String, Option<Value>>> = Vec::new();
     let columns: Vec<String> = query_result.columns.iter().map(|c| c.to_string()).collect();
-    let rows_iter = query_result.rows.iter();
-    for (i, row) in rows_iter.enumerate() {
-        let mut json_row: IndexMap<&String, Option<Value>> = IndexMap::new();
-
-        if i > 0 {
-            if !jsonl {
-                write!(options.output, ",")?;
-            }
-            writeln!(options.output)?;
-        }
+    for row in &query_result.rows {
+        let mut yaml_row: IndexMap<&String, Option<Value>> = IndexMap::new();
 
         for (c, data) in row.iter().enumerate() {
             let column = columns.get(c).expect("column not found");
@@ -49,25 +37,23 @@ pub(crate) async fn format_json(options: &mut FormatterOptions<'_>, jsonl: bool)
                 Some(value) => {
                     if let Value::Bytes(_bytes) = value {
                         let value = Value::String(value.to_string());
-                        json_row.insert(column, Some(value));
+                        yaml_row.insert(column, Some(value));
                     } else {
-                        json_row.insert(column, Some(value.clone()));
+                        yaml_row.insert(column, Some(value.clone()));
                     }
                 }
                 None => {
-                    json_row.insert(column, None);
+                    yaml_row.insert(column, None);
                 }
             }
         }
-        let json = json!(json_row);
-        write!(options.output, "{}", json)?;
+
+        yaml_rows.push(yaml_row);
     }
 
+    let yaml = serde_yaml::to_string(&yaml_rows)?;
+    write!(options.output, "{}", yaml)?;
     writeln!(options.output)?;
-
-    if !jsonl {
-        writeln!(options.output, "]")?;
-    }
 
     write_footer(options)
 }
@@ -110,7 +96,7 @@ mod test {
         formatter.format(&mut options).await.unwrap();
 
         let output = String::from_utf8(output.get_ref().to_vec())?.replace("\r\n", "\n");
-        let expected = "[\n{\"id\":1,\"data\":\"Ynl0ZXM=\"},\n{\"id\":2,\"data\":\"foo\"},\n{\"id\":3,\"data\":null}\n]\n3 rows (9ns)\n";
+        let expected = "- id: 1\n  data: Ynl0ZXM=\n- id: 2\n  data: foo\n- id: 3\n  data: null\n\n3 rows (9ns)\n";
         assert_eq!(output, expected);
         Ok(())
     }

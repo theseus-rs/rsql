@@ -17,6 +17,13 @@ impl From<csv::Error> for Error {
     }
 }
 
+/// Converts a [`serde_yaml::Error`] into an [`IoError`](Error::IoError)
+impl From<serde_yaml::Error> for Error {
+    fn from(error: serde_yaml::Error) -> Self {
+        Error::IoError(error.into())
+    }
+}
+
 /// Converts a [`std::io::Error`] into an [`IoError`](Error::IoError)
 impl From<std::io::Error> for Error {
     fn from(error: std::io::Error) -> Self {
