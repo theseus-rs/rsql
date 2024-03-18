@@ -18,20 +18,31 @@ impl ShellCommand for Command {
     }
 
     fn description(&self) -> &'static str {
-        "format results in ascii, csv, tsv or unicode"
+        "Format results in ascii, csv, json, jsonl, tsv, unicode, ..."
     }
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
+        let formatter_manager = FormatterManager::default();
+
         if options.input.len() <= 1 {
             writeln!(
                 options.output,
                 "Format: {}",
                 options.configuration.results_format
             )?;
+
+            write!(options.output, "Available formats: ")?;
+            for (i, formatter) in formatter_manager.iter().enumerate() {
+                if i > 0 {
+                    write!(options.output, ", ")?;
+                }
+                write!(options.output, "{}", formatter.identifier())?;
+            }
+            writeln!(options.output)?;
+
             return Ok(LoopCondition::Continue);
         }
 
-        let formatter_manager = FormatterManager::default();
         let formatter_identifier = options.input[1].to_lowercase();
         match formatter_manager.get(formatter_identifier.as_str()) {
             Some(_) => options.configuration.results_format = formatter_identifier,
@@ -77,7 +88,10 @@ mod tests {
 
         assert_eq!(result, LoopCondition::Continue);
         let format_output = String::from_utf8(output)?;
-        assert_eq!(format_output, "Format: unicode\n");
+        assert_eq!(
+            format_output,
+            "Format: unicode\nAvailable formats: ascii, csv, json, jsonl, tsv, unicode\n"
+        );
         Ok(())
     }
 
