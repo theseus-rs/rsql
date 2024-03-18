@@ -84,6 +84,20 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_debug() {
+        let options = FormatterOptions {
+            configuration: &mut Configuration::default(),
+            results: &Results::Execute(42),
+            elapsed: &Duration::from_nanos(9),
+            output: &mut io::Cursor::new(Vec::new()),
+        };
+
+        let debug = format!("{:?}", options);
+        assert!(debug.contains("42"));
+        assert!(debug.contains("9ns"));
+    }
+
+    #[test]
     fn test_format_manager() {
         let formatter = crate::formatters::unicode::Formatter;
 

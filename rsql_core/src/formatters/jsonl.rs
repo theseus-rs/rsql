@@ -30,7 +30,7 @@ mod test {
     use std::io::Cursor;
 
     #[tokio::test]
-    async fn test_format() -> anyhow::Result<()> {
+    async fn test_format_query() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
             color_mode: ColorMode::Disabled,
             ..Default::default()

@@ -46,6 +46,17 @@ mod tests {
     }
 
     #[test]
+    fn test_serde_yaml_error() {
+        match serde_yaml::from_str::<String>(">\n@") {
+            Ok(_) => panic!("expected error"),
+            Err(error) => {
+                let io_error = Error::from(error);
+                assert_eq!(io_error.to_string(), "found character that cannot start any token at line 2 column 1, while scanning for the next token");
+            }
+        }
+    }
+
+    #[test]
     fn test_std_io_error() {
         let error = std::io::Error::new(std::io::ErrorKind::Other, "test");
         let io_error = Error::from(error);
