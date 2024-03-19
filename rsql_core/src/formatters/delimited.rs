@@ -52,12 +52,34 @@ mod test {
     use super::*;
     use crate::configuration::Configuration;
     use crate::drivers::QueryResult;
-    use crate::drivers::Results::Query;
+    use crate::drivers::Results::{Execute, Query};
     use crate::drivers::Value;
     use crate::formatters::formatter::FormatterOptions;
     use indoc::indoc;
     use rustyline::ColorMode;
     use std::io::Cursor;
+
+    #[tokio::test]
+    async fn test_format_execute() -> anyhow::Result<()> {
+        let configuration = &mut Configuration {
+            color_mode: ColorMode::Disabled,
+            ..Default::default()
+        };
+        let output = &mut Cursor::new(Vec::new());
+        let mut options = FormatterOptions {
+            configuration,
+            results: &Execute(1),
+            elapsed: &std::time::Duration::from_nanos(9),
+            output,
+        };
+
+        format_delimited(&mut options, b',').await.unwrap();
+
+        let output = String::from_utf8(output.get_ref().to_vec())?.replace("\r\n", "\n");
+        let expected = "1 row (9ns)\n";
+        assert_eq!(output, expected);
+        Ok(())
+    }
 
     #[tokio::test]
     async fn test_format_query() -> anyhow::Result<()> {
