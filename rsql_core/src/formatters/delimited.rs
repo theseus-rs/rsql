@@ -82,6 +82,39 @@ mod test {
     }
 
     #[tokio::test]
+    async fn test_format_query_no_header_no_footer() -> anyhow::Result<()> {
+        let configuration = &mut Configuration {
+            color_mode: ColorMode::Disabled,
+            results_header: false,
+            results_footer: false,
+            ..Default::default()
+        };
+        let query_result = Query(QueryResult {
+            columns: vec!["id".to_string(), "data".to_string()],
+            rows: vec![vec![
+                Some(Value::I64(1)),
+                Some(Value::String("foo".to_string())),
+            ]],
+        });
+        let output = &mut Cursor::new(Vec::new());
+        let mut options = FormatterOptions {
+            configuration,
+            results: &query_result,
+            elapsed: &std::time::Duration::from_nanos(9),
+            output,
+        };
+
+        format_delimited(&mut options, b',').await.unwrap();
+
+        let output = String::from_utf8(output.get_ref().to_vec())?.replace("\r\n", "\n");
+        let expected = indoc! {r#"
+            1,"foo"
+        "#};
+        assert_eq!(output, expected);
+        Ok(())
+    }
+
+    #[tokio::test]
     async fn test_format_query() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
             color_mode: ColorMode::Disabled,

@@ -112,6 +112,22 @@ impl Default for CommandManager {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::drivers::MockConnection;
+
+    #[test]
+    fn test_debug() {
+        let options = CommandOptions {
+            command_manager: &Default::default(),
+            configuration: &mut Configuration::default(),
+            connection: &mut MockConnection::new(),
+            history: &Default::default(),
+            input: vec!["42"],
+            output: &mut io::Cursor::new(Vec::new()),
+        };
+
+        let debug = format!("{:?}", options);
+        assert!(debug.contains("42"));
+    }
 
     #[test]
     fn test_commands() {

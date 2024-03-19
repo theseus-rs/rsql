@@ -1,6 +1,5 @@
 use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use async_trait::async_trait;
-use clearscreen::ClearScreen;
 
 /// Clear the screen
 #[derive(Debug, Default)]
@@ -17,8 +16,7 @@ impl ShellCommand for Command {
     }
 
     async fn execute<'a>(&self, _options: CommandOptions<'a>) -> Result<LoopCondition> {
-        let clear_screen = ClearScreen::default();
-        clear_screen.clear()?;
+        clearscreen::clear()?;
         Ok(LoopCondition::Continue)
     }
 }
