@@ -7,6 +7,7 @@ use crate::shell::helper::ReplHelper;
 use crate::shell::Result;
 use crate::shell::ShellArgs;
 use crate::version::full_version;
+use clap::Parser;
 use colored::Colorize;
 use indicatif::ProgressStyle;
 use rustyline::config::Configurer;
@@ -16,6 +17,17 @@ use rustyline::Editor;
 use std::io;
 use tracing::{error, instrument, Span};
 use tracing_indicatif::span_ext::IndicatifSpanExt;
+
+#[derive(Debug, Parser)]
+struct Args {
+    /// The shell arguments
+    #[clap(flatten)]
+    pub shell_args: ShellArgs,
+
+    /// Display the version of this tool
+    #[arg(long)]
+    version: bool,
+}
 
 /// A builder for creating a [Shell].
 pub struct ShellBuilder {

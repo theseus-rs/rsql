@@ -38,3 +38,35 @@ impl From<std::io::Error> for Error {
         Error::IoError(error.into())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::str::FromStr;
+    use test_log::test;
+
+    #[test]
+    fn test_clear_screen_error() {
+        let std_io_error = std::io::Error::new(std::io::ErrorKind::Other, "test");
+        let error = clearscreen::Error::Io(std_io_error);
+        let io_error = Error::from(error);
+
+        assert_eq!(io_error.to_string(), "test");
+    }
+
+    #[test]
+    fn test_parse_int_error() {
+        let error = u64::from_str("foo").unwrap_err();
+        let io_error = Error::from(error);
+
+        assert_eq!(io_error.to_string(), "invalid digit found in string");
+    }
+
+    #[test]
+    fn test_std_io_error() {
+        let error = std::io::Error::new(std::io::ErrorKind::Other, "test");
+        let io_error = Error::from(error);
+
+        assert_eq!(io_error.to_string(), "test");
+    }
+}
