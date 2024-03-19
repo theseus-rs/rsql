@@ -1,4 +1,4 @@
-use crate::formatters::delimited::format_delimited;
+use crate::formatters::delimited::format;
 use crate::formatters::error::Result;
 use crate::formatters::formatter::FormatterOptions;
 use async_trait::async_trait;
@@ -14,7 +14,7 @@ impl crate::formatters::Formatter for Formatter {
     }
 
     async fn format<'a>(&self, options: &mut FormatterOptions<'a>) -> Result<()> {
-        format_delimited(options, b'\t').await
+        format(options, b'\t').await
     }
 }
 
@@ -22,7 +22,7 @@ impl crate::formatters::Formatter for Formatter {
 mod test {
     use super::*;
     use crate::configuration::Configuration;
-    use crate::drivers::QueryResult;
+    use crate::drivers::MemoryQueryResult;
     use crate::drivers::Results::Query;
     use crate::drivers::Value;
     use crate::formatters::formatter::FormatterOptions;
@@ -37,14 +37,14 @@ mod test {
             color_mode: ColorMode::Disabled,
             ..Default::default()
         };
-        let query_result = Query(QueryResult {
-            columns: vec!["id".to_string(), "data".to_string()],
-            rows: vec![
+        let query_result = Query(Box::new(MemoryQueryResult::new(
+            vec!["id".to_string(), "data".to_string()],
+            vec![
                 vec![Some(Value::I64(1)), Some(Value::Bytes(b"bytes".to_vec()))],
                 vec![Some(Value::I64(2)), Some(Value::String("foo".to_string()))],
                 vec![Some(Value::I64(3)), None],
             ],
-        });
+        )));
         let output = &mut Cursor::new(Vec::new());
         let mut options = FormatterOptions {
             configuration,

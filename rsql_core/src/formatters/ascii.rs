@@ -23,19 +23,17 @@ impl crate::formatters::Formatter for Formatter {
 mod tests {
     use super::*;
     use crate::configuration::Configuration;
-    use crate::drivers::{QueryResult, Results, Value};
+    use crate::drivers::{MemoryQueryResult, Results, Value};
     use crate::formatters::Formatter;
     use indoc::indoc;
     use rustyline::ColorMode;
     use std::time::Duration;
 
     fn query_result() -> Results {
-        let query_result = QueryResult {
-            columns: vec!["id".to_string()],
-            rows: vec![vec![Some(Value::I64(12345))]],
-        };
+        let query_result =
+            MemoryQueryResult::new(vec!["id".to_string()], vec![vec![Some(Value::I64(12345))]]);
 
-        Results::Query(query_result)
+        Results::Query(Box::new(query_result))
     }
 
     #[tokio::test]

@@ -8,6 +8,7 @@ use colored::Colorize;
 use prettytable::format::TableFormat;
 use prettytable::Table;
 use rustyline::ColorMode;
+use std::ops::Deref;
 
 /// Format the results of a query into a table and write to the output.
 pub async fn format<'a>(
@@ -22,34 +23,34 @@ pub async fn format<'a>(
         table.set_format(table_format);
 
         if configuration.results_header {
-            process_headers(query_result, &mut table);
+            process_headers(query_result.deref(), &mut table).await;
         }
 
-        process_data(configuration, query_result, &mut table)?;
+        process_data(configuration, query_result.deref(), &mut table).await?;
 
         table.print(output)?;
     }
 
-    write_footer(options)?;
+    write_footer(options).await?;
     Ok(())
 }
 
-fn process_headers(query_result: &QueryResult, table: &mut Table) {
+async fn process_headers<'a>(query_result: &'a dyn QueryResult, table: &mut Table) {
     let mut column_names = Vec::new();
 
-    for column in &query_result.columns {
+    for column in &query_result.columns().await {
         column_names.push(column.to_string());
     }
 
     table.set_titles(prettytable::Row::from(column_names));
 }
 
-fn process_data(
+async fn process_data<'a>(
     configuration: &Configuration,
-    query_result: &QueryResult,
+    query_result: &'a dyn QueryResult,
     table: &mut Table,
 ) -> Result<()> {
-    for (i, row) in query_result.rows.iter().enumerate() {
+    for (i, row) in query_result.rows().await.iter().enumerate() {
         let mut row_data = Vec::new();
 
         for data in row {
@@ -83,7 +84,7 @@ mod tests {
     use super::*;
     use crate::configuration::Configuration;
     use crate::drivers::Results::{Execute, Query};
-    use crate::drivers::{QueryResult, Results, Value};
+    use crate::drivers::{MemoryQueryResult, Results, Value};
     use indoc::indoc;
     use num_format::Locale;
     use prettytable::format::consts::FORMAT_DEFAULT;
@@ -92,30 +93,27 @@ mod tests {
     const COLUMN_HEADER: &str = "id";
 
     fn query_result_no_rows() -> Results {
-        let query_result = QueryResult {
-            columns: vec![COLUMN_HEADER.to_string()],
-            rows: vec![],
-        };
+        let query_result = MemoryQueryResult::new(vec![COLUMN_HEADER.to_string()], vec![]);
 
-        Query(query_result)
+        Query(Box::new(query_result))
     }
 
     fn query_result_one_row() -> Results {
-        let query_result = QueryResult {
-            columns: vec![COLUMN_HEADER.to_string()],
-            rows: vec![vec![Some(Value::I64(12345))]],
-        };
+        let query_result = MemoryQueryResult::new(
+            vec![COLUMN_HEADER.to_string()],
+            vec![vec![Some(Value::I64(12345))]],
+        );
 
-        Query(query_result)
+        Query(Box::new(query_result))
     }
 
     fn query_result_two_rows() -> Results {
-        let query_result = QueryResult {
-            columns: vec![COLUMN_HEADER.to_string()],
-            rows: vec![vec![None], vec![Some(Value::I64(12345))]],
-        };
+        let query_result = MemoryQueryResult::new(
+            vec![COLUMN_HEADER.to_string()],
+            vec![vec![None], vec![Some(Value::I64(12345))]],
+        );
 
-        Query(query_result)
+        Query(Box::new(query_result))
     }
 
     async fn test_format(

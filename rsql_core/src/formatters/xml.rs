@@ -24,7 +24,7 @@ impl crate::formatters::Formatter for Formatter {
 pub(crate) async fn format_xml(options: &mut FormatterOptions<'_>) -> Result<()> {
     let query_result = match options.results {
         crate::drivers::Results::Query(query_result) => query_result,
-        _ => return write_footer(options),
+        _ => return write_footer(options).await,
     };
 
     let mut writer = Writer::new(&mut options.output);
@@ -32,8 +32,13 @@ pub(crate) async fn format_xml(options: &mut FormatterOptions<'_>) -> Result<()>
     writer.write_event(Event::Start(BytesStart::new("results")))?;
     writeln!(writer.get_mut())?;
 
-    let columns: Vec<String> = query_result.columns.iter().map(|c| c.to_string()).collect();
-    for row in &query_result.rows {
+    let columns: Vec<String> = query_result
+        .columns()
+        .await
+        .iter()
+        .map(|c| c.to_string())
+        .collect();
+    for row in &query_result.rows().await {
         writer.write_event(Event::Start(BytesStart::new("row")))?;
 
         for (c, data) in row.iter().enumerate() {
@@ -63,14 +68,14 @@ pub(crate) async fn format_xml(options: &mut FormatterOptions<'_>) -> Result<()>
     writer.write_event(Event::End(BytesEnd::new("results")))?;
     writeln!(writer.get_mut())?;
 
-    write_footer(options)
+    write_footer(options).await
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
     use crate::configuration::Configuration;
-    use crate::drivers::QueryResult;
+    use crate::drivers::MemoryQueryResult;
     use crate::drivers::Results::{Execute, Query};
     use crate::drivers::Value;
     use crate::formatters::formatter::FormatterOptions;
@@ -108,14 +113,14 @@ mod test {
             color_mode: ColorMode::Disabled,
             ..Default::default()
         };
-        let query_result = Query(QueryResult {
-            columns: vec!["id".to_string(), "data".to_string()],
-            rows: vec![
+        let query_result = Query(Box::new(MemoryQueryResult::new(
+            vec!["id".to_string(), "data".to_string()],
+            vec![
                 vec![Some(Value::I64(1)), Some(Value::Bytes(b"bytes".to_vec()))],
                 vec![Some(Value::I64(2)), Some(Value::String("foo".to_string()))],
                 vec![Some(Value::I64(3)), None],
             ],
-        });
+        )));
         let output = &mut Cursor::new(Vec::new());
         let mut options = FormatterOptions {
             configuration,

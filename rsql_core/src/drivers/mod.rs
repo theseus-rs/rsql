@@ -8,8 +8,9 @@ mod error;
 pub(crate) mod sqlite;
 mod value;
 
+pub use connection::MemoryQueryResult;
 #[cfg(test)]
-pub use connection::MockConnection;
+pub(crate) use connection::MockConnection;
 pub use connection::{Connection, QueryResult, Results};
 pub use driver::{Driver, DriverManager};
 pub use error::{Error, Result};

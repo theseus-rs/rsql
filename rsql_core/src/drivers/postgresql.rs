@@ -1,8 +1,8 @@
 use crate::configuration::Configuration;
-use crate::drivers::connection::{QueryResult, Results};
 use crate::drivers::error::Result;
 use crate::drivers::value::Value;
 use crate::drivers::Error::UnsupportedColumnType;
+use crate::drivers::{MemoryQueryResult, Results};
 use async_trait::async_trait;
 use postgresql_archive::Version;
 use postgresql_embedded::{PostgreSQL, Settings};
@@ -102,8 +102,8 @@ impl crate::drivers::Connection for Connection {
             rows.push(row_data);
         }
 
-        let query_result = QueryResult { columns, rows };
-        Ok(Results::Query(query_result))
+        let query_result = MemoryQueryResult::new(columns, rows);
+        Ok(Results::Query(Box::new(query_result)))
     }
 
     async fn tables(&mut self) -> Result<Vec<String>> {
@@ -239,9 +239,9 @@ mod test {
 
         let results = connection.query("SELECT id, name FROM person").await?;
         if let Results::Query(query_result) = results {
-            assert_eq!(query_result.columns, vec!["id", "name"]);
-            assert_eq!(query_result.rows.len(), 1);
-            match query_result.rows.get(0) {
+            assert_eq!(query_result.columns().await, vec!["id", "name"]);
+            assert_eq!(query_result.rows().await.len(), 1);
+            match query_result.rows().await.get(0) {
                 Some(row) => {
                     assert_eq!(row.len(), 2);
 

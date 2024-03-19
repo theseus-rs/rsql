@@ -1,8 +1,8 @@
 use crate::configuration::Configuration;
-use crate::drivers::connection::{QueryResult, Results};
 use crate::drivers::error::Result;
 use crate::drivers::value::Value;
 use crate::drivers::Error::UnsupportedColumnType;
+use crate::drivers::{MemoryQueryResult, Results};
 use async_trait::async_trait;
 use sqlx::sqlite::{SqliteAutoVacuum, SqliteColumn, SqliteConnectOptions, SqliteRow};
 use sqlx::{Column, Row, SqlitePool, TypeInfo};
@@ -72,8 +72,8 @@ impl crate::drivers::Connection for Connection {
             rows.push(row_data);
         }
 
-        let query_result = QueryResult { columns, rows };
-        Ok(Results::Query(query_result))
+        let query_result = MemoryQueryResult::new(columns, rows);
+        Ok(Results::Query(Box::new(query_result)))
     }
 
     async fn tables(&mut self) -> Result<Vec<String>> {
@@ -193,9 +193,9 @@ mod test {
 
         let results = connection.query("SELECT id, name FROM person").await?;
         if let Results::Query(query_result) = results {
-            assert_eq!(query_result.columns, vec!["id", "name"]);
-            assert_eq!(query_result.rows.len(), 1);
-            match query_result.rows.get(0) {
+            assert_eq!(query_result.columns().await, vec!["id", "name"]);
+            assert_eq!(query_result.rows().await.len(), 1);
+            match query_result.rows().await.get(0) {
                 Some(row) => {
                     assert_eq!(row.len(), 2);
 
@@ -242,9 +242,12 @@ mod test {
 
         let results = connection.query("SELECT t, nu, i, r, no FROM t1").await?;
         if let Results::Query(query_result) = results {
-            assert_eq!(query_result.columns, vec!["t", "nu", "i", "r", "no"]);
-            assert_eq!(query_result.rows.len(), 1);
-            match query_result.rows.get(0) {
+            assert_eq!(
+                query_result.columns().await,
+                vec!["t", "nu", "i", "r", "no"]
+            );
+            assert_eq!(query_result.rows().await.len(), 1);
+            match query_result.rows().await.get(0) {
                 Some(row) => {
                     assert_eq!(row.len(), 5);
 
@@ -295,10 +298,10 @@ mod test {
         let mut value: Option<Value> = None;
 
         if let Results::Query(query_result) = results {
-            assert_eq!(query_result.columns.len(), 1);
-            assert_eq!(query_result.rows.len(), 1);
+            assert_eq!(query_result.columns().await.len(), 1);
+            assert_eq!(query_result.rows().await.len(), 1);
 
-            if let Some(row) = query_result.rows.get(0) {
+            if let Some(row) = query_result.rows().await.get(0) {
                 assert_eq!(row.len(), 1);
 
                 value = row[0].clone();
