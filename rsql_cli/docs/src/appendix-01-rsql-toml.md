@@ -92,8 +92,15 @@ theme.dark = "Solarized (dark)"
 # The format to use for results.
 #
 # Possible values:
-#   "ascii" - Use ASCII characters to draw the table.
-#   "unicode" - Use Unicode characters to draw the table.
+#   "ascii" - ASCII characters to draw a table.
+#   "csv" - Comma Separated Values (CSV)
+#   "html" - HyperText Markup Language (HTML)
+#   "json" - JavaScript Object Notation (JSON)
+#   "jsonl" - JSON Lines (JSONL)
+#   "tsv" - Tab Separated Values (TSV)
+#   "unicode" - Unicode characters to draw a table.
+#   "xml" - Extensible Markup Language (XML)
+#   "yaml" - YAML Ain’t Markup Language (YAML)
 format = "unicode"
 
 # Indicate if header should be displayed when displaying results.

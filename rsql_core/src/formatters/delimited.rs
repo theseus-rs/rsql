@@ -1,57 +1,45 @@
-use crate::drivers::QueryResult;
 use crate::drivers::Results::Query;
 use crate::formatters::error::Result;
 use crate::formatters::footer::write_footer;
 use crate::formatters::formatter::FormatterOptions;
-use std::io;
 
-pub async fn format_delimited<'a>(options: &mut FormatterOptions<'a>, delimiter: u8) -> Result<()> {
+pub async fn format<'a>(options: &mut FormatterOptions<'a>, delimiter: u8) -> Result<()> {
     if let Query(query_result) = &options.results {
-        write_query_results(options, query_result, delimiter).await?;
-    }
+        let output = &mut options.output;
+        let configuration = &options.configuration;
+        let mut writer = csv::WriterBuilder::new()
+            .delimiter(delimiter)
+            .quote_style(csv::QuoteStyle::NonNumeric)
+            .from_writer(output);
 
-    write_footer(options)?;
-    Ok(())
-}
-
-async fn write_query_results(
-    options: &mut FormatterOptions<'_>,
-    query_result: &QueryResult,
-    delimiter: u8,
-) -> Result<()> {
-    let configuration = &options.configuration;
-    let output = &mut options.output as &mut dyn io::Write;
-    let mut writer = csv::WriterBuilder::new()
-        .delimiter(delimiter)
-        .quote_style(csv::QuoteStyle::NonNumeric)
-        .from_writer(output);
-
-    if configuration.results_header {
-        writer.write_record(&query_result.columns)?;
-    }
-
-    for row in &query_result.rows {
-        let mut csv_row: Vec<Vec<u8>> = Vec::new();
-
-        for data in row {
-            let bytes = if let Some(value) = data {
-                Vec::from(value.to_string().as_bytes())
-            } else {
-                Vec::new()
-            };
-            csv_row.push(bytes);
+        if configuration.results_header {
+            writer.write_record(query_result.columns().await)?;
         }
-        writer.write_record(csv_row)?;
+
+        for row in &query_result.rows().await {
+            let mut csv_row: Vec<Vec<u8>> = Vec::new();
+
+            for data in row {
+                let bytes = if let Some(value) = data {
+                    Vec::from(value.to_string().as_bytes())
+                } else {
+                    Vec::new()
+                };
+                csv_row.push(bytes);
+            }
+            writer.write_record(csv_row)?;
+        }
+        writer.flush()?;
     }
-    writer.flush()?;
-    Ok(())
+
+    write_footer(options).await
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
     use crate::configuration::Configuration;
-    use crate::drivers::QueryResult;
+    use crate::drivers::MemoryQueryResult;
     use crate::drivers::Results::{Execute, Query};
     use crate::drivers::Value;
     use crate::formatters::formatter::FormatterOptions;
@@ -73,7 +61,7 @@ mod test {
             output,
         };
 
-        format_delimited(&mut options, b',').await.unwrap();
+        format(&mut options, b',').await.unwrap();
 
         let output = String::from_utf8(output.get_ref().to_vec())?.replace("\r\n", "\n");
         let expected = "1 row (9ns)\n";
@@ -89,13 +77,13 @@ mod test {
             results_footer: false,
             ..Default::default()
         };
-        let query_result = Query(QueryResult {
-            columns: vec!["id".to_string(), "data".to_string()],
-            rows: vec![vec![
+        let query_result = Query(Box::new(MemoryQueryResult::new(
+            vec!["id".to_string(), "data".to_string()],
+            vec![vec![
                 Some(Value::I64(1)),
                 Some(Value::String("foo".to_string())),
             ]],
-        });
+        )));
         let output = &mut Cursor::new(Vec::new());
         let mut options = FormatterOptions {
             configuration,
@@ -104,7 +92,7 @@ mod test {
             output,
         };
 
-        format_delimited(&mut options, b',').await.unwrap();
+        format(&mut options, b',').await.unwrap();
 
         let output = String::from_utf8(output.get_ref().to_vec())?.replace("\r\n", "\n");
         let expected = indoc! {r#"
@@ -120,14 +108,14 @@ mod test {
             color_mode: ColorMode::Disabled,
             ..Default::default()
         };
-        let query_result = Query(QueryResult {
-            columns: vec!["id".to_string(), "data".to_string()],
-            rows: vec![
+        let query_result = Query(Box::new(MemoryQueryResult::new(
+            vec!["id".to_string(), "data".to_string()],
+            vec![
                 vec![Some(Value::I64(1)), Some(Value::Bytes(b"bytes".to_vec()))],
                 vec![Some(Value::I64(2)), Some(Value::String("foo".to_string()))],
                 vec![Some(Value::I64(3)), None],
             ],
-        });
+        )));
         let output = &mut Cursor::new(Vec::new());
         let mut options = FormatterOptions {
             configuration,
@@ -136,7 +124,7 @@ mod test {
             output,
         };
 
-        format_delimited(&mut options, b',').await.unwrap();
+        format(&mut options, b',').await.unwrap();
 
         let output = String::from_utf8(output.get_ref().to_vec())?.replace("\r\n", "\n");
         let expected = indoc! {r#"
