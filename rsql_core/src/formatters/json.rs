@@ -31,12 +31,7 @@ pub(crate) async fn format_json(options: &mut FormatterOptions<'_>, jsonl: bool)
         write!(options.output, "[")?;
     }
 
-    let columns: Vec<String> = query_result
-        .columns()
-        .await
-        .iter()
-        .map(|c| c.to_string())
-        .collect();
+    let columns: Vec<String> = query_result.columns().await;
     let rows = query_result.rows().await;
     for (i, row) in rows.iter().enumerate() {
         let mut json_row: IndexMap<&String, Option<Value>> = IndexMap::new();

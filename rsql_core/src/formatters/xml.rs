@@ -32,12 +32,7 @@ pub(crate) async fn format_xml(options: &mut FormatterOptions<'_>) -> Result<()>
     writer.write_event(Event::Start(BytesStart::new("results")))?;
     writeln!(writer.get_mut())?;
 
-    let columns: Vec<String> = query_result
-        .columns()
-        .await
-        .iter()
-        .map(|c| c.to_string())
-        .collect();
+    let columns: Vec<String> = query_result.columns().await;
     for row in &query_result.rows().await {
         writer.write_event(Event::Start(BytesStart::new("row")))?;
 

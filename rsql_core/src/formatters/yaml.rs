@@ -27,12 +27,7 @@ pub(crate) async fn format_yaml(options: &mut FormatterOptions<'_>) -> Result<()
     };
 
     let mut yaml_rows: Vec<IndexMap<&String, Option<Value>>> = Vec::new();
-    let columns: Vec<String> = query_result
-        .columns()
-        .await
-        .iter()
-        .map(|c| c.to_string())
-        .collect();
+    let columns: Vec<String> = query_result.columns().await;
     for row in &query_result.rows().await {
         let mut yaml_row: IndexMap<&String, Option<Value>> = IndexMap::new();
 
