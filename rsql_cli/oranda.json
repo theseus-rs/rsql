@@ -20,7 +20,7 @@
   },
   "marketing": {
     "analytics": {
-      "google_analytics": {
+      "google": {
         "tracking_id": "G-EGY7KD098M"
       }
     }
