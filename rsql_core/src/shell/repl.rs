@@ -10,10 +10,10 @@ use crate::version::full_version;
 use clap::Parser;
 use colored::Colorize;
 use indicatif::ProgressStyle;
+use regex::Regex;
 use rustyline::config::Configurer;
 use rustyline::error::ReadlineError;
 use rustyline::history::{DefaultHistory, FileHistory};
-use rustyline::Editor;
 use std::io;
 use tracing::{error, instrument, Span};
 use tracing_indicatif::span_ext::IndicatifSpanExt;
@@ -110,9 +110,66 @@ impl Shell {
             .connect(&self.configuration, args.url.as_str())
             .await?;
         let connection = binding.as_mut();
+        let commands = if let Some(file) = &args.file {
+            let contents = file.clone().contents()?;
+            let mut commands = self.load_commands(contents).await?;
+            commands.extend(args.commands.clone());
+            commands
+        } else {
+            args.commands.clone()
+        };
 
-        self.repl(connection).await?;
+        if commands.is_empty() {
+            self.repl(connection).await?;
+        } else {
+            self.process_commands(connection, commands).await?;
+        }
+
         connection.stop().await?;
+        Ok(())
+    }
+
+    async fn load_commands(&mut self, contents: String) -> Result<Vec<String>> {
+        let regex = Regex::new(r"(?ms)^\s*(\..*?|.*?;)\s*$")?;
+        let commands: Vec<String> = regex
+            .find_iter(contents.as_str())
+            .map(|mat| mat.as_str().trim().to_string())
+            .collect();
+        Ok(commands)
+    }
+
+    /// Run with the provided commands.
+    async fn process_commands(
+        &mut self,
+        connection: &mut dyn Connection,
+        commands: Vec<String>,
+    ) -> Result<()> {
+        for command in commands {
+            let result = evaluate(
+                &self.command_manager,
+                &mut self.configuration,
+                connection,
+                &DefaultHistory::new(),
+                command.to_string(),
+            )
+            .await;
+
+            match result {
+                Ok(LoopCondition::Continue) => {}
+                Ok(LoopCondition::Exit(exit_code)) => {
+                    if self.configuration.bail_on_error {
+                        std::process::exit(exit_code);
+                    }
+                }
+                Err(error) => {
+                    eprintln!("{}: {:?}", "Error".red(), error);
+                    if self.configuration.bail_on_error {
+                        std::process::exit(1);
+                    }
+                }
+            }
+        }
+
         Ok(())
     }
 
@@ -149,22 +206,29 @@ impl Shell {
 
         loop {
             let loop_condition = match editor.readline(&prompt) {
-                Ok(line) => evaluate(
-                    &self.command_manager,
-                    configuration,
-                    connection,
-                    &mut editor,
-                    line,
-                )
-                .await
-                .unwrap_or_else(|error| {
-                    eprintln!("{}: {:?}", "Error".red(), error);
-                    if configuration.bail_on_error {
-                        LoopCondition::Exit(1)
-                    } else {
-                        LoopCondition::Continue
+                Ok(line) => {
+                    let result = evaluate(
+                        &self.command_manager,
+                        configuration,
+                        connection,
+                        editor.history(),
+                        line.clone(),
+                    )
+                    .await
+                    .unwrap_or_else(|error| {
+                        eprintln!("{}: {:?}", "Error".red(), error);
+                        if configuration.bail_on_error {
+                            LoopCondition::Exit(1)
+                        } else {
+                            LoopCondition::Continue
+                        }
+                    });
+
+                    if result == LoopCondition::Continue && configuration.history {
+                        let _ = editor.add_history_entry(line.as_str());
                     }
-                }),
+                    result
+                }
                 Err(ReadlineError::Interrupted) => {
                     eprintln!("{}", "Program interrupted".red());
                     error!("{}", "Program interrupted".red());
@@ -209,7 +273,7 @@ async fn evaluate(
     command_manager: &CommandManager,
     configuration: &mut Configuration,
     connection: &mut dyn Connection,
-    editor: &mut Editor<ReplHelper, DefaultHistory>,
+    history: &DefaultHistory,
     line: String,
 ) -> Result<LoopCondition> {
     let loop_condition = if line.starts_with('.') {
@@ -217,17 +281,13 @@ async fn evaluate(
             command_manager,
             configuration,
             connection,
-            editor,
+            history,
             line.as_str(),
         )
         .await?
     } else {
         execute_sql(configuration, connection, line.as_str()).await?
     };
-
-    if configuration.history {
-        let _ = editor.add_history_entry(line.as_str());
-    }
 
     Ok(loop_condition)
 }
@@ -237,7 +297,7 @@ async fn execute_command(
     command_manager: &CommandManager,
     configuration: &mut Configuration,
     connection: &mut dyn Connection,
-    editor: &mut Editor<ReplHelper, DefaultHistory>,
+    history: &DefaultHistory,
     line: &str,
 ) -> Result<LoopCondition> {
     let input: Vec<&str> = line.split_whitespace().collect();
@@ -246,7 +306,6 @@ async fn execute_command(
 
     let loop_condition = match command_manager.get(command_name) {
         Some(command) => {
-            let history = editor.history();
             let options = CommandOptions {
                 command_manager,
                 configuration,

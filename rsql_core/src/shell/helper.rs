@@ -54,3 +54,19 @@ impl Validator for ReplHelper {
         Ok(ValidationResult::Valid(None))
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_new() {
+        let configuration = Configuration::default();
+        let helper = ReplHelper::new(&configuration);
+
+        assert_eq!(helper.color_mode, ColorMode::Forced);
+        assert!(helper.syntax_set.find_syntax_by_name("SQL").is_some());
+        assert_eq!(helper.syntax.name, "SQL");
+        assert_eq!(helper.theme.name, Some("Solarized (dark)".to_string()));
+    }
+}

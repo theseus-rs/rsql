@@ -55,3 +55,42 @@ fn as_256_color_terminal_escaped<'l>(ranges: &[(Style, &'l str)]) -> Cow<'l, str
     write!(color_line, "{}", RESET).expect("write reset");
     color_line.into()
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use crate::configuration::Configuration;
+
+    #[test]
+    fn test_highlight_color_disabled() {
+        let configuration = Configuration {
+            color_mode: ColorMode::Disabled,
+            ..Default::default()
+        };
+        let helper = ReplHelper::new(&configuration);
+        let line = "SELECT";
+        let highlighted = helper.highlight(line, 0);
+        assert!(highlighted.contains(line));
+    }
+
+    #[test]
+    fn test_highlight_color_forced() {
+        let configuration = Configuration {
+            color_mode: ColorMode::Forced,
+            ..Default::default()
+        };
+        let helper = ReplHelper::new(&configuration);
+        let line = "SELECT";
+        let highlighted = helper.highlight(line, 0);
+        assert!(highlighted.contains(line));
+    }
+
+    #[test]
+    fn test_highlight_char() {
+        let configuration = Configuration::default();
+        let helper = ReplHelper::new(&configuration);
+        let line = "SELECT";
+        let highlighted = helper.highlight_char(line, 0, false);
+        assert!(highlighted);
+    }
+}
