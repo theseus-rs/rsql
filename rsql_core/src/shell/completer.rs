@@ -181,3 +181,23 @@ impl Completer for ReplHelper {
         Ok((start, candidates))
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use crate::configuration::Configuration;
+    use rustyline::history::DefaultHistory;
+
+    #[test]
+    fn test_complete() -> anyhow::Result<()> {
+        let configuration = Configuration::default();
+        let helper = ReplHelper::new(&configuration);
+        let history = DefaultHistory::new();
+        let context = Context::new(&history);
+        let (start, candidates) = helper.complete("SEL", 3, &context)?;
+        assert_eq!(start, 0);
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].replacement(), "SELECT");
+        Ok(())
+    }
+}

@@ -16,6 +16,7 @@ async-trait = { workspace = true }
 base64 = { workspace = true }
 chrono = { workspace = true, features = ["serde"] }
 clap = { workspace = true, features = ["derive", "env"] }
+clap-stdin = { workspace = true, features = ["tokio"] }
 clearscreen = { workspace = true }
 colored = { workspace = true }
 config = { workspace = true }
@@ -30,6 +31,7 @@ os_info = { workspace = true }
 prettytable = { workspace = true }
 postgresql_archive = { workspace = true, optional = true }
 postgresql_embedded = { workspace = true, optional = true }
+regex = { workspace = true }
 rust_decimal = { workspace = true }
 rustyline = { workspace = true }
 quick-xml = { workspace = true, features = ["serialize"] }
