@@ -294,6 +294,30 @@ mod test {
     use rustyline::history::DefaultHistory;
 
     #[test]
+    fn test_shell_builder() {
+        let configuration = Configuration {
+            bail_on_error: true,
+            ..Default::default()
+        };
+        let driver_manager = DriverManager::new();
+        let command_manager = CommandManager::new();
+        let formatter_manager = FormatterManager::new();
+        let output = Vec::new();
+        let shell = ShellBuilder::default()
+            .with_configuration(configuration)
+            .with_driver_manager(driver_manager)
+            .with_command_manager(command_manager)
+            .with_formatter_manager(formatter_manager)
+            .with_output(Box::new(output))
+            .build();
+
+        assert_eq!(shell.configuration.bail_on_error, true);
+        assert!(shell.driver_manager.iter().next().is_none());
+        assert!(shell.command_manager.iter().next().is_none());
+        assert!(shell.formatter_manager.iter().next().is_none());
+    }
+
+    #[test]
     fn test_shell_debug() {
         let shell = Shell::default();
         let debug = format!("{:?}", shell);

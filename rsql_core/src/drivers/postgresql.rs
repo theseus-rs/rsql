@@ -177,9 +177,6 @@ impl Connection {
         } else if let Ok(value) = row.try_get(column_name) {
             let value: Option<chrono::NaiveDateTime> = value;
             Ok(value.map(Value::DateTime))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<chrono::DateTime<chrono::Utc>> = value;
-            Ok(value.map(|v| Value::DateTime(v.naive_utc())))
         } else if let Ok(value) = row.try_get(column.name()) {
             let value: Option<uuid::Uuid> = value;
             Ok(value.map(Value::Uuid))
@@ -224,8 +221,8 @@ mod test {
     #[tokio::test]
     async fn test_driver_connect() -> anyhow::Result<()> {
         let configuration = Configuration::default();
-        let drivers = DriverManager::default();
-        let mut connection = drivers.connect(&configuration, DATABASE_URL).await?;
+        let driver_manager = DriverManager::default();
+        let mut connection = driver_manager.connect(&configuration, DATABASE_URL).await?;
         connection.stop().await?;
         Ok(())
     }
@@ -233,8 +230,8 @@ mod test {
     #[tokio::test]
     async fn test_connection_interface() -> anyhow::Result<()> {
         let configuration = Configuration::default();
-        let drivers = DriverManager::default();
-        let mut connection = drivers.connect(&configuration, DATABASE_URL).await?;
+        let driver_manager = DriverManager::default();
+        let mut connection = driver_manager.connect(&configuration, DATABASE_URL).await?;
 
         let _ = connection
             .execute("CREATE TABLE person (id INTEGER, name VARCHAR(20))")
@@ -280,8 +277,8 @@ mod test {
 
     async fn test_data_type(sql: &str) -> anyhow::Result<Option<Value>> {
         let configuration = Configuration::default();
-        let drivers = DriverManager::default();
-        let mut connection = drivers.connect(&configuration, DATABASE_URL).await?;
+        let driver_manager = DriverManager::default();
+        let mut connection = driver_manager.connect(&configuration, DATABASE_URL).await?;
 
         let results = connection.query(sql).await?;
         let mut value: Option<Value> = None;
@@ -429,6 +426,13 @@ mod test {
     async fn test_data_type_none() -> anyhow::Result<()> {
         let result = test_data_type("SELECT pg_sleep(0)").await?;
         assert_eq!(result, None);
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_data_type_not_supported() -> anyhow::Result<()> {
+        let result = test_data_type("SELECT CAST('<a>b</a> as xml)").await;
+        assert!(result.is_err());
         Ok(())
     }
 }

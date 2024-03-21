@@ -168,8 +168,8 @@ mod test {
     #[tokio::test]
     async fn test_driver_connect() -> anyhow::Result<()> {
         let configuration = Configuration::default();
-        let drivers = DriverManager::default();
-        let mut connection = drivers.connect(&configuration, DATABASE_URL).await?;
+        let driver_manager = DriverManager::default();
+        let mut connection = driver_manager.connect(&configuration, DATABASE_URL).await?;
         connection.stop().await?;
         Ok(())
     }
@@ -177,8 +177,8 @@ mod test {
     #[tokio::test]
     async fn test_connection_interface() -> anyhow::Result<()> {
         let configuration = &Configuration::default();
-        let drivers = DriverManager::default();
-        let mut connection = drivers.connect(&configuration, DATABASE_URL).await?;
+        let driver_manager = DriverManager::default();
+        let mut connection = driver_manager.connect(&configuration, DATABASE_URL).await?;
 
         let _ = connection
             .execute("CREATE TABLE person (id INTEGER, name TEXT)")
@@ -226,8 +226,8 @@ mod test {
     #[tokio::test]
     async fn test_table_data_types() -> anyhow::Result<()> {
         let configuration = &Configuration::default();
-        let drivers = DriverManager::default();
-        let mut connection = drivers.connect(&configuration, DATABASE_URL).await?;
+        let driver_manager = DriverManager::default();
+        let mut connection = driver_manager.connect(&configuration, DATABASE_URL).await?;
 
         let _ = connection
             .execute("CREATE TABLE t1(t TEXT, nu NUMERIC, i INTEGER, r REAL, no BLOB)")
@@ -291,8 +291,8 @@ mod test {
 
     async fn test_data_type(sql: &str) -> anyhow::Result<Option<Value>> {
         let configuration = Configuration::default();
-        let drivers = DriverManager::default();
-        let mut connection = drivers.connect(&configuration, DATABASE_URL).await?;
+        let driver_manager = DriverManager::default();
+        let mut connection = driver_manager.connect(&configuration, DATABASE_URL).await?;
 
         let results = connection.query(sql).await?;
         let mut value: Option<Value> = None;
