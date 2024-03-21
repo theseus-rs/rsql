@@ -49,8 +49,7 @@ impl Hinter for ReplHelper {
 }
 
 impl Validator for ReplHelper {
-    fn validate(&self, ctx: &mut ValidationContext) -> rustyline::Result<ValidationResult> {
-        let _ = ctx;
+    fn validate(&self, _ctx: &mut ValidationContext) -> rustyline::Result<ValidationResult> {
         Ok(ValidationResult::Valid(None))
     }
 }

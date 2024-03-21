@@ -12,6 +12,8 @@ pub use connection::MemoryQueryResult;
 #[cfg(test)]
 pub(crate) use connection::MockConnection;
 pub use connection::{Connection, QueryResult, Results};
+#[cfg(test)]
+pub(crate) use driver::MockDriver;
 pub use driver::{Driver, DriverManager};
 pub use error::{Error, Result};
 pub use value::Value;

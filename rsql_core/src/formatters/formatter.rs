@@ -95,7 +95,11 @@ mod tests {
         };
 
         let debug = format!("{:?}", options);
+        assert!(debug.contains("FormatterOptions"));
+        assert!(debug.contains("configuration"));
+        assert!(debug.contains("results"));
         assert!(debug.contains("42"));
+        assert!(debug.contains("elapsed"));
         assert!(debug.contains("9ns"));
     }
 

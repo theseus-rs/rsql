@@ -33,7 +33,7 @@ impl DriverManager {
     }
 
     /// Add a new driver to the list of available drivers
-    fn add(&mut self, driver: Box<dyn Driver>) {
+    pub fn add(&mut self, driver: Box<dyn Driver>) {
         let identifier = driver.identifier();
         let _ = &self.drivers.insert(identifier, driver);
     }
@@ -57,7 +57,7 @@ impl DriverManager {
     ) -> Result<Box<dyn Connection>> {
         let identifier = match url.split_once(':') {
             Some((before, _)) => before,
-            None => "",
+            None => url,
         };
 
         match &self.get(identifier) {
@@ -128,7 +128,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_driver_manager_connect() -> anyhow::Result<()> {
+    async fn test_driver_manager_connect_with_colon() -> anyhow::Result<()> {
         let identifier = "test";
         let mut mock_driver = MockDriver::new();
         mock_driver.expect_identifier().returning(|| identifier);
@@ -141,6 +141,23 @@ mod tests {
 
         let configuration = Configuration::default();
         let _ = driver_manager.connect(&configuration, "test::").await?;
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_driver_manager_connect_without_colon() -> anyhow::Result<()> {
+        let identifier = "test";
+        let mut mock_driver = MockDriver::new();
+        mock_driver.expect_identifier().returning(|| identifier);
+        mock_driver
+            .expect_connect()
+            .returning(|_, _| Ok(Box::new(MockConnection::new())));
+
+        let mut driver_manager = DriverManager::new();
+        driver_manager.add(Box::new(mock_driver));
+
+        let configuration = Configuration::default();
+        let _ = driver_manager.connect(&configuration, identifier).await?;
         Ok(())
     }
 

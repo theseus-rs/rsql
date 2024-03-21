@@ -93,6 +93,9 @@ mod tests {
         );
         let debug = format!("{:?}", executor);
         assert!(debug.contains("CommandExecutor"));
+        assert!(debug.contains("configuration"));
+        assert!(debug.contains("command_manager"));
+        assert!(debug.contains("connection"));
     }
 
     #[tokio::test]
