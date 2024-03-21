@@ -14,7 +14,7 @@ use std::io;
 ///
 /// `Continue`: Continue the loop
 /// `Exit`: Exit the loop with the specified exit code
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub enum LoopCondition {
     Continue,
     Exit(i32),
@@ -127,6 +127,11 @@ mod tests {
         };
 
         let debug = format!("{:?}", options);
+        assert!(debug.contains("CommandOptions"));
+        assert!(debug.contains("configuration"));
+        assert!(debug.contains("command_manager"));
+        assert!(debug.contains("connection"));
+        assert!(debug.contains("input"));
         assert!(debug.contains("42"));
     }
 

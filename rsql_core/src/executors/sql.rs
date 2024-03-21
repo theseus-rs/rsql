@@ -108,6 +108,9 @@ mod tests {
             SqlExecutor::new(&configuration, &formatter_manager, &mut connection, output);
         let debug = format!("{:?}", executor);
         assert!(debug.contains("SqlExecutor"));
+        assert!(debug.contains("configuration"));
+        assert!(debug.contains("formatter_manager"));
+        assert!(debug.contains("connection"));
     }
 
     #[tokio::test]

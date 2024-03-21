@@ -103,6 +103,10 @@ mod tests {
         );
         let debug = format!("{:?}", executor);
         assert!(debug.contains("Executor"));
+        assert!(debug.contains("configuration"));
+        assert!(debug.contains("command_manager"));
+        assert!(debug.contains("formatter_manager"));
+        assert!(debug.contains("connection"));
     }
 
     async fn test_execute_command(echo: bool) -> anyhow::Result<()> {
