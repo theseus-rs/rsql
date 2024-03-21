@@ -22,7 +22,7 @@ pub(crate) static DEFAULT_CONFIG: &str =
     include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/resources/rsql.toml"));
 
 /// A builder for creating a [Configuration] instance.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct ConfigurationBuilder {
     configuration: Configuration,
 }
@@ -227,7 +227,7 @@ impl ConfigurationBuilder {
 }
 
 /// The configuration for the application.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Configuration {
     pub program_name: String,
     pub version: String,
