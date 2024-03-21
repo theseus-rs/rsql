@@ -4,6 +4,7 @@ use crate::drivers::value::Value;
 use crate::drivers::Error::UnsupportedColumnType;
 use crate::drivers::{MemoryQueryResult, Results};
 use async_trait::async_trait;
+use bit_vec::BitVec;
 use postgresql_archive::Version;
 use postgresql_embedded::{PostgreSQL, Settings};
 use sqlx::postgres::{PgColumn, PgConnectOptions, PgRow};
@@ -147,12 +148,6 @@ impl Connection {
             let value: Option<String> = value;
             Ok(value.map(Value::String))
         } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<&str> = value;
-            Ok(value.map(|v| Value::String(v.to_string())))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<i8> = value;
-            Ok(value.map(Value::I8))
-        } else if let Ok(value) = row.try_get(column_name) {
             let value: Option<i16> = value;
             Ok(value.map(Value::I16))
         } else if let Ok(value) = row.try_get(column_name) {
@@ -170,6 +165,9 @@ impl Connection {
         } else if let Ok(value) = row.try_get(column_name) {
             let value: Option<rust_decimal::Decimal> = value;
             Ok(value.map(|v| Value::String(v.to_string())))
+        } else if let Ok(value) = row.try_get(column_name) {
+            let value: Option<bool> = value;
+            Ok(value.map(Value::Bool))
         } else if let Ok(value) = row.try_get(column_name) {
             let value: Option<chrono::NaiveDate> = value;
             Ok(value.map(Value::Date))
@@ -192,6 +190,16 @@ impl Connection {
             let column_type = column.type_info();
             let type_name = format!("{:?}", column_type.deref());
             match type_name.to_lowercase().as_str() {
+                "bit" | "varbit" => {
+                    let value: Option<BitVec> = row.try_get(column_name)?;
+                    Ok(value.map(|v| {
+                        let bit_string: String =
+                            v.iter().map(|bit| if bit { '1' } else { '0' }).collect();
+                        Value::String(bit_string)
+                    }))
+                }
+                // "interval" => Ok(None), // TODO: SELECT CAST('1 year' as interval)
+                // "money" => Ok(None), // TODO: SELECT CAST(1.23 as money)
                 "void" => Ok(None), // pg_sleep() returns void
                 _ => Err(UnsupportedColumnType {
                     column_name: column_name.to_string(),
@@ -208,6 +216,8 @@ impl Connection {
 mod test {
     use crate::configuration::Configuration;
     use crate::drivers::{DriverManager, Results, Value};
+    use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
+    use serde_json::json;
 
     const DATABASE_URL: &str = "postgresql::embedded:";
 
@@ -265,6 +275,160 @@ mod test {
         assert_eq!(tables, vec!["person"]);
 
         connection.stop().await?;
+        Ok(())
+    }
+
+    async fn test_data_type(sql: &str) -> anyhow::Result<Option<Value>> {
+        let configuration = Configuration::default();
+        let drivers = DriverManager::default();
+        let mut connection = drivers.connect(&configuration, DATABASE_URL).await?;
+
+        let results = connection.query(sql).await?;
+        let mut value: Option<Value> = None;
+
+        if let Results::Query(query_result) = results {
+            assert_eq!(query_result.columns().await.len(), 1);
+            assert_eq!(query_result.rows().await.len(), 1);
+
+            if let Some(row) = query_result.rows().await.get(0) {
+                assert_eq!(row.len(), 1);
+
+                value = row[0].clone();
+            }
+        }
+
+        connection.stop().await?;
+        Ok(value)
+    }
+
+    #[tokio::test]
+    async fn test_data_type_bytes() -> anyhow::Result<()> {
+        let result = test_data_type("SELECT CAST('1' as bytea)").await?;
+        let value = result.expect("value is None");
+        assert_eq!(value, Value::Bytes(vec![49]));
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_data_type_string() -> anyhow::Result<()> {
+        let result = test_data_type("SELECT CAST('foo' as char(3))").await?;
+        let value = result.expect("value is None");
+        assert_eq!(value, Value::String("foo".to_string()));
+
+        let result = test_data_type("SELECT CAST('foo' as varchar(5))").await?;
+        let value = result.expect("value is None");
+        assert_eq!(value, Value::String("foo".to_string()));
+
+        let result = test_data_type("SELECT CAST('foo' as text)").await?;
+        let value = result.expect("value is None");
+        assert_eq!(value, Value::String("foo".to_string()));
+
+        let result = test_data_type("SELECT CAST(B'101' as bit(3))").await?;
+        let value = result.expect("value is None");
+        assert_eq!(value, Value::String("101".to_string()));
+
+        let result = test_data_type("SELECT CAST(B'10101' as bit varying(5))").await?;
+        let value = result.expect("value is None");
+        assert_eq!(value, Value::String("10101".to_string()));
+
+        let result = test_data_type("SELECT CAST(1.234 as numeric)").await?;
+        let value = result.expect("value is None");
+        assert_eq!(value, Value::String("1.234".to_string()));
+
+        let result = test_data_type("SELECT CAST(1.234 as decimal)").await?;
+        let value = result.expect("value is None");
+        assert_eq!(value, Value::String("1.234".to_string()));
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_data_type_i16() -> anyhow::Result<()> {
+        let result = test_data_type("SELECT CAST(32767 as smallint)").await?;
+        let value = result.expect("value is None");
+        assert_eq!(value, Value::I16(32_767));
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_data_type_i32() -> anyhow::Result<()> {
+        let result = test_data_type("SELECT CAST(2147483647 as integer)").await?;
+        let value = result.expect("value is None");
+        assert_eq!(value, Value::I32(2_147_483_647));
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_data_type_i64() -> anyhow::Result<()> {
+        let result = test_data_type("SELECT CAST(2147483647 as bigint)").await?;
+        let value = result.expect("value is None");
+        assert_eq!(value, Value::I64(2_147_483_647));
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_data_type_bool() -> anyhow::Result<()> {
+        let result = test_data_type("SELECT CAST(1 as bool)").await?;
+        let value = result.expect("value is None");
+        assert_eq!(value, Value::Bool(true));
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_data_type_f32() -> anyhow::Result<()> {
+        let result = test_data_type("SELECT CAST(1.234 as real)").await?;
+        let value = result.expect("value is None");
+        assert_eq!(value, Value::F32(1.234));
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_data_type_f64() -> anyhow::Result<()> {
+        let result = test_data_type("SELECT CAST(1.234 as double precision)").await?;
+        let value = result.expect("value is None");
+        assert_eq!(value, Value::F64(1.234));
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_data_type_date() -> anyhow::Result<()> {
+        let result = test_data_type("SELECT CAST('1983-01-01' as date)").await?;
+        let value = result.expect("value is None");
+        let date = NaiveDate::from_ymd_opt(1983, 1, 1).expect("invalid date");
+        assert_eq!(value, Value::Date(date));
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_data_type_time() -> anyhow::Result<()> {
+        let result = test_data_type("SELECT CAST('1:23:45' as time)").await?;
+        let value = result.expect("value is None");
+        let time = NaiveTime::from_hms_opt(1, 23, 45).expect("invalid time");
+        assert_eq!(value, Value::Time(time));
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_data_type_date_time() -> anyhow::Result<()> {
+        let result = test_data_type("SELECT CAST('1983-01-01 1:23:45' as timestamp)").await?;
+        let value = result.expect("value is None");
+        let time = NaiveDateTime::parse_from_str("1983-01-01 01:23:45", "%Y-%m-%d %H:%M:%S")?;
+        assert_eq!(value, Value::DateTime(time));
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_data_type_json() -> anyhow::Result<()> {
+        let result = test_data_type(r#"SELECT CAST('{"key": "value"}' as json)"#).await?;
+        let value = result.expect("value is None");
+        assert_eq!(value, Value::Json(json!({"key": "value"})));
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_data_type_none() -> anyhow::Result<()> {
+        let result = test_data_type("SELECT pg_sleep(0)").await?;
+        assert_eq!(result, None);
         Ok(())
     }
 }
