@@ -8,8 +8,8 @@
 
 ### Description
 
-Echo executed commands. By default, the echo command is set to `off`. If the `echo` command is set to `off`, the
-commands will not be echoed to the defined output.
+Echo executed commands. By default, the echo command is set to `off`. If the `echo` command is set to `on`, the
+commands will be echoed to the defined output.
 
 ### Examples
 
