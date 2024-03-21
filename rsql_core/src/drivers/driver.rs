@@ -115,7 +115,7 @@ mod tests {
 
     #[test]
     fn test_driver_manager_default() {
-        let drivers = DriverManager::default();
+        let driver_manager = DriverManager::default();
         let driver_count = 0;
 
         #[cfg(feature = "postgresql")]
@@ -124,7 +124,7 @@ mod tests {
         #[cfg(feature = "sqlite")]
         let driver_count = driver_count + 1;
 
-        assert_eq!(drivers.drivers.len(), driver_count);
+        assert_eq!(driver_manager.drivers.len(), driver_count);
     }
 
     #[tokio::test]
