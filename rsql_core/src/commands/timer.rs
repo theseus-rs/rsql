@@ -2,7 +2,7 @@ use crate::commands::Error::InvalidOption;
 use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use async_trait::async_trait;
 
-/// A shell command to enable or disable query execution timer
+/// Command to enable or disable query execution timer
 #[derive(Debug, Default)]
 pub(crate) struct Command;
 

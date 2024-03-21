@@ -1,6 +1,6 @@
 use crate::commands::error::Result;
 use crate::commands::{
-    bail, clear, exit, footer, format, header, help, history, locale, quit, tables, timer,
+    bail, clear, echo, exit, footer, format, header, help, history, locale, quit, tables, timer,
 };
 use crate::configuration::Configuration;
 use crate::drivers::Connection;
@@ -10,7 +10,7 @@ use std::collections::BTreeMap;
 use std::fmt::Debug;
 use std::io;
 
-/// Loop condition for shell commands
+/// Loop condition for commands
 ///
 /// `Continue`: Continue the loop
 /// `Exit`: Exit the loop with the specified exit code
@@ -20,7 +20,7 @@ pub enum LoopCondition {
     Exit(i32),
 }
 
-/// Options for shell commands
+/// Options for commands
 pub struct CommandOptions<'a> {
     pub command_manager: &'a CommandManager,
     pub configuration: &'a mut Configuration,
@@ -41,7 +41,7 @@ impl Debug for CommandOptions<'_> {
     }
 }
 
-/// Trait that defines a shell command
+/// Trait that defines a command
 #[async_trait]
 pub trait ShellCommand: Debug + Sync {
     /// Get the name of the command
@@ -56,7 +56,7 @@ pub trait ShellCommand: Debug + Sync {
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition>;
 }
 
-/// Manages the active shell commands
+/// Manages the active commands
 #[derive(Debug)]
 pub struct CommandManager {
     commands: BTreeMap<&'static str, Box<dyn ShellCommand>>,
@@ -94,6 +94,7 @@ impl Default for CommandManager {
 
         commands.add(Box::new(bail::Command));
         commands.add(Box::new(clear::Command));
+        commands.add(Box::new(echo::Command));
         commands.add(Box::new(exit::Command));
         commands.add(Box::new(footer::Command));
         commands.add(Box::new(format::Command));
@@ -153,6 +154,6 @@ mod tests {
     fn test_command_manager_default() {
         let command_manager = CommandManager::default();
 
-        assert_eq!(command_manager.commands.len(), 12);
+        assert_eq!(command_manager.commands.len(), 13);
     }
 }

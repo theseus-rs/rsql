@@ -338,11 +338,15 @@ async fn execute_sql(
     let start = std::time::Instant::now();
     let sql = line.trim();
     let command = if sql.len() > 6 { &sql[..6] } else { "" }.trim();
-
     let results = execute(connection, sql, command).await?;
-
     let formatter_manager = FormatterManager::default();
     let result_format = &configuration.results_format;
+    let output = &mut io::stdout() as &mut (dyn io::Write + Send + Sync);
+
+    if configuration.echo {
+        writeln!(output, "{}", sql)?;
+    }
+
     let formatter = match formatter_manager.get(result_format) {
         Some(formatter) => formatter,
         None => {
@@ -356,7 +360,7 @@ async fn execute_sql(
         configuration,
         results: &results,
         elapsed: &start.elapsed(),
-        output: &mut io::stdout(),
+        output,
     };
     formatter.format(&mut options).await?;
     Ok(LoopCondition::Continue)

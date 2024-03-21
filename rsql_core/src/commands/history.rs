@@ -12,7 +12,7 @@ impl ShellCommand for Command {
     }
 
     fn description(&self) -> &'static str {
-        "Show the history of the shell"
+        "Show the command history"
     }
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {

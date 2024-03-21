@@ -2,14 +2,14 @@ use crate::commands::Error::InvalidOption;
 use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use async_trait::async_trait;
 
-/// Command to enable or disable result footer
+/// Command to enable or disable echoing commands
 #[derive(Debug, Default)]
 pub(crate) struct Command;
 
 #[async_trait]
 impl ShellCommand for Command {
     fn name(&self) -> &'static str {
-        "footer"
+        "echo"
     }
 
     fn args(&self) -> &'static str {
@@ -17,21 +17,21 @@ impl ShellCommand for Command {
     }
 
     fn description(&self) -> &'static str {
-        "Enable or disable result footer"
+        "Enable or disable echoing commands"
     }
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
         if options.input.len() <= 1 {
-            let footer = if options.configuration.results_footer {
+            let echo = if options.configuration.echo {
                 "on"
             } else {
                 "off"
             };
-            writeln!(options.output, "Footer: {footer}")?;
+            writeln!(options.output, "Echo: {echo}")?;
             return Ok(LoopCondition::Continue);
         }
 
-        let footer = match options.input[1].to_lowercase().as_str() {
+        let echo = match options.input[1].to_lowercase().as_str() {
             "on" => true,
             "off" => false,
             option => {
@@ -42,7 +42,7 @@ impl ShellCommand for Command {
             }
         };
 
-        options.configuration.results_footer = footer;
+        options.configuration.echo = echo;
 
         Ok(LoopCondition::Continue)
     }
@@ -58,10 +58,10 @@ mod tests {
     use rustyline::history::DefaultHistory;
     use std::default;
 
-    async fn test_execute_no_args(footer: bool) -> anyhow::Result<()> {
+    async fn test_execute_no_args(echo: bool) -> anyhow::Result<()> {
         let mut output = Vec::new();
         let configuration = &mut Configuration {
-            results_footer: footer,
+            echo,
             ..default::Default::default()
         };
         let options = CommandOptions {
@@ -69,19 +69,19 @@ mod tests {
             configuration,
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".footer"],
+            input: vec![".echo"],
             output: &mut output,
         };
 
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        let footer_output = String::from_utf8(output)?;
+        let echo_output = String::from_utf8(output)?;
 
-        if footer {
-            assert_eq!(footer_output, "Footer: on\n");
+        if echo {
+            assert_eq!(echo_output, "Echo: on\n");
         } else {
-            assert_eq!(footer_output, "Footer: off\n");
+            assert_eq!(echo_output, "Echo: off\n");
         }
         Ok(())
     }
@@ -99,7 +99,7 @@ mod tests {
     #[tokio::test]
     async fn test_execute_set_on() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
-            results_footer: false,
+            echo: false,
             ..default::Default::default()
         };
         let options = CommandOptions {
@@ -107,21 +107,21 @@ mod tests {
             configuration,
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".footer", "on"],
+            input: vec![".echo", "on"],
             output: &mut Vec::new(),
         };
 
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        assert!(configuration.results_footer);
+        assert!(configuration.echo);
         Ok(())
     }
 
     #[tokio::test]
     async fn test_execute_set_off() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
-            results_footer: true,
+            echo: true,
             ..default::Default::default()
         };
         let options = CommandOptions {
@@ -129,14 +129,14 @@ mod tests {
             configuration,
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".footer", "off"],
+            input: vec![".echo", "off"],
             output: &mut Vec::new(),
         };
 
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        assert!(!configuration.results_footer);
+        assert!(!configuration.echo);
         Ok(())
     }
 
@@ -147,7 +147,7 @@ mod tests {
             configuration: &mut Configuration::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".footer", "foo"],
+            input: vec![".echo", "foo"],
             output: &mut Vec::new(),
         };
 

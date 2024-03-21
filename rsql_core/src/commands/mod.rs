@@ -1,6 +1,7 @@
 mod bail;
 mod clear;
 mod command;
+mod echo;
 mod error;
 mod exit;
 mod footer;
