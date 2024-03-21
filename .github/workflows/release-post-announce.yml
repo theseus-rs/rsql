@@ -108,6 +108,8 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
+        with:
+          ref: main
 
       - uses: rhysd/changelog-from-release/action@v3
         with:
