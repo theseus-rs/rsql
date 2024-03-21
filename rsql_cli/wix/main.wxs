@@ -69,7 +69,7 @@
 
         <Package Id='*'
             Keywords='Installer'
-            Description='rsql command line interface for PostgreSQL and SQLite3.'
+            Description='rsql is a command line interface for PostgreSQL and SQLite3.'
             Manufacturer='Brian Heineman'
             InstallerVersion='450'
             Languages='1033'
