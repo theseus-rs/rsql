@@ -2,15 +2,12 @@ pub type Result<T, E = Error> = core::result::Result<T, E>;
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
-    /// Command error
-    #[error(transparent)]
-    CommandError(#[from] crate::commands::Error),
     /// Driver error
     #[error(transparent)]
     DriverError(#[from] crate::drivers::Error),
-    /// Format error
+    /// Executor error
     #[error(transparent)]
-    FormatError(#[from] crate::formatters::Error),
+    ExecutorError(#[from] crate::executors::Error),
     /// IO error
     #[error(transparent)]
     IoError(anyhow::Error),
@@ -95,6 +92,7 @@ mod tests {
 
         assert_eq!(io_error.to_string(), "test");
     }
+
     #[test]
     fn test_std_io_error() {
         let error = std::io::Error::new(std::io::ErrorKind::Other, "test");

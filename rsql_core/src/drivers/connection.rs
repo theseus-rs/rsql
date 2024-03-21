@@ -10,6 +10,16 @@ pub enum Results {
     Execute(u64),
 }
 
+impl Results {
+    pub fn is_query(&self) -> bool {
+        matches!(self, Results::Query(_))
+    }
+
+    pub fn is_execute(&self) -> bool {
+        matches!(self, Results::Execute(_))
+    }
+}
+
 /// Results from a query
 #[async_trait]
 pub trait QueryResult: Debug + Send + Sync {
@@ -18,7 +28,7 @@ pub trait QueryResult: Debug + Send + Sync {
 }
 
 /// In-memory query result
-#[derive(Debug, Default)]
+#[derive(Clone, Debug, Default)]
 pub struct MemoryQueryResult {
     columns: Vec<String>,
     rows: Vec<Vec<Option<Value>>>,
@@ -49,4 +59,35 @@ pub trait Connection: Debug + Send {
     async fn query(&self, sql: &str) -> Result<Results>;
     async fn tables(&mut self) -> Result<Vec<String>>;
     async fn stop(&mut self) -> Result<()>;
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_results_is_query() {
+        let query_results = Box::new(MemoryQueryResult::default());
+        assert!(Results::Query(query_results).is_query());
+    }
+
+    #[test]
+    fn test_results_is_execute() {
+        assert!(Results::Execute(42).is_execute());
+    }
+
+    #[test]
+    fn test_memory_query_result_new() {
+        let columns = vec!["a".to_string()];
+        let rows = vec![vec![Some(Value::String("foo".to_string()))]];
+
+        let result = MemoryQueryResult::new(columns, rows);
+
+        let column = result.columns.get(0).expect("no column");
+        assert_eq!(column, &"a".to_string());
+        let row = result.rows.get(0).expect("no rows");
+        let data = row.get(0).expect("no row data");
+        let value = data.as_ref().expect("no value");
+        assert_eq!(value, &Value::String("foo".to_string()));
+    }
 }

@@ -22,10 +22,10 @@ pub enum LoopCondition {
 
 /// Options for commands
 pub struct CommandOptions<'a> {
-    pub command_manager: &'a CommandManager,
     pub configuration: &'a mut Configuration,
-    pub connection: &'a mut dyn Connection,
+    pub command_manager: &'a CommandManager,
     pub history: &'a DefaultHistory,
+    pub connection: &'a mut dyn Connection,
     pub input: Vec<&'a str>,
     pub output: &'a mut (dyn io::Write + Send + Sync),
 }
@@ -33,8 +33,8 @@ pub struct CommandOptions<'a> {
 impl Debug for CommandOptions<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("CommandOptions")
-            .field("command_manager", &self.command_manager)
             .field("configuration", &self.configuration)
+            .field("command_manager", &self.command_manager)
             .field("connection", &self.connection)
             .field("input", &self.input)
             .finish()
