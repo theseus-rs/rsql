@@ -58,6 +58,7 @@ impl Validator for ReplHelper {
 #[cfg(test)]
 mod test {
     use super::*;
+    use rustyline::history::DefaultHistory;
 
     #[test]
     fn test_new() {
@@ -68,5 +69,15 @@ mod test {
         assert!(helper.syntax_set.find_syntax_by_name("SQL").is_some());
         assert_eq!(helper.syntax.name, "SQL");
         assert_eq!(helper.theme.name, Some("Solarized (dark)".to_string()));
+    }
+
+    #[test]
+    fn test_hinter() {
+        let configuration = Configuration::default();
+        let helper = ReplHelper::new(&configuration);
+        let history = &DefaultHistory::new();
+        let ctx = Context::new(history);
+        let hint = helper.hint("SELECT", 0, &ctx);
+        assert!(hint.is_none());
     }
 }

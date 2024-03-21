@@ -3,7 +3,7 @@ use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use crate::formatters::FormatterManager;
 use async_trait::async_trait;
 
-/// A shell command to set the results format
+/// Command to set the results format
 #[derive(Debug, Default)]
 pub(crate) struct Command;
 
@@ -18,7 +18,7 @@ impl ShellCommand for Command {
     }
 
     fn description(&self) -> &'static str {
-        "Format results in ascii, csv, json, jsonl, tsv, unicode, ..."
+        "Format results in ascii, csv, json, jsonl, tsv, unicode, xml, yaml"
     }
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {

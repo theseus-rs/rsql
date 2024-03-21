@@ -3,7 +3,7 @@ use async_trait::async_trait;
 use crate::commands::Error::InvalidOption;
 use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 
-/// A shell command to stop after an error occurs
+/// Command to stop after an error occurs
 #[derive(Debug, Default)]
 pub(crate) struct Command;
 

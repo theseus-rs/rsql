@@ -77,6 +77,13 @@ impl ConfigurationBuilder {
         self
     }
 
+    /// Set the echo value.
+    #[allow(dead_code)]
+    pub fn with_echo(mut self, echo: bool) -> Self {
+        self.configuration.echo = echo;
+        self
+    }
+
     /// Set the log level to use.
     #[allow(dead_code)]
     pub fn with_log_level(mut self, log_level: LevelFilter) -> Self {
@@ -226,6 +233,7 @@ pub struct Configuration {
     pub version: String,
     pub config_dir: Option<PathBuf>,
     pub bail_on_error: bool,
+    pub echo: bool,
     pub log_level: LevelFilter,
     pub log_dir: Option<PathBuf>,
     pub log_rotation: Rotation,
@@ -250,6 +258,7 @@ impl Default for Configuration {
             version: String::new(),
             config_dir: None,
             bail_on_error: false,
+            echo: false,
             log_level: LevelFilter::OFF,
             log_dir: None,
             log_rotation: Rotation::DAILY,
@@ -322,6 +331,9 @@ impl ConfigFile {
 
         if let Ok(bail_on_error) = config.get::<bool>("general.bail_on_error") {
             configuration.bail_on_error = bail_on_error;
+        }
+        if let Ok(echo) = config.get::<bool>("general.echo") {
+            configuration.echo = echo;
         }
 
         if let Ok(log_level) = config.get::<String>("log.level") {
@@ -425,6 +437,7 @@ mod test {
         let program_name = "test";
         let version = "1.2.3";
         let bail_on_error = true;
+        let echo = true;
         let log_level = LevelFilter::OFF;
         let log_dir = ".rsql/logs";
         let log_rotation = Rotation::MINUTELY;
@@ -443,6 +456,7 @@ mod test {
 
         let configuration = ConfigurationBuilder::new(program_name, version)
             .with_bail_on_error(bail_on_error)
+            .with_echo(echo)
             .with_log_level(log_level)
             .with_log_dir(log_dir)
             .with_log_rotation(log_rotation.clone())
@@ -463,6 +477,7 @@ mod test {
         assert_eq!(configuration.program_name, program_name);
         assert_eq!(configuration.version, version);
         assert_eq!(configuration.bail_on_error, bail_on_error);
+        assert_eq!(configuration.echo, echo);
         assert_eq!(configuration.log_level, log_level);
         assert_eq!(configuration.log_dir.unwrap().to_string_lossy(), log_dir);
         assert_eq!(configuration.log_rotation, log_rotation);
@@ -490,6 +505,7 @@ mod test {
         assert!(configuration.version.is_empty());
         assert_eq!(configuration.config_dir, None);
         assert_eq!(configuration.bail_on_error, false);
+        assert_eq!(configuration.echo, false);
         assert_eq!(configuration.log_level, LevelFilter::OFF);
         assert_eq!(configuration.log_dir, None);
         assert_eq!(configuration.log_rotation, Rotation::DAILY);
