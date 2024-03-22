@@ -454,6 +454,30 @@ mod test {
         Ok(())
     }
 
+    async fn test_editor(color: bool) -> anyhow::Result<()> {
+        let configuration = Configuration {
+            bail_on_error: false,
+            color,
+            history: false,
+            ..Default::default()
+        };
+        let shell = ShellBuilder::new()
+            .with_configuration(configuration)
+            .build();
+        let _ = shell.editor("history.txt")?;
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_editor_color_true() -> anyhow::Result<()> {
+        test_editor(true).await
+    }
+
+    #[tokio::test]
+    async fn test_editor_color_false() -> anyhow::Result<()> {
+        test_editor(false).await
+    }
+
     #[tokio::test]
     async fn test_evaluate() -> anyhow::Result<()> {
         let configuration = Configuration {
