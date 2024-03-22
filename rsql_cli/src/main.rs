@@ -2,6 +2,7 @@
 
 use anyhow::Result;
 use clap::Parser;
+use colored::Colorize;
 use rsql_core::configuration::ConfigurationBuilder;
 use rsql_core::shell::{ShellArgs, ShellBuilder};
 use rsql_core::version;
@@ -46,6 +47,16 @@ pub(crate) async fn execute(args: Option<Args>, output: &mut dyn io::Write) -> R
     let result = if args.version {
         version::execute(&mut configuration, output).await
     } else {
+        let command_identifier = &configuration.command_identifier;
+        let help_command = format!("{command_identifier}help");
+        let quit_command = format!("{command_identifier}quit");
+        eprintln!("{}", full_version(&configuration));
+        eprintln!(
+            "Type '{}' for help, '{}' to exit.",
+            help_command.bold(),
+            quit_command.bold()
+        );
+
         let mut shell = ShellBuilder::default()
             .with_configuration(configuration)
             .build();

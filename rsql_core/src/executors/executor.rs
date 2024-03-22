@@ -51,7 +51,8 @@ impl<'a> Executor<'a> {
             writeln!(&mut self.output, "{}", input)?;
         }
 
-        let loop_condition = if input.starts_with('.') {
+        let command_identifier = &self.configuration.command_identifier;
+        let loop_condition = if input.starts_with(command_identifier) {
             let mut executor = CommandExecutor::new(
                 self.configuration,
                 self.command_manager,
@@ -149,9 +150,10 @@ mod tests {
         Ok(())
     }
 
-    async fn test_execute_command(echo: bool) -> anyhow::Result<()> {
+    async fn test_execute_command(command_identifier: &str, echo: bool) -> anyhow::Result<()> {
         let mut configuration = Configuration {
             bail_on_error: false,
+            command_identifier: command_identifier.to_string(),
             echo,
             ..Default::default()
         };
@@ -172,14 +174,14 @@ mod tests {
             &mut output,
         );
 
-        let input = ".bail on";
-        let result = executor.execute(input).await?;
+        let input = format!("{command_identifier}bail on");
+        let result = executor.execute(input.as_str()).await?;
         assert_eq!(result, LoopCondition::Continue);
         let execute_output = String::from_utf8(output)?;
         if echo {
-            assert!(execute_output.contains(input));
+            assert!(execute_output.contains(input.as_str()));
         } else {
-            assert!(!execute_output.contains(input));
+            assert!(!execute_output.contains(input.as_str()));
         }
         assert!(configuration.bail_on_error);
         Ok(())
@@ -187,12 +189,12 @@ mod tests {
 
     #[tokio::test]
     async fn test_execute_command_echo_on() -> anyhow::Result<()> {
-        test_execute_command(true).await
+        test_execute_command("!", true).await
     }
 
     #[tokio::test]
     async fn test_execute_command_echo_off() -> anyhow::Result<()> {
-        test_execute_command(false).await
+        test_execute_command("\\", false).await
     }
 
     async fn test_execute_sql(echo: bool) -> anyhow::Result<()> {
