@@ -15,7 +15,24 @@
 
 ## Getting Started
 
-Install `rsql` from https://theseus-rs.github.io/rsql/rsql_cli/
+`rsql` can be installed using the following methods:
+
+### Linux / MacOS
+
+```shell
+curl --proto '=https' --tlsv1.2 -LsSf https://github.com/theseus-rs/rsql/releases/latest/download/rsql_cli-installer.sh | sh
+```
+
+### Windows
+
+```shell
+irm https://github.com/theseus-rs/rsql/releases/latest/download/rsql_cli-installer.ps1 | iex
+```
+
+For more information, and additional installations instructurs (cargo, homebrew, msi),
+visit the [RSQL](https://theseus-rs.github.io/rsql/rsql_cli/) site.
+
+## Quick Demo
 
 [![asciicast](https://asciinema.org/a/647597.svg)](https://asciinema.org/a/647597)
 

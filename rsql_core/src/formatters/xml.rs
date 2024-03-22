@@ -1,7 +1,7 @@
-use crate::drivers::Value;
 use crate::formatters::error::Result;
 use crate::formatters::footer::write_footer;
 use crate::formatters::formatter::FormatterOptions;
+use crate::formatters::Highlighter;
 use async_trait::async_trait;
 use quick_xml::events::{BytesEnd, BytesStart, BytesText, Event};
 use quick_xml::Writer;
@@ -27,41 +27,39 @@ pub(crate) async fn format_xml(options: &mut FormatterOptions<'_>) -> Result<()>
         _ => return write_footer(options).await,
     };
 
-    let mut writer = Writer::new(&mut options.output);
+    let mut output = Vec::new();
+    let mut writer = Writer::new_with_indent(&mut output, b' ', 2);
 
     writer.write_event(Event::Start(BytesStart::new("results")))?;
-    writeln!(writer.get_mut())?;
-
     let columns: Vec<String> = query_result.columns().await;
     for row in &query_result.rows().await {
         writer.write_event(Event::Start(BytesStart::new("row")))?;
-
         for (c, data) in row.iter().enumerate() {
             let column = columns.get(c).expect("column not found");
 
-            writer.write_event(Event::Start(BytesStart::new(column)))?;
             match data {
                 Some(value) => {
-                    let string_value = if let Value::Bytes(_bytes) = value {
-                        let value = Value::String(value.to_string());
-                        value.to_string()
-                    } else {
-                        value.to_string()
-                    };
+                    let string_value = value.to_string();
+                    writer.write_event(Event::Start(BytesStart::new(column)))?;
                     writer.write_event(Event::Text(BytesText::new(string_value.as_str())))?;
+                    writer.write_event(Event::End(BytesEnd::new(column)))?;
                 }
-                None => {}
+                None => {
+                    writer.write_event(Event::Empty(BytesStart::new(column)))?;
+                }
             }
-
-            writer.write_event(Event::End(BytesEnd::new(column)))?;
         }
-
         writer.write_event(Event::End(BytesEnd::new("row")))?;
-        writeln!(writer.get_mut())?;
     }
-
     writer.write_event(Event::End(BytesEnd::new("results")))?;
-    writeln!(writer.get_mut())?;
+
+    let xml_output = String::from_utf8(output.clone())?;
+    let highlighter = Highlighter::new(options.configuration, "xml");
+    writeln!(
+        &mut options.output,
+        "{}",
+        highlighter.highlight(xml_output.as_str())?
+    )?;
 
     write_footer(options).await
 }
@@ -130,9 +128,18 @@ mod test {
         let output = String::from_utf8(output.get_ref().to_vec())?.replace("\r\n", "\n");
         let expected = indoc! {r#"
             <results>
-            <row><id>1</id><data>Ynl0ZXM=</data></row>
-            <row><id>2</id><data>foo</data></row>
-            <row><id>3</id><data></data></row>
+              <row>
+                <id>1</id>
+                <data>Ynl0ZXM=</data>
+              </row>
+              <row>
+                <id>2</id>
+                <data>foo</data>
+              </row>
+              <row>
+                <id>3</id>
+                <data/>
+              </row>
             </results>
             3 rows (9ns)
         "#};

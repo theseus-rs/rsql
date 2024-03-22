@@ -1,7 +1,7 @@
-use crate::drivers::Value;
 use crate::formatters::error::Result;
 use crate::formatters::footer::write_footer;
 use crate::formatters::formatter::FormatterOptions;
+use crate::formatters::Highlighter;
 use async_trait::async_trait;
 use quick_xml::events::{BytesEnd, BytesStart, BytesText, Event};
 use quick_xml::Writer;
@@ -27,15 +27,11 @@ pub(crate) async fn format_xml(options: &mut FormatterOptions<'_>) -> Result<()>
         _ => return write_footer(options).await,
     };
 
-    let mut writer = Writer::new(&mut options.output);
+    let mut output = Vec::new();
+    let mut writer = Writer::new_with_indent(&mut output, b' ', 2);
 
     writer.write_event(Event::Start(BytesStart::new("table")))?;
-    writeln!(writer.get_mut())?;
-
-    write!(writer.get_mut(), "  ")?;
     writer.write_event(Event::Start(BytesStart::new("thead")))?;
-    writeln!(writer.get_mut())?;
-    write!(writer.get_mut(), "    ")?;
     writer.write_event(Event::Start(BytesStart::new("tr")))?;
     for column in &query_result.columns().await {
         writer.write_event(Event::Start(BytesStart::new("th")))?;
@@ -43,47 +39,38 @@ pub(crate) async fn format_xml(options: &mut FormatterOptions<'_>) -> Result<()>
         writer.write_event(Event::End(BytesEnd::new("th")))?;
     }
     writer.write_event(Event::End(BytesEnd::new("tr")))?;
-    writeln!(writer.get_mut())?;
-    write!(writer.get_mut(), "  ")?;
     writer.write_event(Event::End(BytesEnd::new("thead")))?;
-    writeln!(writer.get_mut())?;
 
-    write!(writer.get_mut(), "  ")?;
     writer.write_event(Event::Start(BytesStart::new("tbody")))?;
-    writeln!(writer.get_mut())?;
-
     for row in &query_result.rows().await {
-        write!(writer.get_mut(), "    ")?;
         writer.write_event(Event::Start(BytesStart::new("tr")))?;
 
         for data in row.iter() {
-            writer.write_event(Event::Start(BytesStart::new("td")))?;
             match data {
                 Some(value) => {
-                    let string_value = if let Value::Bytes(_bytes) = value {
-                        let value = Value::String(value.to_string());
-                        value.to_string()
-                    } else {
-                        value.to_string()
-                    };
+                    let string_value = value.to_string();
+                    writer.write_event(Event::Start(BytesStart::new("td")))?;
                     writer.write_event(Event::Text(BytesText::new(string_value.as_str())))?;
+                    writer.write_event(Event::End(BytesEnd::new("td")))?;
                 }
-                None => {}
+                None => {
+                    writer.write_event(Event::Empty(BytesStart::new("td")))?;
+                }
             }
-
-            writer.write_event(Event::End(BytesEnd::new("td")))?;
         }
 
         writer.write_event(Event::End(BytesEnd::new("tr")))?;
-        writeln!(writer.get_mut())?;
     }
-
-    write!(writer.get_mut(), "  ")?;
     writer.write_event(Event::End(BytesEnd::new("tbody")))?;
-    writeln!(writer.get_mut())?;
-
     writer.write_event(Event::End(BytesEnd::new("table")))?;
-    writeln!(writer.get_mut())?;
+
+    let html_output = String::from_utf8(output.clone())?;
+    let highlighter = Highlighter::new(options.configuration, "html");
+    writeln!(
+        &mut options.output,
+        "{}",
+        highlighter.highlight(html_output.as_str())?
+    )?;
 
     write_footer(options).await
 }
@@ -153,12 +140,24 @@ mod test {
         let expected = indoc! {r#"
             <table>
               <thead>
-                <tr><th>id</th><th>data</th></tr>
+                <tr>
+                  <th>id</th>
+                  <th>data</th>
+                </tr>
               </thead>
               <tbody>
-                <tr><td>1</td><td>Ynl0ZXM=</td></tr>
-                <tr><td>2</td><td>foo</td></tr>
-                <tr><td>3</td><td></td></tr>
+                <tr>
+                  <td>1</td>
+                  <td>Ynl0ZXM=</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>foo</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td/>
+                </tr>
               </tbody>
             </table>
             3 rows (9ns)

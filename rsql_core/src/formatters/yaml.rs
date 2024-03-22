@@ -2,6 +2,7 @@ use crate::drivers::Value;
 use crate::formatters::error::Result;
 use crate::formatters::footer::write_footer;
 use crate::formatters::formatter::FormatterOptions;
+use crate::formatters::highlighter::Highlighter;
 use async_trait::async_trait;
 use indexmap::IndexMap;
 
@@ -52,7 +53,8 @@ pub(crate) async fn format_yaml(options: &mut FormatterOptions<'_>) -> Result<()
     }
 
     let yaml = serde_yaml::to_string(&yaml_rows)?;
-    write!(options.output, "{}", yaml)?;
+    let highlighter = Highlighter::new(options.configuration, "yaml");
+    write!(options.output, "{}", highlighter.highlight(yaml.as_str())?)?;
 
     write_footer(options).await
 }
