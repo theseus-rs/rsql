@@ -57,7 +57,8 @@ mod tests {
 
     use crate::commands::{CommandManager, CommandOptions, LoopCondition};
     use crate::configuration::Configuration;
-    use crate::drivers::MockConnection;
+    use crate::drivers::{DriverManager, MockConnection};
+    use crate::formatters::FormatterManager;
 
     use super::*;
 
@@ -68,8 +69,10 @@ mod tests {
             ..default::Default::default()
         };
         let options = CommandOptions {
-            command_manager: &CommandManager::default(),
             configuration,
+            command_manager: &CommandManager::default(),
+            driver_manager: &DriverManager::default(),
+            formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
             input: vec![".bail"],
@@ -106,8 +109,10 @@ mod tests {
             ..default::Default::default()
         };
         let options = CommandOptions {
-            command_manager: &CommandManager::default(),
             configuration,
+            command_manager: &CommandManager::default(),
+            driver_manager: &DriverManager::default(),
+            formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
             input: vec![".bail", "on"],
@@ -128,8 +133,10 @@ mod tests {
             ..default::Default::default()
         };
         let options = CommandOptions {
-            command_manager: &CommandManager::default(),
             configuration,
+            command_manager: &CommandManager::default(),
+            driver_manager: &DriverManager::default(),
+            formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
             input: vec![".bail", "off"],
@@ -146,8 +153,10 @@ mod tests {
     #[tokio::test]
     async fn test_execute_invalid_option() {
         let options = CommandOptions {
-            command_manager: &CommandManager::default(),
             configuration: &mut Configuration::default(),
+            command_manager: &CommandManager::default(),
+            driver_manager: &DriverManager::default(),
+            formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
             input: vec![".bail", "foo"],

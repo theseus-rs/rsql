@@ -252,6 +252,7 @@ impl Shell {
         let mut executor = Executor::new(
             &mut self.configuration,
             &self.command_manager,
+            &self.driver_manager,
             &self.formatter_manager,
             history,
             connection,

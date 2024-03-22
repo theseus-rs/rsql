@@ -26,7 +26,7 @@ impl Debug for FormatterOptions<'_> {
 }
 
 #[async_trait]
-pub trait Formatter: Debug + Send {
+pub trait Formatter: Debug + Send + Sync {
     fn identifier(&self) -> &'static str;
     async fn format<'a>(&self, options: &mut FormatterOptions<'a>) -> Result<()>;
 }

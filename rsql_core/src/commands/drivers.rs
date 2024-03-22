@@ -1,26 +1,33 @@
 use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use async_trait::async_trait;
-use tracing::info;
 
-/// Quit the application
+/// Command to display the available drivers
 #[derive(Debug, Default)]
 pub(crate) struct Command;
 
 #[async_trait]
 impl ShellCommand for Command {
     fn name(&self) -> &'static str {
-        "quit"
+        "drivers"
     }
 
     fn description(&self) -> &'static str {
-        "Quit the application"
+        "Display available database drivers"
     }
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
-        options.connection.stop().await?;
+        let driver_manager = options.driver_manager;
 
-        info!("Quitting with code 0");
-        Ok(LoopCondition::Exit(0))
+        write!(options.output, "Available drivers: ")?;
+        for (i, driver) in driver_manager.iter().enumerate() {
+            if i > 0 {
+                write!(options.output, ", ")?;
+            }
+            write!(options.output, "{}", driver.identifier())?;
+        }
+        writeln!(options.output)?;
+
+        Ok(LoopCondition::Continue)
     }
 }
 
@@ -36,23 +43,24 @@ mod tests {
 
     #[tokio::test]
     async fn test_execute() -> anyhow::Result<()> {
-        let mock_connection = &mut MockConnection::new();
-        mock_connection.expect_stop().returning(|| Ok(()));
-
+        let mut output = Vec::new();
+        let configuration = &mut Configuration::default();
         let options = CommandOptions {
-            configuration: &mut Configuration::default(),
+            configuration,
             command_manager: &CommandManager::default(),
             driver_manager: &DriverManager::default(),
             formatter_manager: &FormatterManager::default(),
-            connection: mock_connection,
+            connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".quit"],
-            output: &mut Vec::new(),
+            input: vec![".drivers"],
+            output: &mut output,
         };
 
         let result = Command.execute(options).await?;
 
-        assert_eq!(result, LoopCondition::Exit(0));
+        assert_eq!(result, LoopCondition::Continue);
+        let drivers_output = String::from_utf8(output)?;
+        assert_eq!(drivers_output, "Available drivers: postgresql, sqlite\n");
         Ok(())
     }
 }

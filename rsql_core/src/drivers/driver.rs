@@ -9,7 +9,7 @@ use tracing::instrument;
 
 #[cfg_attr(test, mockall::automock)]
 #[async_trait]
-pub trait Driver: Debug + Send {
+pub trait Driver: Debug + Send + Sync {
     fn identifier(&self) -> &'static str;
     async fn connect(
         &self,

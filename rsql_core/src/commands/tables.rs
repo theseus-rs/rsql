@@ -35,7 +35,8 @@ mod tests {
     use crate::commands::LoopCondition;
     use crate::commands::{CommandManager, CommandOptions};
     use crate::configuration::Configuration;
-    use crate::drivers::MockConnection;
+    use crate::drivers::{DriverManager, MockConnection};
+    use crate::formatters::FormatterManager;
     use rustyline::history::DefaultHistory;
 
     #[tokio::test]
@@ -47,8 +48,10 @@ mod tests {
             .returning(|| Ok(vec![table.to_string()]));
         let mut output = Vec::new();
         let options = CommandOptions {
-            command_manager: &CommandManager::default(),
             configuration: &mut Configuration::default(),
+            command_manager: &CommandManager::default(),
+            driver_manager: &DriverManager::default(),
+            formatter_manager: &FormatterManager::default(),
             connection: mock_connection,
             history: &DefaultHistory::new(),
             input: vec![".tables"],
