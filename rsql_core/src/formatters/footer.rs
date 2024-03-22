@@ -3,7 +3,6 @@ use crate::formatters::error::Result;
 use crate::formatters::FormatterOptions;
 use colored::Colorize;
 use num_format::ToFormattedString;
-use rustyline::ColorMode;
 use std::io::Write;
 
 /// Display the footer of the result set.
@@ -31,21 +30,22 @@ pub async fn write_footer<'a>(options: &mut FormatterOptions<'a>) -> Result<()> 
     };
     let output = &mut options.output;
 
-    match configuration.color_mode {
-        ColorMode::Disabled => writeln!(
-            output,
-            "{} {} {}",
-            rows_affected.to_formatted_string(&configuration.locale),
-            row_label,
-            elapsed_display
-        )?,
-        _ => writeln!(
+    if configuration.color {
+        writeln!(
             output,
             "{} {} {}",
             rows_affected.to_formatted_string(&configuration.locale),
             row_label,
             elapsed_display.dimmed()
-        )?,
+        )?
+    } else {
+        writeln!(
+            output,
+            "{} {} {}",
+            rows_affected.to_formatted_string(&configuration.locale),
+            row_label,
+            elapsed_display
+        )?
     }
 
     Ok(())
@@ -128,7 +128,7 @@ mod tests {
     #[tokio::test]
     async fn test_write_footer_no_color_and_no_timer() -> anyhow::Result<()> {
         let mut configuration = Configuration {
-            color_mode: ColorMode::Disabled,
+            color: false,
             results_timer: false,
             ..Default::default()
         };

@@ -26,7 +26,6 @@ mod tests {
     use crate::drivers::{MemoryQueryResult, Results, Value};
     use crate::formatters::Formatter;
     use indoc::indoc;
-    use rustyline::ColorMode;
     use std::time::Duration;
 
     fn query_result() -> Results {
@@ -39,7 +38,7 @@ mod tests {
     #[tokio::test]
     async fn test_format() -> anyhow::Result<()> {
         let mut configuration = Configuration {
-            color_mode: ColorMode::Disabled,
+            color: false,
             ..Default::default()
         };
         let results = query_result();

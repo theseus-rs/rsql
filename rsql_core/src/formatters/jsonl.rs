@@ -27,13 +27,12 @@ mod test {
     use crate::formatters::formatter::FormatterOptions;
     use crate::formatters::Formatter;
     use indoc::indoc;
-    use rustyline::ColorMode;
     use std::io::Cursor;
 
     #[tokio::test]
     async fn test_format_query() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
-            color_mode: ColorMode::Disabled,
+            color: false,
             ..Default::default()
         };
         let query_result = Query(Box::new(MemoryQueryResult::new(

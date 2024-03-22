@@ -11,6 +11,7 @@ use regex::Regex;
 use rustyline::config::Configurer;
 use rustyline::error::ReadlineError;
 use rustyline::history::{DefaultHistory, FileHistory};
+use rustyline::{ColorMode, CompletionType, Editor};
 use std::fmt::Debug;
 use std::{fmt, io};
 use tracing::error;
@@ -155,7 +156,11 @@ impl Shell {
                     }
                 }
                 Err(error) => {
-                    eprintln!("{}: {:?}", "Error".red(), error);
+                    if self.configuration.color {
+                        eprintln!("{}: {:?}", "Error".red(), error);
+                    } else {
+                        eprintln!("Error: {:?}", error);
+                    }
                     if self.configuration.bail_on_error {
                         std::process::exit(1);
                     }
@@ -166,21 +171,20 @@ impl Shell {
         Ok(())
     }
 
-    /// Run the Read-Eval-Print Loop (REPL) for the shell.
-    async fn repl(&mut self, connection: &mut dyn Connection) -> Result<()> {
+    fn editor(&self, history_file: &str) -> Result<Editor<ReplHelper, FileHistory>> {
         let helper = ReplHelper::new(&self.configuration);
-        let history_file = match self.configuration.history_file {
-            Some(ref file) => String::from(file.to_string_lossy()),
-            None => String::new(),
-        };
-        let mut editor = rustyline::Editor::<ReplHelper, FileHistory>::new()?;
-        editor.set_color_mode(self.configuration.color_mode);
+        let mut editor = Editor::<ReplHelper, FileHistory>::new()?;
+        if self.configuration.color {
+            editor.set_color_mode(ColorMode::Forced);
+        } else {
+            editor.set_color_mode(ColorMode::Disabled);
+        }
         editor.set_edit_mode(self.configuration.edit_mode);
-        editor.set_completion_type(rustyline::CompletionType::Circular);
+        editor.set_completion_type(CompletionType::Circular);
         editor.set_helper(Some(helper));
 
         if self.configuration.history {
-            let _ = editor.load_history(history_file.as_str());
+            let _ = editor.load_history(history_file);
             editor.set_history_ignore_dups(self.configuration.history_ignore_dups)?;
 
             if self.configuration.history_limit > 0 {
@@ -188,16 +192,32 @@ impl Shell {
             }
         }
 
-        let prompt = format!("{}> ", self.configuration.program_name);
+        Ok(editor)
+    }
+
+    /// Run the Read-Eval-Print Loop (REPL) for the shell.
+    async fn repl(&mut self, connection: &mut dyn Connection) -> Result<()> {
+        let history_file = match self.configuration.history_file {
+            Some(ref file) => String::from(file.to_string_lossy()),
+            None => String::new(),
+        };
 
         loop {
+            // Create a new editor for each iteration in order to read any changes to the configuration.
+            let mut editor = self.editor(history_file.as_str())?;
+            let prompt = format!("{}> ", self.configuration.program_name);
+
             let loop_condition = match editor.readline(&prompt) {
                 Ok(line) => {
                     let result = &self
                         .evaluate(connection, editor.history(), line.clone())
                         .await
                         .unwrap_or_else(|error| {
-                            eprintln!("{}: {:?}", "Error".red(), error);
+                            if self.configuration.color {
+                                eprintln!("{}: {:?}", "Error".red(), error);
+                            } else {
+                                eprintln!("Error: {:?}", error);
+                            }
                             if self.configuration.bail_on_error {
                                 LoopCondition::Exit(1)
                             } else {
@@ -212,14 +232,24 @@ impl Shell {
                     result
                 }
                 Err(ReadlineError::Interrupted) => {
-                    eprintln!("{}", "Program interrupted".red());
-                    error!("{}", "Program interrupted".red());
+                    if self.configuration.color {
+                        eprintln!("{}", "Program interrupted".red());
+                        error!("{}", "Program interrupted".red());
+                    } else {
+                        eprintln!("Program interrupted");
+                        error!("Program interrupted");
+                    }
                     connection.stop().await?;
                     LoopCondition::Exit(1)
                 }
                 Err(error) => {
-                    eprintln!("{}: {:?}", "Error".red(), error);
-                    error!("{}: {:?}", "Error".red(), error);
+                    if self.configuration.color {
+                        eprintln!("{}: {:?}", "Error".red(), error);
+                        error!("{}: {:?}", "Error".red(), error);
+                    } else {
+                        eprintln!("Error: {:?}", error);
+                        error!("Error: {:?}", error);
+                    }
                     LoopCondition::Exit(1)
                 }
             };
@@ -423,6 +453,30 @@ mod test {
         assert_eq!(shell.configuration.bail_on_error, true);
         assert_eq!(shell.configuration.results_timer, true);
         Ok(())
+    }
+
+    async fn test_editor(color: bool) -> anyhow::Result<()> {
+        let configuration = Configuration {
+            bail_on_error: false,
+            color,
+            history: false,
+            ..Default::default()
+        };
+        let shell = ShellBuilder::new()
+            .with_configuration(configuration)
+            .build();
+        let _ = shell.editor("history.txt")?;
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_editor_color_true() -> anyhow::Result<()> {
+        test_editor(true).await
+    }
+
+    #[tokio::test]
+    async fn test_editor_color_false() -> anyhow::Result<()> {
+        test_editor(false).await
     }
 
     #[tokio::test]

@@ -7,7 +7,6 @@ use crate::formatters::formatter::FormatterOptions;
 use colored::Colorize;
 use prettytable::format::TableFormat;
 use prettytable::Table;
-use rustyline::ColorMode;
 use std::ops::Deref;
 
 /// Format the results of a query into a table and write to the output.
@@ -59,17 +58,14 @@ async fn process_data<'a>(
                 None => "NULL".to_string(),
             };
 
-            match configuration.color_mode {
-                ColorMode::Disabled => {
+            if configuration.color {
+                if i % 2 == 0 {
+                    row_data.push(data.dimmed().to_string());
+                } else {
                     row_data.push(data);
                 }
-                _ => {
-                    if i % 2 == 0 {
-                        row_data.push(data.dimmed().to_string());
-                    } else {
-                        row_data.push(data);
-                    }
-                }
+            } else {
+                row_data.push(data);
             }
         }
 
@@ -137,8 +133,8 @@ mod tests {
     #[tokio::test]
     async fn test_execute_format() -> anyhow::Result<()> {
         let mut configuration = Configuration {
+            color: false,
             locale: Locale::en,
-            color_mode: ColorMode::Disabled,
             ..Default::default()
         };
         let results = Execute(42);
@@ -152,8 +148,8 @@ mod tests {
     #[tokio::test]
     async fn test_query_format_no_rows() -> anyhow::Result<()> {
         let mut configuration = Configuration {
+            color: false,
             locale: Locale::en,
-            color_mode: ColorMode::Disabled,
             ..Default::default()
         };
         let results = query_result_no_rows();
@@ -173,8 +169,8 @@ mod tests {
     #[tokio::test]
     async fn test_query_format_footer_no_timer() -> anyhow::Result<()> {
         let mut configuration = Configuration {
+            color: false,
             locale: Locale::en,
-            color_mode: ColorMode::Disabled,
             results_footer: true,
             results_timer: false,
             ..Default::default()
@@ -196,8 +192,8 @@ mod tests {
     #[tokio::test]
     async fn test_query_format_two_rows_without_color() -> anyhow::Result<()> {
         let mut configuration = Configuration {
+            color: false,
             locale: Locale::en,
-            color_mode: ColorMode::Disabled,
             ..Default::default()
         };
         let results = query_result_two_rows();
@@ -220,8 +216,8 @@ mod tests {
     #[tokio::test]
     async fn test_query_format_two_rows_with_color() -> anyhow::Result<()> {
         let mut configuration = Configuration {
+            color: true,
             locale: Locale::en,
-            color_mode: ColorMode::Forced,
             ..Default::default()
         };
         let results = query_result_two_rows();
@@ -238,8 +234,8 @@ mod tests {
     #[tokio::test]
     async fn test_query_format_no_header_and_no_footer() -> anyhow::Result<()> {
         let mut configuration = Configuration {
+            color: false,
             locale: Locale::en,
-            color_mode: ColorMode::Disabled,
             results_header: false,
             results_footer: false,
             ..Default::default()
