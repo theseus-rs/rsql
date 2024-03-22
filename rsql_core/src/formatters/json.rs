@@ -2,9 +2,10 @@ use crate::drivers::Value;
 use crate::formatters::error::Result;
 use crate::formatters::footer::write_footer;
 use crate::formatters::formatter::FormatterOptions;
+use crate::formatters::Highlighter;
 use async_trait::async_trait;
 use indexmap::IndexMap;
-use serde_json::json;
+use serde_json::{json, to_string_pretty};
 
 /// A formatter for JSON
 #[derive(Debug, Default)]
@@ -27,21 +28,15 @@ pub(crate) async fn format_json(options: &mut FormatterOptions<'_>, jsonl: bool)
         _ => return write_footer(options).await,
     };
 
-    if !jsonl {
-        write!(options.output, "[")?;
-    }
-
+    let highlighter = Highlighter::new(options.configuration, "json");
+    let mut json_rows: Vec<IndexMap<&String, Option<Value>>> = Vec::new();
     let columns: Vec<String> = query_result.columns().await;
     let rows = query_result.rows().await;
     for (i, row) in rows.iter().enumerate() {
         let mut json_row: IndexMap<&String, Option<Value>> = IndexMap::new();
 
-        if i > 0 {
-            if jsonl {
-                writeln!(options.output)?;
-            } else {
-                writeln!(options.output, ",")?;
-            }
+        if i > 0 && jsonl {
+            writeln!(options.output)?;
         }
 
         for (c, data) in row.iter().enumerate() {
@@ -60,16 +55,20 @@ pub(crate) async fn format_json(options: &mut FormatterOptions<'_>, jsonl: bool)
                 }
             }
         }
-        let json = json!(json_row);
-        write!(options.output, "{}", json)?;
+        if !jsonl {
+            json_rows.push(json_row);
+        } else {
+            let json = json!(json_row).to_string();
+            write!(options.output, "{}", highlighter.highlight(json.as_str())?)?;
+        }
     }
 
-    if jsonl {
-        writeln!(options.output)?;
-    } else {
-        writeln!(options.output, "]")?;
+    if !jsonl {
+        let json = to_string_pretty(&json!(json_rows))?;
+        write!(options.output, "{}", highlighter.highlight(json.as_str())?)?;
     }
 
+    writeln!(options.output)?;
     write_footer(options).await
 }
 
@@ -136,9 +135,20 @@ mod test {
 
         let output = String::from_utf8(output.get_ref().to_vec())?.replace("\r\n", "\n");
         let expected = indoc! {r#"
-          [{"id":1,"data":"Ynl0ZXM="},
-          {"id":2,"data":"foo"},
-          {"id":3,"data":null}]
+          [
+            {
+              "id": 1,
+              "data": "Ynl0ZXM="
+            },
+            {
+              "id": 2,
+              "data": "foo"
+            },
+            {
+              "id": 3,
+              "data": null
+            }
+          ]
           3 rows (9ns)
         "#};
         assert_eq!(output, expected);

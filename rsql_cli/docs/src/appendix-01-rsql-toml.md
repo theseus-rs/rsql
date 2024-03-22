@@ -1,7 +1,7 @@
 ## Configuration File (rsql.toml)
 
 A default [rsql.toml](#rsqltoml-1) file will be created on startup if one does not already exist.
-This file is used to configure the behavior of the rsql CLI and will be written to `$HOME/.rsql` directory
+This file is used to configure the behavior of the rsql CLI and will be written to the `$HOME/.rsql` directory
 on Unix-like systems and `%APPDATA%\rsql` on Windows. The file is written in the [TOML](https://toml.io/en/) format.
 
 ### rsql.toml
