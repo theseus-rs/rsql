@@ -41,6 +41,12 @@ impl<'a> Executor<'a> {
     }
 
     pub async fn execute(&mut self, input: &str) -> Result<LoopCondition> {
+        let input = input.trim();
+
+        if input.is_empty() {
+            return Ok(LoopCondition::Continue);
+        }
+
         if self.configuration.echo {
             writeln!(&mut self.output, "{}", input)?;
         }
@@ -116,6 +122,31 @@ mod tests {
         assert!(debug.contains("driver_manager"));
         assert!(debug.contains("formatter_manager"));
         assert!(debug.contains("connection"));
+    }
+
+    #[tokio::test]
+    async fn test_execute_empty_input() -> anyhow::Result<()> {
+        let mut configuration = Configuration::default();
+        let command_manager = CommandManager::default();
+        let driver_manager = DriverManager::default();
+        let formatter_manager = FormatterManager::default();
+        let history = DefaultHistory::new();
+        let mut connection = MockConnection::new();
+        let mut output: Vec<u8> = Vec::new();
+
+        let mut executor = Executor::new(
+            &mut configuration,
+            &command_manager,
+            &driver_manager,
+            &formatter_manager,
+            &history,
+            &mut connection,
+            &mut output,
+        );
+
+        let result = executor.execute("   ").await?;
+        assert_eq!(result, LoopCondition::Continue);
+        Ok(())
     }
 
     async fn test_execute_command(echo: bool) -> anyhow::Result<()> {
