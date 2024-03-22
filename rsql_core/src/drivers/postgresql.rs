@@ -5,6 +5,7 @@ use crate::drivers::Error::UnsupportedColumnType;
 use crate::drivers::{MemoryQueryResult, Results};
 use async_trait::async_trait;
 use bit_vec::BitVec;
+use chrono::Utc;
 use postgresql_archive::Version;
 use postgresql_embedded::{PostgreSQL, Settings};
 use sqlx::postgres::{PgColumn, PgConnectOptions, PgRow};
@@ -197,6 +198,10 @@ impl Connection {
                 }
                 // "interval" => Ok(None), // TODO: SELECT CAST('1 year' as interval)
                 // "money" => Ok(None), // TODO: SELECT CAST(1.23 as money)
+                "timestamptz" => {
+                    let value: Option<chrono::DateTime<Utc>> = row.try_get(column_name)?;
+                    Ok(value.map(|v| Value::DateTime(v.naive_utc())))
+                }
                 "void" => Ok(None), // pg_sleep() returns void
                 _ => Err(UnsupportedColumnType {
                     column_name: column_name.to_string(),
@@ -213,7 +218,7 @@ impl Connection {
 mod test {
     use crate::configuration::Configuration;
     use crate::drivers::{DriverManager, Results, Value};
-    use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
+    use chrono::{NaiveDate, NaiveDateTime, NaiveTime, Utc};
     use serde_json::json;
 
     const DATABASE_URL: &str = "postgresql::embedded:";
@@ -411,6 +416,16 @@ mod test {
         let value = result.expect("value is None");
         let time = NaiveDateTime::parse_from_str("1983-01-01 01:23:45", "%Y-%m-%d %H:%M:%S")?;
         assert_eq!(value, Value::DateTime(time));
+
+        let now = Utc::now().naive_utc();
+        let result = test_data_type("SELECT now()").await?;
+        let value = result.expect("value is None");
+        if let Value::DateTime(value) = value {
+            assert!(value > now);
+        } else {
+            assert!(false);
+        }
+
         Ok(())
     }
 
