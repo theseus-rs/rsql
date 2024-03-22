@@ -43,7 +43,8 @@ impl<'a> CommandExecutor<'a> {
     /// Execute the command and return the loop condition.
     pub(crate) async fn execute(&mut self, command: &str) -> Result<LoopCondition> {
         let input: Vec<&str> = command.split_whitespace().collect();
-        let command_name = &input[0][1..input[0].len()];
+        let command_identifier = &self.configuration.command_identifier;
+        let command_name = &input[0][command_identifier.len()..input[0].len()];
 
         let loop_condition = match &self.command_manager.get(command_name) {
             Some(command) => {
@@ -139,10 +140,10 @@ mod tests {
         assert!(result.is_err());
     }
 
-    #[tokio::test]
-    async fn test_execute() -> anyhow::Result<()> {
+    async fn test_execute(command_identifier: &str) -> anyhow::Result<()> {
         let mut configuration = Configuration {
             bail_on_error: false,
+            command_identifier: command_identifier.to_string(),
             ..Default::default()
         };
         let command_manager = CommandManager::default();
@@ -162,9 +163,25 @@ mod tests {
             output,
         );
 
-        let result = executor.execute(".bail on").await?;
+        let command = format!("{command_identifier}bail on");
+        let result = executor.execute(command.as_str()).await?;
         assert_eq!(result, LoopCondition::Continue);
         assert_eq!(configuration.bail_on_error, true);
         Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_execute_default_command_identifier() -> anyhow::Result<()> {
+        test_execute(".").await
+    }
+
+    #[tokio::test]
+    async fn test_execute_backslash_command_identifier() -> anyhow::Result<()> {
+        test_execute("\\").await
+    }
+
+    #[tokio::test]
+    async fn test_execute_multiple_character_command_identifier() -> anyhow::Result<()> {
+        test_execute("!!").await
     }
 }

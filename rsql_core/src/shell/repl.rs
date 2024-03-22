@@ -6,7 +6,6 @@ use crate::formatters::FormatterManager;
 use crate::shell::helper::ReplHelper;
 use crate::shell::Result;
 use crate::shell::ShellArgs;
-use crate::version::full_version;
 use colored::Colorize;
 use regex::Regex;
 use rustyline::config::Configurer;
@@ -127,7 +126,9 @@ impl Shell {
     }
 
     async fn parse_commands(&mut self, contents: String) -> Result<Vec<String>> {
-        let regex = Regex::new(r"(?ms)^\s*(\..*?|.*?;)\s*$")?;
+        let command_identifier = regex::escape(&self.configuration.command_identifier);
+        let pattern = format!(r"(?ms)^\s*({}.*?|.*?;)\s*$", command_identifier);
+        let regex = Regex::new(pattern.as_str())?;
         let commands: Vec<String> = regex
             .find_iter(contents.as_str())
             .map(|mat| mat.as_str().trim().to_string())
@@ -187,12 +188,6 @@ impl Shell {
             }
         }
 
-        eprintln!("{}", full_version(&self.configuration));
-        eprintln!(
-            "Type '{}' for help, '{}' to exit.",
-            ".help".bold(),
-            ".quit".bold()
-        );
         let prompt = format!("{}> ", self.configuration.program_name);
 
         loop {
@@ -362,7 +357,7 @@ mod test {
     }
 
     #[tokio::test]
-    async fn test_parse_commands() -> anyhow::Result<()> {
+    async fn test_parse_commands_default_command_identifier() -> anyhow::Result<()> {
         let mut shell = Shell::default();
         let contents = indoc! {r#"
             .bail on
@@ -380,6 +375,34 @@ mod test {
         assert_eq!(commands[2], ".timer on");
         assert_eq!(commands[3], "INSERT INTO table ...;");
         assert_eq!(commands[4], ".exit 1");
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_parse_commands_backslash_command_identifier() -> anyhow::Result<()> {
+        let configuration = Configuration {
+            command_identifier: "\\".to_string(),
+            ..Default::default()
+        };
+        let mut shell = ShellBuilder::new()
+            .with_configuration(configuration)
+            .build();
+        let contents = indoc! {r#"
+            \bail on
+            SELECT *
+            FROM table;
+            \timer on
+            INSERT INTO table ...;
+            \exit 1
+        "#};
+        let commands = shell.parse_commands(contents.to_string()).await?;
+
+        assert_eq!(commands.len(), 5);
+        assert_eq!(commands[0], "\\bail on");
+        assert_eq!(commands[1], "SELECT *\nFROM table;");
+        assert_eq!(commands[2], "\\timer on");
+        assert_eq!(commands[3], "INSERT INTO table ...;");
+        assert_eq!(commands[4], "\\exit 1");
         Ok(())
     }
 

@@ -18,13 +18,6 @@
       "path": "./docs"
     }
   },
-  "marketing": {
-    "analytics": {
-      "google": {
-        "tracking_id": "G-EGY7KD098M"
-      }
-    }
-  },
   "styles": {
     "favicon": "rsql_cli/resources/rsql.ico",
     "logo": "resources/rsql.jpg",

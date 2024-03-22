@@ -77,6 +77,13 @@ impl ConfigurationBuilder {
         self
     }
 
+    /// Set the command identifier value.
+    #[allow(dead_code)]
+    pub fn with_command_identifier<S: Into<String>>(mut self, command_identifier: S) -> Self {
+        self.configuration.command_identifier = command_identifier.into();
+        self
+    }
+
     /// Set the echo value.
     #[allow(dead_code)]
     pub fn with_echo(mut self, echo: bool) -> Self {
@@ -233,6 +240,7 @@ pub struct Configuration {
     pub version: String,
     pub config_dir: Option<PathBuf>,
     pub bail_on_error: bool,
+    pub command_identifier: String,
     pub echo: bool,
     pub log_level: LevelFilter,
     pub log_dir: Option<PathBuf>,
@@ -258,6 +266,7 @@ impl Default for Configuration {
             version: String::new(),
             config_dir: None,
             bail_on_error: false,
+            command_identifier: ".".to_string(),
             echo: false,
             log_level: LevelFilter::OFF,
             log_dir: None,
@@ -329,10 +338,13 @@ impl ConfigFile {
         let config = &self.config;
         let config_dir = &self.config_dir;
 
-        if let Ok(bail_on_error) = config.get::<bool>("general.bail_on_error") {
+        if let Ok(bail_on_error) = config.get::<bool>("global.bail_on_error") {
             configuration.bail_on_error = bail_on_error;
         }
-        if let Ok(echo) = config.get::<bool>("general.echo") {
+        if let Ok(command_identifier) = config.get::<String>("global.command_identifier") {
+            configuration.command_identifier = command_identifier;
+        }
+        if let Ok(echo) = config.get::<bool>("global.echo") {
             configuration.echo = echo;
         }
 
@@ -437,6 +449,7 @@ mod test {
         let program_name = "test";
         let version = "1.2.3";
         let bail_on_error = true;
+        let command_identifier = "\\";
         let echo = true;
         let log_level = LevelFilter::OFF;
         let log_dir = ".rsql/logs";
@@ -456,6 +469,7 @@ mod test {
 
         let configuration = ConfigurationBuilder::new(program_name, version)
             .with_bail_on_error(bail_on_error)
+            .with_command_identifier(command_identifier)
             .with_echo(echo)
             .with_log_level(log_level)
             .with_log_dir(log_dir)
@@ -477,6 +491,7 @@ mod test {
         assert_eq!(configuration.program_name, program_name);
         assert_eq!(configuration.version, version);
         assert_eq!(configuration.bail_on_error, bail_on_error);
+        assert_eq!(configuration.command_identifier, command_identifier);
         assert_eq!(configuration.echo, echo);
         assert_eq!(configuration.log_level, log_level);
         assert_eq!(configuration.log_dir.unwrap().to_string_lossy(), log_dir);

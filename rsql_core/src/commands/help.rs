@@ -20,10 +20,11 @@ impl ShellCommand for Command {
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
         let output = options.output;
+        let command_identifier = &options.configuration.command_identifier;
         let command_manager = options.command_manager;
         let width = command_manager
             .iter()
-            .map(|command| command.name().len() + command.args().len() + 1)
+            .map(|command| command_identifier.len() + command.name().len() + command.args().len())
             .max()
             .unwrap_or_default();
 
@@ -38,7 +39,7 @@ impl ShellCommand for Command {
             writeln!(
                 output,
                 "{}{}  {}",
-                format!(".{name}").bold(),
+                format!("{command_identifier}{name}").bold(),
                 args.dimmed(),
                 command.description(),
             )?;
@@ -57,17 +58,21 @@ mod tests {
     use crate::formatters::FormatterManager;
     use rustyline::history::DefaultHistory;
 
-    #[tokio::test]
-    async fn test_execute() -> anyhow::Result<()> {
+    async fn test_execute(command_identifier: &str) -> anyhow::Result<()> {
+        let mut configuration = Configuration {
+            command_identifier: command_identifier.to_string(),
+            ..Default::default()
+        };
         let mut output = Vec::new();
+        let command = format!("{command_identifier}help");
         let options = CommandOptions {
-            configuration: &mut Configuration::default(),
+            configuration: &mut configuration,
             command_manager: &CommandManager::default(),
             driver_manager: &DriverManager::default(),
             formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".help"],
+            input: vec![command.as_str()],
             output: &mut output,
         };
 
@@ -75,7 +80,17 @@ mod tests {
 
         assert_eq!(result, LoopCondition::Continue);
         let help_output = String::from_utf8(output)?;
-        assert!(help_output.contains(".help"));
+        assert!(help_output.contains(command.as_str()));
         Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_execute_postgresql_identifier() -> anyhow::Result<()> {
+        test_execute("\\").await
+    }
+
+    #[tokio::test]
+    async fn test_execute_sqlite_identifier() -> anyhow::Result<()> {
+        test_execute(".").await
     }
 }

@@ -22,6 +22,12 @@ The following is an example of a `rsql.toml` file:
 #   false - continue processing after the first error
 bail_on_error = false
 
+# The string used to initiate a command.
+#
+# This is used to determine if a line is a command or not. For example, if the command identifier
+# is set to ".", then any line that starts with a "." will be considered a command.
+command_identifier = "."
+
 # Indicate if executed commands should be echoed to the defined output.
 #
 # Possible values:
