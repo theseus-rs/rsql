@@ -1,9 +1,11 @@
 use crate::commands::error::Result;
 use crate::commands::{
-    bail, clear, echo, exit, footer, format, header, help, history, locale, quit, tables, timer,
+    bail, clear, drivers, echo, exit, footer, format, header, help, history, locale, quit, tables,
+    timer,
 };
 use crate::configuration::Configuration;
-use crate::drivers::Connection;
+use crate::drivers::{Connection, DriverManager};
+use crate::formatters::FormatterManager;
 use async_trait::async_trait;
 use rustyline::history::DefaultHistory;
 use std::collections::BTreeMap;
@@ -24,6 +26,8 @@ pub enum LoopCondition {
 pub struct CommandOptions<'a> {
     pub configuration: &'a mut Configuration,
     pub command_manager: &'a CommandManager,
+    pub driver_manager: &'a DriverManager,
+    pub formatter_manager: &'a FormatterManager,
     pub history: &'a DefaultHistory,
     pub connection: &'a mut dyn Connection,
     pub input: Vec<&'a str>,
@@ -35,6 +39,8 @@ impl Debug for CommandOptions<'_> {
         f.debug_struct("CommandOptions")
             .field("configuration", &self.configuration)
             .field("command_manager", &self.command_manager)
+            .field("driver_manager", &self.driver_manager)
+            .field("formatter_manager", &self.formatter_manager)
             .field("connection", &self.connection)
             .field("input", &self.input)
             .finish()
@@ -94,6 +100,7 @@ impl Default for CommandManager {
 
         commands.add(Box::new(bail::Command));
         commands.add(Box::new(clear::Command));
+        commands.add(Box::new(drivers::Command));
         commands.add(Box::new(echo::Command));
         commands.add(Box::new(exit::Command));
         commands.add(Box::new(footer::Command));
@@ -118,8 +125,10 @@ mod tests {
     #[test]
     fn test_debug() {
         let options = CommandOptions {
-            command_manager: &Default::default(),
             configuration: &mut Configuration::default(),
+            command_manager: &CommandManager::default(),
+            driver_manager: &DriverManager::default(),
+            formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &Default::default(),
             input: vec!["42"],
@@ -130,6 +139,8 @@ mod tests {
         assert!(debug.contains("CommandOptions"));
         assert!(debug.contains("configuration"));
         assert!(debug.contains("command_manager"));
+        assert!(debug.contains("driver_manager"));
+        assert!(debug.contains("formatter_manager"));
         assert!(debug.contains("connection"));
         assert!(debug.contains("input"));
         assert!(debug.contains("42"));
@@ -159,6 +170,6 @@ mod tests {
     fn test_command_manager_default() {
         let command_manager = CommandManager::default();
 
-        assert_eq!(command_manager.commands.len(), 13);
+        assert_eq!(command_manager.commands.len(), 14);
     }
 }

@@ -34,7 +34,8 @@ mod tests {
     use crate::commands::LoopCondition;
     use crate::commands::{CommandManager, CommandOptions};
     use crate::configuration::Configuration;
-    use crate::drivers::MockConnection;
+    use crate::drivers::{DriverManager, MockConnection};
+    use crate::formatters::FormatterManager;
     use rustyline::history::{DefaultHistory, History};
     use std::default::Default;
 
@@ -49,8 +50,10 @@ mod tests {
 
         let mut output = Vec::new();
         let options = CommandOptions {
-            command_manager: &CommandManager::default(),
             configuration,
+            command_manager: &CommandManager::default(),
+            driver_manager: &DriverManager::default(),
+            formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &history,
             input: vec![".history"],
@@ -76,8 +79,10 @@ mod tests {
 
         let mut output = Vec::new();
         let options = CommandOptions {
-            command_manager: &CommandManager::default(),
             configuration,
+            command_manager: &CommandManager::default(),
+            driver_manager: &DriverManager::default(),
+            formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &history,
             input: vec![".history"],

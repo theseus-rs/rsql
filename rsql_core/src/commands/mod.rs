@@ -1,6 +1,7 @@
 mod bail;
 mod clear;
 mod command;
+mod drivers;
 mod echo;
 mod error;
 mod exit;
