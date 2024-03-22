@@ -203,6 +203,7 @@ impl Shell {
         };
 
         loop {
+            // Create a new editor for each iteration in order to read any changes to the configuration.
             let mut editor = self.editor(history_file.as_str())?;
             let prompt = format!("{}> ", self.configuration.program_name);
 
