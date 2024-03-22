@@ -17,12 +17,11 @@ impl Highlighter for ReplHelper {
 mod test {
     use super::*;
     use crate::configuration::Configuration;
-    use rustyline::ColorMode;
 
     #[test]
     fn test_highlight_color_disabled() {
         let configuration = Configuration {
-            color_mode: ColorMode::Disabled,
+            color: false,
             ..Default::default()
         };
         let helper = ReplHelper::new(&configuration);
@@ -34,7 +33,7 @@ mod test {
     #[test]
     fn test_highlight_color_forced() {
         let configuration = Configuration {
-            color_mode: ColorMode::Forced,
+            color: true,
             ..Default::default()
         };
         let helper = ReplHelper::new(&configuration);

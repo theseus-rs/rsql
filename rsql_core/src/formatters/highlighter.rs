@@ -1,7 +1,6 @@
 use crate::configuration::Configuration;
 use crate::formatters::Result;
 use ansi_colours::ansi256_from_rgb;
-use rustyline::ColorMode;
 use std::borrow::Cow;
 use std::fmt::Write;
 use supports_color::Stream;
@@ -14,7 +13,7 @@ const RESET: &str = "\x1b[0m";
 
 #[derive(Debug)]
 pub struct Highlighter {
-    color_mode: ColorMode,
+    color: bool,
     syntax_set: SyntaxSet,
     syntax: SyntaxReference,
     theme: Theme,
@@ -22,7 +21,7 @@ pub struct Highlighter {
 
 impl Highlighter {
     pub fn new(configuration: &Configuration, syntax_name: &str) -> Self {
-        let color_mode = configuration.color_mode;
+        let color = configuration.color;
         let syntax_set = SyntaxSet::load_defaults_newlines();
         let syntax = syntax_set
             .find_syntax_by_extension(syntax_name)
@@ -37,7 +36,7 @@ impl Highlighter {
             .to_owned();
 
         Self {
-            color_mode,
+            color,
             syntax_set,
             syntax,
             theme,
@@ -45,7 +44,7 @@ impl Highlighter {
     }
 
     pub fn highlight<'l>(&self, content: &'l str) -> Result<Cow<'l, str>> {
-        if self.color_mode == ColorMode::Disabled {
+        if !self.color {
             return Ok(content.into());
         }
 
@@ -90,12 +89,11 @@ impl Highlighter {
 mod test {
     use super::*;
     use crate::configuration::Configuration;
-    use rustyline::ColorMode;
 
     #[test]
     fn test_highlight_color_disabled() {
         let configuration = Configuration {
-            color_mode: ColorMode::Disabled,
+            color: false,
             ..Default::default()
         };
         let helper = Highlighter::new(&configuration, "sql");
@@ -107,7 +105,7 @@ mod test {
     #[test]
     fn test_highlight_color_forced() {
         let configuration = Configuration {
-            color_mode: ColorMode::Forced,
+            color: true,
             ..Default::default()
         };
         let helper = Highlighter::new(&configuration, "sql");

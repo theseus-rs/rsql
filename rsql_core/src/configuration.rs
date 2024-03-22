@@ -3,7 +3,7 @@ use config::{Config, FileFormat};
 use dirs::home_dir;
 use indicatif::ProgressStyle;
 use num_format::Locale;
-use rustyline::{ColorMode, EditMode};
+use rustyline::EditMode;
 use std::env;
 use std::fs::{create_dir_all, OpenOptions};
 use std::io::Write;
@@ -77,6 +77,13 @@ impl ConfigurationBuilder {
         self
     }
 
+    /// Set the color value.
+    #[allow(dead_code)]
+    pub fn with_color(mut self, color: bool) -> Self {
+        self.configuration.color = color;
+        self
+    }
+
     /// Set the command identifier value.
     #[allow(dead_code)]
     pub fn with_command_identifier<S: Into<String>>(mut self, command_identifier: S) -> Self {
@@ -116,13 +123,6 @@ impl ConfigurationBuilder {
     #[allow(dead_code)]
     pub fn with_locale(mut self, locale: Locale) -> Self {
         self.configuration.locale = locale;
-        self
-    }
-
-    /// Set the color mode to use.
-    #[allow(dead_code)]
-    pub fn with_color_mode(mut self, color_mode: ColorMode) -> Self {
-        self.configuration.color_mode = color_mode;
         self
     }
 
@@ -240,13 +240,13 @@ pub struct Configuration {
     pub version: String,
     pub config_dir: Option<PathBuf>,
     pub bail_on_error: bool,
+    pub color: bool,
     pub command_identifier: String,
     pub echo: bool,
     pub log_level: LevelFilter,
     pub log_dir: Option<PathBuf>,
     pub log_rotation: Rotation,
     pub locale: Locale,
-    pub color_mode: ColorMode,
     pub edit_mode: EditMode,
     pub history: bool,
     pub history_file: Option<PathBuf>,
@@ -266,13 +266,13 @@ impl Default for Configuration {
             version: String::new(),
             config_dir: None,
             bail_on_error: false,
+            color: true,
             command_identifier: ".".to_string(),
             echo: false,
             log_level: LevelFilter::OFF,
             log_dir: None,
             log_rotation: Rotation::DAILY,
             locale: Locale::en,
-            color_mode: ColorMode::Forced,
             edit_mode: EditMode::Emacs,
             history: false,
             history_file: None,
@@ -340,6 +340,9 @@ impl ConfigFile {
 
         if let Ok(bail_on_error) = config.get::<bool>("global.bail_on_error") {
             configuration.bail_on_error = bail_on_error;
+        }
+        if let Ok(color) = config.get::<bool>("global.color") {
+            configuration.color = color;
         }
         if let Ok(command_identifier) = config.get::<String>("global.command_identifier") {
             configuration.command_identifier = command_identifier;
@@ -449,13 +452,13 @@ mod test {
         let program_name = "test";
         let version = "1.2.3";
         let bail_on_error = true;
+        let color = true;
         let command_identifier = "\\";
         let echo = true;
         let log_level = LevelFilter::OFF;
         let log_dir = ".rsql/logs";
         let log_rotation = Rotation::MINUTELY;
         let locale = Locale::es;
-        let color_mode = ColorMode::Disabled;
         let edit_mode = EditMode::Vi;
         let history = true;
         let history_file = ".rsql/history.txt";
@@ -469,13 +472,13 @@ mod test {
 
         let configuration = ConfigurationBuilder::new(program_name, version)
             .with_bail_on_error(bail_on_error)
+            .with_color(color)
             .with_command_identifier(command_identifier)
             .with_echo(echo)
             .with_log_level(log_level)
             .with_log_dir(log_dir)
             .with_log_rotation(log_rotation.clone())
             .with_locale(locale)
-            .with_color_mode(color_mode)
             .with_edit_mode(edit_mode)
             .with_history(history)
             .with_history_file(history_file)
@@ -491,13 +494,13 @@ mod test {
         assert_eq!(configuration.program_name, program_name);
         assert_eq!(configuration.version, version);
         assert_eq!(configuration.bail_on_error, bail_on_error);
+        assert_eq!(configuration.color, color);
         assert_eq!(configuration.command_identifier, command_identifier);
         assert_eq!(configuration.echo, echo);
         assert_eq!(configuration.log_level, log_level);
         assert_eq!(configuration.log_dir.unwrap().to_string_lossy(), log_dir);
         assert_eq!(configuration.log_rotation, log_rotation);
         assert_eq!(configuration.locale, locale);
-        assert_eq!(configuration.color_mode, color_mode);
         assert_eq!(configuration.edit_mode, edit_mode);
         assert_eq!(configuration.history, history);
         assert_eq!(
@@ -520,12 +523,12 @@ mod test {
         assert!(configuration.version.is_empty());
         assert_eq!(configuration.config_dir, None);
         assert_eq!(configuration.bail_on_error, false);
-        assert_eq!(configuration.echo, false);
+        assert_eq!(configuration.color, true);
+        assert_eq!(configuration.command_identifier, ".");
         assert_eq!(configuration.log_level, LevelFilter::OFF);
         assert_eq!(configuration.log_dir, None);
         assert_eq!(configuration.log_rotation, Rotation::DAILY);
         assert_eq!(configuration.locale, Locale::en);
-        assert_eq!(configuration.color_mode, ColorMode::Forced);
         assert_eq!(configuration.edit_mode, EditMode::Emacs);
         assert_eq!(configuration.history, false);
         assert_eq!(configuration.history_file, None);

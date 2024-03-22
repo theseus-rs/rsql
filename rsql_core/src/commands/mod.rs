@@ -1,5 +1,6 @@
 mod bail;
 mod clear;
+mod color;
 mod command;
 mod drivers;
 mod echo;

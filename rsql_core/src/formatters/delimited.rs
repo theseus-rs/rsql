@@ -44,13 +44,12 @@ mod test {
     use crate::drivers::Value;
     use crate::formatters::formatter::FormatterOptions;
     use indoc::indoc;
-    use rustyline::ColorMode;
     use std::io::Cursor;
 
     #[tokio::test]
     async fn test_format_execute() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
-            color_mode: ColorMode::Disabled,
+            color: false,
             ..Default::default()
         };
         let output = &mut Cursor::new(Vec::new());
@@ -72,7 +71,7 @@ mod test {
     #[tokio::test]
     async fn test_format_query_no_header_no_footer() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
-            color_mode: ColorMode::Disabled,
+            color: false,
             results_header: false,
             results_footer: false,
             ..Default::default()
@@ -105,7 +104,7 @@ mod test {
     #[tokio::test]
     async fn test_format_query() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
-            color_mode: ColorMode::Disabled,
+            color: false,
             ..Default::default()
         };
         let query_result = Query(Box::new(MemoryQueryResult::new(
