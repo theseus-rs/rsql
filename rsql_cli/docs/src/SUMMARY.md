@@ -25,4 +25,4 @@
 
 - [Appendix](appendix-00.md)
     - [A - Configuration File (rsql.toml)](appendix-01-rsql-toml.md)
-    - [B - Supported Locales](appendix-02-supported-locales-toml.md)
+    - [B - Supported Locales](appendix-02-supported-locales.md)
