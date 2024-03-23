@@ -1,6 +1,7 @@
 use crate::commands::Error::InvalidOption;
 use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use async_trait::async_trait;
+use rust_i18n::t;
 
 /// Command to enable or disable echoing commands
 #[derive(Debug, Default)]
@@ -8,26 +9,31 @@ pub(crate) struct Command;
 
 #[async_trait]
 impl ShellCommand for Command {
-    fn name(&self) -> &'static str {
-        "echo"
+    fn name(&self, locale: &str) -> String {
+        t!("echo_command", locale = locale).to_string()
     }
 
-    fn args(&self) -> &'static str {
-        "on|off"
+    fn args(&self, locale: &str) -> String {
+        let on = t!("on", locale = locale).to_string();
+        let off = t!("off", locale = locale).to_string();
+        t!("on_off_argument", locale = locale, on = on, off = off).to_string()
     }
 
-    fn description(&self) -> &'static str {
-        "Enable or disable echoing commands"
+    fn description(&self, locale: &str) -> String {
+        t!("echo_description", locale = locale).to_string()
     }
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
+        let locale = options.configuration.locale.as_str();
+
         if options.input.len() <= 1 {
             let echo = if options.configuration.echo {
                 "on"
             } else {
                 "off"
             };
-            writeln!(options.output, "Echo: {echo}")?;
+            let echo_setting = t!("echo_setting", locale = locale, echo = echo).to_string();
+            writeln!(options.output, "{}", echo_setting)?;
             return Ok(LoopCondition::Continue);
         }
 
@@ -36,7 +42,7 @@ impl ShellCommand for Command {
             "off" => false,
             option => {
                 return Err(InvalidOption {
-                    command_name: self.name().to_string(),
+                    command_name: self.name(locale).to_string(),
                     option: option.to_string(),
                 })
             }

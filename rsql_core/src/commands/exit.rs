@@ -1,5 +1,6 @@
 use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use async_trait::async_trait;
+use rust_i18n::t;
 use tracing::info;
 
 /// Exit the application
@@ -8,16 +9,16 @@ pub(crate) struct Command;
 
 #[async_trait]
 impl ShellCommand for Command {
-    fn name(&self) -> &'static str {
-        "exit"
+    fn name(&self, locale: &str) -> String {
+        t!("exit_command", locale = locale).to_string()
     }
 
-    fn args(&self) -> &'static str {
-        "[code]"
+    fn args(&self, locale: &str) -> String {
+        t!("exit_argument", locale = locale).to_string()
     }
 
-    fn description(&self) -> &'static str {
-        "Exit the application"
+    fn description(&self, locale: &str) -> String {
+        t!("exit_description", locale = locale).to_string()
     }
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {

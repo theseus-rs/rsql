@@ -2,8 +2,9 @@ use crate::drivers::Results::{Execute, Query};
 use crate::formatters::error::Result;
 use crate::formatters::FormatterOptions;
 use colored::Colorize;
-use num_format::ToFormattedString;
+use num_format::{Locale, ToFormattedString};
 use std::io::Write;
+use std::str::FromStr;
 
 /// Display the footer of the result set.
 /// This includes the number of rows returned and the elapsed time.
@@ -22,30 +23,40 @@ pub async fn write_footer<'a>(options: &mut FormatterOptions<'a>) -> Result<()> 
         Execute(rows_affected) => *rows_affected,
         Query(query_result) => query_result.rows().await.len() as u64,
     };
-    let row_label = if rows_affected == 1 { "row" } else { "rows" };
+    let locale = &configuration.locale;
+    let num_locale = Locale::from_str(locale).unwrap_or(Locale::en);
+    let rows = rows_affected.to_formatted_string(&num_locale);
+    let rows_label = if rows_affected == 1 {
+        t!("row", locale = locale, rows = rows).to_string()
+    } else {
+        t!("rows", locale = locale, rows = rows).to_string()
+    };
     let elapsed_display = if configuration.results_timer {
-        format!("({:?})", options.elapsed)
+        let elapsed = format!("{:?}", options.elapsed);
+        t!("elapsed_format", locale = locale, elapsed = elapsed).to_string()
     } else {
         "".to_string()
     };
     let output = &mut options.output;
 
     if configuration.color {
-        writeln!(
-            output,
-            "{} {} {}",
-            rows_affected.to_formatted_string(&configuration.locale),
-            row_label,
-            elapsed_display.dimmed()
-        )?
+        let footer = t!(
+            "footer_format",
+            locale = locale,
+            rows = rows_label,
+            elapsed = elapsed_display.dimmed()
+        )
+        .to_string();
+        writeln!(output, "{}", footer)?
     } else {
-        writeln!(
-            output,
-            "{} {} {}",
-            rows_affected.to_formatted_string(&configuration.locale),
-            row_label,
-            elapsed_display
-        )?
+        let footer = t!(
+            "footer_format",
+            locale = locale,
+            rows = rows_label,
+            elapsed = elapsed_display
+        )
+        .to_string();
+        writeln!(output, "{}", footer)?
     }
 
     Ok(())

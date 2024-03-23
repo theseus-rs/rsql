@@ -8,7 +8,6 @@ use crate::drivers::{Connection, DriverManager};
 use crate::formatters::FormatterManager;
 use async_trait::async_trait;
 use rustyline::history::DefaultHistory;
-use std::collections::BTreeMap;
 use std::fmt::Debug;
 use std::io;
 
@@ -51,13 +50,13 @@ impl Debug for CommandOptions<'_> {
 #[async_trait]
 pub trait ShellCommand: Debug + Sync {
     /// Get the name of the command
-    fn name(&self) -> &'static str;
+    fn name(&self, locale: &str) -> String;
     /// Get the arguments for the command
-    fn args(&self) -> &'static str {
-        ""
+    fn args(&self, _locale: &str) -> String {
+        "".to_string()
     }
     /// Get the description of the command
-    fn description(&self) -> &'static str;
+    fn description(&self, locale: &str) -> String;
     /// Execute the command
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition>;
 }
@@ -65,31 +64,35 @@ pub trait ShellCommand: Debug + Sync {
 /// Manages the active commands
 #[derive(Debug)]
 pub struct CommandManager {
-    commands: BTreeMap<&'static str, Box<dyn ShellCommand>>,
+    commands: Vec<Box<dyn ShellCommand>>,
 }
 
 impl CommandManager {
     /// Create a new instance of the `CommandManager` struct
     pub fn new() -> Self {
         CommandManager {
-            commands: BTreeMap::new(),
+            commands: Vec::new(),
         }
     }
 
     /// Add a new command to the list of available commands
     fn add(&mut self, command: Box<dyn ShellCommand>) {
-        let name = command.name();
-        let _ = &self.commands.insert(name, command);
+        let _ = &self.commands.push(command);
     }
 
     /// Get a command by name
-    pub fn get(&self, name: &str) -> Option<&dyn ShellCommand> {
-        self.commands.get(name).map(|command| command.as_ref())
+    pub fn get(&self, locale: &str, name: &str) -> Option<&dyn ShellCommand> {
+        for command in &self.commands {
+            if command.name(locale) == name {
+                return Some(command.as_ref());
+            }
+        }
+        None
     }
 
     /// Get an iterator over the available commands
     pub(crate) fn iter(&self) -> impl Iterator<Item = &dyn ShellCommand> {
-        self.commands.values().map(|command| command.as_ref())
+        self.commands.iter().map(|command| command.as_ref())
     }
 }
 
@@ -110,9 +113,9 @@ impl Default for CommandManager {
         commands.add(Box::new(help::Command));
         commands.add(Box::new(history::Command));
         commands.add(Box::new(locale::Command));
+        commands.add(Box::new(quit::Command));
         commands.add(Box::new(tables::Command));
         commands.add(Box::new(timer::Command));
-        commands.add(Box::new(quit::Command));
 
         commands
     }
@@ -150,14 +153,15 @@ mod tests {
     #[test]
     fn test_commands() {
         let command = help::Command;
-        let command_name = command.name();
+        let locale = "en";
+        let command_name = command.name(locale);
         let mut command_manager = CommandManager::new();
         assert_eq!(command_manager.commands.len(), 0);
 
         command_manager.add(Box::new(help::Command));
 
         assert_eq!(command_manager.commands.len(), 1);
-        let result = command_manager.get(command_name);
+        let result = command_manager.get(locale, command_name.as_str());
         assert!(result.is_some());
 
         let mut command_count = 0;

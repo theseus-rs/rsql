@@ -2,6 +2,7 @@ use async_trait::async_trait;
 
 use crate::commands::Error::InvalidOption;
 use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
+use rust_i18n::t;
 
 /// Command to stop after an error occurs
 #[derive(Debug, Default)]
@@ -9,38 +10,46 @@ pub(crate) struct Command;
 
 #[async_trait]
 impl ShellCommand for Command {
-    fn name(&self) -> &'static str {
-        "bail"
+    fn name(&self, locale: &str) -> String {
+        t!("bail_command", locale = locale).to_string()
     }
 
-    fn args(&self) -> &'static str {
-        "on|off"
+    fn args(&self, locale: &str) -> String {
+        let on = t!("on", locale = locale).to_string();
+        let off = t!("off", locale = locale).to_string();
+        t!("on_off_argument", locale = locale, on = on, off = off).to_string()
     }
 
-    fn description(&self) -> &'static str {
-        "Stop after an error occurs"
+    fn description(&self, locale: &str) -> String {
+        t!("bail_description", locale = locale).to_string()
     }
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
+        let locale = options.configuration.locale.as_str();
+        let on = t!("on", locale = locale).to_string();
+        let off = t!("off", locale = locale).to_string();
+
         if options.input.len() <= 1 {
-            let bail_on_error = if options.configuration.bail_on_error {
-                "on"
+            let bail = if options.configuration.bail_on_error {
+                on
             } else {
-                "off"
+                off
             };
-            writeln!(options.output, "Bail on error: {bail_on_error}")?;
+            let bail_setting = t!("bail_setting", locale = locale, bail = bail).to_string();
+            writeln!(options.output, "{}", bail_setting)?;
             return Ok(LoopCondition::Continue);
         }
 
-        let bail_on_error = match options.input[1].to_lowercase().as_str() {
-            "on" => true,
-            "off" => false,
-            option => {
-                return Err(InvalidOption {
-                    command_name: self.name().to_string(),
-                    option: option.to_string(),
-                })
-            }
+        let argument = options.input[1].to_lowercase().to_string();
+        let bail_on_error = if argument == on {
+            true
+        } else if argument == off {
+            false
+        } else {
+            return Err(InvalidOption {
+                command_name: self.name(locale).to_string(),
+                option: argument,
+            });
         };
 
         options.configuration.bail_on_error = bail_on_error;

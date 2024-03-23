@@ -121,8 +121,8 @@ impl ConfigurationBuilder {
 
     /// Set the locale to use.
     #[allow(dead_code)]
-    pub fn with_locale(mut self, locale: Locale) -> Self {
-        self.configuration.locale = locale;
+    pub fn with_locale<S: Into<String>>(mut self, locale: S) -> Self {
+        self.configuration.locale = locale.into();
         self
     }
 
@@ -246,7 +246,7 @@ pub struct Configuration {
     pub log_level: LevelFilter,
     pub log_dir: Option<PathBuf>,
     pub log_rotation: Rotation,
-    pub locale: Locale,
+    pub locale: String,
     pub edit_mode: EditMode,
     pub history: bool,
     pub history_file: Option<PathBuf>,
@@ -272,7 +272,7 @@ impl Default for Configuration {
             log_level: LevelFilter::OFF,
             log_dir: None,
             log_rotation: Rotation::DAILY,
-            locale: Locale::en,
+            locale: "en".to_string(),
             edit_mode: EditMode::Emacs,
             history: false,
             history_file: None,
@@ -404,7 +404,7 @@ impl ConfigFile {
     }
 }
 
-fn get_locale(config: &Config) -> Locale {
+fn get_locale(config: &Config) -> String {
     let default_locale = sys_locale::get_locale().unwrap_or_else(|| String::from("en"));
     let locale = config.get("global.locale").unwrap_or(default_locale);
     let parts: Vec<&str> = locale
@@ -414,13 +414,13 @@ fn get_locale(config: &Config) -> Locale {
 
     for i in (0..parts.len()).rev() {
         let locale = parts[0..=i].join("-");
-        if let Ok(locale) = Locale::from_str(locale.as_str()) {
+        if Locale::from_str(locale.as_str()).is_ok() {
             return locale;
         }
     }
 
     warn!("Invalid locale: {locale}; defaulting to \"en\"");
-    Locale::en
+    "en".to_string()
 }
 
 fn theme(config: &Config) -> Result<String> {
@@ -458,7 +458,7 @@ mod test {
         let log_level = LevelFilter::OFF;
         let log_dir = ".rsql/logs";
         let log_rotation = Rotation::MINUTELY;
-        let locale = Locale::es;
+        let locale = "es";
         let edit_mode = EditMode::Vi;
         let history = true;
         let history_file = ".rsql/history.txt";
@@ -528,7 +528,7 @@ mod test {
         assert_eq!(configuration.log_level, LevelFilter::OFF);
         assert_eq!(configuration.log_dir, None);
         assert_eq!(configuration.log_rotation, Rotation::DAILY);
-        assert_eq!(configuration.locale, Locale::en);
+        assert_eq!(configuration.locale, "en".to_string());
         assert_eq!(configuration.edit_mode, EditMode::Emacs);
         assert_eq!(configuration.history, false);
         assert_eq!(configuration.history_file, None);
@@ -549,7 +549,7 @@ mod test {
             .add_source(config::Environment::with_prefix(prefix).separator("_"))
             .build()?;
         let locale = get_locale(&config);
-        assert_eq!(locale, Locale::de);
+        assert_eq!(locale, "de".to_string());
         Ok(())
     }
 
@@ -561,7 +561,7 @@ mod test {
             .add_source(config::Environment::with_prefix(prefix).separator("_"))
             .build()?;
         let locale = get_locale(&config);
-        assert_eq!(locale, Locale::en_GB);
+        assert_eq!(locale, "en-GB".to_string());
         Ok(())
     }
 
@@ -573,7 +573,7 @@ mod test {
             .add_source(config::Environment::with_prefix(prefix).separator("_"))
             .build()?;
         let locale = get_locale(&config);
-        assert_eq!(locale, Locale::en);
+        assert_eq!(locale, "en".to_string());
         Ok(())
     }
 }

@@ -1,6 +1,7 @@
 use crate::commands::Error::InvalidOption;
 use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use async_trait::async_trait;
+use rust_i18n::t;
 
 /// Command to set the results format
 #[derive(Debug, Default)]
@@ -8,19 +9,20 @@ pub(crate) struct Command;
 
 #[async_trait]
 impl ShellCommand for Command {
-    fn name(&self) -> &'static str {
-        "format"
+    fn name(&self, locale: &str) -> String {
+        t!("format_command", locale = locale).to_string()
     }
 
-    fn args(&self) -> &'static str {
-        "[format]"
+    fn args(&self, locale: &str) -> String {
+        t!("format_argument", locale = locale).to_string()
     }
 
-    fn description(&self) -> &'static str {
-        "Format results in ascii, csv, json, jsonl, tsv, unicode, xml, yaml"
+    fn description(&self, locale: &str) -> String {
+        t!("format_description", locale = locale).to_string()
     }
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
+        let locale = options.configuration.locale.as_str();
         let formatter_manager = options.formatter_manager;
 
         if options.input.len() <= 1 {
@@ -47,7 +49,7 @@ impl ShellCommand for Command {
             Some(_) => options.configuration.results_format = formatter_identifier,
             None => {
                 return Err(InvalidOption {
-                    command_name: self.name().to_string(),
+                    command_name: self.name(locale).to_string(),
                     option: formatter_identifier.to_string(),
                 })
             }

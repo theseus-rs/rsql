@@ -1,6 +1,7 @@
 use crate::commands::Error::InvalidOption;
 use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use async_trait::async_trait;
+use rust_i18n::t;
 
 /// Command to enable or disable result header
 #[derive(Debug, Default)]
@@ -8,38 +9,46 @@ pub(crate) struct Command;
 
 #[async_trait]
 impl ShellCommand for Command {
-    fn name(&self) -> &'static str {
-        "header"
+    fn name(&self, locale: &str) -> String {
+        t!("header_command", locale = locale).to_string()
     }
 
-    fn args(&self) -> &'static str {
-        "on|off"
+    fn args(&self, locale: &str) -> String {
+        let on = t!("on", locale = locale).to_string();
+        let off = t!("off", locale = locale).to_string();
+        t!("on_off_argument", locale = locale, on = on, off = off).to_string()
     }
 
-    fn description(&self) -> &'static str {
-        "Enable or disable result header"
+    fn description(&self, locale: &str) -> String {
+        t!("header_description", locale = locale).to_string()
     }
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
+        let locale = options.configuration.locale.as_str();
+        let on = t!("on", locale = locale).to_string();
+        let off = t!("off", locale = locale).to_string();
+
         if options.input.len() <= 1 {
             let header = if options.configuration.results_header {
-                "on"
+                on
             } else {
-                "off"
+                off
             };
-            writeln!(options.output, "Header: {header}")?;
+            let header_setting = t!("header_setting", locale = locale, header = header).to_string();
+            writeln!(options.output, "{}", header_setting)?;
             return Ok(LoopCondition::Continue);
         }
 
-        let header = match options.input[1].to_lowercase().as_str() {
-            "on" => true,
-            "off" => false,
-            option => {
-                return Err(InvalidOption {
-                    command_name: self.name().to_string(),
-                    option: option.to_string(),
-                })
-            }
+        let argument = options.input[1].to_lowercase().to_string();
+        let header = if argument == on {
+            true
+        } else if argument == off {
+            false
+        } else {
+            return Err(InvalidOption {
+                command_name: self.name(locale).to_string(),
+                option: argument,
+            });
         };
 
         options.configuration.results_header = header;

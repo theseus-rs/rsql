@@ -29,7 +29,7 @@ curl --proto '=https' --tlsv1.2 -LsSf https://github.com/theseus-rs/rsql/release
 irm https://github.com/theseus-rs/rsql/releases/latest/download/rsql_cli-installer.ps1 | iex
 ```
 
-For more information, and additional installations instructurs (cargo, homebrew, msi),
+For more information, and additional installations instructions (cargo, homebrew, msi),
 visit the [RSQL](https://theseus-rs.github.io/rsql/rsql_cli/) site.
 
 ## Quick Demo
