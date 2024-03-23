@@ -34,8 +34,7 @@ impl ShellCommand for Command {
             return Err(InvalidOption {
                 command_name: self.name(locale).to_string(),
                 option: locale.to_string(),
-            })
-            .into();
+            });
         }
         options.configuration.locale = new_locale.to_string();
 
