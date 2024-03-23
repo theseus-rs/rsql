@@ -93,13 +93,18 @@ mod tests {
     use crate::formatters::FormatterManager;
     use rustyline::history::DefaultHistory;
 
-    async fn test_execute(command_identifier: &str) -> anyhow::Result<()> {
+    async fn test_execute(
+        command_identifier: &str,
+        locale: &str,
+        command: &str,
+    ) -> anyhow::Result<()> {
         let mut configuration = Configuration {
             command_identifier: command_identifier.to_string(),
+            locale: locale.to_string(),
             ..Default::default()
         };
         let mut output = Vec::new();
-        let command = format!("{command_identifier}help");
+        let command = format!("{command_identifier}{command}");
         let options = CommandOptions {
             configuration: &mut configuration,
             command_manager: &CommandManager::default(),
@@ -121,11 +126,23 @@ mod tests {
 
     #[tokio::test]
     async fn test_execute_postgresql_identifier() -> anyhow::Result<()> {
-        test_execute("\\").await
+        test_execute("\\", "en", "help").await
     }
 
     #[tokio::test]
     async fn test_execute_sqlite_identifier() -> anyhow::Result<()> {
-        test_execute(".").await
+        test_execute(".", "en", "help").await
+    }
+
+    #[tokio::test]
+    async fn test_execute_rtl() -> anyhow::Result<()> {
+        test_execute(".", "ar-SA", "مساعدة").await
+    }
+
+    #[tokio::test]
+    async fn test_execute_cjk() -> anyhow::Result<()> {
+        test_execute(".", "ja-JP", "ヘルプ").await?;
+        test_execute(".", "ko-KR", "도움말").await?;
+        test_execute(".", "zh-CN", "帮助").await
     }
 }

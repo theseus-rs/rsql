@@ -36,11 +36,11 @@ impl ShellCommand for Command {
                 for (i, entry) in options.history.iter().enumerate() {
                     let num_locale = Locale::from_str(locale).unwrap_or(Locale::en);
                     let index = (i + 1).to_formatted_string(&num_locale);
-                    let entry = if options.configuration.color {
-                        entry.to_string().dimmed().to_string()
-                    } else {
-                        entry.to_string()
+                    let mut entry = entry.to_string();
+                    if options.configuration.color {
+                        entry = entry.dimmed().to_string()
                     };
+
                     let history_list_entry = t!(
                         "history_list_entry",
                         locale = locale,
@@ -93,6 +93,35 @@ mod tests {
     use std::default::Default;
 
     #[tokio::test]
+    async fn test_execute_history_no_args() -> anyhow::Result<()> {
+        let configuration = &mut Configuration {
+            history: true,
+            ..Default::default()
+        };
+        let mut history = DefaultHistory::new();
+        history.add("foo")?;
+
+        let mut output = Vec::new();
+        let options = CommandOptions {
+            configuration,
+            command_manager: &CommandManager::default(),
+            driver_manager: &DriverManager::default(),
+            formatter_manager: &FormatterManager::default(),
+            connection: &mut MockConnection::new(),
+            history: &history,
+            input: vec![".history"],
+            output: &mut output,
+        };
+
+        let result = Command.execute(options).await?;
+
+        assert_eq!(result, LoopCondition::Continue);
+        let history = String::from_utf8(output)?;
+        assert!(history.contains("foo"));
+        Ok(())
+    }
+
+    #[tokio::test]
     async fn test_execute_set_on() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
             history: false,
@@ -141,60 +170,20 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_execute_history_disabled() -> anyhow::Result<()> {
-        let configuration = &mut Configuration {
-            history: false,
-            ..Default::default()
-        };
-        let mut history = DefaultHistory::new();
-        history.add("foo")?;
-
-        let mut output = Vec::new();
+    async fn test_execute_invalid_option() {
         let options = CommandOptions {
-            configuration,
+            configuration: &mut Configuration::default(),
             command_manager: &CommandManager::default(),
             driver_manager: &DriverManager::default(),
             formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
-            history: &history,
-            input: vec![".history"],
-            output: &mut output,
+            history: &DefaultHistory::new(),
+            input: vec![".history", "foo"],
+            output: &mut Vec::new(),
         };
 
-        let result = Command.execute(options).await?;
+        let result = Command.execute(options).await;
 
-        assert_eq!(result, LoopCondition::Continue);
-        let history = String::from_utf8(output)?;
-        assert!(!history.contains("foo"));
-        Ok(())
-    }
-
-    #[tokio::test]
-    async fn test_execute_history_enabled() -> anyhow::Result<()> {
-        let configuration = &mut Configuration {
-            history: true,
-            ..Default::default()
-        };
-        let mut history = DefaultHistory::new();
-        history.add("foo")?;
-
-        let mut output = Vec::new();
-        let options = CommandOptions {
-            configuration,
-            command_manager: &CommandManager::default(),
-            driver_manager: &DriverManager::default(),
-            formatter_manager: &FormatterManager::default(),
-            connection: &mut MockConnection::new(),
-            history: &history,
-            input: vec![".history"],
-            output: &mut output,
-        };
-
-        let result = Command.execute(options).await?;
-
-        assert_eq!(result, LoopCondition::Continue);
-        let history = String::from_utf8(output)?;
-        assert!(history.contains("foo"));
-        Ok(())
+        assert!(result.is_err());
     }
 }

@@ -80,7 +80,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_execute_set_on() -> anyhow::Result<()> {
+    async fn test_execute_set_locale() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
             locale: "en".to_string(),
             ..default::Default::default()
