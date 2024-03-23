@@ -93,7 +93,7 @@ mod tests {
     use std::default::Default;
 
     #[tokio::test]
-    async fn test_execute_history_no_args() -> anyhow::Result<()> {
+    async fn test_execute_history_enabled() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
             history: true,
             ..Default::default()
@@ -118,6 +118,35 @@ mod tests {
         assert_eq!(result, LoopCondition::Continue);
         let history = String::from_utf8(output)?;
         assert!(history.contains("foo"));
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_execute_history_disabled() -> anyhow::Result<()> {
+        let configuration = &mut Configuration {
+            history: false,
+            ..Default::default()
+        };
+        let mut history = DefaultHistory::new();
+        history.add("foo")?;
+
+        let mut output = Vec::new();
+        let options = CommandOptions {
+            configuration,
+            command_manager: &CommandManager::default(),
+            driver_manager: &DriverManager::default(),
+            formatter_manager: &FormatterManager::default(),
+            connection: &mut MockConnection::new(),
+            history: &history,
+            input: vec![".history"],
+            output: &mut output,
+        };
+
+        let result = Command.execute(options).await?;
+
+        assert_eq!(result, LoopCondition::Continue);
+        let history = String::from_utf8(output)?;
+        assert!(!history.contains("foo"));
         Ok(())
     }
 
