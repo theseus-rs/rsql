@@ -205,7 +205,12 @@ impl Shell {
         loop {
             // Create a new editor for each iteration in order to read any changes to the configuration.
             let mut editor = self.editor(history_file.as_str())?;
-            let prompt = format!("{}> ", self.configuration.program_name);
+            let locale = self.configuration.locale.as_str();
+            let prompt = t!(
+                "prompt",
+                locale = locale,
+                program_name = self.configuration.program_name,
+            );
 
             let loop_condition = match editor.readline(&prompt) {
                 Ok(line) => {
@@ -213,11 +218,16 @@ impl Shell {
                         .evaluate(connection, editor.history(), line.clone())
                         .await
                         .unwrap_or_else(|error| {
+                            let mut error_string = "Error:".to_string();
+                            let error_message = format!("{:?}", error);
                             if self.configuration.color {
-                                eprintln!("{}: {:?}", "Error".red(), error);
-                            } else {
-                                eprintln!("Error: {:?}", error);
+                                error_string = error_string.red().to_string();
                             }
+                            eprintln!(
+                                "{error}: {message}",
+                                error = error_string,
+                                message = error_message
+                            );
                             if self.configuration.bail_on_error {
                                 LoopCondition::Exit(1)
                             } else {
@@ -232,24 +242,32 @@ impl Shell {
                     result
                 }
                 Err(ReadlineError::Interrupted) => {
+                    let mut program_interrupted =
+                        t!("program_interrupted", locale = locale).to_string();
                     if self.configuration.color {
-                        eprintln!("{}", "Program interrupted".red());
-                        error!("{}", "Program interrupted".red());
-                    } else {
-                        eprintln!("Program interrupted");
-                        error!("Program interrupted");
+                        program_interrupted = program_interrupted.red().to_string();
                     }
+                    eprintln!("{}", program_interrupted);
+                    error!("Program interrupted");
                     connection.stop().await?;
                     LoopCondition::Exit(1)
                 }
                 Err(error) => {
+                    let mut error_string = t!("error", locale = locale).to_string();
+                    let error_message = format!("{:?}", error);
                     if self.configuration.color {
-                        eprintln!("{}: {:?}", "Error".red(), error);
-                        error!("{}: {:?}", "Error".red(), error);
-                    } else {
-                        eprintln!("Error: {:?}", error);
-                        error!("Error: {:?}", error);
+                        error_string = error_string.red().to_string();
                     }
+                    eprintln!(
+                        "{}",
+                        t!(
+                            "error_format",
+                            locale = locale,
+                            error = error_string.red(),
+                            message = error_message,
+                        )
+                    );
+                    error!(error_message);
                     LoopCondition::Exit(1)
                 }
             };

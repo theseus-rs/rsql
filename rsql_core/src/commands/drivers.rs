@@ -1,5 +1,6 @@
 use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use async_trait::async_trait;
+use rust_i18n::t;
 
 /// Command to display the available drivers
 #[derive(Debug, Default)]
@@ -7,12 +8,12 @@ pub(crate) struct Command;
 
 #[async_trait]
 impl ShellCommand for Command {
-    fn name(&self) -> &'static str {
-        "drivers"
+    fn name(&self, locale: &str) -> String {
+        t!("drivers_command", locale = locale).to_string()
     }
 
-    fn description(&self) -> &'static str {
-        "Display available database drivers"
+    fn description(&self, locale: &str) -> String {
+        t!("drivers_description", locale = locale).to_string()
     }
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {

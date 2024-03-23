@@ -45,8 +45,9 @@ impl<'a> CommandExecutor<'a> {
         let input: Vec<&str> = command.split_whitespace().collect();
         let command_identifier = &self.configuration.command_identifier;
         let command_name = &input[0][command_identifier.len()..input[0].len()];
+        let locale = &self.configuration.locale;
 
-        let loop_condition = match &self.command_manager.get(command_name) {
+        let loop_condition = match &self.command_manager.get(locale.as_str(), command_name) {
             Some(command) => {
                 let options = CommandOptions {
                     configuration: self.configuration,

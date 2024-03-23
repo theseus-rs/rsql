@@ -34,6 +34,7 @@ postgresql_archive = { workspace = true, optional = true }
 postgresql_embedded = { workspace = true, optional = true }
 regex = { workspace = true }
 rust_decimal = { workspace = true }
+rust-i18n = { workspace = true }
 rustyline = { workspace = true }
 quick-xml = { workspace = true, features = ["serialize"] }
 serde = { workspace = true, features = ["derive"] }
@@ -50,6 +51,7 @@ tracing = { workspace = true }
 tracing-appender = { workspace = true }
 tracing-indicatif = { workspace = true }
 tracing-subscriber = { workspace = true, features = ["env-filter", "tracing-log"] }
+unicode-width = { workspace = true }
 uuid = { workspace = true, features = ["serde", "v4"] }
 
 [dev-dependencies]

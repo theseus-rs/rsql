@@ -1,5 +1,6 @@
 use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use async_trait::async_trait;
+use rust_i18n::t;
 use tracing::instrument;
 
 /// List the tables in the database
@@ -8,12 +9,12 @@ pub(crate) struct Command;
 
 #[async_trait]
 impl ShellCommand for Command {
-    fn name(&self) -> &'static str {
-        "tables"
+    fn name(&self, locale: &str) -> String {
+        t!("tables_command", locale = locale).to_string()
     }
 
-    fn description(&self) -> &'static str {
-        "List the tables in the database"
+    fn description(&self, locale: &str) -> String {
+        t!("tables_description", locale = locale).to_string()
     }
 
     #[instrument(name = "tables", skip(options))]

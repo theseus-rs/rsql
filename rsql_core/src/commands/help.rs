@@ -1,8 +1,11 @@
 extern crate colored;
+extern crate unicode_width;
 
 use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use async_trait::async_trait;
 use colored::*;
+use rust_i18n::t;
+use unicode_width::UnicodeWidthStr;
 
 /// Show the help message
 #[derive(Debug, Default)]
@@ -10,38 +13,70 @@ pub(crate) struct Command;
 
 #[async_trait]
 impl ShellCommand for Command {
-    fn name(&self) -> &'static str {
-        "help"
+    fn name(&self, locale: &str) -> String {
+        t!("help_command", locale = locale).to_string()
     }
 
-    fn description(&self) -> &'static str {
-        "Show this help message"
+    fn description(&self, locale: &str) -> String {
+        t!("help_description", locale = locale).to_string()
     }
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
         let output = options.output;
         let command_identifier = &options.configuration.command_identifier;
         let command_manager = options.command_manager;
+        let locale = &options.configuration.locale.as_str();
+        let is_cjk =
+            locale.starts_with("zh") || locale.starts_with("ja") || locale.starts_with("ko");
+        let command_identifier_width = if is_cjk {
+            command_identifier.as_str().width()
+        } else {
+            command_identifier.width_cjk()
+        };
         let width = command_manager
             .iter()
-            .map(|command| command_identifier.len() + command.name().len() + command.args().len())
+            .map(|command| {
+                let (command_name_width, command_args_width) = if is_cjk {
+                    (command.name(locale).width(), command.args(locale).width())
+                } else {
+                    (
+                        command.name(locale).width_cjk(),
+                        command.args(locale).width_cjk(),
+                    )
+                };
+
+                command_identifier_width + command_name_width + command_args_width
+            })
             .max()
             .unwrap_or_default();
 
         for command in command_manager.iter() {
-            let name = command.name();
-            let arg_width = width - name.len();
-            let args = if command.args().is_empty() {
-                format!("{:arg_width$}", command.args(), arg_width = arg_width)
+            let name = command.name(locale);
+            let name_width = if is_cjk {
+                name.width()
             } else {
-                format!(" {:arg_width$}", command.args(), arg_width = arg_width - 1)
+                name.width_cjk()
+            };
+            let args_width = width - name_width;
+            let args = if command.args(locale).is_empty() {
+                format!(
+                    "{args:args_width$}",
+                    args = command.args(locale),
+                    args_width = args_width
+                )
+            } else {
+                format!(
+                    " {args:args_width$}",
+                    args = command.args(locale),
+                    args_width = args_width - 1
+                )
             };
             writeln!(
                 output,
-                "{}{}  {}",
-                format!("{command_identifier}{name}").bold(),
-                args.dimmed(),
-                command.description(),
+                "{name}{args}  {description}",
+                name = format!("{command_identifier}{name}").bold(),
+                args = args.dimmed(),
+                description = command.description(locale),
             )?;
         }
         Ok(LoopCondition::Continue)

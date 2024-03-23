@@ -1,4 +1,6 @@
 #![forbid(unsafe_code)]
+#[macro_use]
+extern crate rust_i18n;
 
 use anyhow::Result;
 use clap::Parser;
@@ -7,8 +9,11 @@ use rsql_core::configuration::ConfigurationBuilder;
 use rsql_core::shell::{ShellArgs, ShellBuilder};
 use rsql_core::version;
 use rsql_core::version::full_version;
+use rust_i18n::t;
 use std::io;
 use tracing::info;
+
+i18n!("locales", fallback = "en");
 
 #[derive(Debug, Parser)]
 pub(crate) struct Args {
@@ -48,14 +53,21 @@ pub(crate) async fn execute(args: Option<Args>, output: &mut dyn io::Write) -> R
         version::execute(&mut configuration, output).await
     } else {
         let command_identifier = &configuration.command_identifier;
-        let help_command = format!("{command_identifier}help");
-        let quit_command = format!("{command_identifier}quit");
-        eprintln!("{}", full_version(&configuration));
-        eprintln!(
-            "Type '{}' for help, '{}' to exit.",
-            help_command.bold(),
-            quit_command.bold()
+        let locale = &configuration.locale.as_str();
+        let banner_version = t!(
+            "banner_version",
+            locale = locale,
+            version = full_version(&configuration)
         );
+        let help_command = format!("{command_identifier}help").bold();
+        let quit_command = format!("{command_identifier}quit").bold();
+        let banner_message = t!(
+            "banner_message",
+            help_command = help_command,
+            quit_command = quit_command
+        );
+        eprintln!("{}", banner_version);
+        eprintln!("{}", banner_message);
 
         let mut shell = ShellBuilder::default()
             .with_configuration(configuration)

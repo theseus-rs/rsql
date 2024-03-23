@@ -5,9 +5,11 @@ use crate::formatters::error::Result;
 use crate::formatters::footer::write_footer;
 use crate::formatters::formatter::FormatterOptions;
 use colored::Colorize;
+use num_format::Locale;
 use prettytable::format::TableFormat;
 use prettytable::Table;
 use std::ops::Deref;
+use std::str::FromStr;
 
 /// Format the results of a query into a table and write to the output.
 pub async fn format<'a>(
@@ -49,12 +51,13 @@ async fn process_data<'a>(
     query_result: &'a dyn QueryResult,
     table: &mut Table,
 ) -> Result<()> {
+    let locale = Locale::from_str(&configuration.locale).unwrap_or(Locale::en);
     for (i, row) in query_result.rows().await.iter().enumerate() {
         let mut row_data = Vec::new();
 
         for data in row {
             let data = match data {
-                Some(data) => data.to_formatted_string(&configuration.locale),
+                Some(data) => data.to_formatted_string(&locale),
                 None => "NULL".to_string(),
             };
 
@@ -82,7 +85,6 @@ mod tests {
     use crate::drivers::Results::{Execute, Query};
     use crate::drivers::{MemoryQueryResult, Results, Value};
     use indoc::indoc;
-    use num_format::Locale;
     use prettytable::format::consts::FORMAT_DEFAULT;
     use std::time::Duration;
 
@@ -134,7 +136,7 @@ mod tests {
     async fn test_execute_format() -> anyhow::Result<()> {
         let mut configuration = Configuration {
             color: false,
-            locale: Locale::en,
+            locale: "en".to_string(),
             ..Default::default()
         };
         let results = Execute(42);
@@ -149,7 +151,7 @@ mod tests {
     async fn test_query_format_no_rows() -> anyhow::Result<()> {
         let mut configuration = Configuration {
             color: false,
-            locale: Locale::en,
+            locale: "en".to_string(),
             ..Default::default()
         };
         let results = query_result_no_rows();
@@ -170,7 +172,7 @@ mod tests {
     async fn test_query_format_footer_no_timer() -> anyhow::Result<()> {
         let mut configuration = Configuration {
             color: false,
-            locale: Locale::en,
+            locale: "en".to_string(),
             results_footer: true,
             results_timer: false,
             ..Default::default()
@@ -193,7 +195,7 @@ mod tests {
     async fn test_query_format_two_rows_without_color() -> anyhow::Result<()> {
         let mut configuration = Configuration {
             color: false,
-            locale: Locale::en,
+            locale: "en".to_string(),
             ..Default::default()
         };
         let results = query_result_two_rows();
@@ -217,7 +219,7 @@ mod tests {
     async fn test_query_format_two_rows_with_color() -> anyhow::Result<()> {
         let mut configuration = Configuration {
             color: true,
-            locale: Locale::en,
+            locale: "en".to_string(),
             ..Default::default()
         };
         let results = query_result_two_rows();
@@ -235,7 +237,7 @@ mod tests {
     async fn test_query_format_no_header_and_no_footer() -> anyhow::Result<()> {
         let mut configuration = Configuration {
             color: false,
-            locale: Locale::en,
+            locale: "en".to_string(),
             results_header: false,
             results_footer: false,
             ..Default::default()

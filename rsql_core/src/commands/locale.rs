@@ -1,8 +1,7 @@
 use crate::commands::Error::InvalidOption;
 use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use async_trait::async_trait;
-use num_format::Locale;
-use std::str::FromStr;
+use rust_i18n::t;
 
 /// Command to set the display locale
 #[derive(Debug, Default)]
@@ -10,40 +9,35 @@ pub(crate) struct Command;
 
 #[async_trait]
 impl ShellCommand for Command {
-    fn name(&self) -> &'static str {
-        "locale"
+    fn name(&self, locale: &str) -> String {
+        t!("locale_command", locale = locale).to_string()
     }
 
-    fn args(&self) -> &'static str {
-        "[locale]"
+    fn args(&self, locale: &str) -> String {
+        t!("locale_argument", locale = locale).to_string()
     }
 
-    fn description(&self) -> &'static str {
-        "Set the display locale"
+    fn description(&self, locale: &str) -> String {
+        t!("locale_description", locale = locale).to_string()
     }
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
         if options.input.len() <= 1 {
-            writeln!(
-                options.output,
-                "Locale: {}",
-                options.configuration.locale.name()
-            )?;
+            writeln!(options.output, "Locale: {}", options.configuration.locale)?;
             return Ok(LoopCondition::Continue);
         }
 
-        let locale = options.input[1];
-        let locale = match Locale::from_str(locale) {
-            Ok(locale) => locale,
-            Err(_) => {
-                return Err(InvalidOption {
-                    command_name: self.name().to_string(),
-                    option: locale.to_string(),
-                })
-            }
-        };
+        let locale = options.configuration.locale.as_str();
+        let new_locale = options.input[1];
 
-        options.configuration.locale = locale;
+        if !available_locales!().contains(&new_locale) {
+            return Err(InvalidOption {
+                command_name: self.name(locale).to_string(),
+                option: locale.to_string(),
+            })
+            .into();
+        }
+        options.configuration.locale = new_locale.to_string();
 
         Ok(LoopCondition::Continue)
     }
@@ -64,7 +58,7 @@ mod tests {
     async fn test_execute_no_args() -> anyhow::Result<()> {
         let mut output = Vec::new();
         let configuration = &mut Configuration {
-            locale: Locale::en,
+            locale: "en".to_string(),
             ..default::Default::default()
         };
         let options = CommandOptions {
@@ -89,7 +83,7 @@ mod tests {
     #[tokio::test]
     async fn test_execute_set_on() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
-            locale: Locale::en,
+            locale: "en".to_string(),
             ..default::Default::default()
         };
         let options = CommandOptions {
@@ -106,7 +100,7 @@ mod tests {
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        assert_eq!(configuration.locale, Locale::en_GB);
+        assert_eq!(configuration.locale, "en-GB".to_string());
         Ok(())
     }
 
