@@ -21,10 +21,9 @@ async fn postgresql() -> Result<()> {
         ..ShellArgs::default()
     };
     let configuration = Configuration::default();
-    let output = Vec::new();
-    let mut shell = ShellBuilder::default()
+    let mut output = Vec::new();
+    let mut shell = ShellBuilder::new(&mut output)
         .with_configuration(configuration)
-        .with_output(Box::new(output))
         .build();
     shell.execute(&args).await
 }
