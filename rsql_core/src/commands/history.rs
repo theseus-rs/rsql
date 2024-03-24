@@ -38,7 +38,7 @@ impl ShellCommand for Command {
                     let index = (i + 1).to_formatted_string(&num_locale);
                     let mut entry = entry.to_string();
                     if options.configuration.color {
-                        entry = entry.dimmed().to_string()
+                        entry = entry.dimmed().to_string();
                     }
 
                     let history_list_entry = t!(

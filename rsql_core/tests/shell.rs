@@ -17,10 +17,10 @@ async fn test_execute_command() -> anyhow::Result<()> {
         .build();
     let _ = shell.execute(&args).await?;
 
-    let comand_output = String::from_utf8(output)?;
+    let command_output = String::from_utf8(output)?;
     let expected = indoc! {r#"
             Locale: en
         "#};
-    assert_eq!(comand_output, expected);
+    assert_eq!(command_output, expected);
     Ok(())
 }
