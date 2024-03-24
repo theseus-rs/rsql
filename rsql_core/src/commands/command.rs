@@ -76,7 +76,7 @@ impl CommandManager {
     }
 
     /// Add a new command to the list of available commands
-    fn add(&mut self, command: Box<dyn ShellCommand>) {
+    pub fn add(&mut self, command: Box<dyn ShellCommand>) {
         let _ = &self.commands.push(command);
     }
 
