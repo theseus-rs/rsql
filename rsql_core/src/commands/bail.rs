@@ -71,6 +71,24 @@ mod tests {
 
     use super::*;
 
+    #[test]
+    fn test_name() {
+        let name = Command.name("en");
+        assert_eq!(name, "bail");
+    }
+
+    #[test]
+    fn test_args() {
+        let args = Command.args("en");
+        assert_eq!(args, "on|off");
+    }
+
+    #[test]
+    fn test_description() {
+        let description = Command.description("en");
+        assert_eq!(description, "Stop after an error occurs");
+    }
+
     async fn test_execute_no_args(bail: bool) -> anyhow::Result<()> {
         let mut output = Vec::new();
         let configuration = &mut Configuration {

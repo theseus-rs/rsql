@@ -92,6 +92,24 @@ mod tests {
     use std::default;
     use std::default::Default;
 
+    #[test]
+    fn test_name() {
+        let name = Command.name("en");
+        assert_eq!(name, "history");
+    }
+
+    #[test]
+    fn test_args() {
+        let args = Command.args("en");
+        assert_eq!(args, "on|off");
+    }
+
+    #[test]
+    fn test_description() {
+        let description = Command.description("en");
+        assert_eq!(description, "Show the command history");
+    }
+
     #[tokio::test]
     async fn test_execute_history_enabled() -> anyhow::Result<()> {
         let configuration = &mut Configuration {

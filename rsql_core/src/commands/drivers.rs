@@ -42,6 +42,18 @@ mod tests {
     use crate::formatters::FormatterManager;
     use rustyline::history::DefaultHistory;
 
+    #[test]
+    fn test_name() {
+        let name = Command.name("en");
+        assert_eq!(name, "drivers");
+    }
+
+    #[test]
+    fn test_description() {
+        let description = Command.description("en");
+        assert_eq!(description, "Display available database drivers");
+    }
+
     #[tokio::test]
     async fn test_execute() -> anyhow::Result<()> {
         let mut output = Vec::new();

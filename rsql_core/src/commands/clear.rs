@@ -21,3 +21,20 @@ impl ShellCommand for Command {
         Ok(LoopCondition::Continue)
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_name() {
+        let name = Command.name("en");
+        assert_eq!(name, "clear");
+    }
+
+    #[test]
+    fn test_description() {
+        let description = Command.description("en");
+        assert_eq!(description, "Clear the screen");
+    }
+}

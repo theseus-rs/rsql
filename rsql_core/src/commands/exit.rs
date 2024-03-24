@@ -44,6 +44,18 @@ mod tests {
     use crate::formatters::FormatterManager;
     use rustyline::history::DefaultHistory;
 
+    #[test]
+    fn test_name() {
+        let name = Command.name("en");
+        assert_eq!(name, "exit");
+    }
+
+    #[test]
+    fn test_description() {
+        let description = Command.description("en");
+        assert_eq!(description, "Exit the application");
+    }
+
     #[tokio::test]
     async fn test_execute_no_argument() -> anyhow::Result<()> {
         let mock_connection = &mut MockConnection::new();
