@@ -5,7 +5,7 @@ use rust_i18n::t;
 
 /// Command to set the results format
 #[derive(Debug, Default)]
-pub(crate) struct Command;
+pub struct Command;
 
 #[async_trait]
 impl ShellCommand for Command {

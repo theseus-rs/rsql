@@ -5,6 +5,7 @@ extern crate rust_i18n;
 use anyhow::Result;
 use clap::Parser;
 use colored::Colorize;
+use rsql_core::commands::{help, quit, ShellCommand};
 use rsql_core::configuration::ConfigurationBuilder;
 use rsql_core::shell::{ShellArgs, ShellBuilder};
 use rsql_core::version;
@@ -53,16 +54,31 @@ pub(crate) async fn execute(args: Option<Args>, output: &mut dyn io::Write) -> R
         version::execute(&mut configuration, output).await
     } else {
         let command_identifier = &configuration.command_identifier;
-        let locale = &configuration.locale.as_str();
+        let locale = configuration.locale.as_str();
         let banner_version = t!(
             "banner_version",
             locale = locale,
             version = full_version(&configuration)
         );
-        let help_command = format!("{command_identifier}help").bold();
-        let quit_command = format!("{command_identifier}quit").bold();
+
+        let mut help_command = format!(
+            "{command_identifier}{help}",
+            command_identifier = command_identifier,
+            help = help::Command.name(locale),
+        );
+        let mut quit_command = format!(
+            "{command_identifier}{quit}",
+            command_identifier = command_identifier,
+            quit = quit::Command.name(locale),
+        );
+        if configuration.color {
+            help_command = help_command.bold().to_string();
+            quit_command = quit_command.bold().to_string();
+        }
+
         let banner_message = t!(
             "banner_message",
+            locale = locale,
             help_command = help_command,
             quit_command = quit_command
         );

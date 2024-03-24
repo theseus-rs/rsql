@@ -6,7 +6,7 @@ use rust_i18n::t;
 
 /// Command to stop after an error occurs
 #[derive(Debug, Default)]
-pub(crate) struct Command;
+pub struct Command;
 
 #[async_trait]
 impl ShellCommand for Command {

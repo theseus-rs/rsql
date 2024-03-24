@@ -2,7 +2,6 @@ use anyhow::{bail, Result};
 use config::{Config, FileFormat};
 use dirs::home_dir;
 use indicatif::ProgressStyle;
-use num_format::Locale;
 use rustyline::EditMode;
 use std::env;
 use std::fs::{create_dir_all, OpenOptions};
@@ -414,7 +413,7 @@ fn get_locale(config: &Config) -> String {
 
     for i in (0..parts.len()).rev() {
         let locale = parts[0..=i].join("-");
-        if Locale::from_str(locale.as_str()).is_ok() {
+        if available_locales!().contains(&locale.as_str()) {
             return locale;
         }
     }
@@ -544,12 +543,12 @@ mod test {
     #[test]
     fn test_get_locale_language() -> Result<()> {
         let prefix = "LOCALE_LANGUAGE_TEST";
-        env::set_var(format!("{prefix}_GLOBAL_LOCALE"), "de-US.foo");
+        env::set_var(format!("{prefix}_GLOBAL_LOCALE"), "de-DE.foo");
         let config = Config::builder()
             .add_source(config::Environment::with_prefix(prefix).separator("_"))
             .build()?;
         let locale = get_locale(&config);
-        assert_eq!(locale, "de".to_string());
+        assert_eq!(locale, "de-DE".to_string());
         Ok(())
     }
 

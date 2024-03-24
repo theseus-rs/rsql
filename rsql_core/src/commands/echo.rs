@@ -5,7 +5,7 @@ use rust_i18n::t;
 
 /// Command to enable or disable echoing commands
 #[derive(Debug, Default)]
-pub(crate) struct Command;
+pub struct Command;
 
 #[async_trait]
 impl ShellCommand for Command {
