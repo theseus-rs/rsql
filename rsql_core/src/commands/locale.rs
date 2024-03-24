@@ -53,6 +53,24 @@ mod tests {
     use rustyline::history::DefaultHistory;
     use std::default;
 
+    #[test]
+    fn test_name() {
+        let name = Command.name("en");
+        assert_eq!(name, "locale");
+    }
+
+    #[test]
+    fn test_args() {
+        let args = Command.args("en");
+        assert_eq!(args, "[locale]");
+    }
+
+    #[test]
+    fn test_description() {
+        let description = Command.description("en");
+        assert_eq!(description, "Set the display locale");
+    }
+
     #[tokio::test]
     async fn test_execute_no_args() -> anyhow::Result<()> {
         let mut output = Vec::new();

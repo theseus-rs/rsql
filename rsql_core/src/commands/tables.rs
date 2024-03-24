@@ -40,6 +40,18 @@ mod tests {
     use crate::formatters::FormatterManager;
     use rustyline::history::DefaultHistory;
 
+    #[test]
+    fn test_name() {
+        let name = Command.name("en");
+        assert_eq!(name, "tables");
+    }
+
+    #[test]
+    fn test_description() {
+        let description = Command.description("en");
+        assert_eq!(description, "List the tables in the database");
+    }
+
     #[tokio::test]
     async fn test_execute() -> anyhow::Result<()> {
         let table = "table1";

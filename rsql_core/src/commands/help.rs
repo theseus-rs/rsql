@@ -73,6 +73,18 @@ mod tests {
     use indoc::indoc;
     use rustyline::history::DefaultHistory;
 
+    #[test]
+    fn test_name() {
+        let name = Command.name("en");
+        assert_eq!(name, "help");
+    }
+
+    #[test]
+    fn test_description() {
+        let description = Command.description("en");
+        assert_eq!(description, "Show this help message");
+    }
+
     async fn test_execute(
         color: bool,
         command_identifier: &str,

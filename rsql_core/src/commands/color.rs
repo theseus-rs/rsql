@@ -64,6 +64,24 @@ mod tests {
     use rustyline::history::DefaultHistory;
     use std::default;
 
+    #[test]
+    fn test_name() {
+        let name = Command.name("en");
+        assert_eq!(name, "color");
+    }
+
+    #[test]
+    fn test_args() {
+        let args = Command.args("en");
+        assert_eq!(args, "on|off");
+    }
+
+    #[test]
+    fn test_description() {
+        let description = Command.description("en");
+        assert_eq!(description, "Enable or disable color output");
+    }
+
     async fn test_execute_no_args(color: bool) -> anyhow::Result<()> {
         let mut output = Vec::new();
         let configuration = &mut Configuration {
