@@ -18,15 +18,21 @@ use tracing::error;
 
 /// A builder for creating a [Shell].
 #[derive(Debug)]
-pub struct ShellBuilder {
-    shell: Shell,
+pub struct ShellBuilder<'a> {
+    shell: Shell<'a>,
 }
 
 /// A shell for interacting with a database.
-impl ShellBuilder {
-    pub fn new() -> Self {
+impl<'a> ShellBuilder<'a> {
+    pub fn new(output: &'a mut (dyn io::Write + Send + Sync)) -> Self {
         Self {
-            shell: Shell::default(),
+            shell: Shell::new(
+                Configuration::default(),
+                DriverManager::default(),
+                CommandManager::default(),
+                FormatterManager::default(),
+                output,
+            ),
         }
     }
 
@@ -54,42 +60,29 @@ impl ShellBuilder {
         self
     }
 
-    /// Set the formatter manager for the shell.
-    pub fn with_output(mut self, output: Box<(dyn io::Write + Send + Sync)>) -> Self {
-        self.shell.output = output;
-        self
-    }
-
     /// Build the shell.
-    pub fn build(self) -> Shell {
+    pub fn build(self) -> Shell<'a> {
         self.shell
     }
 }
 
-/// Default implementation for [ShellBuilder].
-impl Default for ShellBuilder {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 /// A shell for interacting with a database.
-pub struct Shell {
+pub struct Shell<'a> {
     pub configuration: Configuration,
     pub driver_manager: DriverManager,
     pub command_manager: CommandManager,
     pub formatter_manager: FormatterManager,
-    pub output: Box<(dyn io::Write + Send + Sync)>,
+    pub output: &'a mut (dyn io::Write + Send + Sync),
 }
 
 /// Shell implementation.
-impl Shell {
+impl<'a> Shell<'a> {
     fn new(
         configuration: Configuration,
         driver_manager: DriverManager,
         command_manager: CommandManager,
         formatter_manager: FormatterManager,
-        output: Box<(dyn io::Write + Send + Sync)>,
+        output: &'a mut (dyn io::Write + Send + Sync),
     ) -> Self {
         Self {
             configuration,
@@ -306,20 +299,7 @@ impl Shell {
     }
 }
 
-/// Default implementation for [Shell].
-impl Default for Shell {
-    fn default() -> Self {
-        Self::new(
-            Configuration::default(),
-            DriverManager::default(),
-            CommandManager::default(),
-            FormatterManager::default(),
-            Box::new(io::stdout()),
-        )
-    }
-}
-
-impl Debug for Shell {
+impl Debug for Shell<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("Shell")
             .field("configuration", &self.configuration)
@@ -346,13 +326,12 @@ mod test {
         let driver_manager = DriverManager::new();
         let command_manager = CommandManager::new();
         let formatter_manager = FormatterManager::new();
-        let output = Vec::new();
-        let shell = ShellBuilder::default()
+        let mut output = Vec::new();
+        let shell = ShellBuilder::new(&mut output)
             .with_configuration(configuration)
             .with_driver_manager(driver_manager)
             .with_command_manager(command_manager)
             .with_formatter_manager(formatter_manager)
-            .with_output(Box::new(output))
             .build();
 
         assert_eq!(shell.configuration.bail_on_error, true);
@@ -363,7 +342,8 @@ mod test {
 
     #[test]
     fn test_shell_debug() {
-        let shell = Shell::default();
+        let mut output = Vec::new();
+        let shell = ShellBuilder::new(&mut output).build();
         let debug = format!("{:?}", shell);
         assert!(debug.contains("Shell"));
         assert!(debug.contains("configuration"));
@@ -390,7 +370,8 @@ mod test {
         });
         let mut driver_manager = DriverManager::new();
         driver_manager.add(Box::new(mock_driver));
-        let mut shell = ShellBuilder::new()
+        let mut output = Vec::new();
+        let mut shell = ShellBuilder::new(&mut output)
             .with_configuration(configuration)
             .with_driver_manager(driver_manager)
             .build();
@@ -406,7 +387,8 @@ mod test {
 
     #[tokio::test]
     async fn test_parse_commands_default_command_identifier() -> anyhow::Result<()> {
-        let mut shell = Shell::default();
+        let mut output = Vec::new();
+        let mut shell = ShellBuilder::new(&mut output).build();
         let contents = indoc! {r#"
             .bail on
             SELECT *
@@ -432,7 +414,8 @@ mod test {
             command_identifier: "\\".to_string(),
             ..Default::default()
         };
-        let mut shell = ShellBuilder::new()
+        let mut output = Vec::new();
+        let mut shell = ShellBuilder::new(&mut output)
             .with_configuration(configuration)
             .build();
         let contents = indoc! {r#"
@@ -461,7 +444,8 @@ mod test {
             results_timer: false,
             ..Default::default()
         };
-        let mut shell = ShellBuilder::new()
+        let mut output = Vec::new();
+        let mut shell = ShellBuilder::new(&mut output)
             .with_configuration(configuration)
             .build();
         let mut connection = MockConnection::new();
@@ -480,7 +464,8 @@ mod test {
             history: false,
             ..Default::default()
         };
-        let shell = ShellBuilder::new()
+        let mut output = Vec::new();
+        let shell = ShellBuilder::new(&mut output)
             .with_configuration(configuration)
             .build();
         let _ = shell.editor("history.txt")?;
@@ -503,7 +488,8 @@ mod test {
             bail_on_error: false,
             ..Default::default()
         };
-        let mut shell = ShellBuilder::new()
+        let mut output = Vec::new();
+        let mut shell = ShellBuilder::new(&mut output)
             .with_configuration(configuration)
             .build();
         let history = DefaultHistory::new();

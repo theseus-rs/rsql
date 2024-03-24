@@ -1,6 +1,4 @@
-use crate::configuration::Configuration;
-use crate::shell::Result;
-use std::io;
+use rsql_core::configuration::Configuration;
 
 /// Get the full version of the program (e.g. "rsql/0.0.0 Linux/5.11.0-37-generic/x86_64").
 pub fn full_version(configuration: &Configuration) -> String {
@@ -12,13 +10,6 @@ pub fn full_version(configuration: &Configuration) -> String {
     let architecture = info.architecture().unwrap_or("unknown");
 
     format!("{program_name}/{version} {os}/{os_version}/{architecture}")
-}
-
-/// Execute the version command and write the version to the provided output.
-pub async fn execute(configuration: &mut Configuration, output: &mut dyn io::Write) -> Result<()> {
-    let version = full_version(configuration);
-    writeln!(output, "{version}")?;
-    Ok(())
 }
 
 #[cfg(test)]
@@ -35,19 +26,6 @@ mod tests {
         configuration.version = TEST_VERSION.to_string();
         let version_prefix = format!("{TEST_PROGRAM_NAME}/{TEST_VERSION}");
         let version = full_version(&configuration);
-        assert!(version.starts_with(version_prefix.as_str()));
-        Ok(())
-    }
-
-    #[tokio::test]
-    async fn test_execute() -> anyhow::Result<()> {
-        let mut configuration = Configuration::default();
-        configuration.program_name = TEST_PROGRAM_NAME.to_string();
-        configuration.version = TEST_VERSION.to_string();
-        let mut output = Vec::new();
-        execute(&mut configuration, &mut output).await?;
-        let version_prefix = format!("{TEST_PROGRAM_NAME}/{TEST_VERSION}");
-        let version = String::from_utf8(output)?;
         assert!(version.starts_with(version_prefix.as_str()));
         Ok(())
     }
