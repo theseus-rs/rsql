@@ -543,12 +543,12 @@ mod test {
     #[test]
     fn test_get_locale_language() -> Result<()> {
         let prefix = "LOCALE_LANGUAGE_TEST";
-        env::set_var(format!("{prefix}_GLOBAL_LOCALE"), "de-US.foo");
+        env::set_var(format!("{prefix}_GLOBAL_LOCALE"), "de-DE.foo");
         let config = Config::builder()
             .add_source(config::Environment::with_prefix(prefix).separator("_"))
             .build()?;
         let locale = get_locale(&config);
-        assert_eq!(locale, "de".to_string());
+        assert_eq!(locale, "de-DE".to_string());
         Ok(())
     }
 
