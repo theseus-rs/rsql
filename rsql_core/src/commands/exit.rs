@@ -51,6 +51,12 @@ mod tests {
     }
 
     #[test]
+    fn test_args() {
+        let args = Command.args("en");
+        assert_eq!(args, "[code]");
+    }
+
+    #[test]
     fn test_description() {
         let description = Command.description("en");
         assert_eq!(description, "Exit the application");

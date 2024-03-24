@@ -22,12 +22,14 @@ impl ShellCommand for Command {
     }
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
+        let locale = options.configuration.locale.as_str();
+
         if options.input.len() <= 1 {
-            writeln!(options.output, "Locale: {}", options.configuration.locale)?;
+            let format_setting = t!("locale_setting", locale = locale, locale = locale).to_string();
+            writeln!(options.output, "{}", format_setting)?;
             return Ok(LoopCondition::Continue);
         }
 
-        let locale = options.configuration.locale.as_str();
         let new_locale = options.input[1];
 
         if !available_locales!().contains(&new_locale) {

@@ -2,6 +2,10 @@
 # Please review and correct the translations as needed.
 _version: 2
 
+#
+# Bail
+#
+
 bail_command:
   en: "bail"
   ar-SA: "الهروب"
@@ -60,6 +64,7 @@ bail_command:
   uk-UA: "залог"
   vi-VN: "bail"
   zh-CN: "保释"
+
 bail_description:
   en: "Stop after an error occurs"
   ar-SA: "توقف بعد حدوث خطأ"
@@ -118,6 +123,7 @@ bail_description:
   uk-UA: "Зупинити після помилки"
   vi-VN: "Dừng sau khi xảy ra lỗi"
   zh-CN: "发生错误后停止"
+
 bail_setting:
   en: "Bail on error: %{bail}"
   ar-SA: "الهروب عند حدوث خطأ: {bail}%"
@@ -176,6 +182,11 @@ bail_setting:
   uk-UA: "Bail on error: %{bail}"
   vi-VN: "Bail on error: %{bail}"
   zh-CN: "Bail on error: %{bail}"
+
+#
+# Clear
+#
+
 clear_command:
   en: "clear"
   ar-SA: "واضح"
@@ -234,6 +245,7 @@ clear_command:
   uk-UA: "чистий"
   vi-VN: "rõ ràng"
   zh-CN: "清晰"
+
 clear_description:
   en: "Clear the screen"
   ar-SA: "مسح الشاشة"
@@ -292,6 +304,11 @@ clear_description:
   uk-UA: "Очистити екран"
   vi-VN: "Xóa màn hình"
   zh-CN: "清除屏幕"
+
+#
+# Color
+#
+
 color_command:
   en: "color"
   ar-SA: "لون"
@@ -350,6 +367,7 @@ color_command:
   uk-UA: "колір"
   vi-VN: "màu"
   zh-CN: "颜色"
+
 color_description:
   en: "Enable or disable color output"
   ar-SA: "تمكين أو تعطيل إخراج الألوان"
@@ -408,6 +426,7 @@ color_description:
   uk-UA: "Увімкнути або вимкнути кольоровий вивід"
   vi-VN: "Bật hoặc tắt đầu ra màu"
   zh-CN: "启用或禁用彩色输出"
+
 color_setting:
   en: "Color: %{color}"
   ar-SA: "اللون: {color}%"
@@ -466,6 +485,11 @@ color_setting:
   uk-UA: "Колір: %{color}"
   vi-VN: "Màu: %{color}"
   zh-CN: "颜色: %{color}"
+
+#
+# Drivers
+#
+
 drivers_command:
   en: "drivers"
   ar-SA: "المشغلات"
@@ -524,6 +548,7 @@ drivers_command:
   uk-UA: "драйвери"
   vi-VN: "trình điều khiển"
   zh-CN: "驱动程序"
+
 drivers_description:
   en: "Display available database drivers"
   ar-SA: "عرض مشغلات قاعدة البيانات المتاحة"
@@ -582,6 +607,70 @@ drivers_description:
   uk-UA: "Показати доступні драйвери бази даних"
   vi-VN: "Hiển thị các trình điều khiển cơ sở dữ liệu có sẵn"
   zh-CN: "显示可用的数据库驱动程序"
+
+drivers_options:
+  en: "Drivers: %{drivers}"
+  ar-SA: "المشغلات: {drivers}%"
+  be-BY: "Драйверы: %{drivers}"
+  bg-BG: "Драйвери: %{drivers}"
+  bn-BD: "ড্রাইভার: %{drivers}"
+  cs-CZ: "Ovladače: %{drivers}"
+  da-DK: "Drivere: %{drivers}"
+  de-AT: "Treiber: %{drivers}"
+  de-CH: "Treiber: %{drivers}"
+  de-DE: "Treiber: %{drivers}"
+  de-LI: "Treiber: %{drivers}"
+  de-LU: "Treiber: %{drivers}"
+  el-GR: "Οδηγοί: %{drivers}"
+  en-GB: "Drivers: %{drivers}"
+  en-US: "Drivers: %{drivers}"
+  es-ES: "Controladores: %{drivers}"
+  et-EE: "Draiverid: %{drivers}"
+  fi-FI: "Ajurit: %{drivers}"
+  fr-BE: "Pilotes: %{drivers}"
+  fr-CH: "Pilotes: %{drivers}"
+  fr-FR: "Pilotes: %{drivers}"
+  fr-LU: "Pilotes: %{drivers}"
+  ga-IE: "Tiománaithe: %{drivers}"
+  hi-IN: "ड्राइवर: %{drivers}"
+  hr-HR: "Upravljački programi: %{drivers}"
+  hu-HU: "Illesztőprogramok: %{drivers}"
+  is-IS: "Stýrihjöð: %{drivers}"
+  it-CH: "Driver: %{drivers}"
+  it-IT: "Driver: %{drivers}"
+  ja-JP: "ドライバ: %{drivers}"
+  jv-ID: "Driver: %{drivers}"
+  ka-GE: "მძღოლები: %{drivers}"
+  ko-KR: "드라이버: %{drivers}"
+  lt-LT: "Tvarkyklės: %{drivers}"
+  lv-LV: "Vadītāji: %{drivers}"
+  mk-MK: "Драјвери: %{drivers}"
+  mt-MT: "Drivers: %{drivers}"
+  nl-BE: "Drivers: %{drivers}"
+  nl-NL: "Drivers: %{drivers}"
+  no-NO: "Drivere: %{drivers}"
+  pl-PL: "Sterowniki: %{drivers}"
+  pt-BR: "Drivers: %{drivers}"
+  pt-PT: "Drivers: %{drivers}"
+  ro-RO: "Drivere: %{drivers}"
+  ru-RU: "Драйверы: %{drivers}"
+  sk-SK: "Ovládače: %{drivers}"
+  sl-SI: "Gonilniki: %{drivers}"
+  sq-AL: "Drejtuesit: %{drivers}"
+  sr-BA: "Драјвери: %{drivers}"
+  sr-ME: "Драјвери: %{drivers}"
+  sr-RS: "Драјвери: %{drivers}"
+  sv-SE: "Drivrutiner: %{drivers}"
+  th-TH: "ไดรเวอร์: %{drivers}"
+  tr-TR: "Sürücüler: %{drivers}"
+  uk-UA: "Драйвери: %{drivers}"
+  vi-VN: "Trình điều khiển: %{drivers}"
+  zh-CN: "驱动程序: %{drivers}"
+
+#
+# Echo
+#
+
 echo_command:
   en: "echo"
   ar-SA: "صدى"
@@ -640,6 +729,7 @@ echo_command:
   uk-UA: "еко"
   vi-VN: "âm thanh"
   zh-CN: "回声"
+
 echo_description:
   en: "Enable or disable echoing commands"
   ar-SA: "تمكين أو تعطيل صدى الأوامر"
@@ -698,6 +788,7 @@ echo_description:
   uk-UA: "Увімкнути або вимкнути відгук команд"
   vi-VN: "Bật hoặc tắt lệnh phản hồi"
   zh-CN: "启用或禁用命令回显"
+
 echo_setting:
   en: "Echo: %{echo}"
   ar-SA: "الصدى: {echo}%"
@@ -756,6 +847,11 @@ echo_setting:
   uk-UA: "Ехо: %{echo}"
   vi-VN: "Âm thanh: %{echo}"
   zh-CN: "回声: %{echo}"
+
+#
+# Exit
+#
+
 exit_command:
   en: "exit"
   ar-SA: "خروج"
@@ -814,6 +910,7 @@ exit_command:
   uk-UA: "вихід"
   vi-VN: "thoát"
   zh-CN: "退出"
+
 exit_argument:
   en: "[code]"
   ar-SA: "[الرمز]"
@@ -872,6 +969,7 @@ exit_argument:
   uk-UA: "[код]"
   vi-VN: "[mã]"
   zh-CN: "[代码]"
+
 exit_description:
   en: "Exit the application"
   ar-SA: "الخروج من التطبيق"
@@ -930,6 +1028,11 @@ exit_description:
   uk-UA: "Вихід з додатка"
   vi-VN: "Thoát khỏi ứng dụng"
   zh-CN: "退出应用程序"
+
+#
+# Footer
+#
+
 footer_command:
   en: "footer"
   ar-SA: "تذييل"
@@ -988,6 +1091,7 @@ footer_command:
   uk-UA: "підвал"
   vi-VN: "chân trang"
   zh-CN: "页脚"
+
 footer_description:
   en: "Enable or disable result footer"
   ar-SA: "تمكين أو تعطيل تذييل النتيجة"
@@ -1046,6 +1150,7 @@ footer_description:
   uk-UA: "Увімкнути або вимкнути підвал результату"
   vi-VN: "Bật hoặc tắt chân trang kết quả"
   zh-CN: "启用或禁用结果页脚"
+
 footer_setting:
   en: "Footer: %{footer}"
   ar-SA: "تذييل: {footer}%"
@@ -1104,6 +1209,11 @@ footer_setting:
   uk-UA: "Підвал: %{footer}"
   vi-VN: "Chân trang: %{footer}"
   zh-CN: "页脚: %{footer}"
+
+#
+# Format
+#
+
 format_command:
   en: "format"
   ar-SA: "تنسيق"
@@ -1162,6 +1272,7 @@ format_command:
   uk-UA: "формат"
   vi-VN: "định dạng"
   zh-CN: "格式"
+
 format_argument:
   en: "[format]"
   ar-SA: "[تنسيق]"
@@ -1220,6 +1331,7 @@ format_argument:
   uk-UA: "[формат]"
   vi-VN: "[định dạng]"
   zh-CN: "[格式]"
+
 format_description:
   en: "Format results in ascii, csv, html, json, jsonl, tsv, unicode, xml, yaml"
   ar-SA: "تنسيق النتائج في ascii و csv و html و json و jsonl و tsv و unicode و xml و yaml"
@@ -1278,6 +1390,129 @@ format_description:
   uk-UA: "Форматувати результати у ascii, csv, html, json, jsonl, tsv, unicode, xml, yaml"
   vi-VN: "Định dạng kết quả trong ascii, csv, html, json, jsonl, tsv, unicode, xml, yaml"
   zh-CN: "以ascii、csv、html、json、jsonl、tsv、unicode、xml、yaml格式显示结果"
+
+format_setting:
+  en: "Format: %{format}"
+  ar-SA: "تنسيق: {format}%"
+  be-BY: "Фармат: %{format}"
+  bg-BG: "Формат: %{format}"
+  bn-BD: "বিন্যাস: %{format}"
+  cs-CZ: "Formát: %{format}"
+  da-DK: "Format: %{format}"
+  de-AT: "Format: %{format}"
+  de-CH: "Format: %{format}"
+  de-DE: "Format: %{format}"
+  de-LI: "Format: %{format}"
+  de-LU: "Format: %{format}"
+  el-GR: "Μορφή: %{format}"
+  en-GB: "Format: %{format}"
+  en-US: "Format: %{format}"
+  es-ES: "Formato: %{format}"
+  et-EE: "Vorming: %{format}"
+  fi-FI: "Muoto: %{format}"
+  fr-BE: "Format: %{format}"
+  fr-CH: "Format: %{format}"
+  fr-FR: "Format: %{format}"
+  fr-LU: "Format: %{format}"
+  ga-IE: "Formáid: %{format}"
+  hi-IN: "स्वरूप: %{format}"
+  hr-HR: "Format: %{format}"
+  hu-HU: "Formátum: %{format}"
+  is-IS: "Form: %{format}"
+  it-CH: "Formato: %{format}"
+  it-IT: "Formato: %{format}"
+  ja-JP: "フォーマット: %{format}"
+  jv-ID: "Format: %{format}"
+  ka-GE: "ფორმატი: %{format}"
+  ko-KR: "형식: %{format}"
+  lt-LT: "Formatas: %{format}"
+  lv-LV: "Formāts: %{format}"
+  mk-MK: "Формат: %{format}"
+  mt-MT: "Format: %{format}"
+  nl-BE: "Formaat: %{format}"
+  nl-NL: "Formaat: %{format}"
+  no-NO: "Format: %{format}"
+  pl-PL: "Format: %{format}"
+  pt-BR: "Formato: %{format}"
+  pt-PT: "Formato: %{format}"
+  ro-RO: "Format: %{format}"
+  ru-RU: "Формат: %{format}"
+  sk-SK: "Formát: %{format}"
+  sl-SI: "Format: %{format}"
+  sq-AL: "Format: %{format}"
+  sr-BA: "Формат: %{format}"
+  sr-ME: "Формат: %{format}"
+  sr-RS: "Формат: %{format}"
+  sv-SE: "Format: %{format}"
+  th-TH: "รูปแบบ: %{format}"
+  tr-TR: "Biçim: %{format}"
+  uk-UA: "Формат: %{format}"
+  vi-VN: "Định dạng: %{format}"
+  zh-CN: "格式: %{format}"
+
+format_options:
+  en: "Formats: %{formats}"
+  ar-SA: "التنسيقات: {formats}%"
+  be-BY: "Фарматы: %{formats}"
+  bg-BG: "Формати: %{formats}"
+  bn-BD: "বিন্যাস: %{formats}"
+  cs-CZ: "Formáty: %{formats}"
+  da-DK: "Formater: %{formats}"
+  de-AT: "Formate: %{formats}"
+  de-CH: "Formate: %{formats}"
+  de-DE: "Formate: %{formats}"
+  de-LI: "Formate: %{formats}"
+  de-LU: "Formate: %{formats}"
+  el-GR: "Μορφές: %{formats}"
+  en-GB: "Formats: %{formats}"
+  en-US: "Formats: %{formats}"
+  es-ES: "Formatos: %{formats}"
+  et-EE: "Vormingud: %{formats}"
+  fi-FI: "Muodot: %{formats}"
+  fr-BE: "Formats: %{formats}"
+  fr-CH: "Formats: %{formats}"
+  fr-FR: "Formats: %{formats}"
+  fr-LU: "Formats: %{formats}"
+  ga-IE: "Formáid: %{formats}"
+  hi-IN: "स्वरूप: %{formats}"
+  hr-HR: "Formati: %{formats}"
+  hu-HU: "Formátumok: %{formats}"
+  is-IS: "Snið: %{formats}"
+  it-CH: "Formati: %{formats}"
+  it-IT: "Formati: %{formats}"
+  ja-JP: "フォーマット: %{formats}"
+  jv-ID: "Format: %{formats}"
+  ka-GE: "ფორმატები: %{formats}"
+  ko-KR: "형식: %{formats}"
+  lt-LT: "Formatai: %{formats}"
+  lv-LV: "Formāti: %{formats}"
+  mk-MK: "Формати: %{formats}"
+  mt-MT: "Formati: %{formats}"
+  nl-BE: "Formaten: %{formats}"
+  nl-NL: "Formaten: %{formats}"
+  no-NO: "Formater: %{formats}"
+  pl-PL: "Formaty: %{formats}"
+  pt-BR: "Formatos: %{formats}"
+  pt-PT: "Formatos: %{formats}"
+  ro-RO: "Formate: %{formats}"
+  ru-RU: "Форматы: %{formats}"
+  sk-SK: "Formáty: %{formats}"
+  sl-SI: "Formati: %{formats}"
+  sq-AL: "Formatet: %{formats}"
+  sr-BA: "Формати: %{formats}"
+  sr-ME: "Формати: %{formats}"
+  sr-RS: "Формати: %{formats}"
+  sv-SE: "Format: %{formats}"
+  th-TH: "รูปแบบ: %{formats}"
+  tr-TR: "Biçimler: %{formats}"
+  uk-UA: "Формати: %{formats}"
+  vi-VN: "Định dạng: %{formats}"
+  zh-CN: "格式: %{formats}"
+
+#
+# Header
+#
+
 header_command:
   en: "header"
   ar-SA: "رأس"
@@ -1336,6 +1571,7 @@ header_command:
   uk-UA: "заголовок"
   vi-VN: "tiêu đề"
   zh-CN: "标题"
+
 header_description:
   en: "Enable or disable result header"
   ar-SA: "تمكين أو تعطيل رأس النتيجة"
@@ -1394,6 +1630,7 @@ header_description:
   uk-UA: "Увімкнути або вимкнути заголовок результату"
   vi-VN: "Bật hoặc tắt tiêu đề kết quả"
   zh-CN: "启用或禁用结果标题"
+
 header_setting:
   en: "Header: %{header}"
   ar-SA: "رأس: {header}%"
@@ -1452,6 +1689,11 @@ header_setting:
   uk-UA: "Заголовок: %{header}"
   vi-VN: "Tiêu đề: %{header}"
   zh-CN: "标题: %{header}"
+
+#
+# Help
+#
+
 help_command:
   en: "help"
   ar-SA: "مساعدة"
@@ -1510,6 +1752,7 @@ help_command:
   uk-UA: "допомога"
   vi-VN: "trợ giúp"
   zh-CN: "帮助"
+
 help_description:
   en: "Show this help message"
   ar-SA: "عرض رسالة المساعدة هذه"
@@ -1568,6 +1811,11 @@ help_description:
   uk-UA: "Показати це довідкове повідомлення"
   vi-VN: "Hiển thị thông báo trợ giúp này"
   zh-CN: "显示此帮助消息"
+
+#
+# History
+#
+
 history_command:
   en: "history"
   ar-SA: "التاريخ"
@@ -1626,6 +1874,7 @@ history_command:
   uk-UA: "історія"
   vi-VN: "lịch sử"
   zh-CN: "历史"
+
 history_description:
   en: "Show the command history"
   ar-SA: "عرض سجل الأوامر"
@@ -1684,8 +1933,10 @@ history_description:
   uk-UA: "Показати історію команд"
   vi-VN: "Hiển thị lịch sử lệnh"
   zh-CN: "显示命令历史"
+
 history_list_entry:
   en: "%{index}: %{entry}"
+
 history_setting:
   en: "History: %{history}"
   ar-SA: "التاريخ: %{history}"
@@ -1744,6 +1995,11 @@ history_setting:
   uk-UA: "Історія: %{history}"
   vi-VN: "Lịch sử: %{history}"
   zh-CN: "历史: %{history}"
+
+#
+# Locale
+#
+
 locale_command:
   en: "locale"
   ar-SA: "اللغة"
@@ -1802,6 +2058,7 @@ locale_command:
   uk-UA: "локалізація"
   vi-VN: "địa phương"
   zh-CN: "区域"
+
 locale_argument:
   en: "[locale]"
   ar-SA: "[اللغة]"
@@ -1860,6 +2117,7 @@ locale_argument:
   uk-UA: "[локалізація]"
   vi-VN: "[địa phương]"
   zh-CN: "[区域]"
+
 locale_description:
   en: "Set the display locale"
   ar-SA: "تعيين لغة العرض"
@@ -1918,6 +2176,70 @@ locale_description:
   uk-UA: "Встановити мову відображення"
   vi-VN: "Thiết lập ngôn ngữ hiển thị"
   zh-CN: "设置显示区域"
+
+locale_setting:
+  en: "Locale: %{locale}"
+  ar-SA: "اللغة: %{locale}"
+  be-BY: "Месцазнаходжанне: %{locale}"
+  bg-BG: "Локал: %{locale}"
+  bn-BD: "লোকেল: %{locale}"
+  cs-CZ: "Lokalizace: %{locale}"
+  da-DK: "Lokalitet: %{locale}"
+  de-AT: "Lokalisierung: %{locale}"
+  de-CH: "Lokalisierung: %{locale}"
+  de-DE: "Lokalisierung: %{locale}"
+  de-LI: "Lokalisierung: %{locale}"
+  de-LU: "Lokalisierung: %{locale}"
+  el-GR: "Τοπικοποίηση: %{locale}"
+  en-GB: "Locale: %{locale}"
+  en-US: "Locale: %{locale}"
+  es-ES: "Configuración regional: %{locale}"
+  et-EE: "Lokaat: %{locale}"
+  fi-FI: "Alue: %{locale}"
+  fr-BE: "Localisation: %{locale}"
+  fr-CH: "Localisation: %{locale}"
+  fr-FR: "Localisation: %{locale}"
+  fr-LU: "Localisation: %{locale}"
+  ga-IE: "Limistéar: %{locale}"
+  hi-IN: "स्थानीय: %{locale}"
+  hr-HR: "Lokacija: %{locale}"
+  hu-HU: "Hely: %{locale}"
+  is-IS: "Staðsetning: %{locale}"
+  it-CH: "Localizzazione: %{locale}"
+  it-IT: "Localizzazione: %{locale}"
+  ja-JP: "ロケール: %{locale}"
+  jv-ID: "Lokasi: %{locale}"
+  ka-GE: "ლოკალი: %{locale}"
+  ko-KR: "로케일: %{locale}"
+  lt-LT: "Vietovė: %{locale}"
+  lv-LV: "Lokalizācija: %{locale}"
+  mk-MK: "Локал: %{locale}"
+  mt-MT: "Lokal: %{locale}"
+  nl-BE: "Locale: %{locale}"
+  nl-NL: "Locale: %{locale}"
+  no-NO: "Lokalisering: %{locale}"
+  pl-PL: "Lokalizacja: %{locale}"
+  pt-BR: "Local: %{locale}"
+  pt-PT: "Local: %{locale}"
+  ro-RO: "Localizare: %{locale}"
+  ru-RU: "Локализация: %{locale}"
+  sk-SK: "Lokalita: %{locale}"
+  sl-SI: "Lokalizacija: %{locale}"
+  sq-AL: "Lokale: %{locale}"
+  sr-BA: "Локал: %{locale}"
+  sr-ME: "Локал: %{locale}"
+  sr-RS: "Локал: %{locale}"
+  sv-SE: "Lokal: %{locale}"
+  th-TH: "ภูมิภาค: %{locale}"
+  tr-TR: "Yerel: %{locale}"
+  uk-UA: "Локалізація: %{locale}"
+  vi-VN: "Địa phương: %{locale}"
+  zh-CN: "区域: %{locale}"
+
+#
+# Quit
+#
+
 quit_command:
   en: "quit"
   ar-SA: "إنهاء"
@@ -1976,6 +2298,7 @@ quit_command:
   uk-UA: "вийти"
   vi-VN: "thoát"
   zh-CN: "退出"
+
 quit_description:
   en: "Quit the application"
   ar-SA: "إنهاء التطبيق"
@@ -2034,6 +2357,11 @@ quit_description:
   uk-UA: "Вийти з програми"
   vi-VN: "Thoát khỏi ứng dụng"
   zh-CN: "退出应用程序"
+
+#
+# Tables
+#
+
 tables_command:
   en: "tables"
   ar-SA: "الجداول"
@@ -2092,6 +2420,7 @@ tables_command:
   uk-UA: "таблиці"
   vi-VN: "bảng"
   zh-CN: "表"
+
 tables_description:
   en: "List the tables in the database"
   ar-SA: "قائمة الجداول في قاعدة البيانات"
@@ -2150,6 +2479,11 @@ tables_description:
   uk-UA: "Список таблиць у базі даних"
   vi-VN: "Liệt kê các bảng trong cơ sở dữ liệu"
   zh-CN: "列出数据库中的表"
+
+#
+# Timer
+#
+
 timer_command:
   en: "timer"
   ar-SA: "المؤقت"
@@ -2208,6 +2542,7 @@ timer_command:
   uk-UA: "таймер"
   vi-VN: "bộ hẹn giờ"
   zh-CN: "计时器"
+
 timer_description:
   en: "Enable or disable query execution timer"
   ar-SA: "تمكين أو تعطيل مؤقت تنفيذ الاستعلام"
@@ -2266,6 +2601,7 @@ timer_description:
   uk-UA: "Увімкнути або вимкнути таймер виконання запиту"
   vi-VN: "Bật hoặc tắt bộ đếm thời gian thực thi truy vấn"
   zh-CN: "启用或禁用查询执行计时器"
+
 timer_setting:
   en: "Timer: %{timer}"
   ar-SA: "المؤقت: %{timer}"
@@ -2324,6 +2660,11 @@ timer_setting:
   uk-UA: "Таймер: %{timer}"
   vi-VN: "Bộ hẹn giờ: %{timer}"
   zh-CN: "计时器: %{timer}"
+
+#
+# Various Translations
+#
+
 on:
   en: "on"
   ar-SA: "تشغيل"
@@ -2382,6 +2723,7 @@ on:
   uk-UA: "увімкнено"
   vi-VN: "bật"
   zh-CN: "开"
+
 off:
   en: "off"
   ar-SA: "إيقاف"
@@ -2440,5 +2782,10 @@ off:
   uk-UA: "вимкнено"
   vi-VN: "tắt"
   zh-CN: "关"
+
 on_off_argument:
   en: "%{on}|%{off}"
+
+list_delimiter:
+  en: ", "
+  ar-SA: "، "

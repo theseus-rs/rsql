@@ -26,20 +26,23 @@ impl ShellCommand for Command {
         let formatter_manager = options.formatter_manager;
 
         if options.input.len() <= 1 {
-            writeln!(
-                options.output,
-                "Format: {}",
-                options.configuration.results_format
-            )?;
+            let format_setting = t!(
+                "format_setting",
+                locale = locale,
+                format = options.configuration.results_format
+            )
+            .to_string();
+            writeln!(options.output, "{}", format_setting)?;
 
-            write!(options.output, "Available formats: ")?;
-            for (i, formatter) in formatter_manager.iter().enumerate() {
-                if i > 0 {
-                    write!(options.output, ", ")?;
-                }
-                write!(options.output, "{}", formatter.identifier())?;
-            }
-            writeln!(options.output)?;
+            let list_delimiter = t!("list_delimiter", locale = locale).to_string();
+            let formats: String = formatter_manager
+                .iter()
+                .map(|driver| driver.identifier())
+                .collect::<Vec<_>>()
+                .join(list_delimiter.as_str());
+            let format_options =
+                t!("format_options", locale = locale, formats = formats).to_string();
+            writeln!(options.output, "{}", format_options)?;
 
             return Ok(LoopCondition::Continue);
         }
@@ -115,7 +118,7 @@ mod tests {
         let format_output = String::from_utf8(output)?;
         assert_eq!(
             format_output,
-            "Format: unicode\nAvailable formats: ascii, csv, html, json, jsonl, tsv, unicode, xml, yaml\n"
+            "Format: unicode\nFormats: ascii, csv, html, json, jsonl, tsv, unicode, xml, yaml\n"
         );
         Ok(())
     }
