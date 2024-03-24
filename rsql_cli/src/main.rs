@@ -150,11 +150,11 @@ mod tests {
 
         let _ = execute(args, configuration, &mut output).await?;
 
-        let comand_output = String::from_utf8(output)?;
+        let command_output = String::from_utf8(output)?;
         let expected = indoc! {r#"
             Locale: en
         "#};
-        assert_eq!(comand_output, expected);
+        assert_eq!(command_output, expected);
         Ok(())
     }
 
@@ -171,8 +171,8 @@ mod tests {
         };
         welcome_message(&mut output, &configuration);
 
-        let comand_output = String::from_utf8(output).unwrap();
-        assert!(comand_output.starts_with("rsql/0.0.0"));
-        assert!(comand_output.contains("Type '.help' for help, '.quit' to exit."));
+        let command_output = String::from_utf8(output).unwrap();
+        assert!(command_output.starts_with("rsql/0.0.0"));
+        assert!(command_output.contains("Type '.help' for help, '.quit' to exit."));
     }
 }

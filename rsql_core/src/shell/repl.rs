@@ -1,6 +1,7 @@
-use crate::commands::{CommandManager, LoopCondition};
+use crate::commands::{help, CommandManager, LoopCondition, ShellCommand};
 use crate::configuration::Configuration;
 use crate::drivers::{Connection, DriverManager};
+use crate::executors;
 use crate::executors::Executor;
 use crate::formatters::FormatterManager;
 use crate::shell::helper::ReplHelper;
@@ -137,27 +138,11 @@ impl<'a> Shell<'a> {
         commands: Vec<String>,
     ) -> Result<()> {
         for command in commands {
-            let result = &self
+            if let LoopCondition::Exit(exit_code) = &self
                 .evaluate(connection, &DefaultHistory::new(), command.to_string())
-                .await;
-
-            match result {
-                Ok(LoopCondition::Continue) => {}
-                Ok(LoopCondition::Exit(exit_code)) => {
-                    if self.configuration.bail_on_error {
-                        std::process::exit(*exit_code);
-                    }
-                }
-                Err(error) => {
-                    if self.configuration.color {
-                        eprintln!("{}: {:?}", "Error".red(), error);
-                    } else {
-                        eprintln!("Error: {:?}", error);
-                    }
-                    if self.configuration.bail_on_error {
-                        std::process::exit(1);
-                    }
-                }
+                .await?
+            {
+                std::process::exit(*exit_code);
             }
         }
 
@@ -207,32 +192,19 @@ impl<'a> Shell<'a> {
 
             let loop_condition = match editor.readline(&prompt) {
                 Ok(line) => {
-                    let result = &self
+                    match &self
                         .evaluate(connection, editor.history(), line.clone())
                         .await
-                        .unwrap_or_else(|error| {
-                            let mut error_string = "Error:".to_string();
-                            let error_message = format!("{:?}", error);
-                            if self.configuration.color {
-                                error_string = error_string.red().to_string();
+                    {
+                        Ok(LoopCondition::Continue) => LoopCondition::Continue,
+                        Ok(LoopCondition::Exit(exit_code)) => {
+                            if self.configuration.history {
+                                editor.save_history(history_file.as_str())?;
                             }
-                            eprintln!(
-                                "{error}: {message}",
-                                error = error_string,
-                                message = error_message
-                            );
-                            if self.configuration.bail_on_error {
-                                LoopCondition::Exit(1)
-                            } else {
-                                LoopCondition::Continue
-                            }
-                        });
-                    let result = result.clone();
-
-                    if result == LoopCondition::Continue && self.configuration.history {
-                        let _ = editor.add_history_entry(line.as_str());
+                            LoopCondition::Exit(*exit_code)
+                        }
+                        Err(_error) => LoopCondition::Exit(1),
                     }
-                    result
                 }
                 Err(ReadlineError::Interrupted) => {
                     let mut program_interrupted =
@@ -294,8 +266,87 @@ impl<'a> Shell<'a> {
             connection,
             &mut self.output,
         );
-        let loop_condition = executor.execute(line.as_str()).await?;
-        Ok(loop_condition)
+        let result = executor.execute(line.as_str()).await;
+
+        if let Err(executors::Error::InvalidCommand { command_name }) = &result {
+            if self.invalid_command_help_available(command_name.clone())? {
+                return Ok(LoopCondition::Continue);
+            }
+        }
+
+        match result {
+            Ok(LoopCondition::Continue) => Ok(LoopCondition::Continue),
+            Ok(LoopCondition::Exit(exit_code)) => Ok(LoopCondition::Exit(exit_code)),
+            Err(error) => {
+                let locale = self.configuration.locale.as_str();
+                let mut error_string = t!("error", locale = locale).to_string();
+                let error_message = format!("{:?}", error);
+                if self.configuration.color {
+                    error_string = error_string.red().to_string();
+                }
+                eprintln!(
+                    "{}",
+                    t!(
+                        "error_format",
+                        locale = locale,
+                        error = error_string.red(),
+                        message = error_message,
+                    )
+                );
+
+                if self.configuration.bail_on_error {
+                    Err(error.into())
+                } else {
+                    Ok(LoopCondition::Continue)
+                }
+            }
+        }
+    }
+
+    fn invalid_command_help_available(&mut self, mut invalid_command: String) -> Result<bool> {
+        let locale = self.configuration.locale.as_str();
+        let mut help_command = help::Command.name(locale);
+
+        if self
+            .command_manager
+            .get(locale, help_command.as_str())
+            .is_none()
+        {
+            return Ok(false);
+        }
+
+        let command_identifier = &self.configuration.command_identifier;
+        help_command = format!("{command_identifier}{help_command}");
+        invalid_command = format!("{command_identifier}{invalid_command}");
+
+        if self.configuration.color {
+            invalid_command = invalid_command.bold().to_string();
+            help_command = help_command.bold().to_string();
+        }
+
+        let error_message = t!(
+            "invalid_command",
+            locale = locale,
+            invalid_command = invalid_command,
+            help_command = help_command,
+        );
+
+        let mut error_string = t!("error", locale = locale).to_string();
+        if self.configuration.color {
+            error_string = error_string.red().to_string();
+        }
+        writeln!(
+            self.output,
+            "{}",
+            t!(
+                "error_format",
+                locale = locale,
+                error = error_string.red(),
+                message = error_message,
+            )
+        )?;
+
+        Ok(true)
     }
 }
 
@@ -501,6 +552,39 @@ mod test {
 
         assert_eq!(result, LoopCondition::Continue);
         assert_eq!(shell.configuration.bail_on_error, true);
+        Ok(())
+    }
+
+    #[test]
+    fn test_invalid_command_help_available_returns_true() -> anyhow::Result<()> {
+        let configuration = Configuration {
+            color: true,
+            locale: "en".to_string(),
+            ..Default::default()
+        };
+        let mut output = Vec::new();
+        let mut shell = ShellBuilder::new(&mut output)
+            .with_configuration(configuration)
+            .build();
+        let invalid_command = "foo".to_string();
+
+        assert!(shell.invalid_command_help_available(invalid_command)?);
+
+        let command_output = String::from_utf8(output).unwrap();
+        assert!(command_output.contains(".foo"));
+        assert!(command_output.contains(".help"));
+        Ok(())
+    }
+
+    #[test]
+    fn test_invalid_command_help_available_returns_false() -> anyhow::Result<()> {
+        let mut output = Vec::new();
+        let mut shell = ShellBuilder::new(&mut output)
+            .with_command_manager(CommandManager::new())
+            .build();
+        let invalid_command = "foo".to_string();
+
+        assert!(!shell.invalid_command_help_available(invalid_command)?);
         Ok(())
     }
 }
