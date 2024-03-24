@@ -39,7 +39,7 @@ impl ShellCommand for Command {
                     let mut entry = entry.to_string();
                     if options.configuration.color {
                         entry = entry.dimmed().to_string()
-                    };
+                    }
 
                     let history_list_entry = t!(
                         "history_list_entry",
