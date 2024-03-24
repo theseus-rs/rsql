@@ -25,27 +25,26 @@ impl ShellCommand for Command {
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
         let locale = options.configuration.locale.as_str();
+        let on = t!("on", locale = locale).to_string();
+        let off = t!("off", locale = locale).to_string();
 
         if options.input.len() <= 1 {
-            let echo = if options.configuration.echo {
-                "on"
-            } else {
-                "off"
-            };
+            let echo = if options.configuration.echo { on } else { off };
             let echo_setting = t!("echo_setting", locale = locale, echo = echo).to_string();
             writeln!(options.output, "{}", echo_setting)?;
             return Ok(LoopCondition::Continue);
         }
 
-        let echo = match options.input[1].to_lowercase().as_str() {
-            "on" => true,
-            "off" => false,
-            option => {
-                return Err(InvalidOption {
-                    command_name: self.name(locale).to_string(),
-                    option: option.to_string(),
-                })
-            }
+        let argument = options.input[1].to_lowercase().to_string();
+        let echo = if argument == on {
+            true
+        } else if argument == off {
+            false
+        } else {
+            return Err(InvalidOption {
+                command_name: self.name(locale).to_string(),
+                option: argument,
+            });
         };
 
         options.configuration.echo = echo;

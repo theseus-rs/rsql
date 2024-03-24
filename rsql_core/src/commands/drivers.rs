@@ -17,16 +17,17 @@ impl ShellCommand for Command {
     }
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
+        let locale = options.configuration.locale.as_str();
         let driver_manager = options.driver_manager;
 
-        write!(options.output, "Available drivers: ")?;
-        for (i, driver) in driver_manager.iter().enumerate() {
-            if i > 0 {
-                write!(options.output, ", ")?;
-            }
-            write!(options.output, "{}", driver.identifier())?;
-        }
-        writeln!(options.output)?;
+        let list_delimiter = t!("list_delimiter", locale = locale).to_string();
+        let drivers: String = driver_manager
+            .iter()
+            .map(|driver| driver.identifier())
+            .collect::<Vec<_>>()
+            .join(list_delimiter.as_str());
+        let drivers_options = t!("drivers_options", locale = locale, drivers = drivers).to_string();
+        writeln!(options.output, "{}", drivers_options)?;
 
         Ok(LoopCondition::Continue)
     }
@@ -73,7 +74,7 @@ mod tests {
 
         assert_eq!(result, LoopCondition::Continue);
         let drivers_output = String::from_utf8(output)?;
-        assert_eq!(drivers_output, "Available drivers: postgresql, sqlite\n");
+        assert_eq!(drivers_output, "Drivers: postgresql, sqlite\n");
         Ok(())
     }
 }
