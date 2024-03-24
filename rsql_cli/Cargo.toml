@@ -29,14 +29,14 @@ anyhow = { workspace = true }
 clap = { workspace = true, features = ["derive", "env"] }
 colored = { workspace = true }
 dotenvy = { workspace = true }
+os_info = { workspace = true }
 rsql_core = { path = "../rsql_core", version = "0.7.2", features = ["all"] }
 rust-i18n = { workspace = true }
 tokio = { workspace = true, features = ["rt", "rt-multi-thread", "macros"] }
 tracing = { workspace = true }
 
 [dev-dependencies]
-criterion = { workspace = true }
-test-log = { workspace = true }
+indoc = { workspace = true }
 tokio = { workspace = true }
 
 [[bin]]

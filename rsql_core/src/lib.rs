@@ -8,7 +8,6 @@ pub mod drivers;
 pub mod executors;
 pub mod formatters;
 pub mod shell;
-pub mod version;
 
 use rust_i18n::i18n;
 
