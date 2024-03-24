@@ -8,7 +8,7 @@ use std::str::FromStr;
 
 /// Show the history of the shell
 #[derive(Debug, Default)]
-pub(crate) struct Command;
+pub struct Command;
 
 #[async_trait]
 impl ShellCommand for Command {

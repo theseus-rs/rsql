@@ -4,7 +4,7 @@ use rust_i18n::t;
 
 /// Clear the screen
 #[derive(Debug, Default)]
-pub(crate) struct Command;
+pub struct Command;
 
 #[async_trait]
 impl ShellCommand for Command {

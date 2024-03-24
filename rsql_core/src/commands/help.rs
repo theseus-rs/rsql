@@ -9,7 +9,7 @@ use unicode_width::UnicodeWidthStr;
 
 /// Show the help message
 #[derive(Debug, Default)]
-pub(crate) struct Command;
+pub struct Command;
 
 #[async_trait]
 impl ShellCommand for Command {

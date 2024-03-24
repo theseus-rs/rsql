@@ -4,7 +4,7 @@ use rust_i18n::t;
 
 /// Command to display the available drivers
 #[derive(Debug, Default)]
-pub(crate) struct Command;
+pub struct Command;
 
 #[async_trait]
 impl ShellCommand for Command {

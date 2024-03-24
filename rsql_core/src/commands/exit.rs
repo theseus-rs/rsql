@@ -5,7 +5,7 @@ use tracing::info;
 
 /// Exit the application
 #[derive(Debug, Default)]
-pub(crate) struct Command;
+pub struct Command;
 
 #[async_trait]
 impl ShellCommand for Command {

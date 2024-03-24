@@ -2,7 +2,6 @@ use anyhow::{bail, Result};
 use config::{Config, FileFormat};
 use dirs::home_dir;
 use indicatif::ProgressStyle;
-use num_format::Locale;
 use rustyline::EditMode;
 use std::env;
 use std::fs::{create_dir_all, OpenOptions};
@@ -414,7 +413,7 @@ fn get_locale(config: &Config) -> String {
 
     for i in (0..parts.len()).rev() {
         let locale = parts[0..=i].join("-");
-        if Locale::from_str(locale.as_str()).is_ok() {
+        if available_locales!().contains(&locale.as_str()) {
             return locale;
         }
     }
