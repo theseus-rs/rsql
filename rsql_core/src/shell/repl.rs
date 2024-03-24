@@ -275,8 +275,7 @@ impl<'a> Shell<'a> {
         }
 
         match result {
-            Ok(LoopCondition::Continue) => Ok(LoopCondition::Continue),
-            Ok(LoopCondition::Exit(exit_code)) => Ok(LoopCondition::Exit(exit_code)),
+            Ok(loop_condition) => Ok(loop_condition),
             Err(error) => {
                 let locale = self.configuration.locale.as_str();
                 let mut error_string = t!("error", locale = locale).to_string();
@@ -553,6 +552,49 @@ mod test {
         assert_eq!(result, LoopCondition::Continue);
         assert_eq!(shell.configuration.bail_on_error, true);
         Ok(())
+    }
+
+    async fn test_eval_invalid_command(
+        bail: bool,
+        command_manager: CommandManager,
+    ) -> anyhow::Result<()> {
+        let configuration = Configuration {
+            bail_on_error: bail,
+            ..Default::default()
+        };
+        let mut output = Vec::new();
+        let mut shell = ShellBuilder::new(&mut output)
+            .with_configuration(configuration)
+            .with_command_manager(command_manager)
+            .build();
+        let history = DefaultHistory::new();
+        let mut connection = MockConnection::new();
+
+        let result = shell
+            .evaluate(&mut connection, &history, ".foo".to_string())
+            .await;
+
+        if bail {
+            assert!(result.is_err());
+        } else {
+            assert_eq!(result?, LoopCondition::Continue);
+        }
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_evaluate_invalid_command() -> anyhow::Result<()> {
+        test_eval_invalid_command(false, CommandManager::default()).await
+    }
+
+    #[tokio::test]
+    async fn test_evaluate_invalid_command_help_not_available_no_bail() -> anyhow::Result<()> {
+        test_eval_invalid_command(false, CommandManager::new()).await
+    }
+
+    #[tokio::test]
+    async fn test_evaluate_invalid_command_help_not_available_bail() -> anyhow::Result<()> {
+        test_eval_invalid_command(true, CommandManager::new()).await
     }
 
     #[test]
