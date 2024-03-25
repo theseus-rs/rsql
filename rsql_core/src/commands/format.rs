@@ -90,7 +90,7 @@ mod tests {
         let description = Command.description("en");
         assert_eq!(
             description,
-            "Format results in ascii, csv, html, json, jsonl, tsv, unicode, xml, yaml"
+            "Format results in ascii, csv, html, json, jsonl, plain, tsv, unicode, xml, yaml"
         );
     }
 
@@ -118,7 +118,7 @@ mod tests {
         let format_output = String::from_utf8(output)?;
         assert_eq!(
             format_output,
-            "Format: unicode\nFormats: ascii, csv, html, json, jsonl, tsv, unicode, xml, yaml\n"
+            "Format: unicode\nFormats: ascii, csv, html, json, jsonl, plain, tsv, unicode, xml, yaml\n"
         );
         Ok(())
     }

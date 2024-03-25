@@ -106,6 +106,7 @@ theme.dark = "Solarized (dark)"
 #   "html" - HyperText Markup Language (HTML)
 #   "json" - JavaScript Object Notation (JSON)
 #   "jsonl" - JSON Lines (JSONL)
+#   "plain" - Column based layout.
 #   "tsv" - Tab Separated Values (TSV)
 #   "unicode" - Unicode characters to draw a table.
 #   "xml" - Extensible Markup Language (XML)

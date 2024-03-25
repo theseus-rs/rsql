@@ -8,6 +8,7 @@ mod highlighter;
 mod html;
 mod json;
 mod jsonl;
+mod plain;
 mod table;
 mod tsv;
 mod unicode;
