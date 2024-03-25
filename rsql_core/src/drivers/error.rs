@@ -73,6 +73,14 @@ mod test {
     }
 
     #[test]
+    fn test_rusqlite_error() {
+        let error = rusqlite::Error::QueryReturnedNoRows;
+        let io_error = Error::from(error);
+
+        assert_eq!(io_error.to_string(), "Query returned no rows");
+    }
+
+    #[test]
     fn test_sqlx_error() {
         let error = sqlx::Error::RowNotFound;
         let io_error = Error::from(error);

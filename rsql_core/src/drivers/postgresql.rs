@@ -104,14 +104,15 @@ impl crate::drivers::Connection for Connection {
 
     async fn query(&self, sql: &str) -> Result<Results> {
         let query_rows = sqlx::query(sql).fetch_all(&self.pool).await?;
-        let columns = if let Some(row) = query_rows.first() {
-            row.columns()
-                .iter()
-                .map(|column| column.name().to_string())
-                .collect()
-        } else {
-            Vec::new()
-        };
+        let columns: Vec<String> = query_rows
+            .first()
+            .map(|row| {
+                row.columns()
+                    .iter()
+                    .map(|column| column.name().to_string())
+                    .collect()
+            })
+            .unwrap_or_default();
 
         let mut rows = Vec::new();
         for row in query_rows {
