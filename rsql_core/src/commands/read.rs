@@ -101,9 +101,7 @@ mod tests {
 
         let result = Command.execute(options).await;
         let error = result.unwrap_err();
-        assert!(error
-            .to_string()
-            .contains("No such file or directory (os error 2)"));
+        assert!(error.to_string().contains("No such file or directory"));
     }
 
     #[tokio::test]
