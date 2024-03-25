@@ -10,9 +10,12 @@ use postgresql_archive::Version;
 use postgresql_embedded::{PostgreSQL, Settings};
 use sqlx::postgres::{PgColumn, PgConnectOptions, PgRow};
 use sqlx::{Column, PgPool, Row};
+use std::collections::HashMap;
 use std::ops::Deref;
 use std::str::FromStr;
 use std::string::ToString;
+use tracing::debug;
+use url::Url;
 
 const POSTGRESQL_EMBEDDED_VERSION: &str = "16.2.3";
 
@@ -28,9 +31,10 @@ impl crate::drivers::Driver for Driver {
     async fn connect(
         &self,
         configuration: &Configuration,
-        url: &str,
+        url: String,
+        password: Option<String>,
     ) -> Result<Box<dyn crate::drivers::Connection>> {
-        let connection = Connection::new(configuration, url).await?;
+        let connection = Connection::new(configuration, url, password).await?;
         Ok(Box::new(connection))
     }
 }
@@ -42,19 +46,34 @@ pub(crate) struct Connection {
 }
 
 impl Connection {
-    pub(crate) async fn new(configuration: &Configuration, url: &str) -> Result<Connection> {
+    pub(crate) async fn new(
+        configuration: &Configuration,
+        url: String,
+        password: Option<String>,
+    ) -> Result<Connection> {
+        let parsed_url = Url::parse(url.as_str())?;
+        let query_parameters: HashMap<String, String> =
+            parsed_url.query_pairs().into_owned().collect();
+        let embedded = query_parameters
+            .get("embedded")
+            .map(|v| v == "true")
+            .unwrap_or(false);
         let mut database_url = url.to_string();
-        let postgresql = if url.starts_with("postgresql::embedded:") {
-            let version = Version::from_str(POSTGRESQL_EMBEDDED_VERSION)?;
-            let settings = if let Some(config_dir) = &configuration.config_dir {
-                Settings {
-                    installation_dir: config_dir.join("postgresql"),
-                    ..Default::default()
-                }
-            } else {
-                Settings::default()
-            };
 
+        let postgresql = if embedded {
+            let default_version = POSTGRESQL_EMBEDDED_VERSION.to_string();
+            let specified_version = query_parameters.get("version").unwrap_or(&default_version);
+            let version = Version::from_str(specified_version)?;
+            let mut settings = Settings::from_url(url)?;
+
+            if let Some(config_dir) = &configuration.config_dir {
+                settings.installation_dir = config_dir.clone();
+            }
+            if let Some(password) = password {
+                settings.password = password;
+            }
+
+            debug!("Starting embedded PostgreSQL {version} server");
             let mut postgresql = PostgreSQL::new(version, settings);
             postgresql.setup().await?;
             postgresql.start().await?;
@@ -85,14 +104,15 @@ impl crate::drivers::Connection for Connection {
 
     async fn query(&self, sql: &str) -> Result<Results> {
         let query_rows = sqlx::query(sql).fetch_all(&self.pool).await?;
-        let columns = if let Some(row) = query_rows.first() {
-            row.columns()
-                .iter()
-                .map(|column| column.name().to_string())
-                .collect()
-        } else {
-            Vec::new()
-        };
+        let columns: Vec<String> = query_rows
+            .first()
+            .map(|row| {
+                row.columns()
+                    .iter()
+                    .map(|column| column.name().to_string())
+                    .collect()
+            })
+            .unwrap_or_default();
 
         let mut rows = Vec::new();
         for row in query_rows {
@@ -111,13 +131,14 @@ impl crate::drivers::Connection for Connection {
     async fn tables(&mut self) -> Result<Vec<String>> {
         let sql = "SELECT table_name FROM information_schema.tables \
             WHERE table_schema = 'public' ORDER BY table_name";
-        let rows = sqlx::query(sql).fetch_all(&self.pool).await?;
+        let results = self.query(sql).await?;
         let mut tables = Vec::new();
 
-        for row in rows {
-            match row.try_get::<String, _>(0) {
-                Ok(table_name) => tables.push(table_name),
-                Err(error) => return Err(error.into()),
+        if let Results::Query(query_results) = results {
+            for row in query_results.rows().await {
+                if let Some(data) = &row[0] {
+                    tables.push(data.to_string());
+                }
             }
         }
 
@@ -221,7 +242,7 @@ mod test {
     use chrono::{NaiveDate, NaiveDateTime, NaiveTime, Utc};
     use serde_json::json;
 
-    const DATABASE_URL: &str = "postgresql::embedded:";
+    const DATABASE_URL: &str = "postgresql://?embedded=true";
 
     #[tokio::test]
     async fn test_driver_connect() -> anyhow::Result<()> {

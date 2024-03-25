@@ -5,6 +5,9 @@ pub enum Error {
     /// Error when a driver for an identifier is not found
     #[error("driver not found for identifier [{identifier}]")]
     DriverNotFound { identifier: String },
+    /// Error parsing a URL
+    #[error(transparent)]
+    InvalidUrl(#[from] url::ParseError),
     /// IO error
     #[error(transparent)]
     IoError(anyhow::Error),
@@ -28,6 +31,14 @@ impl From<postgresql_archive::Error> for Error {
 #[cfg(feature = "postgresql")]
 impl From<postgresql_embedded::Error> for Error {
     fn from(error: postgresql_embedded::Error) -> Self {
+        Error::IoError(error.into())
+    }
+}
+
+/// Converts a [`rusqlite::Error`] into an [`ParseError`](Error::IoError)
+#[cfg(feature = "rusqlite")]
+impl From<rusqlite::Error> for Error {
+    fn from(error: rusqlite::Error) -> Self {
         Error::IoError(error.into())
     }
 }
@@ -59,6 +70,14 @@ mod test {
         let io_error = Error::from(error);
 
         assert_eq!(io_error.to_string(), "test");
+    }
+
+    #[test]
+    fn test_rusqlite_error() {
+        let error = rusqlite::Error::QueryReturnedNoRows;
+        let io_error = Error::from(error);
+
+        assert_eq!(io_error.to_string(), "Query returned no rows");
     }
 
     #[test]

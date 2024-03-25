@@ -413,7 +413,7 @@ mod test {
         mock_driver
             .expect_identifier()
             .returning(|| driver_identifier);
-        mock_driver.expect_connect().returning(|_, _| {
+        mock_driver.expect_connect().returning(|_, _, _| {
             let mut mock_connection = MockConnection::new();
             mock_connection.expect_stop().returning(|| Ok(()));
             Ok(Box::new(mock_connection))
@@ -426,7 +426,7 @@ mod test {
             .with_driver_manager(driver_manager)
             .build();
         let mut args = ShellArgs::default();
-        args.url = driver_identifier.to_string();
+        args.url = format!("{driver_identifier}://");
         args.commands = vec![".bail on".to_string()];
 
         shell.execute(&args).await?;

@@ -165,7 +165,7 @@ mod tests {
             program_name: "rsql".to_string(),
             version: "0.0.0".to_string(),
             locale: "en".to_string(),
-            color: false,
+            color: true,
             command_identifier: ".".to_string(),
             ..Default::default()
         };
@@ -173,6 +173,7 @@ mod tests {
 
         let command_output = String::from_utf8(output).unwrap();
         assert!(command_output.starts_with("rsql/0.0.0"));
-        assert!(command_output.contains("Type '.help' for help, '.quit' to exit."));
+        assert!(command_output.contains(".help"));
+        assert!(command_output.contains(".quit"));
     }
 }

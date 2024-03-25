@@ -1,8 +1,10 @@
 # All of the initial translations were performed by machine translation.
 # Please review and correct the translations as needed.
 _version: 2
+
 banner_version:
   en: "%{version}"
+
 banner_message:
   en: "Type '%{help_command}' for help, '%{quit_command}' to exit."
   ar-SA: "اكتب '{help_command}%' للمساعدة، '{quit_command}%' للخروج."

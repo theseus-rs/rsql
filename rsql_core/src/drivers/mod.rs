@@ -4,6 +4,8 @@ pub(crate) mod postgresql;
 mod connection;
 mod driver;
 mod error;
+#[cfg(feature = "rusqlite")]
+pub(crate) mod rusqlite;
 #[cfg(feature = "sqlite")]
 pub(crate) mod sqlite;
 mod value;

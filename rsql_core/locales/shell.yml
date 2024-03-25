@@ -125,6 +125,7 @@ error:
 
 error_format:
   en: "%{error}: %{message}"
+  ar-SA: "%{message} :%{error}"
 
 invalid_command:
   en: "Invalid command '%{invalid_command}', for help type '%{help_command}'"

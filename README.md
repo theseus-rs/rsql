@@ -36,6 +36,32 @@ visit the [RSQL](https://theseus-rs.github.io/rsql/rsql_cli/) site.
 
 [![asciicast](https://asciinema.org/a/647597.svg)](https://asciinema.org/a/647597)
 
+## Usage
+
+```shell
+rsql --url <url>
+```
+
+| Driver            | URL                                                                           |
+|-------------------|-------------------------------------------------------------------------------|
+| postgresql (sqlx) | `postgresql://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>` |
+| rusqlite          | `rusqlite://?<memory=true>[&file=<database_file>]`                            |
+| sqlite (sqlx)     | `sqlite://?<memory=true>[&file=<database_file>]`                              |
+
+## Features
+
+| Feature             |                                            |
+|---------------------|--------------------------------------------|
+| Databases           | ✅ (PostgreSQL, SQLite3)                    |
+| Embedded PostgreSQL | ✅                                          |
+| Syntax Highlighting | ✅                                          |
+| Result Highlighting | ✅                                          |
+| History             | ✅                                          |
+| SQL File Execution  | ✅                                          |
+| Output Formats      | ✅ (csv, html, json, jsonl, tsv, xml, yaml) |
+| Localized Interface | ✅ (50+ locales)                            |
+| Key Bindings        | ✅ (emacs, vi)                              |
+
 ## Safety
 
 These crates use `#![forbid(unsafe_code)]` to ensure everything is implemented in 100% safe Rust.

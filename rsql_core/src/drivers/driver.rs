@@ -6,6 +6,7 @@ use async_trait::async_trait;
 use std::collections::BTreeMap;
 use std::fmt::Debug;
 use tracing::instrument;
+use url::Url;
 
 #[cfg_attr(test, mockall::automock)]
 #[async_trait]
@@ -14,7 +15,8 @@ pub trait Driver: Debug + Send + Sync {
     async fn connect(
         &self,
         configuration: &Configuration,
-        url: &str,
+        url: String,
+        password: Option<String>,
     ) -> Result<Box<dyn Connection>>;
 }
 
@@ -55,15 +57,15 @@ impl DriverManager {
         configuration: &Configuration,
         url: &str,
     ) -> Result<Box<dyn Connection>> {
-        let identifier = match url.split_once(':') {
-            Some((before, _)) => before,
-            None => url,
-        };
+        let parsed_url = Url::parse(url)?;
+        let scheme = parsed_url.scheme();
+        let password = parsed_url.password().map(|password| password.to_string());
+        let url = url.to_string();
 
-        match &self.get(identifier) {
-            Some(driver) => driver.connect(configuration, url).await,
+        match &self.get(scheme) {
+            Some(driver) => driver.connect(configuration, url, password).await,
             None => Err(DriverNotFound {
-                identifier: identifier.to_string(),
+                identifier: scheme.to_string(),
             }),
         }
     }
@@ -79,6 +81,8 @@ impl Default for DriverManager {
 
         #[cfg(feature = "postgresql")]
         drivers.add(Box::new(crate::drivers::postgresql::Driver));
+        #[cfg(feature = "rusqlite")]
+        drivers.add(Box::new(crate::drivers::rusqlite::Driver));
         #[cfg(feature = "sqlite")]
         drivers.add(Box::new(crate::drivers::sqlite::Driver));
 
@@ -121,6 +125,9 @@ mod tests {
         #[cfg(feature = "postgresql")]
         let driver_count = driver_count + 1;
 
+        #[cfg(feature = "rusqlite")]
+        let driver_count = driver_count + 1;
+
         #[cfg(feature = "sqlite")]
         let driver_count = driver_count + 1;
 
@@ -134,31 +141,24 @@ mod tests {
         mock_driver.expect_identifier().returning(|| identifier);
         mock_driver
             .expect_connect()
-            .returning(|_, _| Ok(Box::new(MockConnection::new())));
+            .returning(|_, _, _| Ok(Box::new(MockConnection::new())));
 
         let mut driver_manager = DriverManager::new();
         driver_manager.add(Box::new(mock_driver));
 
         let configuration = Configuration::default();
-        let _ = driver_manager.connect(&configuration, "test::").await?;
+        let _ = driver_manager.connect(&configuration, "test:").await?;
         Ok(())
     }
 
     #[tokio::test]
-    async fn test_driver_manager_connect_without_colon() -> anyhow::Result<()> {
-        let identifier = "test";
-        let mut mock_driver = MockDriver::new();
-        mock_driver.expect_identifier().returning(|| identifier);
-        mock_driver
-            .expect_connect()
-            .returning(|_, _| Ok(Box::new(MockConnection::new())));
-
-        let mut driver_manager = DriverManager::new();
-        driver_manager.add(Box::new(mock_driver));
-
+    async fn test_driver_manager_connect_without_colon() {
+        let driver_manager = DriverManager::new();
         let configuration = Configuration::default();
-        let _ = driver_manager.connect(&configuration, identifier).await?;
-        Ok(())
+        assert!(driver_manager
+            .connect(&configuration, "test")
+            .await
+            .is_err());
     }
 
     #[tokio::test]
