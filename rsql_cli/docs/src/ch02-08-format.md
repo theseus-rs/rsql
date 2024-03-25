@@ -17,7 +17,7 @@ The format command sets the format mode for the CLI. The default format mode is 
 | `html`    | [HyperText Markup Language (HTML)](https://html.spec.whatwg.org/multipage/)        |
 | `json`    | [JavaScript Object Notation (JSON)](https://datatracker.ietf.org/doc/html/rfc8259) |
 | `jsonl`   | [JSON Lines (JSONL)](https://jsonlines.org/)                                       |
-| `plain`   | Column based layout.                                                               |
+| `plain`   | Column based layout                                                                |
 | `tsv`     | [Tab Separated Values (TSV)](https://en.wikipedia.org/wiki/Tab-separated_values)   |
 | `unicode` | Unicode characters to draw a table                                                 |
 | `xml`     | [Extensible Markup Language (XML)](https://www.w3.org/TR/xml11/)                   |
