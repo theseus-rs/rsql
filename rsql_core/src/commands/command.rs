@@ -1,7 +1,7 @@
 use crate::commands::error::Result;
 use crate::commands::{
     bail, clear, color, drivers, echo, exit, footer, format, header, help, history, locale, quit,
-    tables, timer,
+    read, tables, timer,
 };
 use crate::configuration::Configuration;
 use crate::drivers::{Connection, DriverManager};
@@ -114,6 +114,7 @@ impl Default for CommandManager {
         commands.add(Box::new(history::Command));
         commands.add(Box::new(locale::Command));
         commands.add(Box::new(quit::Command));
+        commands.add(Box::new(read::Command));
         commands.add(Box::new(tables::Command));
         commands.add(Box::new(timer::Command));
 
@@ -175,6 +176,6 @@ mod tests {
     fn test_command_manager_default() {
         let command_manager = CommandManager::default();
 
-        assert_eq!(command_manager.commands.len(), 15);
+        assert_eq!(command_manager.commands.len(), 16);
     }
 }

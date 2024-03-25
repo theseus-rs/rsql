@@ -3365,6 +3365,7 @@ dependencies = [
  "supports-color",
  "syntect",
  "sys-locale",
+ "tempfile",
  "termbg",
  "test-log",
  "thiserror",

@@ -20,8 +20,9 @@
     - [history](ch02-11-history.md)
     - [locale](ch02-12-locale.md)
     - [quit](ch02-13-quit.md)
-    - [tables](ch02-14-tables.md)
-    - [timer](ch02-15-timer.md)
+    - [read](ch02-14-read.md)
+    - [tables](ch02-15-tables.md)
+    - [timer](ch02-16-timer.md)
 
 - [Appendix](appendix-00.md)
     - [A - Configuration File (rsql.toml)](appendix-01-rsql-toml.md)

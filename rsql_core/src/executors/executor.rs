@@ -5,6 +5,7 @@ use crate::executors::command::CommandExecutor;
 use crate::executors::sql::SqlExecutor;
 use crate::executors::Result;
 use crate::formatters::FormatterManager;
+use regex::Regex;
 use rustyline::history::DefaultHistory;
 use std::fmt::Debug;
 use std::{fmt, io};
@@ -40,7 +41,39 @@ impl<'a> Executor<'a> {
         }
     }
 
+    async fn parse_commands(&self, contents: String) -> Result<Vec<String>> {
+        let command_identifier = regex::escape(&self.configuration.command_identifier);
+        let pattern = format!(r"(?ms)^\s*({}.*?|.*?;|.*)\s*$", command_identifier);
+        let regex = Regex::new(pattern.as_str())?;
+        let commands: Vec<String> = regex
+            .find_iter(contents.as_str())
+            .map(|mat| mat.as_str().trim().to_string())
+            .collect();
+        Ok(commands)
+    }
+
     pub async fn execute(&mut self, input: &str) -> Result<LoopCondition> {
+        let input = input.trim();
+
+        if input.is_empty() {
+            return Ok(LoopCondition::Continue);
+        }
+
+        if self.configuration.echo {
+            writeln!(&mut self.output, "{}", input)?;
+        }
+
+        let commands = self.parse_commands(input.to_string()).await?;
+        for command in commands {
+            if let LoopCondition::Exit(exit_code) = &self.execute_command(command.as_str()).await? {
+                return Ok(LoopCondition::Exit(*exit_code));
+            }
+        }
+
+        Ok(LoopCondition::Continue)
+    }
+
+    async fn execute_command(&mut self, input: &str) -> Result<LoopCondition> {
         let input = input.trim();
 
         if input.is_empty() {
@@ -95,6 +128,7 @@ impl Debug for Executor<'_> {
 mod tests {
     use super::*;
     use crate::drivers::{MockConnection, Results};
+    use indoc::indoc;
     use mockall::predicate::eq;
 
     #[tokio::test]
@@ -123,6 +157,121 @@ mod tests {
         assert!(debug.contains("driver_manager"));
         assert!(debug.contains("formatter_manager"));
         assert!(debug.contains("connection"));
+    }
+
+    #[tokio::test]
+    async fn test_parse_commands_default_command_identifier() -> anyhow::Result<()> {
+        let mut configuration = Configuration::default();
+        let command_manager = CommandManager::default();
+        let driver_manager = DriverManager::default();
+        let formatter_manager = FormatterManager::default();
+        let history = DefaultHistory::new();
+        let mut connection = MockConnection::new();
+        let mut output: Vec<u8> = Vec::new();
+
+        let executor = Executor::new(
+            &mut configuration,
+            &command_manager,
+            &driver_manager,
+            &formatter_manager,
+            &history,
+            &mut connection,
+            &mut output,
+        );
+        let contents = indoc! {r#"
+            .bail on
+            SELECT *
+            FROM table;
+            .timer on
+            INSERT INTO table ...;
+            .exit 1
+            SELECT 1"#};
+        let commands = executor.parse_commands(contents.to_string()).await?;
+
+        assert_eq!(commands.len(), 6);
+        assert_eq!(commands[0], ".bail on");
+        assert_eq!(commands[1], "SELECT *\nFROM table;");
+        assert_eq!(commands[2], ".timer on");
+        assert_eq!(commands[3], "INSERT INTO table ...;");
+        assert_eq!(commands[4], ".exit 1");
+        assert_eq!(commands[5], "SELECT 1");
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_parse_commands_backslash_command_identifier() -> anyhow::Result<()> {
+        let mut configuration = Configuration {
+            command_identifier: "\\".to_string(),
+            ..Default::default()
+        };
+        let command_manager = CommandManager::default();
+        let driver_manager = DriverManager::default();
+        let formatter_manager = FormatterManager::default();
+        let history = DefaultHistory::new();
+        let mut connection = MockConnection::new();
+        let mut output: Vec<u8> = Vec::new();
+
+        let executor = Executor::new(
+            &mut configuration,
+            &command_manager,
+            &driver_manager,
+            &formatter_manager,
+            &history,
+            &mut connection,
+            &mut output,
+        );
+
+        let contents = indoc! {r#"
+            \bail on
+            SELECT *
+            FROM table;
+            \timer on
+            INSERT INTO table ...;
+            \exit 1
+        "#};
+        let commands = executor.parse_commands(contents.to_string()).await?;
+
+        assert_eq!(commands.len(), 5);
+        assert_eq!(commands[0], "\\bail on");
+        assert_eq!(commands[1], "SELECT *\nFROM table;");
+        assert_eq!(commands[2], "\\timer on");
+        assert_eq!(commands[3], "INSERT INTO table ...;");
+        assert_eq!(commands[4], "\\exit 1");
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_execute() -> anyhow::Result<()> {
+        let mut configuration = Configuration {
+            bail_on_error: false,
+            results_timer: false,
+            ..Default::default()
+        };
+        let command_manager = CommandManager::default();
+        let driver_manager = DriverManager::default();
+        let formatter_manager = FormatterManager::default();
+        let history = DefaultHistory::new();
+        let mut connection = MockConnection::new();
+        let mut output: Vec<u8> = Vec::new();
+
+        let mut executor = Executor::new(
+            &mut configuration,
+            &command_manager,
+            &driver_manager,
+            &formatter_manager,
+            &history,
+            &mut connection,
+            &mut output,
+        );
+
+        let input = indoc! {r#"
+            .bail on
+            .timer on
+        "#};
+        let _ = executor.execute(input).await?;
+        assert!(configuration.bail_on_error);
+        assert!(configuration.results_timer);
+        Ok(())
     }
 
     #[tokio::test]
@@ -175,7 +324,7 @@ mod tests {
         );
 
         let input = format!("{command_identifier}bail on");
-        let result = executor.execute(input.as_str()).await?;
+        let result = executor.execute_command(input.as_str()).await?;
         assert_eq!(result, LoopCondition::Continue);
         let execute_output = String::from_utf8(output)?;
         if echo {
@@ -197,7 +346,7 @@ mod tests {
         test_execute_command("\\", false).await
     }
 
-    async fn test_execute_sql(echo: bool) -> anyhow::Result<()> {
+    async fn test_execute_command_sql(echo: bool) -> anyhow::Result<()> {
         let mut configuration = Configuration {
             echo,
             ..Default::default()
@@ -224,7 +373,7 @@ mod tests {
             &mut output,
         );
 
-        let result = executor.execute(input).await?;
+        let result = executor.execute_command(input).await?;
         assert_eq!(result, LoopCondition::Continue);
         let execute_output = String::from_utf8(output)?;
         if echo {
@@ -238,11 +387,11 @@ mod tests {
 
     #[tokio::test]
     async fn test_execute_sql_echo_on() -> anyhow::Result<()> {
-        test_execute_sql(true).await
+        test_execute_command_sql(true).await
     }
 
     #[tokio::test]
     async fn test_execute_sql_echo_off() -> anyhow::Result<()> {
-        test_execute_sql(false).await
+        test_execute_command_sql(false).await
     }
 }

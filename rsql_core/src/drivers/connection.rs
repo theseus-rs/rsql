@@ -54,7 +54,7 @@ impl QueryResult for MemoryQueryResult {
 /// Connection to a database
 #[cfg_attr(test, mockall::automock)]
 #[async_trait]
-pub trait Connection: Debug + Send {
+pub trait Connection: Debug + Send + Sync {
     async fn execute(&self, sql: &str) -> Result<Results>;
     async fn query(&self, sql: &str) -> Result<Results>;
     async fn tables(&mut self) -> Result<Vec<String>>;
