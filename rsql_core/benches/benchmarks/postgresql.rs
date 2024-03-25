@@ -16,7 +16,7 @@ pub fn postgresql_benchmark(criterion: &mut Criterion) {
 
 async fn postgresql() -> Result<()> {
     let args = ShellArgs {
-        url: "postgresql::embedded:".to_string(),
+        url: "postgresql://?embedded=true".to_string(),
         commands: vec!["SELECT 1".to_string()],
         ..ShellArgs::default()
     };

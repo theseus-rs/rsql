@@ -24,6 +24,7 @@ config = { workspace = true }
 csv = { workspace = true }
 dark-light = { workspace = true }
 dirs = { workspace = true }
+form_urlencoded = { workspace = true }
 indexmap = { workspace = true, features = ["serde"] }
 indicatif = { workspace = true }
 lazy_static = { workspace = true }
@@ -32,6 +33,7 @@ prettytable = { workspace = true }
 postgresql_archive = { workspace = true, optional = true }
 postgresql_embedded = { workspace = true, optional = true }
 regex = { workspace = true }
+rusqlite = { workspace = true, features = ["bundled-full"], optional = true }
 rust_decimal = { workspace = true }
 rust-i18n = { workspace = true }
 rustyline = { workspace = true }
@@ -51,6 +53,7 @@ tracing-appender = { workspace = true }
 tracing-indicatif = { workspace = true }
 tracing-subscriber = { workspace = true, features = ["env-filter", "tracing-log"] }
 unicode-width = { workspace = true }
+url = { workspace = true }
 uuid = { workspace = true, features = ["serde", "v4"] }
 
 [dev-dependencies]
@@ -61,13 +64,16 @@ test-log = { workspace = true }
 tokio = { workspace = true }
 
 [features]
-all = ["postgresql", "sqlite"]
+all = ["postgresql", "rusqlite", "sqlite"]
 default = []
 postgresql = [
     "dep:postgresql_archive",
     "dep:postgresql_embedded",
     "dep:sqlx",
     "sqlx/postgres",
+]
+rusqlite = [
+    "dep:rusqlite",
 ]
 sqlite = [
     "dep:sqlx",

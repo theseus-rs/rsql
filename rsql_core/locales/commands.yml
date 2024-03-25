@@ -1936,6 +1936,7 @@ history_description:
 
 history_list_entry:
   en: "%{index}: %{entry}"
+  ar-SA: "%{entry} :%{index}"
 
 history_setting:
   en: "History: %{history}"
@@ -2785,6 +2786,7 @@ off:
 
 on_off_argument:
   en: "%{on}|%{off}"
+  ar-SA: "%{off}|%{on}"
 
 list_delimiter:
   en: ", "

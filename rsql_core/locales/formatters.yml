@@ -60,6 +60,7 @@ row:
   uk-UA: "%{rows} рядок"
   vi-VN: "%{rows} hàng"
   zh-CN: "%{rows} 行"
+
 rows:
   en: "%{rows} rows"
   ar-SA: "%{rows} صفوف"
@@ -118,7 +119,10 @@ rows:
   uk-UA: "%{rows} рядків"
   vi-VN: "%{rows} hàng"
   zh-CN: "%{rows} 行"
+
 elapsed_format:
   en: "(%{elapsed})"
+
 footer_format:
   en: "%{rows} %{elapsed}"
+  ar-SA: "%{elapsed} %{rows}"

@@ -1329,6 +1329,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "fallible-iterator"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2acce4a10f12dc2fb14a218589d4f1f62ef011b2d0cc4b3cb1bba8e94da14649"
+
+[[package]]
+name = "fallible-streaming-iterator"
+version = "0.1.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7360491ce676a36bf9bb3c56c1aa791658183a54d2744120f27285738d90465a"
+
+[[package]]
 name = "fastrand"
 version = "1.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2764,9 +2776,9 @@ checksum = "7170ef9988bc169ba16dd36a7fa041e5c4cbeb6a35b76d4c03daded371eae7c0"
 
 [[package]]
 name = "postgresql_archive"
-version = "0.7.2"
+version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eeca8c09ecf55f89fdd7c1e7b75cc693d41b78629ee701b4e020c546af5588b5"
+checksum = "3b2d7e287cc007383c6a4e17996ff9cba37c103ba5714fea54526b81d5bc3717"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -2794,9 +2806,9 @@ dependencies = [
 
 [[package]]
 name = "postgresql_embedded"
-version = "0.7.2"
+version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f153110706e6576b743cbb5e49ae0c25545c369f1670217e6b387b866b898565"
+checksum = "87bc5713011963f3227b3e9b10943afd6752092d5eeba363341212e372a46c8a"
 dependencies = [
  "anyhow",
  "bytes",
@@ -2808,6 +2820,7 @@ dependencies = [
  "thiserror",
  "tokio",
  "tracing",
+ "url",
 ]
 
 [[package]]
@@ -3329,6 +3342,7 @@ dependencies = [
  "csv",
  "dark-light",
  "dirs 5.0.1",
+ "form_urlencoded",
  "indexmap 2.2.6",
  "indicatif",
  "indoc",
@@ -3340,12 +3354,13 @@ dependencies = [
  "prettytable",
  "quick-xml",
  "regex",
+ "rusqlite",
  "rust-i18n",
  "rust_decimal",
  "rustyline",
  "serde",
  "serde_json",
- "serde_yaml 0.9.33",
+ "serde_yaml 0.9.34+deprecated",
  "sqlx",
  "supports-color",
  "syntect",
@@ -3359,6 +3374,27 @@ dependencies = [
  "tracing-indicatif",
  "tracing-subscriber",
  "unicode-width",
+ "url",
+ "uuid",
+]
+
+[[package]]
+name = "rusqlite"
+version = "0.30.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a78046161564f5e7cd9008aff3b2990b3850dc8e0349119b98e8f251e099f24d"
+dependencies = [
+ "bitflags 2.5.0",
+ "chrono",
+ "csv",
+ "fallible-iterator",
+ "fallible-streaming-iterator",
+ "hashlink",
+ "libsqlite3-sys",
+ "serde_json",
+ "smallvec",
+ "time",
+ "url",
  "uuid",
 ]
 
@@ -3700,9 +3736,9 @@ dependencies = [
 
 [[package]]
 name = "serde_yaml"
-version = "0.9.33"
+version = "0.9.34+deprecated"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a0623d197252096520c6f2a5e1171ee436e5af99a5d7caa2891e55e61950e6d9"
+checksum = "6a8b1a1a2ebf674015cc02edccce75287f1a0130d394307b36743c2f5d504b47"
 dependencies = [
  "indexmap 2.2.6",
  "itoa",

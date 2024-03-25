@@ -74,7 +74,23 @@ mod tests {
 
         assert_eq!(result, LoopCondition::Continue);
         let drivers_output = String::from_utf8(output)?;
-        assert_eq!(drivers_output, "Drivers: postgresql, sqlite\n");
+        let mut drivers: Vec<&str> = Vec::new();
+
+        #[cfg(feature = "postgresql")]
+        drivers.push("postgresql");
+
+        #[cfg(feature = "rusqlite")]
+        drivers.push("rusqlite");
+
+        #[cfg(feature = "sqlite")]
+        drivers.push("sqlite");
+
+        let available_drivers = drivers.join(", ");
+
+        assert_eq!(
+            drivers_output,
+            format!("Drivers: {available_drivers}\n").as_str()
+        );
         Ok(())
     }
 }
