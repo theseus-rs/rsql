@@ -60,6 +60,7 @@ uuid = { workspace = true, features = ["serde", "v4"] }
 criterion = { workspace = true, features = ["async_tokio"] }
 indoc = { workspace = true }
 mockall = { workspace = true }
+tempfile = { workspace = true }
 test-log = { workspace = true }
 tokio = { workspace = true }
 

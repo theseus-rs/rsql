@@ -13,6 +13,7 @@ pub mod help;
 pub mod history;
 pub mod locale;
 pub mod quit;
+pub mod read;
 pub mod tables;
 pub mod timer;
 

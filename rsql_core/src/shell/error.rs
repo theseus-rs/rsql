@@ -30,13 +30,6 @@ impl From<indicatif::style::TemplateError> for Error {
     }
 }
 
-/// Converts a [`regex::Error`] into an [`IoError`](Error::IoError)
-impl From<regex::Error> for Error {
-    fn from(error: regex::Error) -> Self {
-        Error::IoError(error.into())
-    }
-}
-
 /// Converts a [`rustyline::error::ReadlineError`] into an [`IoError`](Error::IoError)
 impl From<rustyline::error::ReadlineError> for Error {
     fn from(error: rustyline::error::ReadlineError) -> Self {
@@ -74,14 +67,6 @@ mod tests {
                 assert!(template_error.to_string().contains(":"));
             }
         }
-    }
-
-    #[test]
-    fn test_regex_error() {
-        let error = regex::Error::Syntax("test".to_string());
-        let io_error = Error::from(error);
-
-        assert_eq!(io_error.to_string(), "test");
     }
 
     #[test]

@@ -8,7 +8,6 @@ use crate::shell::helper::ReplHelper;
 use crate::shell::Result;
 use crate::shell::ShellArgs;
 use colored::Colorize;
-use regex::Regex;
 use rustyline::config::Configurer;
 use rustyline::error::ReadlineError;
 use rustyline::history::{DefaultHistory, FileHistory};
@@ -101,51 +100,26 @@ impl<'a> Shell<'a> {
             .connect(&self.configuration, args.url.as_str())
             .await?;
         let connection = binding.as_mut();
-        let commands = if let Some(file) = &args.file {
-            let contents = file.clone().contents()?;
-            let mut commands = self.parse_commands(contents).await?;
-            commands.extend(args.commands.clone());
-            commands
+        let input = if let Some(file) = &args.file {
+            Some(file.clone().contents()?)
+        } else if !args.commands.is_empty() {
+            Some(args.commands.join("\n"))
         } else {
-            args.commands.clone()
+            None
         };
 
-        if commands.is_empty() {
-            self.repl(connection).await?;
-        } else {
-            self.process_commands(connection, commands).await?;
-        }
-
-        connection.stop().await?;
-        Ok(())
-    }
-
-    async fn parse_commands(&mut self, contents: String) -> Result<Vec<String>> {
-        let command_identifier = regex::escape(&self.configuration.command_identifier);
-        let pattern = format!(r"(?ms)^\s*({}.*?|.*?;)\s*$", command_identifier);
-        let regex = Regex::new(pattern.as_str())?;
-        let commands: Vec<String> = regex
-            .find_iter(contents.as_str())
-            .map(|mat| mat.as_str().trim().to_string())
-            .collect();
-        Ok(commands)
-    }
-
-    /// Run with the provided commands.
-    async fn process_commands(
-        &mut self,
-        connection: &mut dyn Connection,
-        commands: Vec<String>,
-    ) -> Result<()> {
-        for command in commands {
+        if let Some(input) = input {
             if let LoopCondition::Exit(exit_code) = &self
-                .evaluate(connection, &DefaultHistory::new(), command.to_string())
+                .evaluate(connection, &DefaultHistory::new(), input.to_string())
                 .await?
             {
                 std::process::exit(*exit_code);
             }
+        } else {
+            self.repl(connection).await?;
         }
 
+        connection.stop().await?;
         Ok(())
     }
 
@@ -364,7 +338,6 @@ impl Debug for Shell<'_> {
 mod test {
     use super::*;
     use crate::drivers::{MockConnection, MockDriver};
-    use indoc::indoc;
     use rustyline::history::DefaultHistory;
 
     #[test]
@@ -432,78 +405,6 @@ mod test {
         shell.execute(&args).await?;
 
         assert_eq!(shell.configuration.bail_on_error, true);
-        Ok(())
-    }
-
-    #[tokio::test]
-    async fn test_parse_commands_default_command_identifier() -> anyhow::Result<()> {
-        let mut output = Vec::new();
-        let mut shell = ShellBuilder::new(&mut output).build();
-        let contents = indoc! {r#"
-            .bail on
-            SELECT *
-            FROM table;
-            .timer on
-            INSERT INTO table ...;
-            .exit 1
-        "#};
-        let commands = shell.parse_commands(contents.to_string()).await?;
-
-        assert_eq!(commands.len(), 5);
-        assert_eq!(commands[0], ".bail on");
-        assert_eq!(commands[1], "SELECT *\nFROM table;");
-        assert_eq!(commands[2], ".timer on");
-        assert_eq!(commands[3], "INSERT INTO table ...;");
-        assert_eq!(commands[4], ".exit 1");
-        Ok(())
-    }
-
-    #[tokio::test]
-    async fn test_parse_commands_backslash_command_identifier() -> anyhow::Result<()> {
-        let configuration = Configuration {
-            command_identifier: "\\".to_string(),
-            ..Default::default()
-        };
-        let mut output = Vec::new();
-        let mut shell = ShellBuilder::new(&mut output)
-            .with_configuration(configuration)
-            .build();
-        let contents = indoc! {r#"
-            \bail on
-            SELECT *
-            FROM table;
-            \timer on
-            INSERT INTO table ...;
-            \exit 1
-        "#};
-        let commands = shell.parse_commands(contents.to_string()).await?;
-
-        assert_eq!(commands.len(), 5);
-        assert_eq!(commands[0], "\\bail on");
-        assert_eq!(commands[1], "SELECT *\nFROM table;");
-        assert_eq!(commands[2], "\\timer on");
-        assert_eq!(commands[3], "INSERT INTO table ...;");
-        assert_eq!(commands[4], "\\exit 1");
-        Ok(())
-    }
-
-    #[tokio::test]
-    async fn test_process_commands() -> anyhow::Result<()> {
-        let configuration = Configuration {
-            bail_on_error: false,
-            results_timer: false,
-            ..Default::default()
-        };
-        let mut output = Vec::new();
-        let mut shell = ShellBuilder::new(&mut output)
-            .with_configuration(configuration)
-            .build();
-        let mut connection = MockConnection::new();
-        let commands = vec![".bail on".to_string(), ".timer on".to_string()];
-
-        shell.process_commands(&mut connection, commands).await?;
-        assert_eq!(shell.configuration.bail_on_error, true);
-        assert_eq!(shell.configuration.results_timer, true);
         Ok(())
     }
 

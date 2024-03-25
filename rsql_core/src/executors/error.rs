@@ -26,6 +26,13 @@ impl From<indicatif::style::TemplateError> for Error {
     }
 }
 
+/// Converts a [`regex::Error`] into an [`IoError`](Error::IoError)
+impl From<regex::Error> for Error {
+    fn from(error: regex::Error) -> Self {
+        Error::IoError(error.into())
+    }
+}
+
 /// Converts a [`std::io::Error`] into an [`IoError`](Error::IoError)
 impl From<std::io::Error> for Error {
     fn from(error: std::io::Error) -> Self {
@@ -42,6 +49,14 @@ mod tests {
         let error = result.err().expect("Error");
         let template_error = Error::from(error);
         assert!(template_error.to_string().contains(":"));
+    }
+
+    #[test]
+    fn test_regex_error() {
+        let error = regex::Error::Syntax("test".to_string());
+        let io_error = Error::from(error);
+
+        assert_eq!(io_error.to_string(), "test");
     }
 
     #[test]
