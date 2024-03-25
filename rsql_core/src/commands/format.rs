@@ -108,7 +108,7 @@ mod tests {
             formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".format"],
+            input: vec![".format".to_string()],
             output: &mut output,
         };
 
@@ -136,7 +136,7 @@ mod tests {
             formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".format", "ascii"],
+            input: vec![".format".to_string(), "ascii".to_string()],
             output: &mut Vec::new(),
         };
 
@@ -160,7 +160,7 @@ mod tests {
             formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".format", "unicode"],
+            input: vec![".format".to_string(), "unicode".to_string()],
             output: &mut Vec::new(),
         };
 
@@ -180,7 +180,7 @@ mod tests {
             formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".format", "foo"],
+            input: vec![".format".to_string(), "foo".to_string()],
             output: &mut Vec::new(),
         };
 

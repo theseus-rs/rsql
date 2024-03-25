@@ -3,6 +3,7 @@ use crate::configuration::Configuration;
 use crate::drivers::{Connection, DriverManager};
 use crate::executors::{Error, Result};
 use crate::formatters::FormatterManager;
+use regex::Regex;
 use rustyline::history::DefaultHistory;
 use std::fmt::Debug;
 use std::{fmt, io};
@@ -42,7 +43,7 @@ impl<'a> CommandExecutor<'a> {
 
     /// Execute the command and return the loop condition.
     pub(crate) async fn execute(&mut self, command: &str) -> Result<LoopCondition> {
-        let input: Vec<&str> = command.split_whitespace().collect();
+        let input = split_string(command);
         let command_identifier = &self.configuration.command_identifier;
         let command_name = &input[0][command_identifier.len()..input[0].len()];
         let locale = &self.configuration.locale;
@@ -82,6 +83,24 @@ impl Debug for CommandExecutor<'_> {
             .field("connection", &self.connection)
             .finish()
     }
+}
+
+fn split_string(input: &str) -> Vec<String> {
+    let pattern = Regex::new(r#"'[^']*'|"[^"]*"|\S+"#).expect("Invalid regex");
+    let mut result = Vec::new();
+
+    for cap in pattern.captures_iter(input) {
+        let mut segment = cap[0].to_string();
+
+        if segment.starts_with('"') || segment.starts_with('\'') {
+            segment.pop();
+            segment.remove(0);
+        }
+
+        result.push(segment.replace("\\ ", " "));
+    }
+
+    result
 }
 
 #[cfg(test)]
@@ -184,5 +203,29 @@ mod tests {
     #[tokio::test]
     async fn test_execute_multiple_character_command_identifier() -> anyhow::Result<()> {
         test_execute("!!").await
+    }
+
+    fn assert_split(input: &str, expected: Vec<&str>) {
+        assert_eq!(split_string(input), expected);
+    }
+
+    #[test]
+    fn test_split_strings() {
+        assert_split(r#"foo "bar baz""#, vec!["foo", "bar baz"]);
+        assert_split(r#"foo "bar'baz""#, vec!["foo", "bar'baz"]);
+
+        assert_split(r#"foo 'bar baz'"#, vec!["foo", "bar baz"]);
+        assert_split(r#"foo 'bar"baz'"#, vec!["foo", "bar\"baz"]);
+
+        assert_split(
+            r#"foo 'bar baz' "qux quux""#,
+            vec!["foo", "bar baz", "qux quux"],
+        );
+
+        assert_split(r#".print "hello, world!""#, vec![".print", "hello, world!"]);
+        assert_split(
+            r#"\print "hello, world!""#,
+            vec!["\\print", "hello, world!"],
+        );
     }
 }

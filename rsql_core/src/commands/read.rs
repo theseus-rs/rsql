@@ -25,7 +25,7 @@ impl ShellCommand for Command {
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
         let locale = options.configuration.locale.as_str();
-        let file = *options.input.get(1).unwrap_or(&"");
+        let file = options.input.get(1).unwrap_or(&"".to_string()).to_string();
         let contents = fs::read_to_string(file);
 
         if let Err(error) = contents {
@@ -96,7 +96,7 @@ mod tests {
             formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".read"],
+            input: vec![".read".to_string()],
             output: &mut output,
         };
 
@@ -107,7 +107,7 @@ mod tests {
     async fn test_execute_read_file() -> anyhow::Result<()> {
         let mut file = NamedTempFile::new()?;
         write!(file, ".locale en-GB")?;
-        let path = file.as_ref().to_str().expect("Invalid path");
+        let path = file.as_ref().to_string_lossy().to_string();
 
         let configuration = &mut Configuration {
             locale: "en".to_string(),
@@ -120,7 +120,7 @@ mod tests {
             formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".read", path],
+            input: vec![".read".to_string(), path],
             output: &mut Vec::new(),
         };
 
@@ -149,7 +149,7 @@ mod tests {
             formatter_manager: &FormatterManager::default(),
             connection,
             history: &DefaultHistory::new(),
-            input: vec![".read", path],
+            input: vec![".read".to_string(), path.to_string()],
             output: &mut Vec::new(),
         };
 
@@ -166,7 +166,7 @@ mod tests {
             formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".read", "foo"],
+            input: vec![".read".to_string(), "foo".to_string()],
             output: &mut Vec::new(),
         };
 

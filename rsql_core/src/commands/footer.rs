@@ -99,7 +99,7 @@ mod tests {
             formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".footer"],
+            input: vec![".footer".to_string()],
             output: &mut output,
         };
 
@@ -139,7 +139,7 @@ mod tests {
             formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".footer", "on"],
+            input: vec![".footer".to_string(), "on".to_string()],
             output: &mut Vec::new(),
         };
 
@@ -163,7 +163,7 @@ mod tests {
             formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".footer", "off"],
+            input: vec![".footer".to_string(), "off".to_string()],
             output: &mut Vec::new(),
         };
 
@@ -183,7 +183,7 @@ mod tests {
             formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".footer", "foo"],
+            input: vec![".footer".to_string(), "foo".to_string()],
             output: &mut Vec::new(),
         };
 
