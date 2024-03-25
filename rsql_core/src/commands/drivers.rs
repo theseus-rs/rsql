@@ -66,7 +66,7 @@ mod tests {
             formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".drivers"],
+            input: vec![".drivers".to_string()],
             output: &mut output,
         };
 

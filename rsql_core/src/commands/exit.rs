@@ -74,7 +74,7 @@ mod tests {
             formatter_manager: &FormatterManager::default(),
             connection: mock_connection,
             history: &DefaultHistory::new(),
-            input: vec![".exit"],
+            input: vec![".exit".to_string()],
             output: &mut Vec::new(),
         };
 
@@ -96,7 +96,7 @@ mod tests {
             formatter_manager: &FormatterManager::default(),
             connection: mock_connection,
             history: &DefaultHistory::new(),
-            input: vec![".exit", "1"],
+            input: vec![".exit".to_string(), "1".to_string()],
             output: &mut Vec::new(),
         };
 
@@ -115,7 +115,7 @@ mod tests {
             formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".exit", "foo"],
+            input: vec![".exit".to_string(), "foo".to_string()],
             output: &mut Vec::new(),
         };
 

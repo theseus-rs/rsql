@@ -1,7 +1,7 @@
 use crate::commands::error::Result;
 use crate::commands::{
-    bail, clear, color, drivers, echo, exit, footer, format, header, help, history, locale, quit,
-    read, tables, timer,
+    bail, clear, color, drivers, echo, exit, footer, format, header, help, history, locale, print,
+    quit, read, tables, timer,
 };
 use crate::configuration::Configuration;
 use crate::drivers::{Connection, DriverManager};
@@ -29,7 +29,7 @@ pub struct CommandOptions<'a> {
     pub formatter_manager: &'a FormatterManager,
     pub history: &'a DefaultHistory,
     pub connection: &'a mut dyn Connection,
-    pub input: Vec<&'a str>,
+    pub input: Vec<String>,
     pub output: &'a mut (dyn io::Write + Send + Sync),
 }
 
@@ -113,6 +113,7 @@ impl Default for CommandManager {
         commands.add(Box::new(help::Command));
         commands.add(Box::new(history::Command));
         commands.add(Box::new(locale::Command));
+        commands.add(Box::new(print::Command));
         commands.add(Box::new(quit::Command));
         commands.add(Box::new(read::Command));
         commands.add(Box::new(tables::Command));
@@ -136,7 +137,7 @@ mod tests {
             formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &Default::default(),
-            input: vec!["42"],
+            input: vec!["42".to_string()],
             output: &mut io::Cursor::new(Vec::new()),
         };
 
@@ -176,6 +177,6 @@ mod tests {
     fn test_command_manager_default() {
         let command_manager = CommandManager::default();
 
-        assert_eq!(command_manager.commands.len(), 16);
+        assert_eq!(command_manager.commands.len(), 17);
     }
 }

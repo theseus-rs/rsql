@@ -99,7 +99,7 @@ mod tests {
             formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".header"],
+            input: vec![".header".to_string()],
             output: &mut output,
         };
 
@@ -139,7 +139,7 @@ mod tests {
             formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".header", "on"],
+            input: vec![".header".to_string(), "on".to_string()],
             output: &mut Vec::new(),
         };
 
@@ -163,7 +163,7 @@ mod tests {
             formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".header", "off"],
+            input: vec![".header".to_string(), "off".to_string()],
             output: &mut Vec::new(),
         };
 
@@ -183,7 +183,7 @@ mod tests {
             formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".header", "foo"],
+            input: vec![".header".to_string(), "foo".to_string()],
             output: &mut Vec::new(),
         };
 

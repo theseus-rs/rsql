@@ -12,6 +12,7 @@ pub mod header;
 pub mod help;
 pub mod history;
 pub mod locale;
+pub mod print;
 pub mod quit;
 pub mod read;
 pub mod tables;

@@ -67,7 +67,7 @@ mod tests {
             formatter_manager: &FormatterManager::default(),
             connection: mock_connection,
             history: &DefaultHistory::new(),
-            input: vec![".tables"],
+            input: vec![".tables".to_string()],
             output: &mut output,
         };
 

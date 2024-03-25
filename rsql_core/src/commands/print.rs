@@ -1,44 +1,33 @@
-use crate::commands::Error::InvalidOption;
 use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use async_trait::async_trait;
 use rust_i18n::t;
 
-/// Command to set the display locale
+/// Command to print the specified string to the output.
 #[derive(Debug, Default)]
 pub struct Command;
 
 #[async_trait]
 impl ShellCommand for Command {
     fn name(&self, locale: &str) -> String {
-        t!("locale_command", locale = locale).to_string()
+        t!("print_command", locale = locale).to_string()
     }
 
     fn args(&self, locale: &str) -> String {
-        t!("locale_argument", locale = locale).to_string()
+        t!("print_argument", locale = locale).to_string()
     }
 
     fn description(&self, locale: &str) -> String {
-        t!("locale_description", locale = locale).to_string()
+        t!("print_description", locale = locale).to_string()
     }
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
-        let locale = options.configuration.locale.as_str();
-
         if options.input.len() <= 1 {
-            let format_setting = t!("locale_setting", locale = locale, locale = locale).to_string();
-            writeln!(options.output, "{}", format_setting)?;
-            return Ok(LoopCondition::Continue);
+            writeln!(options.output)?;
+        } else {
+            for option in options.input.iter().skip(1) {
+                writeln!(options.output, "{}", option)?;
+            }
         }
-
-        let new_locale = options.input[1].as_str();
-
-        if !available_locales!().contains(&new_locale) {
-            return Err(InvalidOption {
-                command_name: self.name(locale).to_string(),
-                option: locale.to_string(),
-            });
-        }
-        options.configuration.locale = new_locale.to_string();
 
         Ok(LoopCondition::Continue)
     }
@@ -58,28 +47,28 @@ mod tests {
     #[test]
     fn test_name() {
         let name = Command.name("en");
-        assert_eq!(name, "locale");
+        assert_eq!(name, "print");
     }
 
     #[test]
     fn test_args() {
         let args = Command.args("en");
-        assert_eq!(args, "[locale]");
+        assert_eq!(args, "[string]");
     }
 
     #[test]
     fn test_description() {
         let description = Command.description("en");
-        assert_eq!(description, "Set the display locale");
+        assert_eq!(description, "Print the specified string");
     }
 
     #[tokio::test]
     async fn test_execute_no_args() -> anyhow::Result<()> {
-        let mut output = Vec::new();
         let configuration = &mut Configuration {
             locale: "en".to_string(),
             ..default::Default::default()
         };
+        let mut output = Vec::new();
         let options = CommandOptions {
             configuration,
             command_manager: &CommandManager::default(),
@@ -87,7 +76,7 @@ mod tests {
             formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".locale".to_string()],
+            input: vec![".print".to_string()],
             output: &mut output,
         };
 
@@ -95,16 +84,17 @@ mod tests {
 
         assert_eq!(result, LoopCondition::Continue);
         let locale_output = String::from_utf8(output)?;
-        assert_eq!(locale_output, "Locale: en\n");
+        assert_eq!(locale_output, "\n");
         Ok(())
     }
 
     #[tokio::test]
-    async fn test_execute_set_locale() -> anyhow::Result<()> {
+    async fn test_execute_argument() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
             locale: "en".to_string(),
             ..default::Default::default()
         };
+        let mut output = Vec::new();
         let options = CommandOptions {
             configuration,
             command_manager: &CommandManager::default(),
@@ -112,32 +102,15 @@ mod tests {
             formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".locale".to_string(), "en-GB".to_string()],
-            output: &mut Vec::new(),
+            input: vec![".print".to_string(), "foo".to_string()],
+            output: &mut output,
         };
 
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        assert_eq!(configuration.locale, "en-GB".to_string());
+        let locale_output = String::from_utf8(output)?;
+        assert_eq!(locale_output, "foo\n");
         Ok(())
-    }
-
-    #[tokio::test]
-    async fn test_execute_invalid_option() {
-        let options = CommandOptions {
-            configuration: &mut Configuration::default(),
-            command_manager: &CommandManager::default(),
-            driver_manager: &DriverManager::default(),
-            formatter_manager: &FormatterManager::default(),
-            connection: &mut MockConnection::new(),
-            history: &DefaultHistory::new(),
-            input: vec![".locale".to_string(), "foo".to_string()],
-            output: &mut Vec::new(),
-        };
-
-        let result = Command.execute(options).await;
-
-        assert!(result.is_err());
     }
 }

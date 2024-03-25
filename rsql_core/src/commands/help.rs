@@ -101,7 +101,7 @@ mod tests {
         command_manager.add(Box::new(footer::Command));
         command_manager.add(Box::new(Command));
         let mut output = Vec::new();
-        let command = format!("{command_identifier}{command}");
+        let command = &format!("{command_identifier}{command}");
         let options = CommandOptions {
             configuration: &mut configuration,
             command_manager: &command_manager,
@@ -109,7 +109,7 @@ mod tests {
             formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![command.as_str()],
+            input: vec![command.to_string()],
             output: &mut output,
         };
 
@@ -117,7 +117,7 @@ mod tests {
 
         assert_eq!(result, LoopCondition::Continue);
         let help_output = String::from_utf8(output)?;
-        assert!(help_output.contains(command.as_str()));
+        assert!(help_output.contains(command));
         Ok(help_output)
     }
 
