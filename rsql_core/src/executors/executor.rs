@@ -54,15 +54,6 @@ impl<'a> Executor<'a> {
 
     pub async fn execute(&mut self, input: &str) -> Result<LoopCondition> {
         let input = input.trim();
-
-        if input.is_empty() {
-            return Ok(LoopCondition::Continue);
-        }
-
-        if self.configuration.echo {
-            writeln!(&mut self.output, "{}", input)?;
-        }
-
         let commands = self.parse_commands(input.to_string()).await?;
         for command in commands {
             if let LoopCondition::Exit(exit_code) = &self.execute_command(command.as_str()).await? {
@@ -296,6 +287,32 @@ mod tests {
 
         let result = executor.execute("   ").await?;
         assert_eq!(result, LoopCondition::Continue);
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_execute_loop_exit() -> anyhow::Result<()> {
+        let mut configuration = Configuration::default();
+        let command_manager = CommandManager::default();
+        let driver_manager = DriverManager::default();
+        let formatter_manager = FormatterManager::default();
+        let history = DefaultHistory::new();
+        let mut connection = MockConnection::new();
+        connection.expect_stop().returning(|| Ok(()));
+        let mut output: Vec<u8> = Vec::new();
+
+        let mut executor = Executor::new(
+            &mut configuration,
+            &command_manager,
+            &driver_manager,
+            &formatter_manager,
+            &history,
+            &mut connection,
+            &mut output,
+        );
+
+        let result = executor.execute(".exit 42").await?;
+        assert_eq!(result, LoopCondition::Exit(42));
         Ok(())
     }
 

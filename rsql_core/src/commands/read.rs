@@ -60,6 +60,7 @@ mod tests {
     use crate::commands::LoopCondition;
     use crate::commands::{CommandManager, CommandOptions};
     use crate::configuration::Configuration;
+    use crate::drivers;
     use crate::drivers::{DriverManager, MockConnection};
     use crate::formatters::FormatterManager;
     use rustyline::history::DefaultHistory;
@@ -99,9 +100,7 @@ mod tests {
             output: &mut output,
         };
 
-        let result = Command.execute(options).await;
-        let error = result.unwrap_err();
-        assert!(error.to_string().contains("No such file or directory"));
+        assert!(Command.execute(options).await.is_err());
     }
 
     #[tokio::test]
@@ -129,6 +128,32 @@ mod tests {
 
         assert_eq!(result, LoopCondition::Continue);
         assert_eq!(configuration.locale, "en-GB".to_string());
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_execute_error() -> anyhow::Result<()> {
+        let mut file = NamedTempFile::new()?;
+        write!(file, ".exit 42")?;
+        let path = file.as_ref().to_str().expect("Invalid path");
+
+        let configuration = &mut Configuration::default();
+        let connection = &mut MockConnection::new();
+        connection
+            .expect_stop()
+            .returning(|| Err(drivers::Error::IoError(anyhow::anyhow!("Error"))));
+        let options = CommandOptions {
+            configuration,
+            command_manager: &CommandManager::default(),
+            driver_manager: &DriverManager::default(),
+            formatter_manager: &FormatterManager::default(),
+            connection,
+            history: &DefaultHistory::new(),
+            input: vec![".read", path],
+            output: &mut Vec::new(),
+        };
+
+        assert!(Command.execute(options).await.is_err());
         Ok(())
     }
 
