@@ -46,11 +46,11 @@ impl Connection {
         let database_url = if memory {
             "sqlite::memory:".to_string()
         } else {
-            let file = params.get("file").map_or("", |value| value.as_str());
+            let file = params.remove("file").unwrap_or("".to_string());
             let query: String = form_urlencoded::Serializer::new(String::new())
                 .extend_pairs(params.iter())
                 .finish();
-            format!("sqlite://{file}{query}").to_string()
+            format!("sqlite://{file}?{query}").to_string()
         };
 
         let options = SqliteConnectOptions::from_str(database_url.as_str())?
