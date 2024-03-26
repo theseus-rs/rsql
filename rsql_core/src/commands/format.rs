@@ -88,10 +88,7 @@ mod tests {
     #[test]
     fn test_description() {
         let description = Command.description("en");
-        assert_eq!(
-            description,
-            "Format results in ascii, csv, html, json, jsonl, plain, tsv, unicode, xml, yaml"
-        );
+        assert_eq!(description, "Set the output format for the results.");
     }
 
     #[tokio::test]
@@ -118,7 +115,7 @@ mod tests {
         let format_output = String::from_utf8(output)?;
         assert_eq!(
             format_output,
-            "Format: unicode\nFormats: ascii, csv, html, json, jsonl, plain, tsv, unicode, xml, yaml\n"
+            "Format: unicode\nFormats: ascii, csv, html, json, jsonl, markdown, plain, tsv, unicode, xml, yaml\n"
         );
         Ok(())
     }

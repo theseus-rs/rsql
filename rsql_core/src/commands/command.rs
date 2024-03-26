@@ -1,8 +1,4 @@
 use crate::commands::error::Result;
-use crate::commands::{
-    bail, clear, color, drivers, echo, exit, footer, format, header, help, history, indexes,
-    locale, print, quit, read, sleep, tables, timer,
-};
 use crate::configuration::Configuration;
 use crate::drivers::{Connection, DriverManager};
 use crate::formatters::FormatterManager;
@@ -101,25 +97,25 @@ impl Default for CommandManager {
     fn default() -> Self {
         let mut commands = CommandManager::new();
 
-        commands.add(Box::new(bail::Command));
-        commands.add(Box::new(clear::Command));
-        commands.add(Box::new(color::Command));
-        commands.add(Box::new(drivers::Command));
-        commands.add(Box::new(echo::Command));
-        commands.add(Box::new(exit::Command));
-        commands.add(Box::new(footer::Command));
-        commands.add(Box::new(format::Command));
-        commands.add(Box::new(header::Command));
-        commands.add(Box::new(help::Command));
-        commands.add(Box::new(history::Command));
-        commands.add(Box::new(indexes::Command));
-        commands.add(Box::new(locale::Command));
-        commands.add(Box::new(print::Command));
-        commands.add(Box::new(quit::Command));
-        commands.add(Box::new(read::Command));
-        commands.add(Box::new(sleep::Command));
-        commands.add(Box::new(tables::Command));
-        commands.add(Box::new(timer::Command));
+        commands.add(Box::new(crate::commands::bail::Command));
+        commands.add(Box::new(crate::commands::clear::Command));
+        commands.add(Box::new(crate::commands::color::Command));
+        commands.add(Box::new(crate::commands::drivers::Command));
+        commands.add(Box::new(crate::commands::echo::Command));
+        commands.add(Box::new(crate::commands::exit::Command));
+        commands.add(Box::new(crate::commands::footer::Command));
+        commands.add(Box::new(crate::commands::format::Command));
+        commands.add(Box::new(crate::commands::header::Command));
+        commands.add(Box::new(crate::commands::help::Command));
+        commands.add(Box::new(crate::commands::history::Command));
+        commands.add(Box::new(crate::commands::indexes::Command));
+        commands.add(Box::new(crate::commands::locale::Command));
+        commands.add(Box::new(crate::commands::print::Command));
+        commands.add(Box::new(crate::commands::quit::Command));
+        commands.add(Box::new(crate::commands::read::Command));
+        commands.add(Box::new(crate::commands::sleep::Command));
+        commands.add(Box::new(crate::commands::tables::Command));
+        commands.add(Box::new(crate::commands::timer::Command));
 
         commands
     }
@@ -156,13 +152,13 @@ mod tests {
 
     #[test]
     fn test_commands() {
-        let command = help::Command;
+        let command = crate::commands::help::Command;
         let locale = "en";
         let command_name = command.name(locale);
         let mut command_manager = CommandManager::new();
         assert_eq!(command_manager.commands.len(), 0);
 
-        command_manager.add(Box::new(help::Command));
+        command_manager.add(Box::new(command));
 
         assert_eq!(command_manager.commands.len(), 1);
         let result = command_manager.get(locale, command_name.as_str());
