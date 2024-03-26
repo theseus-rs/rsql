@@ -27,6 +27,7 @@ dirs = { workspace = true }
 form_urlencoded = { workspace = true }
 indexmap = { workspace = true, features = ["serde"] }
 indicatif = { workspace = true }
+indoc = { workspace = true }
 lazy_static = { workspace = true }
 num-format = { workspace = true }
 prettytable = { workspace = true }
@@ -58,7 +59,6 @@ uuid = { workspace = true, features = ["serde", "v4"] }
 
 [dev-dependencies]
 criterion = { workspace = true, features = ["async_tokio"] }
-indoc = { workspace = true }
 mockall = { workspace = true }
 tempfile = { workspace = true }
 test-log = { workspace = true }

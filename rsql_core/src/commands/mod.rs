@@ -11,6 +11,7 @@ pub mod format;
 pub mod header;
 pub mod help;
 pub mod history;
+pub mod indexes;
 pub mod locale;
 pub mod print;
 pub mod quit;
