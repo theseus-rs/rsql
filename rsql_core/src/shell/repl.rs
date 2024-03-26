@@ -166,19 +166,21 @@ impl<'a> Shell<'a> {
 
             let loop_condition = match editor.readline(&prompt) {
                 Ok(line) => {
-                    match &self
+                    let loop_condition = match &self
                         .evaluate(connection, editor.history(), line.clone())
                         .await
                     {
                         Ok(LoopCondition::Continue) => LoopCondition::Continue,
-                        Ok(LoopCondition::Exit(exit_code)) => {
-                            if self.configuration.history {
-                                editor.save_history(history_file.as_str())?;
-                            }
-                            LoopCondition::Exit(*exit_code)
-                        }
+                        Ok(LoopCondition::Exit(exit_code)) => LoopCondition::Exit(*exit_code),
                         Err(_error) => LoopCondition::Exit(1),
+                    };
+
+                    if self.configuration.history {
+                        let _ = editor.add_history_entry(line.as_str());
+                        editor.save_history(history_file.as_str())?;
                     }
+
+                    loop_condition
                 }
                 Err(ReadlineError::Interrupted) => {
                     let mut program_interrupted =
@@ -214,10 +216,6 @@ impl<'a> Shell<'a> {
             match loop_condition {
                 LoopCondition::Continue => {}
                 LoopCondition::Exit(exit_code) => {
-                    if self.configuration.history {
-                        editor.save_history(history_file.as_str())?;
-                    }
-
                     std::process::exit(exit_code);
                 }
             }
