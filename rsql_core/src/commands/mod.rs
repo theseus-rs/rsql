@@ -16,6 +16,7 @@ pub mod locale;
 pub mod print;
 pub mod quit;
 pub mod read;
+pub mod sleep;
 pub mod tables;
 pub mod timer;
 
