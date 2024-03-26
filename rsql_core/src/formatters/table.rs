@@ -20,6 +20,11 @@ pub async fn format<'a>(
     let output = &mut options.output;
 
     if let Query(query_result) = &options.results {
+        if query_result.columns().await.is_empty() {
+            write_footer(options).await?;
+            return Ok(());
+        }
+
         let mut table = Table::new();
         table.set_format(table_format);
 
@@ -90,9 +95,13 @@ mod tests {
 
     const COLUMN_HEADER: &str = "id";
 
+    fn query_result_no_columns() -> Results {
+        let query_result = MemoryQueryResult::new(vec![], vec![]);
+        Query(Box::new(query_result))
+    }
+
     fn query_result_no_rows() -> Results {
         let query_result = MemoryQueryResult::new(vec![COLUMN_HEADER.to_string()], vec![]);
-
         Query(Box::new(query_result))
     }
 
@@ -101,7 +110,6 @@ mod tests {
             vec![COLUMN_HEADER.to_string()],
             vec![vec![Some(Value::I64(12345))]],
         );
-
         Query(Box::new(query_result))
     }
 
@@ -110,7 +118,6 @@ mod tests {
             vec![COLUMN_HEADER.to_string()],
             vec![vec![None], vec![Some(Value::I64(12345))]],
         );
-
         Query(Box::new(query_result))
     }
 
@@ -249,6 +256,23 @@ mod tests {
             +--------+
             | 12,345 |
             +--------+
+        "#};
+        assert_eq!(output, expected);
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_query_format_no_columns() -> anyhow::Result<()> {
+        let mut configuration = Configuration {
+            color: false,
+            locale: "en".to_string(),
+            ..Default::default()
+        };
+        let results = query_result_no_columns();
+
+        let output = test_format(&mut configuration, &results).await?;
+        let expected = indoc! {r#"
+            0 rows (9ns)
         "#};
         assert_eq!(output, expected);
         Ok(())
