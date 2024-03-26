@@ -1,7 +1,6 @@
 use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use async_trait::async_trait;
 use rust_i18n::t;
-use tracing::instrument;
 
 /// List the tables in the database
 #[derive(Debug, Default)]
@@ -17,7 +16,6 @@ impl ShellCommand for Command {
         t!("tables_description", locale = locale).to_string()
     }
 
-    #[instrument(name = "tables", skip(options))]
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
         let output = options.output;
         let tables = options.connection.tables().await?;

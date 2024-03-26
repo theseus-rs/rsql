@@ -6,6 +6,7 @@ use crate::drivers::{MemoryQueryResult, Results};
 use async_trait::async_trait;
 use bit_vec::BitVec;
 use chrono::Utc;
+use indoc::indoc;
 use postgresql_archive::Version;
 use postgresql_embedded::{PostgreSQL, Settings};
 use sqlx::postgres::{PgColumn, PgConnectOptions, PgRow};
@@ -102,6 +103,41 @@ impl crate::drivers::Connection for Connection {
         Ok(Results::Execute(rows))
     }
 
+    async fn indexes<'table>(&mut self, table: Option<&'table str>) -> Result<Vec<String>> {
+        let mut sql = indoc! {r#"
+            SELECT i.relname AS index_name
+              FROM pg_class t,
+                   pg_class i,
+                   pg_index ix,
+                   pg_attribute a,
+                   information_schema.tables ist
+             WHERE t.oid = ix.indrelid
+               AND i.oid = ix.indexrelid
+               AND a.attrelid = t.oid
+               AND a.attnum = ANY(ix.indkey)
+               AND t.relkind = 'r'
+               AND ist.table_name = t.relname
+               AND ist.table_schema = current_schema()
+        "#}
+        .to_string();
+        if let Some(table) = table {
+            sql = format!("{sql} AND ist.table_name = '{table}'");
+        }
+        sql = format!("{sql} ORDER BY index_name").to_string();
+        let results = self.query(sql.as_str()).await?;
+        let mut indexes = Vec::new();
+
+        if let Results::Query(query_results) = results {
+            for row in query_results.rows().await {
+                if let Some(data) = &row[0] {
+                    indexes.push(data.to_string());
+                }
+            }
+        }
+
+        Ok(indexes)
+    }
+
     async fn query(&self, sql: &str) -> Result<Results> {
         let query_rows = sqlx::query(sql).fetch_all(&self.pool).await?;
         let columns: Vec<String> = query_rows
@@ -129,8 +165,13 @@ impl crate::drivers::Connection for Connection {
     }
 
     async fn tables(&mut self) -> Result<Vec<String>> {
-        let sql = "SELECT table_name FROM information_schema.tables \
-            WHERE table_schema = 'public' ORDER BY table_name";
+        let sql = indoc! { r#"
+            SELECT table_name
+              FROM information_schema.tables
+             WHERE table_catalog = current_database()
+               AND table_schema = 'public'
+             ORDER BY table_name
+        "#};
         let results = self.query(sql).await?;
         let mut tables = Vec::new();
 
@@ -293,9 +334,6 @@ mod test {
                 None => assert!(false),
             }
         }
-
-        let tables = connection.tables().await?;
-        assert_eq!(tables, vec!["person"]);
 
         connection.stop().await?;
         Ok(())
@@ -469,6 +507,66 @@ mod test {
     async fn test_data_type_not_supported() -> anyhow::Result<()> {
         let result = test_data_type("SELECT CAST('<a>b</a> as xml)").await;
         assert!(result.is_err());
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_indexes() -> anyhow::Result<()> {
+        let configuration = Configuration::default();
+        let driver_manager = DriverManager::default();
+        let mut connection = driver_manager.connect(&configuration, DATABASE_URL).await?;
+
+        let _ = connection
+            .execute("CREATE TABLE contacts (id INTEGER PRIMARY KEY, email VARCHAR(20))")
+            .await?;
+        let _ = connection
+            .execute("CREATE TABLE users (id INTEGER PRIMARY KEY, email VARCHAR(20))")
+            .await?;
+
+        let tables = connection.indexes(None).await?;
+        assert_eq!(tables, vec!["contacts_pkey", "users_pkey"]);
+
+        connection.stop().await?;
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_indexes_table() -> anyhow::Result<()> {
+        let configuration = Configuration::default();
+        let driver_manager = DriverManager::default();
+        let mut connection = driver_manager.connect(&configuration, DATABASE_URL).await?;
+
+        let _ = connection
+            .execute("CREATE TABLE contacts (id INTEGER PRIMARY KEY, email VARCHAR(20))")
+            .await?;
+        let _ = connection
+            .execute("CREATE TABLE users (id INTEGER PRIMARY KEY, email VARCHAR(20))")
+            .await?;
+
+        let tables = connection.indexes(Some("users")).await?;
+        assert_eq!(tables, vec!["users_pkey"]);
+
+        connection.stop().await?;
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_tables() -> anyhow::Result<()> {
+        let configuration = Configuration::default();
+        let driver_manager = DriverManager::default();
+        let mut connection = driver_manager.connect(&configuration, DATABASE_URL).await?;
+
+        let _ = connection
+            .execute("CREATE TABLE contacts (id INTEGER PRIMARY KEY, email VARCHAR(20))")
+            .await?;
+        let _ = connection
+            .execute("CREATE TABLE users (id INTEGER PRIMARY KEY, email VARCHAR(20))")
+            .await?;
+
+        let tables = connection.tables().await?;
+        assert_eq!(tables, vec!["contacts", "users"]);
+
+        connection.stop().await?;
         Ok(())
     }
 }

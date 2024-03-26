@@ -4,6 +4,7 @@ use crate::drivers::value::Value;
 use crate::drivers::Error::UnsupportedColumnType;
 use crate::drivers::{MemoryQueryResult, Results};
 use async_trait::async_trait;
+use indoc::indoc;
 use sqlx::sqlite::{SqliteAutoVacuum, SqliteColumn, SqliteConnectOptions, SqliteRow};
 use sqlx::{Column, Row, SqlitePool, TypeInfo};
 use std::collections::HashMap;
@@ -68,6 +69,31 @@ impl crate::drivers::Connection for Connection {
     async fn execute(&self, sql: &str) -> Result<Results> {
         let rows = sqlx::query(sql).execute(&self.pool).await?.rows_affected();
         Ok(Results::Execute(rows))
+    }
+
+    async fn indexes<'table>(&mut self, table: Option<&'table str>) -> Result<Vec<String>> {
+        let mut sql = indoc! {r#"
+            SELECT name
+              FROM sqlite_master
+             WHERE type = 'index'
+        "#}
+        .to_string();
+        if let Some(table) = table {
+            sql = format!("{sql} AND tbl_name = '{table}'");
+        }
+        sql = format!("{sql} ORDER BY name");
+        let results = self.query(sql.as_str()).await?;
+        let mut indexes = Vec::new();
+
+        if let Results::Query(query_results) = results {
+            for row in query_results.rows().await {
+                if let Some(data) = &row[0] {
+                    indexes.push(data.to_string());
+                }
+            }
+        }
+
+        Ok(indexes)
     }
 
     async fn query(&self, sql: &str) -> Result<Results> {
@@ -236,9 +262,6 @@ mod test {
             }
         }
 
-        let tables = connection.tables().await?;
-        assert_eq!(tables, vec!["person"]);
-
         connection.stop().await?;
         Ok(())
     }
@@ -384,6 +407,69 @@ mod test {
             Some(value) => assert_eq!(value, Value::String("foo".to_string())),
             _ => assert!(false),
         }
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_indexes() -> anyhow::Result<()> {
+        let configuration = Configuration::default();
+        let driver_manager = DriverManager::default();
+        let mut connection = driver_manager.connect(&configuration, DATABASE_URL).await?;
+
+        let _ = connection
+            .execute("CREATE TABLE contacts (id INTEGER PRIMARY KEY, email VARCHAR(20) UNIQUE)")
+            .await?;
+        let _ = connection
+            .execute("CREATE TABLE users (id INTEGER PRIMARY KEY, email VARCHAR(20) UNIQUE)")
+            .await?;
+
+        let tables = connection.indexes(None).await?;
+        assert_eq!(
+            tables,
+            vec!["sqlite_autoindex_contacts_1", "sqlite_autoindex_users_1"]
+        );
+
+        connection.stop().await?;
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_indexes_table() -> anyhow::Result<()> {
+        let configuration = Configuration::default();
+        let driver_manager = DriverManager::default();
+        let mut connection = driver_manager.connect(&configuration, DATABASE_URL).await?;
+
+        let _ = connection
+            .execute("CREATE TABLE contacts (id INTEGER PRIMARY KEY, email VARCHAR(20) UNIQUE)")
+            .await?;
+        let _ = connection
+            .execute("CREATE TABLE users (id INTEGER PRIMARY KEY, email VARCHAR(20) UNIQUE)")
+            .await?;
+
+        let tables = connection.indexes(Some("users")).await?;
+        assert_eq!(tables, vec!["sqlite_autoindex_users_1"]);
+
+        connection.stop().await?;
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_tables() -> anyhow::Result<()> {
+        let configuration = Configuration::default();
+        let driver_manager = DriverManager::default();
+        let mut connection = driver_manager.connect(&configuration, DATABASE_URL).await?;
+
+        let _ = connection
+            .execute("CREATE TABLE contacts (id INTEGER PRIMARY KEY, email VARCHAR(20))")
+            .await?;
+        let _ = connection
+            .execute("CREATE TABLE users (id INTEGER PRIMARY KEY, email VARCHAR(20))")
+            .await?;
+
+        let tables = connection.tables().await?;
+        assert_eq!(tables, vec!["contacts", "users"]);
+
+        connection.stop().await?;
         Ok(())
     }
 }
