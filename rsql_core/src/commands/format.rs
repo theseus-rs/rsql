@@ -115,7 +115,7 @@ mod tests {
         let format_output = String::from_utf8(output)?;
         assert_eq!(
             format_output,
-            "Format: unicode\nFormats: ascii, csv, html, json, jsonl, markdown, plain, tsv, unicode, xml, yaml\n"
+            "Format: unicode\nFormats: ascii, csv, html, json, jsonl, markdown, plain, psql, tsv, unicode, xml, yaml\n"
         );
         Ok(())
     }

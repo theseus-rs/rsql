@@ -10,6 +10,7 @@ mod json;
 mod jsonl;
 mod markdown;
 mod plain;
+mod psql;
 mod table;
 mod tsv;
 mod unicode;
