@@ -1,7 +1,7 @@
 use crate::commands::error::Result;
 use crate::commands::{
     bail, clear, color, drivers, echo, exit, footer, format, header, help, history, indexes,
-    locale, print, quit, read, tables, timer,
+    locale, print, quit, read, sleep, tables, timer,
 };
 use crate::configuration::Configuration;
 use crate::drivers::{Connection, DriverManager};
@@ -117,6 +117,7 @@ impl Default for CommandManager {
         commands.add(Box::new(print::Command));
         commands.add(Box::new(quit::Command));
         commands.add(Box::new(read::Command));
+        commands.add(Box::new(sleep::Command));
         commands.add(Box::new(tables::Command));
         commands.add(Box::new(timer::Command));
 

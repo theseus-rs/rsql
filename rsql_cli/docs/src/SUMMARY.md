@@ -23,8 +23,9 @@
     - [print](ch02-14-print.md)
     - [quit](ch02-15-quit.md)
     - [read](ch02-16-read.md)
-    - [tables](ch02-17-tables.md)
-    - [timer](ch02-18-timer.md)
+    - [sleep](ch02-17-sleep.md)
+    - [tables](ch02-18-tables.md)
+    - [timer](ch02-19-timer.md)
 
 - [Appendix](appendix-00.md)
     - [A - Configuration File (rsql.toml)](appendix-01-rsql-toml.md)
