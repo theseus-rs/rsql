@@ -4,18 +4,18 @@ use crate::formatters::formatter::FormatterOptions;
 use async_trait::async_trait;
 use csv::QuoteStyle;
 
-/// A formatter for Tab Separated Values (TSV)
+/// A formatter for sqlite tables
 #[derive(Debug, Default)]
 pub struct Formatter;
 
 #[async_trait]
 impl crate::formatters::Formatter for Formatter {
     fn identifier(&self) -> &'static str {
-        "tsv"
+        "sqlite"
     }
 
     async fn format<'a>(&self, options: &mut FormatterOptions<'a>) -> Result<()> {
-        format(options, b'\t', QuoteStyle::NonNumeric).await
+        format(options, b'|', QuoteStyle::Never).await
     }
 }
 
@@ -58,10 +58,10 @@ mod test {
 
         let output = String::from_utf8(output.get_ref().to_vec())?.replace("\r\n", "\n");
         let expected = indoc! {"
-            \"id\"\t\"data\"
-            1\t\"Ynl0ZXM=\"
-            2\t\"foo\"
-            3\t\"\"
+            id|data
+            1|Ynl0ZXM=
+            2|foo
+            3|
             3 rows (9ns)
         "};
         assert_eq!(output, expected);

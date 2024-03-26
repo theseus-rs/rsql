@@ -11,6 +11,7 @@ mod jsonl;
 mod markdown;
 mod plain;
 mod psql;
+mod sqlite;
 mod table;
 mod tsv;
 mod unicode;

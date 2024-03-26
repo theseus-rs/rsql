@@ -2,6 +2,7 @@ use crate::formatters::delimited::format;
 use crate::formatters::error::Result;
 use crate::formatters::formatter::FormatterOptions;
 use async_trait::async_trait;
+use csv::QuoteStyle;
 
 /// A formatter for Column Separated Values (CSV)
 #[derive(Debug, Default)]
@@ -14,7 +15,7 @@ impl crate::formatters::Formatter for Formatter {
     }
 
     async fn format<'a>(&self, options: &mut FormatterOptions<'a>) -> Result<()> {
-        format(options, b',').await
+        format(options, b',', QuoteStyle::NonNumeric).await
     }
 }
 
