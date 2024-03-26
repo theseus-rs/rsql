@@ -50,17 +50,17 @@ rsql --url <url>
 
 ## Features
 
-| Feature             |                                                   |
-|---------------------|---------------------------------------------------|
-| Databases           | ✅ (PostgreSQL, SQLite3)                           |
-| Embedded PostgreSQL | ✅                                                 |
-| Syntax Highlighting | ✅                                                 |
-| Result Highlighting | ✅                                                 |
-| History             | ✅                                                 |
-| SQL File Execution  | ✅                                                 |
-| Output Formats      | ✅ (csv, html, json, jsonl, plain, tsv, xml, yaml) |
-| Localized Interface | ✅ (50+ locales)                                   |
-| Key Bindings        | ✅ (emacs, vi)                                     |
+| Feature             |                                                             |
+|---------------------|-------------------------------------------------------------|
+| Databases           | ✅ (PostgreSQL, SQLite3)                                     |
+| Embedded PostgreSQL | ✅                                                           |
+| Syntax Highlighting | ✅                                                           |
+| Result Highlighting | ✅                                                           |
+| History             | ✅                                                           |
+| SQL File Execution  | ✅                                                           |
+| Output Formats      | ✅ (csv, html, json, jsonl, markdown, plain, tsv, xml, yaml) |
+| Localized Interface | ✅ (50+ locales)                                             |
+| Key Bindings        | ✅ (emacs, vi)                                               |
 
 ## Safety
 
