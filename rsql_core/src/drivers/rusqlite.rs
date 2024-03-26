@@ -76,22 +76,30 @@ impl crate::drivers::Connection for Connection {
              WHERE type = 'index'
         "#}
         .to_string();
-        if let Some(table) = table {
-            sql = format!("{sql} AND tbl_name = '{table}'");
+        if table.is_some() {
+            sql = format!("{sql} AND tbl_name = ?1");
         }
         sql = format!("{sql} ORDER BY name");
-        let results = self.query(sql.as_str()).await?;
-        let mut tables = Vec::new();
 
-        if let Results::Query(query_results) = results {
-            for row in query_results.rows().await {
-                if let Some(data) = &row[0] {
-                    tables.push(data.to_string());
-                }
+        let connection = match self.connection.lock() {
+            Ok(connection) => connection,
+            Err(error) => return Err(Error::IoError(anyhow!("Error: {:?}", error))),
+        };
+        let mut statement = connection.prepare(sql.as_str())?;
+
+        let mut query_rows = match table {
+            Some(table) => statement.query([table])?,
+            None => statement.query([])?,
+        };
+
+        let mut indexes = Vec::new();
+        while let Some(query_row) = query_rows.next()? {
+            if let Some(value) = self.convert_to_value(query_row, 0)? {
+                indexes.push(value.to_string());
             }
         }
 
-        Ok(tables)
+        Ok(indexes)
     }
 
     async fn query(&self, sql: &str) -> Result<Results> {

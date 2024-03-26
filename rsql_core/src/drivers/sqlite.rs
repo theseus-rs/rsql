@@ -78,17 +78,25 @@ impl crate::drivers::Connection for Connection {
              WHERE type = 'index'
         "#}
         .to_string();
-        if let Some(table) = table {
-            sql = format!("{sql} AND tbl_name = '{table}'");
+        if table.is_some() {
+            sql = format!("{sql} AND tbl_name = $1");
         }
         sql = format!("{sql} ORDER BY name");
-        let results = self.query(sql.as_str()).await?;
+        let query_rows = match table {
+            Some(table) => {
+                sqlx::query(sql.as_str())
+                    .bind(table)
+                    .fetch_all(&self.pool)
+                    .await?
+            }
+            None => sqlx::query(sql.as_str()).fetch_all(&self.pool).await?,
+        };
         let mut indexes = Vec::new();
 
-        if let Results::Query(query_results) = results {
-            for row in query_results.rows().await {
-                if let Some(data) = &row[0] {
-                    indexes.push(data.to_string());
+        for row in query_rows {
+            if let Some(column) = row.columns().first() {
+                if let Some(value) = self.convert_to_value(&row, column)? {
+                    indexes.push(value.to_string());
                 }
             }
         }
