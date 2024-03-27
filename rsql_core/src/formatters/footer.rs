@@ -1,3 +1,4 @@
+use crate::drivers::Results;
 use crate::drivers::Results::{Execute, Query};
 use crate::formatters::error::Result;
 use crate::formatters::FormatterOptions;
@@ -12,14 +13,14 @@ use std::str::FromStr;
 /// The number of rows will be formatted based on the locale.
 ///
 /// Example: "N,NNN,NNN rows (M.MMMs)"
-pub async fn write_footer<'a>(options: &mut FormatterOptions<'a>) -> Result<()> {
+pub async fn write_footer<'a>(options: &mut FormatterOptions<'a>, results: &Results) -> Result<()> {
     let configuration = &options.configuration;
 
     if !configuration.results_footer {
         return Ok(());
     }
 
-    let rows_affected = match options.results {
+    let rows_affected = match results {
         Execute(rows_affected) => *rows_affected,
         Query(query_result) => query_result.rows().await.len() as u64,
     };
@@ -87,12 +88,11 @@ mod tests {
         let output = &mut Cursor::new(Vec::new());
         let mut options = FormatterOptions {
             configuration,
-            results,
-            elapsed: &Duration::from_nanos(9),
+            elapsed: Duration::from_nanos(9),
             output,
         };
 
-        write_footer(&mut options).await?;
+        write_footer(&mut options, results).await?;
 
         let output = String::from_utf8(output.get_ref().to_vec())?.replace("\r\n", "\n");
         Ok(output)

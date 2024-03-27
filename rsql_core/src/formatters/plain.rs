@@ -1,3 +1,4 @@
+use crate::drivers::Results;
 use crate::formatters::error::Result;
 use crate::formatters::formatter::FormatterOptions;
 use crate::formatters::table;
@@ -19,8 +20,12 @@ impl crate::formatters::Formatter for Formatter {
         "plain"
     }
 
-    async fn format<'a>(&self, options: &mut FormatterOptions<'a>) -> Result<()> {
-        table::format(*FORMAT_PLAIN, options).await
+    async fn format<'a>(
+        &self,
+        options: &mut FormatterOptions<'a>,
+        results: &Results,
+    ) -> Result<()> {
+        table::format(*FORMAT_PLAIN, options, results).await
     }
 }
 
@@ -47,17 +52,15 @@ mod tests {
             ..Default::default()
         };
         let results = query_result();
-        let elapsed = Duration::from_nanos(5678);
         let output = &mut Vec::new();
         let mut options = FormatterOptions {
             configuration: &mut configuration,
-            results: &results,
-            elapsed: &elapsed,
+            elapsed: Duration::from_nanos(5678),
             output,
         };
         let formatter = Formatter;
 
-        formatter.format(&mut options).await?;
+        formatter.format(&mut options, &results).await?;
 
         let plain_output = String::from_utf8(output.clone())?.replace("\r\n", "\n");
         let expected = indoc! {r#"

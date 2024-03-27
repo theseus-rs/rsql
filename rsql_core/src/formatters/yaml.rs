@@ -1,4 +1,4 @@
-use crate::drivers::Value;
+use crate::drivers::{Results, Value};
 use crate::formatters::error::Result;
 use crate::formatters::footer::write_footer;
 use crate::formatters::formatter::FormatterOptions;
@@ -16,15 +16,22 @@ impl crate::formatters::Formatter for Formatter {
         "yaml"
     }
 
-    async fn format<'a>(&self, options: &mut FormatterOptions<'a>) -> Result<()> {
-        format_yaml(options).await
+    async fn format<'a>(
+        &self,
+        options: &mut FormatterOptions<'a>,
+        results: &Results,
+    ) -> Result<()> {
+        format_yaml(options, results).await
     }
 }
 
-pub(crate) async fn format_yaml(options: &mut FormatterOptions<'_>) -> Result<()> {
-    let query_result = match options.results {
-        crate::drivers::Results::Query(query_result) => query_result,
-        _ => return write_footer(options).await,
+pub(crate) async fn format_yaml(
+    options: &mut FormatterOptions<'_>,
+    results: &Results,
+) -> Result<()> {
+    let query_result = match results {
+        Results::Query(query_result) => query_result,
+        _ => return write_footer(options, results).await,
     };
 
     let mut yaml_rows: Vec<IndexMap<&String, Option<Value>>> = Vec::new();
@@ -56,7 +63,7 @@ pub(crate) async fn format_yaml(options: &mut FormatterOptions<'_>) -> Result<()
     let highlighter = Highlighter::new(options.configuration, "yaml");
     write!(options.output, "{}", highlighter.highlight(yaml.as_str())?)?;
 
-    write_footer(options).await
+    write_footer(options, results).await
 }
 
 #[cfg(test)]
@@ -70,6 +77,7 @@ mod test {
     use crate::formatters::Formatter;
     use indoc::indoc;
     use std::io::Cursor;
+    use std::time::Duration;
 
     #[tokio::test]
     async fn test_format_execute() -> anyhow::Result<()> {
@@ -80,13 +88,12 @@ mod test {
         let output = &mut Cursor::new(Vec::new());
         let mut options = FormatterOptions {
             configuration,
-            results: &Execute(1),
-            elapsed: &std::time::Duration::from_nanos(9),
+            elapsed: Duration::from_nanos(9),
             output,
         };
 
         let formatter = Formatter;
-        formatter.format(&mut options).await.unwrap();
+        formatter.format(&mut options, &Execute(1)).await?;
 
         let output = String::from_utf8(output.get_ref().to_vec())?.replace("\r\n", "\n");
         let expected = "1 row (9ns)\n";
@@ -111,13 +118,12 @@ mod test {
         let output = &mut Cursor::new(Vec::new());
         let mut options = FormatterOptions {
             configuration,
-            results: &query_result,
-            elapsed: &std::time::Duration::from_nanos(9),
+            elapsed: Duration::from_nanos(9),
             output,
         };
 
         let formatter = Formatter;
-        formatter.format(&mut options).await.unwrap();
+        formatter.format(&mut options, &query_result).await?;
 
         let output = String::from_utf8(output.get_ref().to_vec())?.replace("\r\n", "\n");
         let expected = indoc! {r#"

@@ -1,3 +1,4 @@
+use crate::drivers::Results;
 use crate::formatters::error::Result;
 use crate::formatters::formatter::FormatterOptions;
 use async_trait::async_trait;
@@ -12,8 +13,12 @@ impl crate::formatters::Formatter for Formatter {
         "jsonl"
     }
 
-    async fn format<'a>(&self, options: &mut FormatterOptions<'a>) -> Result<()> {
-        crate::formatters::json::format_json(options, true).await
+    async fn format<'a>(
+        &self,
+        options: &mut FormatterOptions<'a>,
+        results: &Results,
+    ) -> Result<()> {
+        crate::formatters::json::format_json(options, true, results).await
     }
 }
 
@@ -28,6 +33,7 @@ mod test {
     use crate::formatters::Formatter;
     use indoc::indoc;
     use std::io::Cursor;
+    use std::time::Duration;
 
     #[tokio::test]
     async fn test_format_query() -> anyhow::Result<()> {
@@ -46,13 +52,12 @@ mod test {
         let output = &mut Cursor::new(Vec::new());
         let mut options = FormatterOptions {
             configuration,
-            results: &query_result,
-            elapsed: &std::time::Duration::from_nanos(9),
+            elapsed: Duration::from_nanos(9),
             output,
         };
 
         let formatter = Formatter;
-        formatter.format(&mut options).await.unwrap();
+        formatter.format(&mut options, &query_result).await?;
 
         let output = String::from_utf8(output.get_ref().to_vec())?.replace("\r\n", "\n");
         let expected = indoc! {r#"

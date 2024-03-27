@@ -1,3 +1,4 @@
+use crate::drivers::Results;
 use crate::drivers::Results::Query;
 use crate::formatters::error::Result;
 use crate::formatters::footer::write_footer;
@@ -8,8 +9,9 @@ pub async fn format<'a>(
     options: &mut FormatterOptions<'a>,
     delimiter: u8,
     quote_style: QuoteStyle,
+    results: &Results,
 ) -> Result<()> {
-    if let Query(query_result) = &options.results {
+    if let Query(query_result) = &results {
         let output = &mut options.output;
         let configuration = &options.configuration;
         let mut writer = csv::WriterBuilder::new()
@@ -37,7 +39,7 @@ pub async fn format<'a>(
         writer.flush()?;
     }
 
-    write_footer(options).await
+    write_footer(options, results).await
 }
 
 #[cfg(test)]
@@ -50,6 +52,7 @@ mod test {
     use crate::formatters::formatter::FormatterOptions;
     use indoc::indoc;
     use std::io::Cursor;
+    use std::time::Duration;
 
     #[tokio::test]
     async fn test_format_execute() -> anyhow::Result<()> {
@@ -60,12 +63,11 @@ mod test {
         let output = &mut Cursor::new(Vec::new());
         let mut options = FormatterOptions {
             configuration,
-            results: &Execute(1),
-            elapsed: &std::time::Duration::from_nanos(9),
+            elapsed: Duration::from_nanos(9),
             output,
         };
 
-        format(&mut options, b',', QuoteStyle::NonNumeric)
+        format(&mut options, b',', QuoteStyle::NonNumeric, &Execute(1))
             .await
             .unwrap();
 
@@ -93,12 +95,11 @@ mod test {
         let output = &mut Cursor::new(Vec::new());
         let mut options = FormatterOptions {
             configuration,
-            results: &query_result,
-            elapsed: &std::time::Duration::from_nanos(9),
+            elapsed: Duration::from_nanos(9),
             output,
         };
 
-        format(&mut options, b',', QuoteStyle::NonNumeric)
+        format(&mut options, b',', QuoteStyle::NonNumeric, &query_result)
             .await
             .unwrap();
 
@@ -127,12 +128,11 @@ mod test {
         let output = &mut Cursor::new(Vec::new());
         let mut options = FormatterOptions {
             configuration,
-            results: &query_result,
-            elapsed: &std::time::Duration::from_nanos(9),
+            elapsed: Duration::from_nanos(9),
             output,
         };
 
-        format(&mut options, b',', QuoteStyle::NonNumeric)
+        format(&mut options, b',', QuoteStyle::NonNumeric, &query_result)
             .await
             .unwrap();
 
