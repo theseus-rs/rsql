@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en" id="oranda" class="dark">
+  <head>
+    <title>rsql</title>
+    
+    
+      <link rel="icon" href="/rsql/rsql_cli/favicon.ico" />
+    
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+      <meta name="description" content="rsql is a command line interface for PostgreSQL and SQLite3." />
+      <meta property="og:description" content="rsql is a command line interface for PostgreSQL and SQLite3." />
+    
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="rsql" />
+    
+    
+    
+    <meta http-equiv="Permissions-Policy" content="interest-cohort=()" />
+    <link rel="stylesheet" href="/rsql/rsql_cli/oranda-v0.6.1.css" />
+    
+    
+  </head>
+  <body>
+    <div class="container">
+      <div class="page-body">
+        
+          <div class="repo_banner">
+            <a href="https://github.com/theseus-rs/rsql">
+              <div class="github-icon" aria-hidden="true"></div>
+              Check out our GitHub!
+            </a>
+          </div>
+        
+
+        <main>
+          <header>
+            
+              <img src="/rsql/rsql_cli/rsql.jpg" alt="rsql" class="logo" />
+            
+            <h1 class="title">rsql</h1>
+            
+  <nav class="nav">
+    <ul>
+      <li><a href="/rsql/rsql_cli/">Home</a></li>
+
+      
+
+      
+        <li><a href="/rsql/rsql_cli/artifacts/">Install</a></li>
+      
+
+      
+        <li><a href="/rsql/rsql_cli/book/">Docs</a></li>
+      
+
+      
+
+      
+        <li><a href="/rsql/rsql_cli/changelog/">Changelog</a></li>
+      
+    </ul>
+  </nav>
+
+          </header>
+
+          
+  <div>
+    <h1>
+      Releases
+      
+        <a href="/rsql/rsql_cli/changelog.rss" class="inline-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+  <path d="M3.75 3a.75.75 0 00-.75.75v.5c0 .414.336.75.75.75H4c6.075 0 11 4.925 11 11v.25c0 .414.336.75.75.75h.5a.75.75 0 00.75-.75V16C17 8.82 11.18 3 4 3h-.25z" />
+  <path d="M3 8.75A.75.75 0 013.75 8H4a8 8 0 018 8v.25a.75.75 0 01-.75.75h-.5a.75.75 0 01-.75-.75V16a6 6 0 00-6-6h-.25A.75.75 0 013 9.25v-.5zM7 15a2 2 0 11-4 0 2 2 0 014 0z" />
+</svg></a>
+      
+    </h1>
+    <div class="releases-wrapper">
+      <nav class="releases-nav">
+        
+
+        
+        <ul>
+          
+            <li class="">
+              <a href="v0.7.4/">v0.7.4</a>
+            </li>
+          
+            <li class="">
+              <a href="v0.7.3/">v0.7.3</a>
+            </li>
+          
+            <li class="">
+              <a href="v0.7.2/">v0.7.2</a>
+            </li>
+          
+            <li class="">
+              <a href="v0.7.1/">v0.7.1</a>
+            </li>
+          
+            <li class="">
+              <a href="v0.7.0/">v0.7.0</a>
+            </li>
+          
+            <li class="">
+              <a href="v0.6.0/">v0.6.0</a>
+            </li>
+          
+            <li class="">
+              <a href="v0.5.2/">v0.5.2</a>
+            </li>
+          
+            <li class="">
+              <a href="v0.5.1/">v0.5.1</a>
+            </li>
+          
+            <li class="">
+              <a href="v0.5.0/">v0.5.0</a>
+            </li>
+          
+            <li class="">
+              <a href="v0.4.4/">v0.4.4</a>
+            </li>
+          
+            <li class="">
+              <a href="v0.4.3/">v0.4.3</a>
+            </li>
+          
+            <li class="">
+              <a href="v0.4.2/">v0.4.2</a>
+            </li>
+          
+            <li class="">
+              <a href="v0.4.1/">v0.4.1</a>
+            </li>
+          
+            <li class="">
+              <a href="v0.4.0/">v0.4.0</a>
+            </li>
+          
+            <li class="">
+              <a href="v0.3.0/">v0.3.0</a>
+            </li>
+          
+            <li class="">
+              <a href="v0.2.1/">v0.2.1</a>
+            </li>
+          
+            <li class="">
+              <a href="v0.2.0/">v0.2.0</a>
+            </li>
+          
+            <li class="">
+              <a href="v0.1.4/">v0.1.4</a>
+            </li>
+          
+            <li class="">
+              <a href="v0.1.3/">v0.1.3</a>
+            </li>
+          
+            <li class="">
+              <a href="v0.1.2/">v0.1.2</a>
+            </li>
+          
+            <li class="">
+              <a href="v0.1.1/">v0.1.1</a>
+            </li>
+          
+            <li class="">
+              <a href="v0.1.0/">v0.1.0</a>
+            </li>
+          
+        </ul>
+      </nav>
+
+      <div class="releases-list">
+        
+          
+          <section class="release ">
+  <h2 id="tag-v0.7.4">
+    <a href="v0.7.4/">
+      
+        v0.7.4
+      
+    </a>
+  </h2>
+  <div class="release-info">
+    <span class="flex items-center gap-2">
+      <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'>
+    <path stroke-linecap='round' stroke-linejoin='round' d='M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z' />
+    <path stroke-linecap='round' stroke-linejoin='round' d='M6 6h.008v.008H6V6z' /></svg>
+      v0.7.4
+    </span>
+    <span class="flex items-center gap-2">
+      
+        <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'><path stroke-linecap='round' stroke-linejoin='round' d='M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5' /></svg>
+        Mar 26 2024 at 23:06 UTC
+      
+    </span>
+  </div>
+  <div class="release-body">
+    <h2>✨ Enhancements</h2>
+<ul>
+<li>add psql format (#84)</li>
+<li>add markdown format (#83)</li>
+<li>add sleep command (#81)</li>
+<li>add indexes command (#80)</li>
+<li>add print command (#79)</li>
+<li>add read command (#78)</li>
+</ul>
+<h2>🐞 Bug fixes</h2>
+<ul>
+<li>correct editor history not being tracked when enabled (#86)</li>
+<li>correct ascii, plain and unicode format when there are no columns (#82)</li>
+</ul>
+<h2>📖 Documentation</h2>
+<ul>
+<li>update web docs (#85)</li>
+</ul>
+
+  </div>
+</section>
+        
+          
+          <section class="release ">
+  <h2 id="tag-v0.7.3">
+    <a href="v0.7.3/">
+      
+        v0.7.3
+      
+    </a>
+  </h2>
+  <div class="release-info">
+    <span class="flex items-center gap-2">
+      <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'>
+    <path stroke-linecap='round' stroke-linejoin='round' d='M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z' />
+    <path stroke-linecap='round' stroke-linejoin='round' d='M6 6h.008v.008H6V6z' /></svg>
+      v0.7.3
+    </span>
+    <span class="flex items-center gap-2">
+      
+        <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'><path stroke-linecap='round' stroke-linejoin='round' d='M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5' /></svg>
+        Mar 25 2024 at 19:00 UTC
+      
+    </span>
+  </div>
+  <div class="release-body">
+    <h2>✨ Enhancements</h2>
+<ul>
+<li>add plain format (#77)</li>
+<li>add rusqlite driver (#76)</li>
+<li>provide help text on invalid command if available (#75)</li>
+<li>additional localization (#74)</li>
+</ul>
+<h2>🐞 Bug fixes</h2>
+<ul>
+<li>suppress startup banner when commands or file are specified (#72)</li>
+<li>correct unicode character width calculation (#71)</li>
+</ul>
+<h2>📖 Documentation</h2>
+<ul>
+<li>correct supported locales link (#70)</li>
+</ul>
+<h2>🛠️ Other improvements</h2>
+<ul>
+<li>improve test coverage (#73)</li>
+</ul>
+
+  </div>
+</section>
+        
+          
+          <section class="release ">
+  <h2 id="tag-v0.7.2">
+    <a href="v0.7.2/">
+      
+        v0.7.2
+      
+    </a>
+  </h2>
+  <div class="release-info">
+    <span class="flex items-center gap-2">
+      <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'>
+    <path stroke-linecap='round' stroke-linejoin='round' d='M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z' />
+    <path stroke-linecap='round' stroke-linejoin='round' d='M6 6h.008v.008H6V6z' /></svg>
+      v0.7.2
+    </span>
+    <span class="flex items-center gap-2">
+      
+        <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'><path stroke-linecap='round' stroke-linejoin='round' d='M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5' /></svg>
+        Mar 23 2024 at 18:34 UTC
+      
+    </span>
+  </div>
+  <div class="release-body">
+    <h2>✨ Enhancements</h2>
+<ul>
+<li>add i18n support (#69)</li>
+<li>update history command to allow configuration (#68)</li>
+<li>add color command (#67)</li>
+<li>add postgresql support for timestampz (#66)</li>
+<li>add configurable command identifier (#65)</li>
+</ul>
+
+  </div>
+</section>
+        
+          
+          <section class="release ">
+  <h2 id="tag-v0.7.1">
+    <a href="v0.7.1/">
+      
+        v0.7.1
+      
+    </a>
+  </h2>
+  <div class="release-info">
+    <span class="flex items-center gap-2">
+      <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'>
+    <path stroke-linecap='round' stroke-linejoin='round' d='M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z' />
+    <path stroke-linecap='round' stroke-linejoin='round' d='M6 6h.008v.008H6V6z' /></svg>
+      v0.7.1
+    </span>
+    <span class="flex items-center gap-2">
+      
+        <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'><path stroke-linecap='round' stroke-linejoin='round' d='M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5' /></svg>
+        Mar 22 2024 at 18:33 UTC
+      
+    </span>
+  </div>
+  <div class="release-body">
+    <h2>✨ Enhancements</h2>
+<ul>
+<li>add result highlighter for html, json, jsonl, xml, and yaml (#63)</li>
+<li>add drivers command (#62)</li>
+<li>add support for PostgreSQL bit and bit varying (#60)</li>
+</ul>
+<h2>🐞 Bug fixes</h2>
+<ul>
+<li>no-op empty commands (#64)</li>
+</ul>
+<h2>🛠️ Other improvements</h2>
+<ul>
+<li>improve test coverage (#61)</li>
+<li>add postgresql and sqlite benchmarks (#59)</li>
+</ul>
+
+  </div>
+</section>
+        
+          
+          <section class="release ">
+  <h2 id="tag-v0.7.0">
+    <a href="v0.7.0/">
+      
+        v0.7.0
+      
+    </a>
+  </h2>
+  <div class="release-info">
+    <span class="flex items-center gap-2">
+      <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'>
+    <path stroke-linecap='round' stroke-linejoin='round' d='M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z' />
+    <path stroke-linecap='round' stroke-linejoin='round' d='M6 6h.008v.008H6V6z' /></svg>
+      v0.7.0
+    </span>
+    <span class="flex items-center gap-2">
+      
+        <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'><path stroke-linecap='round' stroke-linejoin='round' d='M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5' /></svg>
+        Mar 21 2024 at 18:23 UTC
+      
+    </span>
+  </div>
+  <div class="release-body">
+    <h2>💥 Breaking changes</h2>
+<ul>
+<li>add executors (#56)</li>
+</ul>
+<h2>✨ Enhancements</h2>
+<ul>
+<li>allow shell output writer to be configured (#57)</li>
+<li>add echo command (#55)</li>
+</ul>
+<h2>📖 Documentation</h2>
+<ul>
+<li>add security policy (#58)</li>
+</ul>
+<h2>🛠️ Other improvements</h2>
+<ul>
+<li>set branch for changelog (#54)</li>
+<li>add executors (#56)</li>
+</ul>
+
+  </div>
+</section>
+        
+          
+          <section class="release ">
+  <h2 id="tag-v0.6.0">
+    <a href="v0.6.0/">
+      
+        v0.6.0
+      
+    </a>
+  </h2>
+  <div class="release-info">
+    <span class="flex items-center gap-2">
+      <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'>
+    <path stroke-linecap='round' stroke-linejoin='round' d='M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z' />
+    <path stroke-linecap='round' stroke-linejoin='round' d='M6 6h.008v.008H6V6z' /></svg>
+      v0.6.0
+    </span>
+    <span class="flex items-center gap-2">
+      
+        <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'><path stroke-linecap='round' stroke-linejoin='round' d='M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5' /></svg>
+        Mar 20 2024 at 23:51 UTC
+      
+    </span>
+  </div>
+  <div class="release-body">
+    <h2>💥 Breaking changes</h2>
+<ul>
+<li>run commands from file, stdin, or command line (#53)</li>
+<li>refactor QueryResult to be an async trait (#49)</li>
+</ul>
+<h2>✨ Enhancements</h2>
+<ul>
+<li>run commands from file, stdin, or command line (#53)</li>
+</ul>
+<h2>📦 Build system</h2>
+<ul>
+<li>add changelog generation job (#52)</li>
+</ul>
+<h2>🛠️ Other improvements</h2>
+<ul>
+<li>add pull request template (#51)</li>
+<li>add github issue templates (#50)</li>
+<li>refactor QueryResult to be an async trait (#49)</li>
+</ul>
+
+  </div>
+</section>
+        
+          
+          <section class="release ">
+  <h2 id="tag-v0.5.2">
+    <a href="v0.5.2/">
+      
+        v0.5.2
+      
+    </a>
+  </h2>
+  <div class="release-info">
+    <span class="flex items-center gap-2">
+      <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'>
+    <path stroke-linecap='round' stroke-linejoin='round' d='M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z' />
+    <path stroke-linecap='round' stroke-linejoin='round' d='M6 6h.008v.008H6V6z' /></svg>
+      v0.5.2
+    </span>
+    <span class="flex items-center gap-2">
+      
+        <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'><path stroke-linecap='round' stroke-linejoin='round' d='M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5' /></svg>
+        Mar 19 2024 at 16:47 UTC
+      
+    </span>
+  </div>
+  <div class="release-body">
+    <h2>🛠️ Other improvements</h2>
+<ul>
+<li>add web analytics (#47)</li>
+<li>improve test coverage (#46)</li>
+<li>improve test coverage (#48)</li>
+</ul>
+
+  </div>
+</section>
+        
+          
+          <section class="release ">
+  <h2 id="tag-v0.5.1">
+    <a href="v0.5.1/">
+      
+        v0.5.1
+      
+    </a>
+  </h2>
+  <div class="release-info">
+    <span class="flex items-center gap-2">
+      <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'>
+    <path stroke-linecap='round' stroke-linejoin='round' d='M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z' />
+    <path stroke-linecap='round' stroke-linejoin='round' d='M6 6h.008v.008H6V6z' /></svg>
+      v0.5.1
+    </span>
+    <span class="flex items-center gap-2">
+      
+        <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'><path stroke-linecap='round' stroke-linejoin='round' d='M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5' /></svg>
+        Mar 19 2024 at 02:17 UTC
+      
+    </span>
+  </div>
+  <div class="release-body">
+    <h2>✨ Enhancements</h2>
+<ul>
+<li>add html format (#45)</li>
+<li>add xml format (#44)</li>
+<li>add yaml format (#42)</li>
+<li>add json and jsonl formats (#41)</li>
+<li>add tsv formatter (#40)</li>
+</ul>
+<h2>🛠️ Other improvements</h2>
+<ul>
+<li>improve test coverage (#43)</li>
+</ul>
+
+  </div>
+</section>
+        
+          
+          <section class="release ">
+  <h2 id="tag-v0.5.0">
+    <a href="v0.5.0/">
+      
+        v0.5.0
+      
+    </a>
+  </h2>
+  <div class="release-info">
+    <span class="flex items-center gap-2">
+      <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'>
+    <path stroke-linecap='round' stroke-linejoin='round' d='M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z' />
+    <path stroke-linecap='round' stroke-linejoin='round' d='M6 6h.008v.008H6V6z' /></svg>
+      v0.5.0
+    </span>
+    <span class="flex items-center gap-2">
+      
+        <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'><path stroke-linecap='round' stroke-linejoin='round' d='M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5' /></svg>
+        Mar 17 2024 at 23:30 UTC
+      
+    </span>
+  </div>
+  <div class="release-body">
+    <h2>💥 Breaking changes</h2>
+<ul>
+<li>add custom Result and Error types (#39)</li>
+<li>add csv formatter (#38)</li>
+</ul>
+<h2>✨ Enhancements</h2>
+<ul>
+<li>add csv formatter (#38)</li>
+</ul>
+<h2>🛠️ Other improvements</h2>
+<ul>
+<li>add custom Result and Error types (#39)</li>
+<li>remove table header highlight (#37)</li>
+</ul>
+
+  </div>
+</section>
+        
+          
+          <section class="release ">
+  <h2 id="tag-v0.4.4">
+    <a href="v0.4.4/">
+      
+        v0.4.4
+      
+    </a>
+  </h2>
+  <div class="release-info">
+    <span class="flex items-center gap-2">
+      <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'>
+    <path stroke-linecap='round' stroke-linejoin='round' d='M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z' />
+    <path stroke-linecap='round' stroke-linejoin='round' d='M6 6h.008v.008H6V6z' /></svg>
+      v0.4.4
+    </span>
+    <span class="flex items-center gap-2">
+      
+        <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'><path stroke-linecap='round' stroke-linejoin='round' d='M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5' /></svg>
+        Mar 16 2024 at 19:07 UTC
+      
+    </span>
+  </div>
+  <div class="release-body">
+    <h2>📦 Build system</h2>
+<ul>
+<li>remove armv5te support (#36)</li>
+</ul>
+
+  </div>
+</section>
+        
+          
+          <section class="release ">
+  <h2 id="tag-v0.4.3">
+    <a href="v0.4.3/">
+      
+        v0.4.3
+      
+    </a>
+  </h2>
+  <div class="release-info">
+    <span class="flex items-center gap-2">
+      <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'>
+    <path stroke-linecap='round' stroke-linejoin='round' d='M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z' />
+    <path stroke-linecap='round' stroke-linejoin='round' d='M6 6h.008v.008H6V6z' /></svg>
+      v0.4.3
+    </span>
+    <span class="flex items-center gap-2">
+      
+        <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'><path stroke-linecap='round' stroke-linejoin='round' d='M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5' /></svg>
+        Mar 16 2024 at 18:41 UTC
+      
+    </span>
+  </div>
+  <div class="release-body">
+    <h2>✨ Enhancements</h2>
+<ul>
+<li>add progress indicator to long running operations (#34)</li>
+</ul>
+<h2>🐞 Bug fixes</h2>
+<ul>
+<li>correct sqlx dependency (#35)</li>
+</ul>
+<h2>📖 Documentation</h2>
+<ul>
+<li>add downloads badge to readme (#31)</li>
+</ul>
+<h2>📦 Build system</h2>
+<ul>
+<li>make sqlx and optional dependency (#33)</li>
+</ul>
+<h2>🛠️ Other improvements</h2>
+<ul>
+<li>update driver manager test to work without sqlite feature (#32)</li>
+</ul>
+
+  </div>
+</section>
+        
+          
+          <section class="release ">
+  <h2 id="tag-v0.4.2">
+    <a href="v0.4.2/">
+      
+        v0.4.2
+      
+    </a>
+  </h2>
+  <div class="release-info">
+    <span class="flex items-center gap-2">
+      <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'>
+    <path stroke-linecap='round' stroke-linejoin='round' d='M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z' />
+    <path stroke-linecap='round' stroke-linejoin='round' d='M6 6h.008v.008H6V6z' /></svg>
+      v0.4.2
+    </span>
+    <span class="flex items-center gap-2">
+      
+        <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'><path stroke-linecap='round' stroke-linejoin='round' d='M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5' /></svg>
+        Mar 16 2024 at 04:25 UTC
+      
+    </span>
+  </div>
+  <div class="release-body">
+    <h2>✨ Enhancements</h2>
+<ul>
+<li>install postgresql embedded to rsql configuration directory (#30)</li>
+</ul>
+<h2>🛠️ Other improvements</h2>
+<ul>
+<li>upgrade postgresql-embedded (#29)</li>
+</ul>
+
+  </div>
+</section>
+        
+          
+          <section class="release ">
+  <h2 id="tag-v0.4.1">
+    <a href="v0.4.1/">
+      
+        v0.4.1
+      
+    </a>
+  </h2>
+  <div class="release-info">
+    <span class="flex items-center gap-2">
+      <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'>
+    <path stroke-linecap='round' stroke-linejoin='round' d='M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z' />
+    <path stroke-linecap='round' stroke-linejoin='round' d='M6 6h.008v.008H6V6z' /></svg>
+      v0.4.1
+    </span>
+    <span class="flex items-center gap-2">
+      
+        <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'><path stroke-linecap='round' stroke-linejoin='round' d='M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5' /></svg>
+        Mar 15 2024 at 02:14 UTC
+      
+    </span>
+  </div>
+  <div class="release-body">
+    <h2>🐞 Bug fixes</h2>
+<ul>
+<li>corrected sqlite conversion logic error where strings were treated as bytes (#28)</li>
+</ul>
+<h2>🛠️ Other improvements</h2>
+<ul>
+<li>remove invalid crate category (#27)</li>
+<li>add driver interface tests (#26)</li>
+</ul>
+
+  </div>
+</section>
+        
+          
+          <section class="release ">
+  <h2 id="tag-v0.4.0">
+    <a href="v0.4.0/">
+      
+        v0.4.0
+      
+    </a>
+  </h2>
+  <div class="release-info">
+    <span class="flex items-center gap-2">
+      <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'>
+    <path stroke-linecap='round' stroke-linejoin='round' d='M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z' />
+    <path stroke-linecap='round' stroke-linejoin='round' d='M6 6h.008v.008H6V6z' /></svg>
+      v0.4.0
+    </span>
+    <span class="flex items-center gap-2">
+      
+        <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'><path stroke-linecap='round' stroke-linejoin='round' d='M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5' /></svg>
+        Mar 14 2024 at 21:39 UTC
+      
+    </span>
+  </div>
+  <div class="release-body">
+    <h2>💥 Breaking changes</h2>
+<ul>
+<li>add shell and shellbuilder to facilitate configuring drivers, commands and formatters (#24)</li>
+<li>add Formatters and FormatterManager. change .display command to .format (#21)</li>
+</ul>
+<h2>✨ Enhancements</h2>
+<ul>
+<li>add shell and shellbuilder to facilitate configuring drivers, commands and formatters (#24)</li>
+</ul>
+<h2>📖 Documentation</h2>
+<ul>
+<li>correct history document formatting (#20)</li>
+</ul>
+<h2>🛠️ Other improvements</h2>
+<ul>
+<li>add command tests to increase coverage (#25)</li>
+<li>add table tests to improve coverage (#23)</li>
+<li>improve table formatter test coverage (#22)</li>
+<li>add Formatters and FormatterManager. change .display command to .format (#21)</li>
+</ul>
+
+  </div>
+</section>
+        
+          
+          <section class="release ">
+  <h2 id="tag-v0.3.0">
+    <a href="v0.3.0/">
+      
+        v0.3.0
+      
+    </a>
+  </h2>
+  <div class="release-info">
+    <span class="flex items-center gap-2">
+      <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'>
+    <path stroke-linecap='round' stroke-linejoin='round' d='M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z' />
+    <path stroke-linecap='round' stroke-linejoin='round' d='M6 6h.008v.008H6V6z' /></svg>
+      v0.3.0
+    </span>
+    <span class="flex items-center gap-2">
+      
+        <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'><path stroke-linecap='round' stroke-linejoin='round' d='M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5' /></svg>
+        Mar 14 2024 at 00:05 UTC
+      
+    </span>
+  </div>
+  <div class="release-body">
+    <h2>💥 Breaking changes</h2>
+<ul>
+<li>refactor results to support configurable output formatting (#19)</li>
+<li>refactor modules to better align with usage (#18)</li>
+</ul>
+<h2>✨ Enhancements</h2>
+<ul>
+<li>add support for postgresql void type (#17)</li>
+</ul>
+<h2>📖 Documentation</h2>
+<ul>
+<li>add initial command documentation (#16)</li>
+</ul>
+<h2>🛠️ Other improvements</h2>
+<ul>
+<li>refactor results to support configurable output formatting (#19)</li>
+<li>refactor modules to better align with usage (#18)</li>
+</ul>
+
+  </div>
+</section>
+        
+          
+          <section class="release ">
+  <h2 id="tag-v0.2.1">
+    <a href="v0.2.1/">
+      
+        v0.2.1
+      
+    </a>
+  </h2>
+  <div class="release-info">
+    <span class="flex items-center gap-2">
+      <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'>
+    <path stroke-linecap='round' stroke-linejoin='round' d='M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z' />
+    <path stroke-linecap='round' stroke-linejoin='round' d='M6 6h.008v.008H6V6z' /></svg>
+      v0.2.1
+    </span>
+    <span class="flex items-center gap-2">
+      
+        <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'><path stroke-linecap='round' stroke-linejoin='round' d='M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5' /></svg>
+        Mar 13 2024 at 19:53 UTC
+      
+    </span>
+  </div>
+  <div class="release-body">
+    <h2>📖 Documentation</h2>
+<ul>
+<li>add scaffolding for web documentation (#15)</li>
+</ul>
+
+  </div>
+</section>
+        
+          
+          <section class="release ">
+  <h2 id="tag-v0.2.0">
+    <a href="v0.2.0/">
+      
+        v0.2.0
+      
+    </a>
+  </h2>
+  <div class="release-info">
+    <span class="flex items-center gap-2">
+      <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'>
+    <path stroke-linecap='round' stroke-linejoin='round' d='M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z' />
+    <path stroke-linecap='round' stroke-linejoin='round' d='M6 6h.008v.008H6V6z' /></svg>
+      v0.2.0
+    </span>
+    <span class="flex items-center gap-2">
+      
+        <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'><path stroke-linecap='round' stroke-linejoin='round' d='M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5' /></svg>
+        Mar 13 2024 at 18:52 UTC
+      
+    </span>
+  </div>
+  <div class="release-body">
+    <h2>💥 Breaking changes</h2>
+<ul>
+<li>add configurable driver support (#12)</li>
+<li>refactor Engine to Connection (#14)</li>
+<li>rename Commands to CommandManager (#13)</li>
+</ul>
+<h2>✨ Enhancements</h2>
+<ul>
+<li>add configurable driver support (#12)</li>
+<li>add option/command to bail on the first error (#11)</li>
+<li>convert byte results to base64 when printing results (#10)</li>
+</ul>
+<h2>📖 Documentation</h2>
+<ul>
+<li>update website changelog configuration (#9)</li>
+</ul>
+<h2>🛠️ Other improvements</h2>
+<ul>
+<li>refactor Engine to Connection (#14)</li>
+<li>rename Commands to CommandManager (#13)</li>
+</ul>
+
+  </div>
+</section>
+        
+          
+          <section class="release ">
+  <h2 id="tag-v0.1.4">
+    <a href="v0.1.4/">
+      
+        v0.1.4
+      
+    </a>
+  </h2>
+  <div class="release-info">
+    <span class="flex items-center gap-2">
+      <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'>
+    <path stroke-linecap='round' stroke-linejoin='round' d='M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z' />
+    <path stroke-linecap='round' stroke-linejoin='round' d='M6 6h.008v.008H6V6z' /></svg>
+      v0.1.4
+    </span>
+    <span class="flex items-center gap-2">
+      
+        <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'><path stroke-linecap='round' stroke-linejoin='round' d='M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5' /></svg>
+        Mar 12 2024 at 22:06 UTC
+      
+    </span>
+  </div>
+  <div class="release-body">
+    <h2>✨ Enhancements</h2>
+<ul>
+<li>add ability to detect/set locale and display numeric data with locale format (#8)</li>
+</ul>
+<img width="322" alt="image" src="https://github.com/theseus-rs/rsql/assets/3210678/d500c204-620c-42be-bb22-be73152be65b">
+<ul>
+<li>allow commands in rsql_core to be configured by caller (#6)</li>
+</ul>
+<h2>🛠️ Other improvements</h2>
+<ul>
+<li>internal: disable sqlite as default database url when the sqlite feature is not enabled (#7)</li>
+</ul>
+
+  </div>
+</section>
+        
+          
+          <section class="release ">
+  <h2 id="tag-v0.1.3">
+    <a href="v0.1.3/">
+      
+        v0.1.3
+      
+    </a>
+  </h2>
+  <div class="release-info">
+    <span class="flex items-center gap-2">
+      <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'>
+    <path stroke-linecap='round' stroke-linejoin='round' d='M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z' />
+    <path stroke-linecap='round' stroke-linejoin='round' d='M6 6h.008v.008H6V6z' /></svg>
+      v0.1.3
+    </span>
+    <span class="flex items-center gap-2">
+      
+        <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'><path stroke-linecap='round' stroke-linejoin='round' d='M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5' /></svg>
+        Mar 12 2024 at 01:31 UTC
+      
+    </span>
+  </div>
+  <div class="release-body">
+    <h2>📖 Documentation</h2>
+<ul>
+<li>update documentation links (#5)</li>
+</ul>
+
+  </div>
+</section>
+        
+          
+          <section class="release ">
+  <h2 id="tag-v0.1.2">
+    <a href="v0.1.2/">
+      
+        v0.1.2
+      
+    </a>
+  </h2>
+  <div class="release-info">
+    <span class="flex items-center gap-2">
+      <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'>
+    <path stroke-linecap='round' stroke-linejoin='round' d='M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z' />
+    <path stroke-linecap='round' stroke-linejoin='round' d='M6 6h.008v.008H6V6z' /></svg>
+      v0.1.2
+    </span>
+    <span class="flex items-center gap-2">
+      
+        <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'><path stroke-linecap='round' stroke-linejoin='round' d='M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5' /></svg>
+        Mar 12 2024 at 00:31 UTC
+      
+    </span>
+  </div>
+  <div class="release-body">
+    <h2>🛠️ Other improvements</h2>
+<ul>
+<li>add command tests (#4)</li>
+</ul>
+
+  </div>
+</section>
+        
+          
+          <section class="release ">
+  <h2 id="tag-v0.1.1">
+    <a href="v0.1.1/">
+      
+        v0.1.1
+      
+    </a>
+  </h2>
+  <div class="release-info">
+    <span class="flex items-center gap-2">
+      <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'>
+    <path stroke-linecap='round' stroke-linejoin='round' d='M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z' />
+    <path stroke-linecap='round' stroke-linejoin='round' d='M6 6h.008v.008H6V6z' /></svg>
+      v0.1.1
+    </span>
+    <span class="flex items-center gap-2">
+      
+        <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'><path stroke-linecap='round' stroke-linejoin='round' d='M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5' /></svg>
+        Mar 11 2024 at 17:59 UTC
+      
+    </span>
+  </div>
+  <div class="release-body">
+    <h2>📖 Documentation</h2>
+<ul>
+<li>add documentation configuration (#2)</li>
+</ul>
+<h2>📦 Build system</h2>
+<ul>
+<li>add release publish jobs for additional CPU architectures (#3)</li>
+</ul>
+<h2>🛠️ Other improvements</h2>
+<ul>
+<li>add cli tests (#1)</li>
+</ul>
+
+  </div>
+</section>
+        
+          
+          <section class="release ">
+  <h2 id="tag-v0.1.0">
+    <a href="v0.1.0/">
+      
+        v0.1.0
+      
+    </a>
+  </h2>
+  <div class="release-info">
+    <span class="flex items-center gap-2">
+      <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'>
+    <path stroke-linecap='round' stroke-linejoin='round' d='M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z' />
+    <path stroke-linecap='round' stroke-linejoin='round' d='M6 6h.008v.008H6V6z' /></svg>
+      v0.1.0
+    </span>
+    <span class="flex items-center gap-2">
+      
+        <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-6 h-6'><path stroke-linecap='round' stroke-linejoin='round' d='M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5' /></svg>
+        Mar 11 2024 at 03:24 UTC
+      
+    </span>
+  </div>
+  <div class="release-body">
+    <h2>✨ Enhancements</h2>
+<ul>
+<li>initial release (<a href="https://github.com/theseus-rs/rsql/tree/71f259e6776b3f86c844479e652bb77f88482a3b" rel="noopener noreferrer">71f259e</a>)</li>
+</ul>
+
+  </div>
+</section>
+        
+      </div>
+    </div>
+  </div>
+
+        </main>
+      </div>
+
+      <footer>
+        
+          <a href="https://github.com/theseus-rs/rsql"><div class="github-icon" aria-hidden="true"></div></a>
+        
+        <span>
+          rsql, Apache-2.0 OR MIT
+        </span>
+      </footer>
+    </div>
+
+    
+    
+
+    
+  <script src="/rsql/rsql_cli/artifacts.js"></script>
+
+  </body>
+</html>
