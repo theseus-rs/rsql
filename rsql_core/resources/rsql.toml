@@ -109,6 +109,7 @@ theme.dark = "Solarized (dark)"
 #   "markdown" - Markdown
 #   "plain" - Column based layout
 #   "psql" - PostgreSQL formatted table
+#   "sqlite" - SQLite formatted table
 #   "tsv" - Tab Separated Values (TSV)
 #   "unicode" - Unicode characters to draw a table
 #   "xml" - Extensible Markup Language (XML)

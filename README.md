@@ -39,7 +39,7 @@ visit the [RSQL](https://theseus-rs.github.io/rsql/rsql_cli/) site.
 ## Usage
 
 ```shell
-rsql --url <url>
+rsql --url '<url>'
 ```
 
 | Driver            | URL                                                                           |

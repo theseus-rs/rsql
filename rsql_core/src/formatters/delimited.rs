@@ -2,14 +2,19 @@ use crate::drivers::Results::Query;
 use crate::formatters::error::Result;
 use crate::formatters::footer::write_footer;
 use crate::formatters::formatter::FormatterOptions;
+use csv::QuoteStyle;
 
-pub async fn format<'a>(options: &mut FormatterOptions<'a>, delimiter: u8) -> Result<()> {
+pub async fn format<'a>(
+    options: &mut FormatterOptions<'a>,
+    delimiter: u8,
+    quote_style: QuoteStyle,
+) -> Result<()> {
     if let Query(query_result) = &options.results {
         let output = &mut options.output;
         let configuration = &options.configuration;
         let mut writer = csv::WriterBuilder::new()
             .delimiter(delimiter)
-            .quote_style(csv::QuoteStyle::NonNumeric)
+            .quote_style(quote_style)
             .from_writer(output);
 
         if configuration.results_header {
@@ -60,7 +65,9 @@ mod test {
             output,
         };
 
-        format(&mut options, b',').await.unwrap();
+        format(&mut options, b',', QuoteStyle::NonNumeric)
+            .await
+            .unwrap();
 
         let output = String::from_utf8(output.get_ref().to_vec())?.replace("\r\n", "\n");
         let expected = "1 row (9ns)\n";
@@ -91,7 +98,9 @@ mod test {
             output,
         };
 
-        format(&mut options, b',').await.unwrap();
+        format(&mut options, b',', QuoteStyle::NonNumeric)
+            .await
+            .unwrap();
 
         let output = String::from_utf8(output.get_ref().to_vec())?.replace("\r\n", "\n");
         let expected = indoc! {r#"
@@ -123,7 +132,9 @@ mod test {
             output,
         };
 
-        format(&mut options, b',').await.unwrap();
+        format(&mut options, b',', QuoteStyle::NonNumeric)
+            .await
+            .unwrap();
 
         let output = String::from_utf8(output.get_ref().to_vec())?.replace("\r\n", "\n");
         let expected = indoc! {r#"
