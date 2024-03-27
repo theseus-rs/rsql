@@ -1,6 +1,6 @@
 use crate::configuration::Configuration;
-use crate::drivers::QueryResult;
 use crate::drivers::Results::Query;
+use crate::drivers::{QueryResult, Results};
 use crate::formatters::error::Result;
 use crate::formatters::footer::write_footer;
 use crate::formatters::formatter::FormatterOptions;
@@ -15,13 +15,14 @@ use std::str::FromStr;
 pub async fn format<'a>(
     table_format: TableFormat,
     options: &mut FormatterOptions<'a>,
+    results: &Results,
 ) -> Result<()> {
     let configuration = &options.configuration;
     let output = &mut options.output;
 
-    if let Query(query_result) = &options.results {
+    if let Query(query_result) = &results {
         if query_result.columns().await.is_empty() {
-            write_footer(options).await?;
+            write_footer(options, results).await?;
             return Ok(());
         }
 
@@ -37,7 +38,7 @@ pub async fn format<'a>(
         table.print(output)?;
     }
 
-    write_footer(options).await?;
+    write_footer(options, results).await?;
     Ok(())
 }
 
@@ -125,16 +126,14 @@ mod tests {
         configuration: &mut Configuration,
         results: &Results,
     ) -> anyhow::Result<String> {
-        let elapsed = Duration::from_nanos(9);
         let output = &mut Vec::new();
         let mut options = FormatterOptions {
             configuration,
-            results: &results,
-            elapsed: &elapsed,
+            elapsed: Duration::from_nanos(9),
             output,
         };
 
-        format(*FORMAT_DEFAULT, &mut options).await?;
+        format(*FORMAT_DEFAULT, &mut options, &results).await?;
 
         Ok(String::from_utf8(output.clone())?.replace("\r\n", "\n"))
     }

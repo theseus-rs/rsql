@@ -10,8 +10,7 @@ use std::time::Duration;
 /// Options for formatters
 pub struct FormatterOptions<'a> {
     pub configuration: &'a mut Configuration,
-    pub results: &'a Results,
-    pub elapsed: &'a Duration,
+    pub elapsed: Duration,
     pub output: &'a mut (dyn io::Write + Send + Sync),
 }
 
@@ -19,7 +18,6 @@ impl Debug for FormatterOptions<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("FormatterOptions")
             .field("configuration", &self.configuration)
-            .field("results", &self.results)
             .field("elapsed", &self.elapsed)
             .finish()
     }
@@ -28,7 +26,8 @@ impl Debug for FormatterOptions<'_> {
 #[async_trait]
 pub trait Formatter: Debug + Send + Sync {
     fn identifier(&self) -> &'static str;
-    async fn format<'a>(&self, options: &mut FormatterOptions<'a>) -> Result<()>;
+    async fn format<'a>(&self, options: &mut FormatterOptions<'a>, results: &Results)
+        -> Result<()>;
 }
 
 /// Manages available formatters
@@ -93,16 +92,13 @@ mod tests {
     fn test_debug() {
         let options = FormatterOptions {
             configuration: &mut Configuration::default(),
-            results: &Results::Execute(42),
-            elapsed: &Duration::from_nanos(9),
+            elapsed: Duration::from_nanos(9),
             output: &mut io::Cursor::new(Vec::new()),
         };
 
         let debug = format!("{:?}", options);
         assert!(debug.contains("FormatterOptions"));
         assert!(debug.contains("configuration"));
-        assert!(debug.contains("results"));
-        assert!(debug.contains("42"));
         assert!(debug.contains("elapsed"));
         assert!(debug.contains("9ns"));
     }

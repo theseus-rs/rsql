@@ -51,11 +51,10 @@ impl<'a> SqlExecutor<'a> {
 
         let mut options = FormatterOptions {
             configuration: &mut self.configuration.clone(),
-            results,
-            elapsed: &start.elapsed(),
+            elapsed: start.elapsed(),
             output: &mut self.output,
         };
-        formatter.format(&mut options).await?;
+        formatter.format(&mut options, results).await?;
         Ok(LoopCondition::Continue)
     }
 
