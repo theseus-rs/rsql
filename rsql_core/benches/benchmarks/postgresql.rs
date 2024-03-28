@@ -6,7 +6,7 @@ use rsql_core::configuration::Configuration;
 use rsql_core::shell::{Result, ShellArgs, ShellBuilder};
 
 pub fn postgresql_benchmark(criterion: &mut Criterion) {
-    criterion.bench_function("postgresql", |bencher| {
+    criterion.bench_function("postgresql-embedded", |bencher| {
         let runtime = Runtime::new().expect("Failed to create Tokio runtime");
         bencher
             .to_async(runtime)
@@ -14,7 +14,7 @@ pub fn postgresql_benchmark(criterion: &mut Criterion) {
     });
 }
 
-async fn postgresql() -> Result<()> {
+async fn postgresql() -> Result<i32> {
     let args = ShellArgs {
         url: "postgresql://?embedded=true".to_string(),
         commands: vec!["SELECT 1".to_string()],
