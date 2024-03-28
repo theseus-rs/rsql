@@ -39,21 +39,22 @@ async fn main() -> Result<()> {
         .with_config()
         .build();
 
-    execute(args, configuration, &mut io::stdout()).await
+    let exit_code = execute(args, configuration, &mut io::stdout()).await?;
+    std::process::exit(exit_code);
 }
 
 pub(crate) async fn execute(
     args: Args,
     configuration: Configuration,
     output: &mut (dyn io::Write + Send + Sync),
-) -> Result<()> {
+) -> Result<i32> {
     let version = full_version(&configuration);
 
     info!("{version} initialized");
 
-    let result = if args.version {
+    let exit_code = if args.version {
         writeln!(output, "{version}")?;
-        Ok(())
+        0
     } else {
         if args.shell_args.commands.is_empty() && args.shell_args.file.is_none() {
             welcome_message(&mut io::stderr(), &configuration);
@@ -62,15 +63,11 @@ pub(crate) async fn execute(
         let mut shell = ShellBuilder::new(output)
             .with_configuration(configuration)
             .build();
-        shell.execute(&args.shell_args).await
+        shell.execute(&args.shell_args).await?
     };
 
     info!("{version} completed");
-
-    match result {
-        Ok(_) => Ok(()),
-        Err(error) => Err(error.into()),
-    }
+    Ok(exit_code)
 }
 
 fn welcome_message(output: &mut dyn io::Write, configuration: &Configuration) {

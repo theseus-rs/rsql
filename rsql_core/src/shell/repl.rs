@@ -94,7 +94,7 @@ impl<'a> Shell<'a> {
     }
 
     /// Execute the shell with the provided arguments.
-    pub async fn execute(&mut self, args: &ShellArgs) -> Result<()> {
+    pub async fn execute(&mut self, args: &ShellArgs) -> Result<i32> {
         let mut binding = self
             .driver_manager
             .connect(&self.configuration, args.url.as_str())
@@ -108,19 +108,20 @@ impl<'a> Shell<'a> {
             None
         };
 
-        if let Some(input) = input {
-            if let LoopCondition::Exit(exit_code) = &self
+        let exit_code = if let Some(input) = input {
+            match &self
                 .evaluate(connection, &DefaultHistory::new(), input.to_string())
                 .await?
             {
-                std::process::exit(*exit_code);
+                LoopCondition::Continue => 0,
+                LoopCondition::Exit(exit_code) => *exit_code,
             }
         } else {
-            self.repl(connection).await?;
-        }
+            self.repl(connection).await?
+        };
 
         connection.stop().await?;
-        Ok(())
+        Ok(exit_code)
     }
 
     fn editor(&self, history_file: &str) -> Result<Editor<ReplHelper, FileHistory>> {
@@ -148,7 +149,7 @@ impl<'a> Shell<'a> {
     }
 
     /// Run the Read-Eval-Print Loop (REPL) for the shell.
-    async fn repl(&mut self, connection: &mut dyn Connection) -> Result<()> {
+    async fn repl(&mut self, connection: &mut dyn Connection) -> Result<i32> {
         let history_file = match self.configuration.history_file {
             Some(ref file) => String::from(file.to_string_lossy()),
             None => String::new(),
@@ -213,11 +214,8 @@ impl<'a> Shell<'a> {
                 }
             };
 
-            match loop_condition {
-                LoopCondition::Continue => {}
-                LoopCondition::Exit(exit_code) => {
-                    std::process::exit(exit_code);
-                }
+            if let LoopCondition::Exit(exit_code) = loop_condition {
+                return Ok(exit_code);
             }
         }
     }
