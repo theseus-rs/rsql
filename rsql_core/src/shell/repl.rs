@@ -7,35 +7,23 @@ use crate::formatters::FormatterManager;
 use crate::shell::helper::ReplHelper;
 use crate::shell::Result;
 use crate::shell::ShellArgs;
+use crate::writers::Output;
 use colored::Colorize;
 use rustyline::config::Configurer;
 use rustyline::error::ReadlineError;
 use rustyline::history::{DefaultHistory, FileHistory};
 use rustyline::{ColorMode, CompletionType, Editor};
 use std::fmt::Debug;
-use std::{fmt, io};
 use tracing::error;
 
 /// A builder for creating a [Shell].
-#[derive(Debug)]
-pub struct ShellBuilder<'a> {
-    shell: Shell<'a>,
+#[derive(Debug, Default)]
+pub struct ShellBuilder {
+    shell: Shell,
 }
 
 /// A shell for interacting with a database.
-impl<'a> ShellBuilder<'a> {
-    pub fn new(output: &'a mut (dyn io::Write + Send + Sync)) -> Self {
-        Self {
-            shell: Shell::new(
-                Configuration::default(),
-                DriverManager::default(),
-                CommandManager::default(),
-                FormatterManager::default(),
-                output,
-            ),
-        }
-    }
-
+impl ShellBuilder {
     /// Set the configuration for the shell.
     pub fn with_configuration(mut self, configuration: Configuration) -> Self {
         self.shell.configuration = configuration;
@@ -60,39 +48,30 @@ impl<'a> ShellBuilder<'a> {
         self
     }
 
+    /// Set the output for the shell.
+    pub fn with_output(mut self, output: Output) -> Self {
+        self.shell.output = output;
+        self
+    }
+
     /// Build the shell.
-    pub fn build(self) -> Shell<'a> {
+    pub fn build(self) -> Shell {
         self.shell
     }
 }
 
 /// A shell for interacting with a database.
-pub struct Shell<'a> {
+#[derive(Debug, Default)]
+pub struct Shell {
     pub configuration: Configuration,
     pub driver_manager: DriverManager,
     pub command_manager: CommandManager,
     pub formatter_manager: FormatterManager,
-    pub output: &'a mut (dyn io::Write + Send + Sync),
+    pub output: Output,
 }
 
 /// Shell implementation.
-impl<'a> Shell<'a> {
-    fn new(
-        configuration: Configuration,
-        driver_manager: DriverManager,
-        command_manager: CommandManager,
-        formatter_manager: FormatterManager,
-        output: &'a mut (dyn io::Write + Send + Sync),
-    ) -> Self {
-        Self {
-            configuration,
-            driver_manager,
-            command_manager,
-            formatter_manager,
-            output,
-        }
-    }
-
+impl Shell {
     /// Execute the shell with the provided arguments.
     pub async fn execute(&mut self, args: &ShellArgs) -> Result<i32> {
         let mut binding = self
@@ -319,17 +298,6 @@ impl<'a> Shell<'a> {
     }
 }
 
-impl Debug for Shell<'_> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Shell")
-            .field("configuration", &self.configuration)
-            .field("driver_manager", &self.driver_manager)
-            .field("command_manager", &self.command_manager)
-            .field("formatter_manager", &self.formatter_manager)
-            .finish()
-    }
-}
-
 #[cfg(test)]
 mod test {
     use super::*;
@@ -345,12 +313,13 @@ mod test {
         let driver_manager = DriverManager::new();
         let command_manager = CommandManager::new();
         let formatter_manager = FormatterManager::new();
-        let mut output = Vec::new();
-        let shell = ShellBuilder::new(&mut output)
+        let output = Output::default();
+        let shell = ShellBuilder::default()
             .with_configuration(configuration)
             .with_driver_manager(driver_manager)
             .with_command_manager(command_manager)
             .with_formatter_manager(formatter_manager)
+            .with_output(output)
             .build();
 
         assert_eq!(shell.configuration.bail_on_error, true);
@@ -361,8 +330,7 @@ mod test {
 
     #[test]
     fn test_shell_debug() {
-        let mut output = Vec::new();
-        let shell = ShellBuilder::new(&mut output).build();
+        let shell = ShellBuilder::default().build();
         let debug = format!("{:?}", shell);
         assert!(debug.contains("Shell"));
         assert!(debug.contains("configuration"));
@@ -389,8 +357,7 @@ mod test {
         });
         let mut driver_manager = DriverManager::new();
         driver_manager.add(Box::new(mock_driver));
-        let mut output = Vec::new();
-        let mut shell = ShellBuilder::new(&mut output)
+        let mut shell = ShellBuilder::default()
             .with_configuration(configuration)
             .with_driver_manager(driver_manager)
             .build();
@@ -411,8 +378,7 @@ mod test {
             history: false,
             ..Default::default()
         };
-        let mut output = Vec::new();
-        let shell = ShellBuilder::new(&mut output)
+        let shell = ShellBuilder::default()
             .with_configuration(configuration)
             .build();
         let _ = shell.editor("history.txt")?;
@@ -435,8 +401,7 @@ mod test {
             bail_on_error: false,
             ..Default::default()
         };
-        let mut output = Vec::new();
-        let mut shell = ShellBuilder::new(&mut output)
+        let mut shell = ShellBuilder::default()
             .with_configuration(configuration)
             .build();
         let history = DefaultHistory::new();
@@ -459,8 +424,7 @@ mod test {
             bail_on_error: bail,
             ..Default::default()
         };
-        let mut output = Vec::new();
-        let mut shell = ShellBuilder::new(&mut output)
+        let mut shell = ShellBuilder::default()
             .with_configuration(configuration)
             .with_command_manager(command_manager)
             .build();
@@ -501,24 +465,22 @@ mod test {
             locale: "en".to_string(),
             ..Default::default()
         };
-        let mut output = Vec::new();
-        let mut shell = ShellBuilder::new(&mut output)
+        let mut shell = ShellBuilder::default()
             .with_configuration(configuration)
             .build();
-        let invalid_command = "foo".to_string();
 
+        let invalid_command = "foo".to_string();
         assert!(shell.invalid_command_help_available(invalid_command)?);
 
-        let command_output = String::from_utf8(output).unwrap();
-        assert!(command_output.contains(".foo"));
-        assert!(command_output.contains(".help"));
+        let output = shell.output.to_string();
+        assert!(output.contains(".foo"));
+        assert!(output.contains(".help"));
         Ok(())
     }
 
     #[test]
     fn test_invalid_command_help_available_returns_false() -> anyhow::Result<()> {
-        let mut output = Vec::new();
-        let mut shell = ShellBuilder::new(&mut output)
+        let mut shell = ShellBuilder::default()
             .with_command_manager(CommandManager::new())
             .build();
         let invalid_command = "foo".to_string();

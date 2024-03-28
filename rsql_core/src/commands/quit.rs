@@ -33,6 +33,7 @@ mod tests {
     use crate::configuration::Configuration;
     use crate::drivers::{DriverManager, MockConnection};
     use crate::formatters::FormatterManager;
+    use crate::writers::Output;
     use rustyline::history::DefaultHistory;
 
     #[test]
@@ -60,9 +61,8 @@ mod tests {
             connection: mock_connection,
             history: &DefaultHistory::new(),
             input: vec![".quit".to_string()],
-            output: &mut Vec::new(),
+            output: &mut Output::default(),
         };
-
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Exit(0));

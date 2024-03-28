@@ -10,6 +10,7 @@ use colored::Colorize;
 use rsql_core::commands::{help, quit, ShellCommand};
 use rsql_core::configuration::{Configuration, ConfigurationBuilder};
 use rsql_core::shell::{ShellArgs, ShellBuilder};
+use rsql_core::writers::{Output, StdoutWriter};
 use rust_i18n::t;
 use std::io;
 use tracing::info;
@@ -38,15 +39,15 @@ async fn main() -> Result<()> {
     let configuration = ConfigurationBuilder::new(program_name, version)
         .with_config()
         .build();
-
-    let exit_code = execute(args, configuration, &mut io::stdout()).await?;
+    let output = Output::new(Box::new(StdoutWriter::default()));
+    let exit_code = execute(args, configuration, output).await?;
     std::process::exit(exit_code);
 }
 
 pub(crate) async fn execute(
     args: Args,
     configuration: Configuration,
-    output: &mut (dyn io::Write + Send + Sync),
+    mut output: Output,
 ) -> Result<i32> {
     let version = full_version(&configuration);
 
@@ -60,8 +61,9 @@ pub(crate) async fn execute(
             welcome_message(&mut io::stderr(), &configuration);
         }
 
-        let mut shell = ShellBuilder::new(output)
+        let mut shell = ShellBuilder::default()
             .with_configuration(configuration)
+            .with_output(output)
             .build();
         shell.execute(&args.shell_args).await?
     };
@@ -122,11 +124,11 @@ mod tests {
             shell_args: ShellArgs::default(),
             version: true,
         };
-        let mut output = Vec::new();
+        let output = Output::default();
 
-        let _ = execute(args, configuration, &mut output).await?;
+        let _ = execute(args, configuration, output).await?;
 
-        let version = String::from_utf8(output)?;
+        let version = output.to_string();
         assert!(version.starts_with("rsql/0.0.0"));
         Ok(())
     }
@@ -143,11 +145,11 @@ mod tests {
             shell_args,
             version: false,
         };
-        let mut output = Vec::new();
+        let output = Output::default();
 
-        let _ = execute(args, configuration, &mut output).await?;
+        let _ = execute(args, configuration, output).await?;
 
-        let command_output = String::from_utf8(output)?;
+        let command_output = output.to_string();
         let expected = indoc! {r#"
             Locale: en
         "#};

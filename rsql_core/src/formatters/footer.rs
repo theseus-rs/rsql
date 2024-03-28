@@ -69,7 +69,7 @@ mod tests {
     use crate::configuration::Configuration;
     use crate::drivers::MemoryQueryResult;
     use crate::drivers::{Results, Value};
-    use std::io::Cursor;
+    use crate::writers::Output;
     use std::time::Duration;
 
     fn query_result(rows: u8) -> Results {
@@ -85,7 +85,7 @@ mod tests {
         configuration: &mut Configuration,
         results: &Results,
     ) -> anyhow::Result<String> {
-        let output = &mut Cursor::new(Vec::new());
+        let output = &mut Output::default();
         let mut options = FormatterOptions {
             configuration,
             elapsed: Duration::from_nanos(9),
@@ -94,7 +94,7 @@ mod tests {
 
         write_footer(&mut options, results).await?;
 
-        let output = String::from_utf8(output.get_ref().to_vec())?.replace("\r\n", "\n");
+        let output = output.to_string().replace("\r\n", "\n");
         Ok(output)
     }
 

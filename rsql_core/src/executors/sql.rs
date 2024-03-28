@@ -4,9 +4,10 @@ use crate::drivers::{Connection, Results};
 use crate::executors::Result;
 use crate::formatters;
 use crate::formatters::{FormatterManager, FormatterOptions};
+use crate::writers::Output;
 use indicatif::ProgressStyle;
+use std::fmt;
 use std::fmt::Debug;
-use std::{fmt, io};
 use tracing::{instrument, Span};
 use tracing_indicatif::span_ext::IndicatifSpanExt;
 
@@ -15,7 +16,7 @@ pub(crate) struct SqlExecutor<'a> {
     configuration: &'a Configuration,
     formatter_manager: &'a FormatterManager,
     connection: &'a mut dyn Connection,
-    output: &'a mut (dyn io::Write + Send + Sync),
+    output: &'a mut Output,
 }
 
 /// Implementation for [SqlExecutor].
@@ -24,7 +25,7 @@ impl<'a> SqlExecutor<'a> {
         configuration: &'a Configuration,
         formatter_manager: &'a FormatterManager,
         connection: &'a mut dyn Connection,
-        output: &'a mut (dyn io::Write + Send + Sync),
+        output: &'a mut Output,
     ) -> SqlExecutor<'a> {
         Self {
             configuration,
@@ -52,7 +53,7 @@ impl<'a> SqlExecutor<'a> {
         let mut options = FormatterOptions {
             configuration: &mut self.configuration.clone(),
             elapsed: start.elapsed(),
-            output: &mut self.output,
+            output: self.output,
         };
         formatter.format(&mut options, results).await?;
         Ok(LoopCondition::Continue)
@@ -101,7 +102,7 @@ mod tests {
         let configuration = Configuration::default();
         let formatter_manager = FormatterManager::default();
         let mut connection = MockConnection::new();
-        let output = &mut io::stdout();
+        let output = &mut Output::default();
 
         let executor =
             SqlExecutor::new(&configuration, &formatter_manager, &mut connection, output);
@@ -122,7 +123,7 @@ mod tests {
         let mut connection = MockConnection::new();
         let sql = "SELECT * FROM foo";
         let connection = &mut connection as &mut dyn Connection;
-        let mut output: Vec<u8> = Vec::new();
+        let mut output = Output::default();
 
         let mut executor =
             SqlExecutor::new(&configuration, &formatter_manager, connection, &mut output);
@@ -143,14 +144,14 @@ mod tests {
             .with(eq(sql))
             .returning(|_| Ok(Results::Execute(42)));
         let connection = &mut connection as &mut dyn Connection;
-        let mut output: Vec<u8> = Vec::new();
+        let mut output = Output::default();
 
         let mut executor =
             SqlExecutor::new(&configuration, &formatter_manager, connection, &mut output);
         let result = executor.execute(sql).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        let execute_output = String::from_utf8(output)?;
+        let execute_output = output.to_string();
         assert!(execute_output.contains("42"));
 
         Ok(())
@@ -167,7 +168,7 @@ mod tests {
             .with(eq(sql))
             .returning(|_| Ok(Results::Query(Box::new(MemoryQueryResult::default()))));
         let connection = &mut connection as &mut dyn Connection;
-        let output = &mut io::stdout();
+        let output = &mut Output::default();
 
         let mut executor = SqlExecutor::new(&configuration, &formatter_manager, connection, output);
 
@@ -188,7 +189,7 @@ mod tests {
             .with(eq(sql))
             .returning(|_| Ok(Results::Execute(42)));
         let connection = &mut connection as &mut dyn Connection;
-        let output = &mut io::stdout();
+        let output = &mut Output::default();
 
         let mut executor = SqlExecutor::new(&configuration, &formatter_manager, connection, output);
 

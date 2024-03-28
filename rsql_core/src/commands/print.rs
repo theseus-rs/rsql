@@ -41,6 +41,7 @@ mod tests {
     use crate::configuration::Configuration;
     use crate::drivers::{DriverManager, MockConnection};
     use crate::formatters::FormatterManager;
+    use crate::writers::Output;
     use rustyline::history::DefaultHistory;
     use std::default;
 
@@ -68,7 +69,7 @@ mod tests {
             locale: "en".to_string(),
             ..default::Default::default()
         };
-        let mut output = Vec::new();
+        let mut output = Output::default();
         let options = CommandOptions {
             configuration,
             command_manager: &CommandManager::default(),
@@ -83,7 +84,7 @@ mod tests {
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        let locale_output = String::from_utf8(output)?;
+        let locale_output = output.to_string();
         assert_eq!(locale_output, "\n");
         Ok(())
     }
@@ -94,7 +95,7 @@ mod tests {
             locale: "en".to_string(),
             ..default::Default::default()
         };
-        let mut output = Vec::new();
+        let mut output = Output::default();
         let options = CommandOptions {
             configuration,
             command_manager: &CommandManager::default(),
@@ -109,7 +110,7 @@ mod tests {
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        let locale_output = String::from_utf8(output)?;
+        let locale_output = output.to_string();
         assert_eq!(locale_output, "foo\n");
         Ok(())
     }

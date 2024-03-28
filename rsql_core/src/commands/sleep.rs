@@ -55,6 +55,7 @@ mod tests {
     use crate::configuration::Configuration;
     use crate::drivers::{DriverManager, MockConnection};
     use crate::formatters::FormatterManager;
+    use crate::writers::Output;
     use rustyline::history::DefaultHistory;
     use std::time::Instant;
 
@@ -86,7 +87,7 @@ mod tests {
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
             input: vec![".sleep".to_string()],
-            output: &mut Vec::new(),
+            output: &mut Output::default(),
         };
 
         let start = Instant::now();
@@ -107,7 +108,7 @@ mod tests {
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
             input: vec![".sleep".to_string(), ".5".to_string()],
-            output: &mut Vec::new(),
+            output: &mut Output::default(),
         };
 
         let start = Instant::now();
@@ -128,11 +129,8 @@ mod tests {
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
             input: vec![".sleep".to_string(), "foo".to_string()],
-            output: &mut Vec::new(),
+            output: &mut Output::default(),
         };
-
-        let result = Command.execute(options).await;
-
-        assert!(result.is_err());
+        assert!(Command.execute(options).await.is_err());
     }
 }

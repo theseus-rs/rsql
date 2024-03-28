@@ -2,10 +2,10 @@ use crate::commands::error::Result;
 use crate::configuration::Configuration;
 use crate::drivers::{Connection, DriverManager};
 use crate::formatters::FormatterManager;
+use crate::writers::Output;
 use async_trait::async_trait;
 use rustyline::history::DefaultHistory;
 use std::fmt::Debug;
-use std::io;
 
 /// Loop condition for commands
 ///
@@ -26,7 +26,7 @@ pub struct CommandOptions<'a> {
     pub history: &'a DefaultHistory,
     pub connection: &'a mut dyn Connection,
     pub input: Vec<String>,
-    pub output: &'a mut (dyn io::Write + Send + Sync),
+    pub output: &'a mut Output,
 }
 
 impl Debug for CommandOptions<'_> {
@@ -37,6 +37,7 @@ impl Debug for CommandOptions<'_> {
             .field("driver_manager", &self.driver_manager)
             .field("formatter_manager", &self.formatter_manager)
             .field("connection", &self.connection)
+            .field("output", &self.output)
             .field("input", &self.input)
             .finish()
     }
@@ -110,6 +111,7 @@ impl Default for CommandManager {
         commands.add(Box::new(crate::commands::history::Command));
         commands.add(Box::new(crate::commands::indexes::Command));
         commands.add(Box::new(crate::commands::locale::Command));
+        commands.add(Box::new(crate::commands::output::Command));
         commands.add(Box::new(crate::commands::print::Command));
         commands.add(Box::new(crate::commands::quit::Command));
         commands.add(Box::new(crate::commands::read::Command));
@@ -136,7 +138,7 @@ mod tests {
             connection: &mut MockConnection::new(),
             history: &Default::default(),
             input: vec!["42".to_string()],
-            output: &mut io::Cursor::new(Vec::new()),
+            output: &mut Output::default(),
         };
 
         let debug = format!("{:?}", options);
@@ -175,6 +177,6 @@ mod tests {
     fn test_command_manager_default() {
         let command_manager = CommandManager::default();
 
-        assert_eq!(command_manager.commands.len(), 19);
+        assert_eq!(command_manager.commands.len(), 20);
     }
 }

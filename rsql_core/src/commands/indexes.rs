@@ -41,6 +41,7 @@ mod tests {
     use crate::configuration::Configuration;
     use crate::drivers::{DriverManager, MockConnection};
     use crate::formatters::FormatterManager;
+    use crate::writers::Output;
     use rustyline::history::DefaultHistory;
 
     #[test]
@@ -68,7 +69,7 @@ mod tests {
         mock_connection
             .expect_indexes()
             .returning(|_| Ok(vec![index.to_string()]));
-        let mut output = Vec::new();
+        let mut output = Output::default();
         let options = CommandOptions {
             configuration: &mut Configuration::default(),
             command_manager: &CommandManager::default(),
@@ -83,7 +84,7 @@ mod tests {
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        let tables = String::from_utf8(output)?;
+        let tables = output.to_string();
         assert!(tables.contains(index));
         Ok(())
     }
@@ -96,7 +97,7 @@ mod tests {
         mock_connection
             .expect_indexes()
             .returning(|_| Ok(vec![index.to_string()]));
-        let mut output = Vec::new();
+        let mut output = Output::default();
         let options = CommandOptions {
             configuration: &mut Configuration::default(),
             command_manager: &CommandManager::default(),
@@ -111,7 +112,7 @@ mod tests {
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        let tables = String::from_utf8(output)?;
+        let tables = output.to_string();
         assert!(tables.contains(index));
         Ok(())
     }

@@ -1,26 +1,18 @@
 use crate::configuration::Configuration;
 use crate::drivers::Results;
 use crate::formatters::error::Result;
+use crate::writers::Output;
 use async_trait::async_trait;
 use std::collections::BTreeMap;
 use std::fmt::Debug;
-use std::io;
 use std::time::Duration;
 
 /// Options for formatters
+#[derive(Debug)]
 pub struct FormatterOptions<'a> {
     pub configuration: &'a mut Configuration,
     pub elapsed: Duration,
-    pub output: &'a mut (dyn io::Write + Send + Sync),
-}
-
-impl Debug for FormatterOptions<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("FormatterOptions")
-            .field("configuration", &self.configuration)
-            .field("elapsed", &self.elapsed)
-            .finish()
-    }
+    pub output: &'a mut Output,
 }
 
 #[async_trait]
@@ -87,21 +79,6 @@ impl Default for FormatterManager {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_debug() {
-        let options = FormatterOptions {
-            configuration: &mut Configuration::default(),
-            elapsed: Duration::from_nanos(9),
-            output: &mut io::Cursor::new(Vec::new()),
-        };
-
-        let debug = format!("{:?}", options);
-        assert!(debug.contains("FormatterOptions"));
-        assert!(debug.contains("configuration"));
-        assert!(debug.contains("elapsed"));
-        assert!(debug.contains("9ns"));
-    }
 
     #[test]
     fn test_format_manager() {

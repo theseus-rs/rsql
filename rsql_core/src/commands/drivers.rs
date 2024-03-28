@@ -41,6 +41,7 @@ mod tests {
     use crate::configuration::Configuration;
     use crate::drivers::{DriverManager, MockConnection};
     use crate::formatters::FormatterManager;
+    use crate::writers::Output;
     use rustyline::history::DefaultHistory;
 
     #[test]
@@ -57,7 +58,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_execute() -> anyhow::Result<()> {
-        let mut output = Vec::new();
+        let mut output = Output::default();
         let configuration = &mut Configuration::default();
         let options = CommandOptions {
             configuration,
@@ -73,7 +74,7 @@ mod tests {
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        let drivers_output = String::from_utf8(output)?;
+        let drivers_output = output.to_string();
         let mut drivers: Vec<&str> = Vec::new();
 
         #[cfg(feature = "postgresql")]

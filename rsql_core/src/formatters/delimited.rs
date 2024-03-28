@@ -50,8 +50,8 @@ mod test {
     use crate::drivers::Results::{Execute, Query};
     use crate::drivers::Value;
     use crate::formatters::formatter::FormatterOptions;
+    use crate::writers::Output;
     use indoc::indoc;
-    use std::io::Cursor;
     use std::time::Duration;
 
     #[tokio::test]
@@ -60,7 +60,7 @@ mod test {
             color: false,
             ..Default::default()
         };
-        let output = &mut Cursor::new(Vec::new());
+        let output = &mut Output::default();
         let mut options = FormatterOptions {
             configuration,
             elapsed: Duration::from_nanos(9),
@@ -71,7 +71,7 @@ mod test {
             .await
             .unwrap();
 
-        let output = String::from_utf8(output.get_ref().to_vec())?.replace("\r\n", "\n");
+        let output = output.to_string().replace("\r\n", "\n");
         let expected = "1 row (9ns)\n";
         assert_eq!(output, expected);
         Ok(())
@@ -92,7 +92,7 @@ mod test {
                 Some(Value::String("foo".to_string())),
             ]],
         )));
-        let output = &mut Cursor::new(Vec::new());
+        let output = &mut Output::default();
         let mut options = FormatterOptions {
             configuration,
             elapsed: Duration::from_nanos(9),
@@ -103,7 +103,7 @@ mod test {
             .await
             .unwrap();
 
-        let output = String::from_utf8(output.get_ref().to_vec())?.replace("\r\n", "\n");
+        let output = output.to_string().replace("\r\n", "\n");
         let expected = indoc! {r#"
             1,"foo"
         "#};
@@ -125,7 +125,7 @@ mod test {
                 vec![Some(Value::I64(3)), None],
             ],
         )));
-        let output = &mut Cursor::new(Vec::new());
+        let output = &mut Output::default();
         let mut options = FormatterOptions {
             configuration,
             elapsed: Duration::from_nanos(9),
@@ -136,7 +136,7 @@ mod test {
             .await
             .unwrap();
 
-        let output = String::from_utf8(output.get_ref().to_vec())?.replace("\r\n", "\n");
+        let output = output.to_string().replace("\r\n", "\n");
         let expected = indoc! {r#"
             "id","data"
             1,"Ynl0ZXM="

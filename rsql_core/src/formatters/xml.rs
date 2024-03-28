@@ -3,6 +3,7 @@ use crate::formatters::error::Result;
 use crate::formatters::footer::write_footer;
 use crate::formatters::formatter::FormatterOptions;
 use crate::formatters::Highlighter;
+use crate::writers::Output;
 use async_trait::async_trait;
 use quick_xml::events::{BytesEnd, BytesStart, BytesText, Event};
 use quick_xml::Writer;
@@ -35,7 +36,7 @@ pub(crate) async fn format_xml(
         _ => return write_footer(options, results).await,
     };
 
-    let mut output = Vec::new();
+    let mut output = Output::default();
     let mut writer = Writer::new_with_indent(&mut output, b' ', 2);
 
     writer.write_event(Event::Start(BytesStart::new("results")))?;
@@ -61,7 +62,7 @@ pub(crate) async fn format_xml(
     }
     writer.write_event(Event::End(BytesEnd::new("results")))?;
 
-    let xml_output = String::from_utf8(output.clone())?;
+    let xml_output = output.to_string();
     let highlighter = Highlighter::new(options.configuration, "xml");
     writeln!(
         &mut options.output,
@@ -82,7 +83,6 @@ mod test {
     use crate::formatters::formatter::FormatterOptions;
     use crate::formatters::Formatter;
     use indoc::indoc;
-    use std::io::Cursor;
     use std::time::Duration;
 
     #[tokio::test]
@@ -91,7 +91,7 @@ mod test {
             color: false,
             ..Default::default()
         };
-        let output = &mut Cursor::new(Vec::new());
+        let output = &mut Output::default();
         let mut options = FormatterOptions {
             configuration,
             elapsed: Duration::from_nanos(9),
@@ -101,7 +101,7 @@ mod test {
         let formatter = Formatter;
         formatter.format(&mut options, &Execute(1)).await?;
 
-        let output = String::from_utf8(output.get_ref().to_vec())?.replace("\r\n", "\n");
+        let output = output.to_string().replace("\r\n", "\n");
         let expected = "1 row (9ns)\n";
         assert_eq!(output, expected);
         Ok(())
@@ -121,7 +121,7 @@ mod test {
                 vec![Some(Value::I64(3)), None],
             ],
         )));
-        let output = &mut Cursor::new(Vec::new());
+        let output = &mut Output::default();
         let mut options = FormatterOptions {
             configuration,
             elapsed: Duration::from_nanos(9),
@@ -131,7 +131,7 @@ mod test {
         let formatter = Formatter;
         formatter.format(&mut options, &query_result).await?;
 
-        let output = String::from_utf8(output.get_ref().to_vec())?.replace("\r\n", "\n");
+        let output = output.to_string().replace("\r\n", "\n");
         let expected = indoc! {r#"
             <results>
               <row>
