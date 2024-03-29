@@ -112,39 +112,4 @@ mod tests {
         assert!(output.to_string().contains(&path));
         Ok(())
     }
-
-    // #[tokio::test]
-    // async fn test_execute_error() -> anyhow::Result<()> {
-    //     let mut output = Output::default();
-    //     let file = NamedTempFile::new()?;
-    //     let path = file.as_ref().to_string_lossy().to_string();
-    //     let options = CommandOptions {
-    //         configuration: &mut Configuration::default(),
-    //         command_manager: &CommandManager::default(),
-    //         driver_manager: &DriverManager::default(),
-    //         formatter_manager: &FormatterManager::default(),
-    //         connection: &mut MockConnection::new(),
-    //         history: &DefaultHistory::new(),
-    //         input: vec![".output".to_string(), path],
-    //         output: &mut output,
-    //     };
-    //
-    //     assert!(Command.execute(options).await.is_err());
-    //     Ok(())
-    // }
-    //
-    // #[tokio::test]
-    // async fn test_execute_invalid_option() {
-    //     let options = CommandOptions {
-    //         configuration: &mut Configuration::default(),
-    //         command_manager: &CommandManager::default(),
-    //         driver_manager: &DriverManager::default(),
-    //         formatter_manager: &FormatterManager::default(),
-    //         connection: &mut MockConnection::new(),
-    //         history: &DefaultHistory::new(),
-    //         input: vec![".output".to_string(), "foo".to_string()],
-    //         output: &mut Output::default(),
-    //     };
-    //     assert!(Command.execute(options).await.is_err());
-    // }
 }

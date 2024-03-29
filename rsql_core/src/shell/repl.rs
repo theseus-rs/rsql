@@ -365,7 +365,7 @@ mod test {
         args.url = format!("{driver_identifier}://");
         args.commands = vec![".bail on".to_string()];
 
-        shell.execute(&args).await?;
+        assert_eq!(0, shell.execute(&args).await?);
 
         assert_eq!(shell.configuration.bail_on_error, true);
         Ok(())

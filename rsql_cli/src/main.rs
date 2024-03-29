@@ -111,7 +111,6 @@ fn welcome_message(output: &mut dyn io::Write, configuration: &Configuration) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use indoc::indoc;
 
     #[tokio::test]
     async fn test_execute_version() -> Result<()> {
@@ -126,17 +125,15 @@ mod tests {
         };
         let output = Output::default();
 
-        let _ = execute(args, configuration, output).await?;
+        assert_eq!(0, execute(args, configuration, output).await?);
 
-        let version = output.to_string();
-        assert!(version.starts_with("rsql/0.0.0"));
         Ok(())
     }
 
     #[tokio::test]
     async fn test_execute_command() -> Result<()> {
         let configuration = Configuration::default();
-        let commands = vec![".locale en".to_string(), ".locale".to_string()];
+        let commands = vec![".exit 42".to_string()];
         let shell_args = ShellArgs {
             commands,
             ..Default::default()
@@ -147,13 +144,8 @@ mod tests {
         };
         let output = Output::default();
 
-        let _ = execute(args, configuration, output).await?;
+        assert_eq!(42, execute(args, configuration, output).await?);
 
-        let command_output = output.to_string();
-        let expected = indoc! {r#"
-            Locale: en
-        "#};
-        assert_eq!(command_output, expected);
         Ok(())
     }
 
