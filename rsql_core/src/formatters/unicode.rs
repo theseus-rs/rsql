@@ -52,6 +52,7 @@ mod tests {
     use crate::configuration::Configuration;
     use crate::drivers::{MemoryQueryResult, Results, Value};
     use crate::formatters::Formatter;
+    use crate::writers::Output;
     use indoc::indoc;
     use std::time::Duration;
 
@@ -69,7 +70,7 @@ mod tests {
             ..Default::default()
         };
         let results = query_result();
-        let output = &mut Vec::new();
+        let output = &mut Output::default();
         let mut options = FormatterOptions {
             configuration: &mut configuration,
             elapsed: Duration::from_nanos(5678),
@@ -79,7 +80,7 @@ mod tests {
 
         formatter.format(&mut options, &results).await?;
 
-        let unicode_output = String::from_utf8(output.clone())?.replace("\r\n", "\n");
+        let unicode_output = output.to_string().replace("\r\n", "\n");
         let expected = indoc! {r#"
             ┌────────┐
             │ id     │

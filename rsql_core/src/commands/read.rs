@@ -63,6 +63,7 @@ mod tests {
     use crate::drivers;
     use crate::drivers::{DriverManager, MockConnection};
     use crate::formatters::FormatterManager;
+    use crate::writers::Output;
     use rustyline::history::DefaultHistory;
     use std::io::Write;
     use tempfile::NamedTempFile;
@@ -87,7 +88,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_execute_no_args() {
-        let mut output = Vec::new();
+        let mut output = Output::default();
         let configuration = &mut Configuration::default();
         let options = CommandOptions {
             configuration,
@@ -121,7 +122,7 @@ mod tests {
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
             input: vec![".read".to_string(), path],
-            output: &mut Vec::new(),
+            output: &mut Output::default(),
         };
 
         let result = Command.execute(options).await?;
@@ -150,7 +151,7 @@ mod tests {
             connection,
             history: &DefaultHistory::new(),
             input: vec![".read".to_string(), path.to_string()],
-            output: &mut Vec::new(),
+            output: &mut Output::default(),
         };
 
         assert!(Command.execute(options).await.is_err());
@@ -167,11 +168,8 @@ mod tests {
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
             input: vec![".read".to_string(), "foo".to_string()],
-            output: &mut Vec::new(),
+            output: &mut Output::default(),
         };
-
-        let result = Command.execute(options).await;
-
-        assert!(result.is_err());
+        assert!(Command.execute(options).await.is_err());
     }
 }

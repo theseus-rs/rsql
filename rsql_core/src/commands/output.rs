@@ -1,32 +1,36 @@
 use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
+use crate::writers::{FileWriter, StdoutWriter};
 use async_trait::async_trait;
 use rust_i18n::t;
+use std::fs::File;
 
-/// Command to display index information.
+/// Command to output results to a file or console
 #[derive(Debug, Default)]
 pub struct Command;
 
 #[async_trait]
 impl ShellCommand for Command {
-    fn name(&self, index: &str) -> String {
-        t!("indexes_command", index = index).to_string()
+    fn name(&self, locale: &str) -> String {
+        t!("output_command", locale = locale).to_string()
     }
 
-    fn args(&self, index: &str) -> String {
-        t!("indexes_argument", index = index).to_string()
+    fn args(&self, locale: &str) -> String {
+        t!("output_argument", locale = locale).to_string()
     }
 
-    fn description(&self, index: &str) -> String {
-        t!("indexes_description", index = index).to_string()
+    fn description(&self, locale: &str) -> String {
+        t!("output_description", locale = locale).to_string()
     }
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
-        let output = options.output;
-        let table = options.input.get(1).map(|s| s.as_str());
-        let indexes = options.connection.indexes(table).await?;
+        let file = options.input.get(1).unwrap_or(&"".to_string()).to_string();
 
-        for index in indexes {
-            writeln!(output, "{}", index)?;
+        if file.is_empty() {
+            options.output.set(Box::new(StdoutWriter));
+        } else {
+            let file = File::create(file)?;
+            let writer = FileWriter::new(file);
+            options.output.set(Box::new(writer));
         }
 
         Ok(LoopCondition::Continue)
@@ -43,77 +47,68 @@ mod tests {
     use crate::formatters::FormatterManager;
     use crate::writers::Output;
     use rustyline::history::DefaultHistory;
+    use tempfile::NamedTempFile;
 
     #[test]
     fn test_name() {
         let name = Command.name("en");
-        assert_eq!(name, "indexes");
+        assert_eq!(name, "output");
     }
 
     #[test]
     fn test_args() {
         let args = Command.args("en");
-        assert_eq!(args, "[table]");
+        assert_eq!(args, "[file]");
     }
 
     #[test]
     fn test_description() {
         let description = Command.description("en");
-        assert_eq!(description, "Display the indexes");
+        assert_eq!(
+            description,
+            "Output the contents to a [file] or the console"
+        );
     }
 
     #[tokio::test]
-    async fn test_execute() -> anyhow::Result<()> {
-        let index = "index1";
-        let mock_connection = &mut MockConnection::new();
-        mock_connection
-            .expect_indexes()
-            .returning(|_| Ok(vec![index.to_string()]));
+    async fn test_execute_no_args() -> anyhow::Result<()> {
         let mut output = Output::default();
+        assert!(output.to_string().is_empty());
         let options = CommandOptions {
             configuration: &mut Configuration::default(),
             command_manager: &CommandManager::default(),
             driver_manager: &DriverManager::default(),
             formatter_manager: &FormatterManager::default(),
-            connection: mock_connection,
+            connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".indexes".to_string()],
+            input: vec![".output".to_string()],
             output: &mut output,
         };
 
-        let result = Command.execute(options).await?;
-
-        assert_eq!(result, LoopCondition::Continue);
-        let tables = output.to_string();
-        assert!(tables.contains(index));
+        let _ = Command.execute(options).await?;
+        assert_eq!(output.to_string(), "stdout");
         Ok(())
     }
 
     #[tokio::test]
-    async fn test_execute_with_table() -> anyhow::Result<()> {
-        let table = "table1";
-        let index = "index1";
-        let mock_connection = &mut MockConnection::new();
-        mock_connection
-            .expect_indexes()
-            .returning(|_| Ok(vec![index.to_string()]));
+    async fn test_execute_set_file() -> anyhow::Result<()> {
         let mut output = Output::default();
+        assert!(output.to_string().is_empty());
+        let file = NamedTempFile::new()?;
+        let path = file.as_ref().to_string_lossy().to_string();
         let options = CommandOptions {
             configuration: &mut Configuration::default(),
             command_manager: &CommandManager::default(),
             driver_manager: &DriverManager::default(),
             formatter_manager: &FormatterManager::default(),
-            connection: mock_connection,
+            connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".indexes".to_string(), table.to_string()],
+            input: vec![".output".to_string(), path.clone()],
             output: &mut output,
         };
 
         let result = Command.execute(options).await?;
-
         assert_eq!(result, LoopCondition::Continue);
-        let tables = output.to_string();
-        assert!(tables.contains(index));
         Ok(())
     }
 }

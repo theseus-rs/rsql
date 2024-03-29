@@ -13,6 +13,7 @@ pub mod help;
 pub mod history;
 pub mod indexes;
 pub mod locale;
+pub mod output;
 pub mod print;
 pub mod quit;
 pub mod read;

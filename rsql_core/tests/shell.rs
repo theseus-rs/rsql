@@ -10,14 +10,12 @@ async fn test_execute_command() -> anyhow::Result<()> {
         commands,
         ..Default::default()
     };
-    let mut output = Vec::new();
-
-    let mut shell = ShellBuilder::new(&mut output)
+    let mut shell = ShellBuilder::default()
         .with_configuration(configuration)
         .build();
     let _ = shell.execute(&args).await?;
 
-    let command_output = String::from_utf8(output)?;
+    let command_output = shell.output.to_string();
     let expected = indoc! {r#"
             Locale: en
         "#};

@@ -31,8 +31,8 @@ mod test {
     use crate::drivers::Value;
     use crate::formatters::formatter::FormatterOptions;
     use crate::formatters::Formatter;
+    use crate::writers::Output;
     use indoc::indoc;
-    use std::io::Cursor;
     use std::time::Duration;
 
     #[tokio::test]
@@ -49,7 +49,7 @@ mod test {
                 vec![Some(Value::I64(3)), None],
             ],
         )));
-        let output = &mut Cursor::new(Vec::new());
+        let output = &mut Output::default();
         let mut options = FormatterOptions {
             configuration,
             elapsed: Duration::from_nanos(9),
@@ -59,7 +59,7 @@ mod test {
         let formatter = Formatter;
         formatter.format(&mut options, &query_result).await?;
 
-        let output = String::from_utf8(output.get_ref().to_vec())?.replace("\r\n", "\n");
+        let output = output.to_string().replace("\r\n", "\n");
         let expected = indoc! {r#"
             {"id":1,"data":"Ynl0ZXM="}
             {"id":2,"data":"foo"}

@@ -70,6 +70,7 @@ mod tests {
     use crate::configuration::Configuration;
     use crate::drivers::{DriverManager, MockConnection};
     use crate::formatters::FormatterManager;
+    use crate::writers::Output;
     use indoc::indoc;
     use rustyline::history::DefaultHistory;
 
@@ -100,7 +101,7 @@ mod tests {
         let mut command_manager = CommandManager::new();
         command_manager.add(Box::new(footer::Command));
         command_manager.add(Box::new(Command));
-        let mut output = Vec::new();
+        let mut output = Output::default();
         let command = &format!("{command_identifier}{command}");
         let options = CommandOptions {
             configuration: &mut configuration,
@@ -116,7 +117,7 @@ mod tests {
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        let help_output = String::from_utf8(output)?;
+        let help_output = output.to_string();
         assert!(help_output.contains(command));
         Ok(help_output)
     }

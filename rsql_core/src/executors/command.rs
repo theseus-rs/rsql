@@ -3,10 +3,11 @@ use crate::configuration::Configuration;
 use crate::drivers::{Connection, DriverManager};
 use crate::executors::{Error, Result};
 use crate::formatters::FormatterManager;
+use crate::writers::Output;
 use regex::Regex;
 use rustyline::history::DefaultHistory;
+use std::fmt;
 use std::fmt::Debug;
-use std::{fmt, io};
 
 /// A command executor.
 pub(crate) struct CommandExecutor<'a> {
@@ -16,7 +17,7 @@ pub(crate) struct CommandExecutor<'a> {
     formatter_manager: &'a FormatterManager,
     history: &'a DefaultHistory,
     connection: &'a mut dyn Connection,
-    output: &'a mut (dyn io::Write + Send + Sync),
+    output: &'a mut Output,
 }
 
 /// Implementation for [CommandExecutor].
@@ -28,7 +29,7 @@ impl<'a> CommandExecutor<'a> {
         formatter_manager: &'a FormatterManager,
         history: &'a DefaultHistory,
         connection: &'a mut dyn Connection,
-        output: &'a mut (dyn io::Write + Send + Sync),
+        output: &'a mut Output,
     ) -> CommandExecutor<'a> {
         Self {
             configuration,
@@ -58,7 +59,7 @@ impl<'a> CommandExecutor<'a> {
                     connection: self.connection,
                     history: self.history,
                     input,
-                    output: &mut self.output,
+                    output: self.output,
                 };
                 command.execute(options).await?
             }
@@ -116,7 +117,7 @@ mod tests {
         let formatter_manager = FormatterManager::default();
         let history = DefaultHistory::new();
         let mut connection = MockConnection::new();
-        let output = &mut io::stdout();
+        let output = &mut Output::default();
 
         let executor = CommandExecutor::new(
             &mut configuration,
@@ -144,7 +145,7 @@ mod tests {
         let formatter_manager = FormatterManager::default();
         let history = DefaultHistory::new();
         let mut connection = MockConnection::new();
-        let output = &mut io::stdout();
+        let output = &mut Output::default();
 
         let mut executor = CommandExecutor::new(
             &mut configuration,
@@ -171,7 +172,7 @@ mod tests {
         let formatter_manager = FormatterManager::default();
         let history = DefaultHistory::new();
         let mut connection = MockConnection::new();
-        let output = &mut io::stdout();
+        let output = &mut Output::default();
 
         let mut executor = CommandExecutor::new(
             &mut configuration,

@@ -46,6 +46,7 @@ sqlx = { workspace = true, features = ["bit-vec", "chrono", "json", "macros", "r
 supports-color = { workspace = true }
 sys-locale = { workspace = true }
 syntect = { workspace = true }
+tempfile = { workspace = true }
 termbg = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["rt", "rt-multi-thread", "macros"] }
@@ -60,7 +61,6 @@ uuid = { workspace = true, features = ["serde", "v4"] }
 [dev-dependencies]
 criterion = { workspace = true, features = ["async_tokio"] }
 mockall = { workspace = true }
-tempfile = { workspace = true }
 test-log = { workspace = true }
 tokio = { workspace = true }
 

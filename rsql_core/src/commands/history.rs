@@ -88,6 +88,7 @@ mod tests {
     use crate::configuration::Configuration;
     use crate::drivers::{DriverManager, MockConnection};
     use crate::formatters::FormatterManager;
+    use crate::writers::Output;
     use rustyline::history::{DefaultHistory, History};
     use std::default;
     use std::default::Default;
@@ -119,7 +120,7 @@ mod tests {
         let mut history = DefaultHistory::new();
         history.add("foo")?;
 
-        let mut output = Vec::new();
+        let mut output = Output::default();
         let options = CommandOptions {
             configuration,
             command_manager: &CommandManager::default(),
@@ -134,7 +135,7 @@ mod tests {
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        let history = String::from_utf8(output)?;
+        let history = output.to_string();
         assert!(history.contains("foo"));
         Ok(())
     }
@@ -148,7 +149,7 @@ mod tests {
         let mut history = DefaultHistory::new();
         history.add("foo")?;
 
-        let mut output = Vec::new();
+        let mut output = Output::default();
         let options = CommandOptions {
             configuration,
             command_manager: &CommandManager::default(),
@@ -163,7 +164,7 @@ mod tests {
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        let history = String::from_utf8(output)?;
+        let history = output.to_string();
         assert!(!history.contains("foo"));
         Ok(())
     }
@@ -182,7 +183,7 @@ mod tests {
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
             input: vec![".history".to_string(), "on".to_string()],
-            output: &mut Vec::new(),
+            output: &mut Output::default(),
         };
 
         let result = Command.execute(options).await?;
@@ -206,7 +207,7 @@ mod tests {
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
             input: vec![".history".to_string(), "off".to_string()],
-            output: &mut Vec::new(),
+            output: &mut Output::default(),
         };
 
         let result = Command.execute(options).await?;
@@ -226,11 +227,8 @@ mod tests {
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
             input: vec![".history".to_string(), "foo".to_string()],
-            output: &mut Vec::new(),
+            output: &mut Output::default(),
         };
-
-        let result = Command.execute(options).await;
-
-        assert!(result.is_err());
+        assert!(Command.execute(options).await.is_err());
     }
 }

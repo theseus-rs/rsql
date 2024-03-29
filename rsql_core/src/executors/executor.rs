@@ -5,10 +5,11 @@ use crate::executors::command::CommandExecutor;
 use crate::executors::sql::SqlExecutor;
 use crate::executors::Result;
 use crate::formatters::FormatterManager;
+use crate::writers::Output;
 use regex::Regex;
 use rustyline::history::DefaultHistory;
+use std::fmt;
 use std::fmt::Debug;
-use std::{fmt, io};
 
 pub struct Executor<'a> {
     configuration: &'a mut Configuration,
@@ -17,7 +18,7 @@ pub struct Executor<'a> {
     formatter_manager: &'a FormatterManager,
     history: &'a DefaultHistory,
     connection: &'a mut dyn Connection,
-    output: &'a mut (dyn io::Write + Send + Sync),
+    output: &'a mut Output,
 }
 
 impl<'a> Executor<'a> {
@@ -28,7 +29,7 @@ impl<'a> Executor<'a> {
         formatter_manager: &'a FormatterManager,
         history: &'a DefaultHistory,
         connection: &'a mut dyn Connection,
-        output: &'a mut (dyn io::Write + Send + Sync),
+        output: &'a mut Output,
     ) -> Executor<'a> {
         Self {
             configuration,
@@ -130,7 +131,7 @@ mod tests {
         let formatter_manager = FormatterManager::default();
         let history = DefaultHistory::new();
         let mut connection = MockConnection::new();
-        let output = &mut io::stdout();
+        let output = &mut Output::default();
 
         let executor = Executor::new(
             &mut configuration,
@@ -158,7 +159,7 @@ mod tests {
         let formatter_manager = FormatterManager::default();
         let history = DefaultHistory::new();
         let mut connection = MockConnection::new();
-        let mut output: Vec<u8> = Vec::new();
+        let mut output = Output::default();
 
         let executor = Executor::new(
             &mut configuration,
@@ -200,7 +201,7 @@ mod tests {
         let formatter_manager = FormatterManager::default();
         let history = DefaultHistory::new();
         let mut connection = MockConnection::new();
-        let mut output: Vec<u8> = Vec::new();
+        let mut output = Output::default();
 
         let executor = Executor::new(
             &mut configuration,
@@ -243,7 +244,7 @@ mod tests {
         let formatter_manager = FormatterManager::default();
         let history = DefaultHistory::new();
         let mut connection = MockConnection::new();
-        let mut output: Vec<u8> = Vec::new();
+        let mut output = Output::default();
 
         let mut executor = Executor::new(
             &mut configuration,
@@ -273,7 +274,7 @@ mod tests {
         let formatter_manager = FormatterManager::default();
         let history = DefaultHistory::new();
         let mut connection = MockConnection::new();
-        let mut output: Vec<u8> = Vec::new();
+        let mut output = Output::default();
 
         let mut executor = Executor::new(
             &mut configuration,
@@ -299,7 +300,7 @@ mod tests {
         let history = DefaultHistory::new();
         let mut connection = MockConnection::new();
         connection.expect_stop().returning(|| Ok(()));
-        let mut output: Vec<u8> = Vec::new();
+        let mut output = Output::default();
 
         let mut executor = Executor::new(
             &mut configuration,
@@ -328,7 +329,7 @@ mod tests {
         let formatter_manager = FormatterManager::default();
         let history = DefaultHistory::new();
         let mut connection = MockConnection::new();
-        let mut output: Vec<u8> = Vec::new();
+        let mut output = Output::default();
 
         let mut executor = Executor::new(
             &mut configuration,
@@ -343,7 +344,7 @@ mod tests {
         let input = format!("{command_identifier}bail on");
         let result = executor.execute_command(input.as_str()).await?;
         assert_eq!(result, LoopCondition::Continue);
-        let execute_output = String::from_utf8(output)?;
+        let execute_output = output.to_string();
         if echo {
             assert!(execute_output.contains(input.as_str()));
         } else {
@@ -378,7 +379,7 @@ mod tests {
             .expect_execute()
             .with(eq(input))
             .returning(|_| Ok(Results::Execute(42)));
-        let mut output: Vec<u8> = Vec::new();
+        let mut output = Output::default();
 
         let mut executor = Executor::new(
             &mut configuration,
@@ -392,7 +393,7 @@ mod tests {
 
         let result = executor.execute_command(input).await?;
         assert_eq!(result, LoopCondition::Continue);
-        let execute_output = String::from_utf8(output)?;
+        let execute_output = output.to_string();
         if echo {
             assert!(execute_output.contains(input));
         } else {

@@ -90,6 +90,7 @@ mod tests {
     use crate::configuration::Configuration;
     use crate::drivers::Results::{Execute, Query};
     use crate::drivers::{MemoryQueryResult, Results, Value};
+    use crate::writers::Output;
     use indoc::indoc;
     use prettytable::format::consts::FORMAT_DEFAULT;
     use std::time::Duration;
@@ -126,7 +127,7 @@ mod tests {
         configuration: &mut Configuration,
         results: &Results,
     ) -> anyhow::Result<String> {
-        let output = &mut Vec::new();
+        let output = &mut Output::default();
         let mut options = FormatterOptions {
             configuration,
             elapsed: Duration::from_nanos(9),
@@ -135,7 +136,7 @@ mod tests {
 
         format(*FORMAT_DEFAULT, &mut options, &results).await?;
 
-        Ok(String::from_utf8(output.clone())?.replace("\r\n", "\n"))
+        Ok(output.to_string().replace("\r\n", "\n"))
     }
 
     #[tokio::test]

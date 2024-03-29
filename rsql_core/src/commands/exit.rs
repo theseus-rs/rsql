@@ -42,6 +42,7 @@ mod tests {
     use crate::configuration::Configuration;
     use crate::drivers::{DriverManager, MockConnection};
     use crate::formatters::FormatterManager;
+    use crate::writers::Output;
     use rustyline::history::DefaultHistory;
 
     #[test]
@@ -75,7 +76,7 @@ mod tests {
             connection: mock_connection,
             history: &DefaultHistory::new(),
             input: vec![".exit".to_string()],
-            output: &mut Vec::new(),
+            output: &mut Output::default(),
         };
 
         let result = Command.execute(options).await?;
@@ -97,7 +98,7 @@ mod tests {
             connection: mock_connection,
             history: &DefaultHistory::new(),
             input: vec![".exit".to_string(), "1".to_string()],
-            output: &mut Vec::new(),
+            output: &mut Output::default(),
         };
 
         let result = Command.execute(options).await?;
@@ -107,7 +108,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_execute_invalid() -> anyhow::Result<()> {
+    async fn test_execute_invalid() {
         let options = CommandOptions {
             configuration: &mut Configuration::default(),
             command_manager: &CommandManager::default(),
@@ -116,12 +117,8 @@ mod tests {
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
             input: vec![".exit".to_string(), "foo".to_string()],
-            output: &mut Vec::new(),
+            output: &mut Output::default(),
         };
-
-        let result = Command.execute(options).await;
-
-        assert!(result.is_err());
-        Ok(())
+        assert!(Command.execute(options).await.is_err());
     }
 }

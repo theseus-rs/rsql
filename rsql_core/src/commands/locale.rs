@@ -52,6 +52,7 @@ mod tests {
     use crate::configuration::Configuration;
     use crate::drivers::{DriverManager, MockConnection};
     use crate::formatters::FormatterManager;
+    use crate::writers::Output;
     use rustyline::history::DefaultHistory;
     use std::default;
 
@@ -75,7 +76,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_execute_no_args() -> anyhow::Result<()> {
-        let mut output = Vec::new();
+        let mut output = Output::default();
         let configuration = &mut Configuration {
             locale: "en".to_string(),
             ..default::Default::default()
@@ -94,7 +95,7 @@ mod tests {
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        let locale_output = String::from_utf8(output)?;
+        let locale_output = output.to_string();
         assert_eq!(locale_output, "Locale: en\n");
         Ok(())
     }
@@ -113,7 +114,7 @@ mod tests {
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
             input: vec![".locale".to_string(), "en-GB".to_string()],
-            output: &mut Vec::new(),
+            output: &mut Output::default(),
         };
 
         let result = Command.execute(options).await?;
@@ -133,11 +134,8 @@ mod tests {
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
             input: vec![".locale".to_string(), "foo".to_string()],
-            output: &mut Vec::new(),
+            output: &mut Output::default(),
         };
-
-        let result = Command.execute(options).await;
-
-        assert!(result.is_err());
+        assert!(Command.execute(options).await.is_err());
     }
 }
