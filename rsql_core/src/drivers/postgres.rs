@@ -256,17 +256,12 @@ impl Connection {
                 let byte_value: Option<&[u8]> = row.try_get(column_index)?;
                 byte_value.map(|value| Value::Bytes(value.to_vec()))
             }
-            Type::DATE => {
-                let date_value: Option<NaiveDate> = row.try_get(column_index)?;
-                date_value.map(|value| Value::Date(value))
-            }
+            Type::DATE => self.get_single(row, column_index, |v: NaiveDate| Value::Date(v))?,
             Type::TIME | Type::TIMETZ => {
-                let time_value: Option<NaiveTime> = row.try_get(column_index)?;
-                time_value.map(|value| Value::Time(value))
+                self.get_single(row, column_index, |v: NaiveTime| Value::Time(v))?
             }
             Type::TIMESTAMP => {
-                let date_time_value: Option<NaiveDateTime> = row.try_get(column_index)?;
-                date_time_value.map(|value| Value::DateTime(value))
+                self.get_single(row, column_index, |v: NaiveDateTime| Value::DateTime(v))?
             }
             Type::TIMESTAMPTZ => {
                 let system_time: Option<SystemTime> = row.try_get(column_index)?;
