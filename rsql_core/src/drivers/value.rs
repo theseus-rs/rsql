@@ -368,7 +368,7 @@ mod tests {
 
     #[test]
     fn test_array() -> Result<()> {
-        let array = Value::Array(vec![
+        let array = vec![
             Value::Bool(true),
             Value::I8(1),
             Value::I16(2),
@@ -389,15 +389,16 @@ mod tests {
             )),
             Value::Uuid(Uuid::from_str("acf5b3e3-4099-4f34-81c7-5803cbc87a2d")?),
             Value::Json(json!({"foo": "bar", "baz": 123})),
-        ]);
+        ];
         assert_eq!(
-            array.to_formatted_string(&Locale::en),
+            Value::Array(array.clone()).to_formatted_string(&Locale::en),
             r#"true, 1, 2, 3, 12,345, 5, 6, 7, 8, 9.1, 10.42, foo, 2000-12-31, 12:13:14.015, 2000-12-31 12:13:14.015, acf5b3e3-4099-4f34-81c7-5803cbc87a2d, {"foo":"bar","baz":123}"#
         );
         assert_eq!(
-            array.to_string(),
+            Value::Array(array.clone()).to_string(),
             r#"true, 1, 2, 3, 12345, 5, 6, 7, 8, 9.1, 10.42, foo, 2000-12-31, 12:13:14.015, 2000-12-31 12:13:14.015, acf5b3e3-4099-4f34-81c7-5803cbc87a2d, {"foo":"bar","baz":123}"#
         );
+        assert_eq!(json!(Value::Array(array.clone())), json!(array.clone()));
         Ok(())
     }
 }
