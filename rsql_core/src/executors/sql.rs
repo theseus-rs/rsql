@@ -48,7 +48,8 @@ impl<'a> SqlExecutor<'a> {
                 .into())
             }
         };
-        let results = &self.execute_sql(sql).await?;
+        let limit = self.configuration.results_limit;
+        let results = &self.execute_sql(sql, limit).await?;
 
         let mut options = FormatterOptions {
             configuration: &mut self.configuration.clone(),
@@ -63,15 +64,15 @@ impl<'a> SqlExecutor<'a> {
     ///
     /// This function is split out so that it can be instrumented and a visual progress indicator
     /// can be shown without leaving artifacts in the output when the results are formatted.
-    #[instrument(skip(sql))]
-    async fn execute_sql(&mut self, sql: &str) -> Result<Results> {
+    #[instrument(skip(sql, limit))]
+    async fn execute_sql(&mut self, sql: &str, limit: u64) -> Result<Results> {
         Span::current().pb_set_style(&ProgressStyle::with_template(
             "{span_child_prefix}{spinner}",
         )?);
         let command = if sql.len() > 6 { &sql[..6] } else { "" };
 
         let results = if command.to_lowercase() == "select" {
-            self.connection.query(sql).await?
+            self.connection.query(sql, limit).await?
         } else {
             self.connection.execute(sql).await?
         };
@@ -163,16 +164,16 @@ mod tests {
         let formatter_manager = FormatterManager::default();
         let mut connection = MockConnection::new();
         let sql = "SELECT * FROM foo";
+        let limit = 42;
         connection
             .expect_query()
-            .with(eq(sql))
-            .returning(|_| Ok(Results::Query(Box::new(MemoryQueryResult::default()))));
+            .returning(|_, _| Ok(Results::Query(Box::new(MemoryQueryResult::default()))));
         let connection = &mut connection as &mut dyn Connection;
         let output = &mut Output::default();
 
         let mut executor = SqlExecutor::new(&configuration, &formatter_manager, connection, output);
 
-        let results = executor.execute_sql(sql).await?;
+        let results = executor.execute_sql(sql, limit).await?;
         assert!(results.is_query());
 
         Ok(())
@@ -193,7 +194,7 @@ mod tests {
 
         let mut executor = SqlExecutor::new(&configuration, &formatter_manager, connection, output);
 
-        let results = executor.execute_sql(sql).await?;
+        let results = executor.execute_sql(sql, 0).await?;
         assert!(results.is_execute());
         if let Results::Execute(results) = results {
             assert_eq!(results, 42);

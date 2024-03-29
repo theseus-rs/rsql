@@ -148,6 +148,9 @@ format = "unicode"
 #   false - don't display the header
 header = true
 
+# The maximum number of rows to display. 0 means no limit.
+limit = 100
+
 # Indicate if rows returned should be displayed.
 #
 # Possible values:

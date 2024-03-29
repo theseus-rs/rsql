@@ -13,6 +13,7 @@ pub mod header;
 pub mod help;
 pub mod history;
 pub mod indexes;
+pub mod limit;
 pub mod locale;
 pub mod output;
 pub mod print;

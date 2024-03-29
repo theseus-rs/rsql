@@ -195,6 +195,13 @@ impl ConfigurationBuilder {
         self
     }
 
+    /// Set the limit for the number of results returned.
+    #[allow(dead_code)]
+    pub fn with_results_limit(mut self, results_limit: u64) -> Self {
+        self.configuration.results_limit = results_limit;
+        self
+    }
+
     /// Set the display of rows returned.
     #[allow(dead_code)]
     pub fn with_results_rows(mut self, results_rows: bool) -> Self {
@@ -270,6 +277,7 @@ pub struct Configuration {
     pub results_footer: bool,
     pub results_format: String,
     pub results_header: bool,
+    pub results_limit: u64,
     pub results_rows: bool,
     pub results_timer: bool,
 }
@@ -298,6 +306,7 @@ impl Default for Configuration {
             results_footer: true,
             results_format: "unicode".to_string(),
             results_header: true,
+            results_limit: 100,
             results_rows: true,
             results_timer: true,
         }
@@ -416,6 +425,9 @@ impl ConfigFile {
         if let Ok(results_header) = config.get::<bool>("results.header") {
             configuration.results_header = results_header;
         }
+        if let Ok(results_limit) = config.get::<u64>("results.limit") {
+            configuration.results_limit = results_limit;
+        }
         if let Ok(results_rows) = config.get::<bool>("results.rows") {
             configuration.results_rows = results_rows;
         }
@@ -492,6 +504,7 @@ mod test {
         let results_footer = false;
         let results_format = "unicode".to_string();
         let results_header = false;
+        let results_limit = 42u64;
         let results_rows = false;
         let results_timer = false;
 
@@ -514,6 +527,7 @@ mod test {
             .with_results_footer(results_footer)
             .with_results_format(results_format.clone())
             .with_results_header(results_header)
+            .with_results_limit(results_limit)
             .with_results_rows(results_rows)
             .with_results_timer(results_timer)
             .build();
@@ -541,6 +555,7 @@ mod test {
         assert_eq!(configuration.results_footer, results_footer);
         assert_eq!(configuration.results_format, results_format);
         assert_eq!(configuration.results_header, results_header);
+        assert_eq!(configuration.results_limit, results_limit);
         assert_eq!(configuration.results_rows, results_rows);
         assert_eq!(configuration.results_timer, results_timer);
     }
@@ -568,6 +583,7 @@ mod test {
         assert_eq!(configuration.results_footer, true);
         assert_eq!(configuration.results_format, "unicode".to_string());
         assert_eq!(configuration.results_header, true);
+        assert_eq!(configuration.results_limit, 100);
         assert_eq!(configuration.results_rows, true);
         assert_eq!(configuration.results_timer, true);
     }

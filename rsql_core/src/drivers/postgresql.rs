@@ -146,7 +146,7 @@ impl crate::drivers::Connection for Connection {
         Ok(indexes)
     }
 
-    async fn query(&self, sql: &str) -> Result<Results> {
+    async fn query(&self, sql: &str, limit: u64) -> Result<Results> {
         let query_rows = sqlx::query(sql).fetch_all(&self.pool).await?;
         let columns: Vec<String> = query_rows
             .first()
@@ -166,6 +166,10 @@ impl crate::drivers::Connection for Connection {
                 row_data.push(value);
             }
             rows.push(row_data);
+
+            if limit > 0 && rows.len() >= limit as usize {
+                break;
+            }
         }
 
         let query_result = MemoryQueryResult::new(columns, rows);
@@ -180,7 +184,7 @@ impl crate::drivers::Connection for Connection {
                AND table_schema = 'public'
              ORDER BY table_name
         "#};
-        let results = self.query(sql).await?;
+        let results = self.query(sql, 0).await?;
         let mut tables = Vec::new();
 
         if let Results::Query(query_results) = results {
@@ -303,6 +307,19 @@ mod test {
     }
 
     #[tokio::test]
+    async fn test_limit_rows() -> anyhow::Result<()> {
+        let configuration = Configuration::default();
+        let driver_manager = DriverManager::default();
+        let connection = driver_manager.connect(&configuration, DATABASE_URL).await?;
+        let results = connection.query("SELECT 1 UNION ALL SELECT 2", 1).await?;
+        assert!(results.is_query());
+        if let Results::Query(query_result) = results {
+            assert_eq!(query_result.rows().await.len(), 1);
+        }
+        Ok(())
+    }
+
+    #[tokio::test]
     async fn test_connection_interface() -> anyhow::Result<()> {
         let configuration = Configuration::default();
         let driver_manager = DriverManager::default();
@@ -319,7 +336,7 @@ mod test {
             assert_eq!(rows, 1);
         }
 
-        let results = connection.query("SELECT id, name FROM person").await?;
+        let results = connection.query("SELECT id, name FROM person", 0).await?;
         if let Results::Query(query_result) = results {
             assert_eq!(query_result.columns().await, vec!["id", "name"]);
             assert_eq!(query_result.rows().await.len(), 1);
@@ -352,7 +369,7 @@ mod test {
         let driver_manager = DriverManager::default();
         let mut connection = driver_manager.connect(&configuration, DATABASE_URL).await?;
 
-        let results = connection.query(sql).await?;
+        let results = connection.query(sql, 0).await?;
         let mut value: Option<Value> = None;
 
         if let Results::Query(query_result) = results {
