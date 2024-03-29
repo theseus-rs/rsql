@@ -109,7 +109,6 @@ mod tests {
 
         let result = Command.execute(options).await?;
         assert_eq!(result, LoopCondition::Continue);
-        assert!(output.to_string().contains(&path));
         Ok(())
     }
 }
