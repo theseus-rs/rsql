@@ -116,6 +116,13 @@ theme.dark = "Solarized (dark)"
 #   false - don't display the changes
 changes = true
 
+# Indicate if footer should be displayed when displaying results.
+#
+# Possible values:
+#   true - display the footer
+#   false - don't display the footer
+footer = true
+
 # The format to use for results.
 #
 # Possible values:
@@ -141,12 +148,12 @@ format = "unicode"
 #   false - don't display the header
 header = true
 
-# Indicate if footer should be displayed when displaying results.
+# Indicate if rows returned should be displayed.
 #
 # Possible values:
-#   true - display the footer
-#   false - don't display the footer
-footer = true
+#   true - display the rows
+#   false - don't display the rows
+rows = true
 
 # Enable timer for commands.
 #

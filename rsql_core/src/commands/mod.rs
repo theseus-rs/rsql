@@ -1,5 +1,5 @@
 pub mod bail;
-mod changes;
+pub mod changes;
 pub mod clear;
 pub mod color;
 pub mod command;
@@ -18,6 +18,7 @@ pub mod output;
 pub mod print;
 pub mod quit;
 pub mod read;
+pub mod rows;
 pub mod sleep;
 pub mod tables;
 pub mod timer;
