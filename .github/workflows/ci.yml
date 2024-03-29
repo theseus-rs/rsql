@@ -43,8 +43,10 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      - name: Set up Docker
-        uses: crazy-max/ghaction-setup-docker@v3
+      - name: Install Docker for macOS
+        if: ${{ startsWith(matrix.os, 'macos-') }}
+        run: |
+          brew install docker
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@master
