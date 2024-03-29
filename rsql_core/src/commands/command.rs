@@ -111,6 +111,7 @@ impl Default for CommandManager {
         commands.add(Box::new(crate::commands::help::Command));
         commands.add(Box::new(crate::commands::history::Command));
         commands.add(Box::new(crate::commands::indexes::Command));
+        commands.add(Box::new(crate::commands::limit::Command));
         commands.add(Box::new(crate::commands::locale::Command));
         commands.add(Box::new(crate::commands::output::Command));
         commands.add(Box::new(crate::commands::print::Command));
@@ -179,6 +180,6 @@ mod tests {
     fn test_command_manager_default() {
         let command_manager = CommandManager::default();
 
-        assert_eq!(command_manager.commands.len(), 22);
+        assert_eq!(command_manager.commands.len(), 23);
     }
 }
