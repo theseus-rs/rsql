@@ -43,11 +43,6 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      - name: Install Docker for macOS
-        if: ${{ startsWith(matrix.os, 'macos-') }}
-        run: |
-          brew install docker
-
       - name: Install Rust
         uses: dtolnay/rust-toolchain@master
         with:

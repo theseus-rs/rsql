@@ -294,6 +294,7 @@ mod test {
     use crate::drivers::{DriverManager, Results, Value};
     use chrono::{NaiveDate, NaiveDateTime, NaiveTime, Utc};
     use serde_json::json;
+    use std::env;
     use testcontainers::{clients, RunnableImage};
     use testcontainers_modules::postgres;
 
@@ -599,6 +600,10 @@ mod test {
 
     #[tokio::test]
     async fn test_container() -> anyhow::Result<()> {
+        if env::var("CI")? == "true" && cfg!(target_os = "macos") {
+            println!("Skipping test")
+        }
+
         let docker = clients::Cli::default();
         let postgres_image = RunnableImage::from(postgres::Postgres::default());
         let container = docker.run(postgres_image);
