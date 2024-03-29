@@ -1,19 +1,22 @@
 use criterion::{criterion_group, Criterion};
+use std::time::Duration;
 use tokio::runtime::Runtime;
 
 use rsql_core::configuration::Configuration;
 use rsql_core::shell::{Result, ShellArgs, ShellBuilder};
 
-pub fn sqlite_benchmark(criterion: &mut Criterion) {
-    criterion.bench_function("sqlite", |bencher| {
+pub fn postgres_benchmark(criterion: &mut Criterion) {
+    criterion.bench_function("postgres-embedded", |bencher| {
         let runtime = Runtime::new().expect("Failed to create Tokio runtime");
-        bencher.to_async(runtime).iter(|| async { sqlite().await });
+        bencher
+            .to_async(runtime)
+            .iter(|| async { postgres().await });
     });
 }
 
-async fn sqlite() -> Result<i32> {
+async fn postgres() -> Result<i32> {
     let args = ShellArgs {
-        url: "sqlite://?memory=true".to_string(),
+        url: "postgres://?embedded=true".to_string(),
         commands: vec!["SELECT 1".to_string()],
         ..ShellArgs::default()
     };
@@ -26,6 +29,8 @@ async fn sqlite() -> Result<i32> {
 
 criterion_group!(
     name = all;
-    config = Criterion::default().sample_size(10);
-    targets = sqlite_benchmark
+    config = Criterion::default()
+        .measurement_time(Duration::from_secs(10))
+        .sample_size(10);
+    targets = postgres_benchmark
 );

@@ -594,4 +594,35 @@ mod test {
         connection.stop().await?;
         Ok(())
     }
+
+    #[cfg(not(target_os = "macos"))]
+    #[tokio::test]
+    async fn test_container() -> anyhow::Result<()> {
+        let docker = testcontainers::clients::Cli::default();
+        let postgres_image = testcontainers::RunnableImage::from(
+            testcontainers_modules::postgres::Postgres::default(),
+        );
+        let container = docker.run(postgres_image);
+        let port = container.get_host_port_ipv4(5432);
+
+        let database_url = format!("postgresql://postgres:postgres@localhost:{}/postgres", port);
+        let configuration = Configuration::default();
+        let driver_manager = DriverManager::default();
+        let connection = driver_manager
+            .connect(&configuration, database_url.as_str())
+            .await?;
+
+        let results = connection.query("SELECT 'foo'::TEXT", 0).await?;
+        assert!(results.is_query());
+        if let Results::Query(query_result) = results {
+            let rows = query_result.rows().await;
+            let row = rows.first().expect("row is None");
+            let cell = row.first().expect("cell is None");
+            if let Some(value) = cell.clone() {
+                assert_eq!(value, Value::String("foo".to_string()));
+            }
+        }
+
+        Ok(())
+    }
 }

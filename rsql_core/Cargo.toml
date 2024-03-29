@@ -63,6 +63,8 @@ uuid = { workspace = true, features = ["serde", "v4"] }
 criterion = { workspace = true, features = ["async_tokio"] }
 mockall = { workspace = true }
 test-log = { workspace = true }
+testcontainers = { workspace = true }
+testcontainers-modules = { workspace = true, features = ["postgres"] }
 tokio = { workspace = true }
 
 [features]

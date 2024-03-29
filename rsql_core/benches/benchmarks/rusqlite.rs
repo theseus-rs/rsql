@@ -4,16 +4,18 @@ use tokio::runtime::Runtime;
 use rsql_core::configuration::Configuration;
 use rsql_core::shell::{Result, ShellArgs, ShellBuilder};
 
-pub fn sqlite_benchmark(criterion: &mut Criterion) {
-    criterion.bench_function("sqlite", |bencher| {
+pub fn rusqlite_benchmark(criterion: &mut Criterion) {
+    criterion.bench_function("rusqlite", |bencher| {
         let runtime = Runtime::new().expect("Failed to create Tokio runtime");
-        bencher.to_async(runtime).iter(|| async { sqlite().await });
+        bencher
+            .to_async(runtime)
+            .iter(|| async { rusqlite().await });
     });
 }
 
-async fn sqlite() -> Result<i32> {
+async fn rusqlite() -> Result<i32> {
     let args = ShellArgs {
-        url: "sqlite://?memory=true".to_string(),
+        url: "rusqlite://?memory=true".to_string(),
         commands: vec!["SELECT 1".to_string()],
         ..ShellArgs::default()
     };
@@ -27,5 +29,5 @@ async fn sqlite() -> Result<i32> {
 criterion_group!(
     name = all;
     config = Criterion::default().sample_size(10);
-    targets = sqlite_benchmark
+    targets = rusqlite_benchmark
 );
