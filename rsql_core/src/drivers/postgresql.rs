@@ -598,12 +598,9 @@ mod test {
         Ok(())
     }
 
+    #[cfg(not(target_os = "macos"))]
     #[tokio::test]
     async fn test_container() -> anyhow::Result<()> {
-        if env::var("CI")? == "true" && cfg!(target_os = "macos") {
-            println!("Skipping test")
-        }
-
         let docker = clients::Cli::default();
         let postgres_image = RunnableImage::from(postgres::Postgres::default());
         let container = docker.run(postgres_image);
