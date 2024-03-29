@@ -52,6 +52,8 @@ mod tests {
         writer.flush()?;
         assert_eq!(writer.as_slice(), data.as_bytes());
         assert_eq!(writer.as_utf8()?, data);
+
+        let writer = MemoryWriter::new(data.as_bytes().to_vec());
         assert_eq!(writer.to_string(), data);
         Ok(())
     }

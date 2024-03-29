@@ -32,6 +32,7 @@ mod tests {
         let mut writer = StdoutWriter::default();
         writer.write_all(b"Hello, world!")?;
         writer.flush()?;
+        assert_eq!(writer.to_string(), "stdout");
         Ok(())
     }
 }

@@ -13,10 +13,6 @@ impl Output {
         Self { writer }
     }
 
-    pub fn get(&self) -> &dyn Writer {
-        self.writer.as_ref()
-    }
-
     pub fn set(&mut self, writer: Box<dyn Writer + Send + Sync>) {
         self.writer = writer;
     }
@@ -28,9 +24,7 @@ impl Output {
 
 impl Default for Output {
     fn default() -> Self {
-        Self {
-            writer: Box::<MemoryWriter>::default(),
-        }
+        Output::new(Box::<MemoryWriter>::default())
     }
 }
 
