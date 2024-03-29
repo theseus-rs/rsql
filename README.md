@@ -44,23 +44,24 @@ rsql --url '<url>'
 
 | Driver            | URL                                                                           |
 |-------------------|-------------------------------------------------------------------------------|
+| postgres          | `postgres://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`   |
 | postgresql (sqlx) | `postgresql://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>` |
 | rusqlite          | `rusqlite://?<memory=true>[&file=<database_file>]`                            |
 | sqlite (sqlx)     | `sqlite://?<memory=true>[&file=<database_file>]`                              |
 
 ## Features
 
-| Feature             |                                                                   |
-|---------------------|-------------------------------------------------------------------|
-| Databases           | ✅ (PostgreSQL, SQLite3)                                           |
-| Embedded PostgreSQL | ✅                                                                 |
-| Syntax Highlighting | ✅                                                                 |
-| Result Highlighting | ✅                                                                 |
-| History             | ✅                                                                 |
-| SQL File Execution  | ✅                                                                 |
-| Output Formats      | ✅ (csv, html, json, jsonl, markdown, plain, psql, tsv, xml, yaml) |
-| Localized Interface | ✅ (50+ locales)                                                   |
-| Key Bindings        | ✅ (emacs, vi)                                                     |
+| Feature             |                                                                           |
+|---------------------|---------------------------------------------------------------------------|
+| Databases           | ✅ (PostgreSQL, SQLite3)                                                   |
+| Embedded PostgreSQL | ✅                                                                         |
+| Syntax Highlighting | ✅                                                                         |
+| Result Highlighting | ✅                                                                         |
+| History             | ✅                                                                         |
+| SQL File Execution  | ✅                                                                         |
+| Output Formats      | ✅ (csv, html, json, jsonl, markdown, plain, psql, sqlite, tsv, xml, yaml) |
+| Localized Interface | ✅ (50+ locales)                                                           |
+| Key Bindings        | ✅ (emacs, vi)                                                             |
 
 ## Safety
 

@@ -50,6 +50,7 @@ tempfile = { workspace = true }
 termbg = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["rt", "rt-multi-thread", "macros"] }
+tokio-postgres = { workspace = true, features = ["array-impls", "with-bit-vec-0_6", "with-chrono-0_4", "with-serde_json-1", "with-uuid-1"], optional = true }
 tracing = { workspace = true }
 tracing-appender = { workspace = true }
 tracing-indicatif = { workspace = true }
@@ -65,8 +66,13 @@ test-log = { workspace = true }
 tokio = { workspace = true }
 
 [features]
-all = ["postgresql", "rusqlite", "sqlite"]
+all = ["postgres", "postgresql", "rusqlite", "sqlite"]
 default = []
+postgres = [
+    "dep:postgresql_archive",
+    "dep:postgresql_embedded",
+    "dep:tokio-postgres",
+]
 postgresql = [
     "dep:postgresql_archive",
     "dep:postgresql_embedded",

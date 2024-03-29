@@ -123,9 +123,3 @@ off:
 on_off_argument:
   en: "%{on}|%{off}"
   ar-SA: "%{off}|%{on}"
-
-list_delimiter:
-  en: ", "
-  ar-SA: "، "
-  ja-JP: "、"
-  zh-CN: "、"

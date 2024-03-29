@@ -2,6 +2,12 @@
 
 The first query is a simple one. It selects the database version and returns the result.
 
+### Postgres
+
+```shell
+rsql --url 'postgres://?embedded=true' -- "SELECT version();"
+```
+
 ### PostgreSQL
 
 ```shell
