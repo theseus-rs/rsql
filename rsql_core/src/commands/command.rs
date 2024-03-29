@@ -99,6 +99,7 @@ impl Default for CommandManager {
         let mut commands = CommandManager::new();
 
         commands.add(Box::new(crate::commands::bail::Command));
+        commands.add(Box::new(crate::commands::changes::Command));
         commands.add(Box::new(crate::commands::clear::Command));
         commands.add(Box::new(crate::commands::color::Command));
         commands.add(Box::new(crate::commands::drivers::Command));
@@ -177,6 +178,6 @@ mod tests {
     fn test_command_manager_default() {
         let command_manager = CommandManager::default();
 
-        assert_eq!(command_manager.commands.len(), 20);
+        assert_eq!(command_manager.commands.len(), 21);
     }
 }

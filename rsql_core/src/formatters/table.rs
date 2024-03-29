@@ -192,7 +192,7 @@ mod tests {
             | id |
             +====+
             +----+
-            0 rows 
+            0 rows
         "#};
         assert_eq!(output, expected);
         Ok(())
