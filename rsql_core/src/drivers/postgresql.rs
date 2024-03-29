@@ -294,9 +294,6 @@ mod test {
     use crate::drivers::{DriverManager, Results, Value};
     use chrono::{NaiveDate, NaiveDateTime, NaiveTime, Utc};
     use serde_json::json;
-    use std::env;
-    use testcontainers::{clients, RunnableImage};
-    use testcontainers_modules::postgres;
 
     const DATABASE_URL: &str = "postgresql://?embedded=true";
 
@@ -601,8 +598,10 @@ mod test {
     #[cfg(not(target_os = "macos"))]
     #[tokio::test]
     async fn test_container() -> anyhow::Result<()> {
-        let docker = clients::Cli::default();
-        let postgres_image = RunnableImage::from(postgres::Postgres::default());
+        let docker = testcontainers::clients::Cli::default();
+        let postgres_image = testcontainers::RunnableImage::from(
+            testcontainers_modules::postgres::Postgres::default(),
+        );
         let container = docker.run(postgres_image);
         let port = container.get_host_port_ipv4(5432);
 
