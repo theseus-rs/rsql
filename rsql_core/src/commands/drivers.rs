@@ -78,6 +78,9 @@ mod tests {
         let mut drivers: Vec<&str> = Vec::new();
 
         #[cfg(feature = "postgresql")]
+        drivers.push("postgres");
+
+        #[cfg(feature = "postgresql")]
         drivers.push("postgresql");
 
         #[cfg(feature = "rusqlite")]

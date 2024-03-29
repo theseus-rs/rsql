@@ -28,6 +28,7 @@ pub enum Value {
     DateTime(chrono::NaiveDateTime),
     Uuid(uuid::Uuid),
     Json(serde_json::Value),
+    Array(Vec<Value>),
 }
 
 impl Value {
@@ -51,6 +52,14 @@ impl Value {
             Value::DateTime(value) => value.to_string(),
             Value::Uuid(value) => value.to_string(),
             Value::Json(value) => value.to_string(),
+            Value::Array(value) => {
+                let list_delimiter = t!("list_delimiter", locale = locale.name()).to_string();
+                value
+                    .iter()
+                    .map(|value| value.to_formatted_string(locale))
+                    .collect::<Vec<String>>()
+                    .join(list_delimiter.as_str())
+            }
         }
     }
 }
@@ -76,6 +85,11 @@ impl fmt::Display for Value {
             Value::DateTime(value) => value.to_string(),
             Value::Uuid(value) => value.to_string(),
             Value::Json(value) => value.to_string(),
+            Value::Array(value) => value
+                .iter()
+                .map(|value| value.to_string())
+                .collect::<Vec<String>>()
+                .join(", "),
         };
         write!(f, "{}", string_value)
     }
@@ -105,6 +119,7 @@ impl Serialize for Value {
             Value::DateTime(value) => serializer.serialize_str(&value.to_string()),
             Value::Uuid(value) => serializer.serialize_str(&value.to_string()),
             Value::Json(ref value) => value.serialize(serializer),
+            Value::Array(ref value) => value.serialize(serializer),
         }
     }
 }
@@ -348,6 +363,42 @@ mod tests {
             json!(Value::Json(original_json.clone())),
             json!({"foo":"bar","baz":123})
         );
+        Ok(())
+    }
+
+    #[test]
+    fn test_array() -> Result<()> {
+        let array = vec![
+            Value::Bool(true),
+            Value::I8(1),
+            Value::I16(2),
+            Value::I32(3),
+            Value::I64(12345),
+            Value::U8(5),
+            Value::U16(6),
+            Value::U32(7),
+            Value::U64(8),
+            Value::F32(9.1),
+            Value::F64(10.42),
+            Value::String("foo".to_string()),
+            Value::Date(NaiveDate::from_ymd_opt(2000, 12, 31).unwrap()),
+            Value::Time(NaiveTime::from_hms_milli_opt(12, 13, 14, 15).unwrap()),
+            Value::DateTime(NaiveDateTime::new(
+                NaiveDate::from_ymd_opt(2000, 12, 31).unwrap(),
+                NaiveTime::from_hms_milli_opt(12, 13, 14, 15).unwrap(),
+            )),
+            Value::Uuid(Uuid::from_str("acf5b3e3-4099-4f34-81c7-5803cbc87a2d")?),
+            Value::Json(json!({"foo": "bar", "baz": 123})),
+        ];
+        assert_eq!(
+            Value::Array(array.clone()).to_formatted_string(&Locale::en),
+            r#"true, 1, 2, 3, 12,345, 5, 6, 7, 8, 9.1, 10.42, foo, 2000-12-31, 12:13:14.015, 2000-12-31 12:13:14.015, acf5b3e3-4099-4f34-81c7-5803cbc87a2d, {"foo":"bar","baz":123}"#
+        );
+        assert_eq!(
+            Value::Array(array.clone()).to_string(),
+            r#"true, 1, 2, 3, 12345, 5, 6, 7, 8, 9.1, 10.42, foo, 2000-12-31, 12:13:14.015, 2000-12-31 12:13:14.015, acf5b3e3-4099-4f34-81c7-5803cbc87a2d, {"foo":"bar","baz":123}"#
+        );
+        assert_eq!(json!(Value::Array(array.clone())), json!(array.clone()));
         Ok(())
     }
 }

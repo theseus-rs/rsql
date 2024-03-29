@@ -20,7 +20,7 @@ pub enum Error {
 }
 
 /// Converts a [`postgresql_archive::Error`] into an [`IoError`](Error::IoError)
-#[cfg(feature = "postgresql")]
+#[cfg(any(feature = "postgres", feature = "postgresql"))]
 impl From<postgresql_archive::Error> for Error {
     fn from(error: postgresql_archive::Error) -> Self {
         Error::IoError(error.into())
@@ -28,7 +28,7 @@ impl From<postgresql_archive::Error> for Error {
 }
 
 /// Converts a [`postgresql_embedded::Error`] into an [`IoError`](Error::IoError)
-#[cfg(feature = "postgresql")]
+#[cfg(any(feature = "postgres", feature = "postgresql"))]
 impl From<postgresql_embedded::Error> for Error {
     fn from(error: postgresql_embedded::Error) -> Self {
         Error::IoError(error.into())
@@ -51,10 +51,19 @@ impl From<sqlx::Error> for Error {
     }
 }
 
+/// Converts a [`tokio_postgres::Error`] into an [`IoError`](Error::IoError)
+#[cfg(feature = "postgres")]
+impl From<tokio_postgres::Error> for Error {
+    fn from(error: tokio_postgres::Error) -> Self {
+        Error::IoError(error.into())
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
 
+    #[cfg(any(feature = "postgres", feature = "postgresql"))]
     #[test]
     fn test_archive_error() {
         let error = postgresql_archive::Error::Unexpected("test".to_string());
@@ -63,6 +72,7 @@ mod test {
         assert_eq!(io_error.to_string(), "test");
     }
 
+    #[cfg(any(feature = "postgres", feature = "postgresql"))]
     #[test]
     fn test_embedded_error() {
         let archive_error = postgresql_archive::Error::Unexpected("test".to_string());
@@ -72,6 +82,7 @@ mod test {
         assert_eq!(io_error.to_string(), "test");
     }
 
+    #[cfg(feature = "rusqlite")]
     #[test]
     fn test_rusqlite_error() {
         let error = rusqlite::Error::QueryReturnedNoRows;
@@ -80,6 +91,7 @@ mod test {
         assert_eq!(io_error.to_string(), "Query returned no rows");
     }
 
+    #[cfg(any(feature = "postgresql", feature = "sqlite"))]
     #[test]
     fn test_sqlx_error() {
         let error = sqlx::Error::RowNotFound;

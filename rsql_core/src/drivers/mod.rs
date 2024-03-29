@@ -1,9 +1,10 @@
-#[cfg(feature = "postgresql")]
-pub(crate) mod postgresql;
-
 mod connection;
 mod driver;
 mod error;
+#[cfg(feature = "postgres")]
+pub(crate) mod postgres;
+#[cfg(feature = "postgresql")]
+pub(crate) mod postgresql;
 #[cfg(feature = "rusqlite")]
 pub(crate) mod rusqlite;
 #[cfg(feature = "sqlite")]
