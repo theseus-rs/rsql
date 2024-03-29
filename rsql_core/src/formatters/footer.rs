@@ -123,6 +123,18 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn test_write_footer_execute_no_changes() -> anyhow::Result<()> {
+        let mut configuration = Configuration {
+            results_changes: false,
+            ..Default::default()
+        };
+        let output = test_write_footer(&mut configuration, &Execute(42)).await?;
+        assert!(!output.contains("42 rows"));
+        assert!(output.contains("(9ns)"));
+        Ok(())
+    }
+
+    #[tokio::test]
     async fn test_write_footer_no_rows() -> anyhow::Result<()> {
         let mut configuration = Configuration::default();
         let output = test_write_footer(&mut configuration, &query_result(0)).await?;
