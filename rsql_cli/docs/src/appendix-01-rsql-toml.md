@@ -22,6 +22,13 @@ The following is an example of a `rsql.toml` file:
 #   false - continue processing after the first error
 bail_on_error = false
 
+# Indicate if color should be used in the output.
+#
+# Possible values:
+#   true - use color in the output
+#   false - don't use color in the output
+#color = true
+
 # The string used to initiate a command.
 #
 # This is used to determine if a line is a command or not. For example, if the command identifier
@@ -101,6 +108,13 @@ theme.dark = "Solarized (dark)"
 #theme = "Solarized (dark)"
 
 [results]
+
+# Indicate if changes should be displayed.
+#
+# Possible values:
+#   true - display the changes
+#   false - don't display the changes
+changes = true
 
 # The format to use for results.
 #

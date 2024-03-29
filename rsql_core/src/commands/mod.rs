@@ -1,4 +1,5 @@
 pub mod bail;
+mod changes;
 pub mod clear;
 pub mod color;
 pub mod command;

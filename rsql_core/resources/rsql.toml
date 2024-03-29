@@ -98,6 +98,13 @@ theme.dark = "Solarized (dark)"
 
 [results]
 
+# Indicate if changes should be displayed.
+#
+# Possible values:
+#   true - display the changes
+#   false - don't display the changes
+changes = true
+
 # The format to use for results.
 #
 # Possible values:

@@ -167,6 +167,13 @@ impl ConfigurationBuilder {
         self
     }
 
+    /// Set the display of rows changed.
+    #[allow(dead_code)]
+    pub fn with_results_changes(mut self, results_changes: bool) -> Self {
+        self.configuration.results_changes = results_changes;
+        self
+    }
+
     /// Set the results format to use.
     #[allow(dead_code)]
     pub fn with_results_format<S: Into<String>>(mut self, results_format: S) -> Self {
@@ -174,21 +181,21 @@ impl ConfigurationBuilder {
         self
     }
 
-    /// Set the results header to use.
+    /// Set the display of the results' header.
     #[allow(dead_code)]
     pub fn with_results_header(mut self, results_header: bool) -> Self {
         self.configuration.results_header = results_header;
         self
     }
 
-    /// Set the results footer to use.
+    /// Set the display of the results' footer.
     #[allow(dead_code)]
     pub fn with_results_footer(mut self, results_footer: bool) -> Self {
         self.configuration.results_footer = results_footer;
         self
     }
 
-    /// Set the results timer to use.
+    /// Set the display of the results' timer.
     #[allow(dead_code)]
     pub fn with_results_timer(mut self, results_timer: bool) -> Self {
         self.configuration.results_timer = results_timer;
@@ -252,6 +259,7 @@ pub struct Configuration {
     pub history_limit: usize,
     pub history_ignore_dups: bool,
     pub theme: String,
+    pub results_changes: bool,
     pub results_format: String,
     pub results_header: bool,
     pub results_footer: bool,
@@ -278,6 +286,7 @@ impl Default for Configuration {
             history_limit: 1000,
             history_ignore_dups: true,
             theme: "Solarized (dark)".to_string(),
+            results_changes: true,
             results_format: "unicode".to_string(),
             results_header: true,
             results_footer: true,
@@ -386,6 +395,9 @@ impl ConfigFile {
 
         configuration.theme = theme(config)?;
 
+        if let Ok(results_changes) = config.get::<bool>("results.changes") {
+            configuration.results_changes = results_changes;
+        }
         if let Ok(results_format) = config.get::<String>("results.format") {
             configuration.results_format = results_format;
         }
@@ -464,6 +476,7 @@ mod test {
         let history_limit = 42;
         let history_ignore_dups = false;
         let theme = "Solarized (light)";
+        let results_changes = false;
         let results_format = "unicode".to_string();
         let results_header = false;
         let results_footer = false;
@@ -484,6 +497,7 @@ mod test {
             .with_history_limit(history_limit)
             .with_history_ignore_dups(history_ignore_dups)
             .with_theme(theme)
+            .with_results_changes(results_changes)
             .with_results_format(results_format.clone())
             .with_results_header(results_header)
             .with_results_footer(results_footer)
@@ -509,6 +523,7 @@ mod test {
         assert_eq!(configuration.history_limit, history_limit);
         assert_eq!(configuration.history_ignore_dups, history_ignore_dups);
         assert_eq!(configuration.theme, theme);
+        assert_eq!(configuration.results_changes, results_changes);
         assert_eq!(configuration.results_format, results_format);
         assert_eq!(configuration.results_header, results_header);
         assert_eq!(configuration.results_footer, results_footer);
@@ -534,6 +549,7 @@ mod test {
         assert_eq!(configuration.history_limit, 1000);
         assert_eq!(configuration.history_ignore_dups, true);
         assert_eq!(configuration.theme, "Solarized (dark)");
+        assert_eq!(configuration.results_changes, true);
         assert_eq!(configuration.results_format, "unicode".to_string());
         assert_eq!(configuration.results_header, true);
         assert_eq!(configuration.results_footer, true);

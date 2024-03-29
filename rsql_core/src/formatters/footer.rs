@@ -27,7 +27,9 @@ pub async fn write_footer<'a>(options: &mut FormatterOptions<'a>, results: &Resu
     let locale = &configuration.locale;
     let num_locale = Locale::from_str(locale).unwrap_or(Locale::en);
     let rows = rows_affected.to_formatted_string(&num_locale);
-    let rows_label = if rows_affected == 1 {
+    let rows_label = if !configuration.results_changes {
+        "".to_string()
+    } else if rows_affected == 1 {
         t!("row", locale = locale, rows = rows).to_string()
     } else {
         t!("rows", locale = locale, rows = rows).to_string()
@@ -47,6 +49,7 @@ pub async fn write_footer<'a>(options: &mut FormatterOptions<'a>, results: &Resu
             rows = rows_label,
             elapsed = elapsed_display.dimmed()
         )
+        .trim()
         .to_string();
         writeln!(output, "{}", footer)?
     } else {
@@ -56,6 +59,7 @@ pub async fn write_footer<'a>(options: &mut FormatterOptions<'a>, results: &Resu
             rows = rows_label,
             elapsed = elapsed_display
         )
+        .trim()
         .to_string();
         writeln!(output, "{}", footer)?
     }
@@ -114,6 +118,18 @@ mod tests {
         let mut configuration = Configuration::default();
         let output = test_write_footer(&mut configuration, &Execute(42)).await?;
         assert!(output.contains("42 rows"));
+        assert!(output.contains("(9ns)"));
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_write_footer_execute_no_changes() -> anyhow::Result<()> {
+        let mut configuration = Configuration {
+            results_changes: false,
+            ..Default::default()
+        };
+        let output = test_write_footer(&mut configuration, &Execute(42)).await?;
+        assert!(!output.contains("42 rows"));
         assert!(output.contains("(9ns)"));
         Ok(())
     }
