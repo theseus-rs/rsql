@@ -36,12 +36,7 @@ impl ShellCommand for Command {
             return Ok(LoopCondition::Continue);
         }
 
-        let limit = match options.input.get(1) {
-            Some(argument) => argument.parse::<u64>()?,
-            None => 100u64,
-        };
-
-        options.configuration.results_limit = limit;
+        options.configuration.results_limit = options.input[1].parse::<u64>()?;
 
         Ok(LoopCondition::Continue)
     }
