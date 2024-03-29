@@ -39,7 +39,7 @@ async fn main() -> Result<()> {
     let configuration = ConfigurationBuilder::new(program_name, version)
         .with_config()
         .build();
-    let output = Output::new(Box::new(StdoutWriter::default()));
+    let output = Output::new(Box::<StdoutWriter>::default());
     let exit_code = execute(args, configuration, output).await?;
     std::process::exit(exit_code);
 }

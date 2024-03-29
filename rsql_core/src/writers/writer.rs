@@ -21,10 +21,6 @@ impl Output {
         self.writer = writer;
     }
 
-    pub fn to_string(&self) -> String {
-        self.writer.to_string()
-    }
-
     pub fn write_fmt(&mut self, fmt: std::fmt::Arguments) -> io::Result<()> {
         self.writer.write_fmt(fmt)
     }
@@ -33,16 +29,16 @@ impl Output {
 impl Default for Output {
     fn default() -> Self {
         Self {
-            writer: Box::new(MemoryWriter::default()),
+            writer: Box::<MemoryWriter>::default(),
         }
     }
 }
 
-// impl Display for Output {
-//     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-//         write!(f, "{}", self.writer.to_string())
-//     }
-// }
+impl Display for Output {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.writer)
+    }
+}
 
 impl Write for Output {
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
