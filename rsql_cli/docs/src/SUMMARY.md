@@ -25,9 +25,10 @@
     - [print](ch02-16-print.md)
     - [quit](ch02-17-quit.md)
     - [read](ch02-18-read.md)
-    - [sleep](ch02-19-sleep.md)
-    - [tables](ch02-20-tables.md)
-    - [timer](ch02-21-timer.md)
+    - [rows](ch02-19-rows.md)
+    - [sleep](ch02-20-sleep.md)
+    - [tables](ch02-21-tables.md)
+    - [timer](ch02-22-timer.md)
 
 - [Appendix](appendix-00.md)
     - [A - Configuration File (rsql.toml)](appendix-01-rsql-toml.md)

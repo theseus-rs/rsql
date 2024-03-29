@@ -20,14 +20,17 @@ pub async fn write_footer<'a>(options: &mut FormatterOptions<'a>, results: &Resu
         return Ok(());
     }
 
-    let rows_affected = match results {
-        Execute(rows_affected) => *rows_affected,
-        Query(query_result) => query_result.rows().await.len() as u64,
+    let (display_rows, rows_affected) = match results {
+        Execute(rows_affected) => (configuration.results_changes, *rows_affected),
+        Query(query_result) => (
+            configuration.results_rows,
+            query_result.rows().await.len() as u64,
+        ),
     };
     let locale = &configuration.locale;
     let num_locale = Locale::from_str(locale).unwrap_or(Locale::en);
     let rows = rows_affected.to_formatted_string(&num_locale);
-    let rows_label = if !configuration.results_changes {
+    let rows_label = if !display_rows {
         "".to_string()
     } else if rows_affected == 1 {
         t!("row", locale = locale, rows = rows).to_string()
@@ -126,6 +129,7 @@ mod tests {
     async fn test_write_footer_execute_no_changes() -> anyhow::Result<()> {
         let mut configuration = Configuration {
             results_changes: false,
+            results_rows: true,
             ..Default::default()
         };
         let output = test_write_footer(&mut configuration, &Execute(42)).await?;
@@ -145,9 +149,25 @@ mod tests {
 
     #[tokio::test]
     async fn test_write_footer_one_row() -> anyhow::Result<()> {
-        let mut configuration = Configuration::default();
+        let mut configuration = Configuration {
+            results_changes: false,
+            ..Default::default()
+        };
         let output = test_write_footer(&mut configuration, &query_result(1)).await?;
         assert!(output.contains("1 row"));
+        assert!(output.contains("(9ns)"));
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_write_footer_one_row_no_rows_displayed() -> anyhow::Result<()> {
+        let mut configuration = Configuration {
+            results_changes: true,
+            results_rows: false,
+            ..Default::default()
+        };
+        let output = test_write_footer(&mut configuration, &query_result(1)).await?;
+        assert!(!output.contains("1 row"));
         assert!(output.contains("(9ns)"));
         Ok(())
     }

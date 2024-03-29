@@ -174,6 +174,13 @@ impl ConfigurationBuilder {
         self
     }
 
+    /// Set the display of the results' footer.
+    #[allow(dead_code)]
+    pub fn with_results_footer(mut self, results_footer: bool) -> Self {
+        self.configuration.results_footer = results_footer;
+        self
+    }
+
     /// Set the results format to use.
     #[allow(dead_code)]
     pub fn with_results_format<S: Into<String>>(mut self, results_format: S) -> Self {
@@ -188,10 +195,10 @@ impl ConfigurationBuilder {
         self
     }
 
-    /// Set the display of the results' footer.
+    /// Set the display of rows returned.
     #[allow(dead_code)]
-    pub fn with_results_footer(mut self, results_footer: bool) -> Self {
-        self.configuration.results_footer = results_footer;
+    pub fn with_results_rows(mut self, results_rows: bool) -> Self {
+        self.configuration.results_rows = results_rows;
         self
     }
 
@@ -260,9 +267,10 @@ pub struct Configuration {
     pub history_ignore_dups: bool,
     pub theme: String,
     pub results_changes: bool,
+    pub results_footer: bool,
     pub results_format: String,
     pub results_header: bool,
-    pub results_footer: bool,
+    pub results_rows: bool,
     pub results_timer: bool,
 }
 
@@ -287,9 +295,10 @@ impl Default for Configuration {
             history_ignore_dups: true,
             theme: "Solarized (dark)".to_string(),
             results_changes: true,
+            results_footer: true,
             results_format: "unicode".to_string(),
             results_header: true,
-            results_footer: true,
+            results_rows: true,
             results_timer: true,
         }
     }
@@ -398,14 +407,17 @@ impl ConfigFile {
         if let Ok(results_changes) = config.get::<bool>("results.changes") {
             configuration.results_changes = results_changes;
         }
+        if let Ok(results_footer) = config.get::<bool>("results.footer") {
+            configuration.results_footer = results_footer;
+        }
         if let Ok(results_format) = config.get::<String>("results.format") {
             configuration.results_format = results_format;
         }
         if let Ok(results_header) = config.get::<bool>("results.header") {
             configuration.results_header = results_header;
         }
-        if let Ok(results_footer) = config.get::<bool>("results.footer") {
-            configuration.results_footer = results_footer;
+        if let Ok(results_rows) = config.get::<bool>("results.rows") {
+            configuration.results_rows = results_rows;
         }
         if let Ok(results_timer) = config.get::<bool>("results.timer") {
             configuration.results_timer = results_timer;
@@ -477,9 +489,10 @@ mod test {
         let history_ignore_dups = false;
         let theme = "Solarized (light)";
         let results_changes = false;
+        let results_footer = false;
         let results_format = "unicode".to_string();
         let results_header = false;
-        let results_footer = false;
+        let results_rows = false;
         let results_timer = false;
 
         let configuration = ConfigurationBuilder::new(program_name, version)
@@ -498,9 +511,10 @@ mod test {
             .with_history_ignore_dups(history_ignore_dups)
             .with_theme(theme)
             .with_results_changes(results_changes)
+            .with_results_footer(results_footer)
             .with_results_format(results_format.clone())
             .with_results_header(results_header)
-            .with_results_footer(results_footer)
+            .with_results_rows(results_rows)
             .with_results_timer(results_timer)
             .build();
 
@@ -524,9 +538,10 @@ mod test {
         assert_eq!(configuration.history_ignore_dups, history_ignore_dups);
         assert_eq!(configuration.theme, theme);
         assert_eq!(configuration.results_changes, results_changes);
+        assert_eq!(configuration.results_footer, results_footer);
         assert_eq!(configuration.results_format, results_format);
         assert_eq!(configuration.results_header, results_header);
-        assert_eq!(configuration.results_footer, results_footer);
+        assert_eq!(configuration.results_rows, results_rows);
         assert_eq!(configuration.results_timer, results_timer);
     }
 
@@ -550,9 +565,10 @@ mod test {
         assert_eq!(configuration.history_ignore_dups, true);
         assert_eq!(configuration.theme, "Solarized (dark)");
         assert_eq!(configuration.results_changes, true);
+        assert_eq!(configuration.results_footer, true);
         assert_eq!(configuration.results_format, "unicode".to_string());
         assert_eq!(configuration.results_header, true);
-        assert_eq!(configuration.results_footer, true);
+        assert_eq!(configuration.results_rows, true);
         assert_eq!(configuration.results_timer, true);
     }
 

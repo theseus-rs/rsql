@@ -120,7 +120,6 @@ changes_description:
   vi-VN: "Hiển thị số hàng đã thay đổi"
   zh-CN: "显示更改的行数"
 
-
 changes_setting:
   en: "Changes: %{changes}"
   ar-SA: "التغييرات: {changes}%"
