@@ -43,6 +43,12 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Install Rust
         uses: dtolnay/rust-toolchain@master
         with:
