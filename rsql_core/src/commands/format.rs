@@ -89,7 +89,7 @@ mod tests {
     #[test]
     fn test_description() {
         let description = Command.description("en");
-        assert_eq!(description, "Set the output format for the results.");
+        assert_eq!(description, "Set the output format for the results");
     }
 
     #[tokio::test]
