@@ -212,7 +212,7 @@ impl Connection {
     }
 }
 
-// #[cfg(not(target_os = "macos"))]
+#[cfg(not(target_os = "macos"))]
 #[cfg(test)]
 mod test {
     use crate::configuration::Configuration;
