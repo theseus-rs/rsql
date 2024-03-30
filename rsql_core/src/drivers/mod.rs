@@ -1,6 +1,8 @@
 mod connection;
 mod driver;
 mod error;
+#[cfg(feature = "mysql")]
+pub(crate) mod mysql;
 #[cfg(feature = "postgres")]
 pub(crate) mod postgres;
 #[cfg(feature = "postgresql")]

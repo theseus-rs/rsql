@@ -11,7 +11,7 @@
 [![License](https://img.shields.io/crates/l/rsql_cli)](https://github.com/theseus-rs/rsql_cli#license)
 [![Semantic Versioning](https://img.shields.io/badge/%E2%9A%99%EF%B8%8F_SemVer-2.0.0-blue)](https://semver.org/spec/v2.0.0.html)
 
-`rsql` is a command line interface for PostgreSQL and SQLite3.
+`rsql` is a command line interface for MariaDB, MySQL, PostgreSQL and SQLite3.
 
 ## Getting Started
 
@@ -44,6 +44,7 @@ rsql --url '<url>'
 
 | Driver            | URL                                                                           |
 |-------------------|-------------------------------------------------------------------------------|
+| mysql (sqlx)      | `mysql://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`      |
 | postgres          | `postgres://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`   |
 | postgresql (sqlx) | `postgresql://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>` |
 | rusqlite          | `rusqlite://?<memory=true>[&file=<database_file>]`                            |
@@ -53,7 +54,7 @@ rsql --url '<url>'
 
 | Feature             |                                                                           |
 |---------------------|---------------------------------------------------------------------------|
-| Databases           | ✅ (PostgreSQL, SQLite3)                                                   |
+| Databases           | ✅ (MariaDB, MySQL, PostgreSQL, SQLite3)                                   |
 | Embedded PostgreSQL | ✅                                                                         |
 | Syntax Highlighting | ✅                                                                         |
 | Result Highlighting | ✅                                                                         |

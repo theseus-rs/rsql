@@ -59,7 +59,10 @@ mod tests {
     #[tokio::test]
     async fn test_execute() -> anyhow::Result<()> {
         let mut output = Output::default();
-        let configuration = &mut Configuration::default();
+        let configuration = &mut Configuration {
+            locale: "en".to_string(),
+            ..Default::default()
+        };
         let options = CommandOptions {
             configuration,
             command_manager: &CommandManager::default(),
@@ -76,6 +79,9 @@ mod tests {
         assert_eq!(result, LoopCondition::Continue);
         let drivers_output = output.to_string();
         let mut drivers: Vec<&str> = Vec::new();
+
+        #[cfg(feature = "mysql")]
+        drivers.push("mysql");
 
         #[cfg(feature = "postgresql")]
         drivers.push("postgres");

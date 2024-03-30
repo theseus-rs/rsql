@@ -498,8 +498,8 @@ mod test {
     async fn test_data_type_date_time() -> anyhow::Result<()> {
         let result = test_data_type("SELECT CAST('1983-01-01 1:23:45' as timestamp)").await?;
         let value = result.expect("value is None");
-        let time = NaiveDateTime::parse_from_str("1983-01-01 01:23:45", "%Y-%m-%d %H:%M:%S")?;
-        assert_eq!(value, Value::DateTime(time));
+        let date_time = NaiveDateTime::parse_from_str("1983-01-01 01:23:45", "%Y-%m-%d %H:%M:%S")?;
+        assert_eq!(value, Value::DateTime(date_time));
 
         let now = Utc::now().naive_utc();
         let result = test_data_type("SELECT now()").await?;
@@ -536,7 +536,7 @@ mod test {
     }
 
     #[tokio::test]
-    async fn test_indexes() -> anyhow::Result<()> {
+    async fn test_schema() -> anyhow::Result<()> {
         let configuration = Configuration::default();
         let driver_manager = DriverManager::default();
         let mut connection = driver_manager.connect(&configuration, DATABASE_URL).await?;
@@ -548,45 +548,11 @@ mod test {
             .execute("CREATE TABLE users (id INTEGER PRIMARY KEY, email VARCHAR(20))")
             .await?;
 
-        let tables = connection.indexes(None).await?;
-        assert_eq!(tables, vec!["contacts_pkey", "users_pkey"]);
+        let indexes = connection.indexes(None).await?;
+        assert_eq!(indexes, vec!["contacts_pkey", "users_pkey"]);
 
-        connection.stop().await?;
-        Ok(())
-    }
-
-    #[tokio::test]
-    async fn test_indexes_table() -> anyhow::Result<()> {
-        let configuration = Configuration::default();
-        let driver_manager = DriverManager::default();
-        let mut connection = driver_manager.connect(&configuration, DATABASE_URL).await?;
-
-        let _ = connection
-            .execute("CREATE TABLE contacts (id INTEGER PRIMARY KEY, email VARCHAR(20))")
-            .await?;
-        let _ = connection
-            .execute("CREATE TABLE users (id INTEGER PRIMARY KEY, email VARCHAR(20))")
-            .await?;
-
-        let tables = connection.indexes(Some("users")).await?;
-        assert_eq!(tables, vec!["users_pkey"]);
-
-        connection.stop().await?;
-        Ok(())
-    }
-
-    #[tokio::test]
-    async fn test_tables() -> anyhow::Result<()> {
-        let configuration = Configuration::default();
-        let driver_manager = DriverManager::default();
-        let mut connection = driver_manager.connect(&configuration, DATABASE_URL).await?;
-
-        let _ = connection
-            .execute("CREATE TABLE contacts (id INTEGER PRIMARY KEY, email VARCHAR(20))")
-            .await?;
-        let _ = connection
-            .execute("CREATE TABLE users (id INTEGER PRIMARY KEY, email VARCHAR(20))")
-            .await?;
+        let indexes = connection.indexes(Some("users")).await?;
+        assert_eq!(indexes, vec!["users_pkey"]);
 
         let tables = connection.tables().await?;
         assert_eq!(tables, vec!["contacts", "users"]);
