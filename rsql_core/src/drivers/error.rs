@@ -19,6 +19,14 @@ pub enum Error {
     },
 }
 
+/// Converts a [`libsql::Error`] into an [`IoError`](Error::IoError)
+#[cfg(feature = "libsql")]
+impl From<libsql::Error> for Error {
+    fn from(error: libsql::Error) -> Self {
+        Error::IoError(error.into())
+    }
+}
+
 /// Converts a [`postgresql_archive::Error`] into an [`IoError`](Error::IoError)
 #[cfg(any(feature = "postgres", feature = "postgresql"))]
 impl From<postgresql_archive::Error> for Error {
@@ -62,6 +70,15 @@ impl From<tokio_postgres::Error> for Error {
 #[cfg(test)]
 mod test {
     use super::*;
+
+    #[cfg(feature = "libsql")]
+    #[test]
+    fn test_libsql_error() {
+        let error = libsql::Error::ConnectionFailed("test".to_string());
+        let io_error = Error::from(error);
+
+        assert_eq!(io_error.to_string(), "test");
+    }
 
     #[cfg(any(feature = "postgres", feature = "postgresql"))]
     #[test]

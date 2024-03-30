@@ -44,7 +44,8 @@ rsql --url '<url>'
 
 | Driver            | URL                                                                           |
 |-------------------|-------------------------------------------------------------------------------|
-| mysql (sqlx)      | `mysql://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`      |
+| libsql            | `libsql://<host>?[<memory=true>][&file=<database_file>][&auth_token=<token>]` |
+| mysql (sqlx)      | `mysql://<user>[:<password>]@<host>[:<port>]/<database>`                      |
 | postgres          | `postgres://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`   |
 | postgresql (sqlx) | `postgresql://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>` |
 | rusqlite          | `rusqlite://?<memory=true>[&file=<database_file>]`                            |
@@ -54,7 +55,7 @@ rsql --url '<url>'
 
 | Feature             |                                                                           |
 |---------------------|---------------------------------------------------------------------------|
-| Databases           | ✅ (MariaDB, MySQL, PostgreSQL, SQLite3)                                   |
+| Databases           | ✅ LibSQL (Turso), MariaDB, MySQL, PostgreSQL, SQLite3)                    |
 | Embedded PostgreSQL | ✅                                                                         |
 | Syntax Highlighting | ✅                                                                         |
 | Result Highlighting | ✅                                                                         |

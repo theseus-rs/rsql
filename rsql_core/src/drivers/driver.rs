@@ -79,6 +79,8 @@ impl Default for DriverManager {
         #[cfg(any(feature = "postgresql", feature = "sqlite"))]
         sqlx::any::install_default_drivers();
 
+        #[cfg(feature = "libsql")]
+        drivers.add(Box::new(crate::drivers::libsql::Driver));
         #[cfg(feature = "mysql")]
         drivers.add(Box::new(crate::drivers::mysql::Driver));
         #[cfg(feature = "postgres")]
