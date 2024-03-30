@@ -44,17 +44,21 @@ rsql --url '<url>'
 
 | Driver            | URL                                                                           |
 |-------------------|-------------------------------------------------------------------------------|
-| mysql (sqlx)      | `mysql://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`      |
+| libsql¹           | `libsql://<host>?[<memory=true>][&file=<database_file>][&auth_token=<token>]` |
+| mysql (sqlx)      | `mysql://<user>[:<password>]@<host>[:<port>]/<database>`                      |
 | postgres          | `postgres://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`   |
 | postgresql (sqlx) | `postgresql://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>` |
 | rusqlite          | `rusqlite://?<memory=true>[&file=<database_file>]`                            |
 | sqlite (sqlx)     | `sqlite://?<memory=true>[&file=<database_file>]`                              |
 
+¹ `libsql` needs to be enabled with the `libsql` feature flag; it is disabled by default as it conflicts
+with `rusqlite`.
+
 ## Features
 
 | Feature             |                                                                           |
 |---------------------|---------------------------------------------------------------------------|
-| Databases           | ✅ (MariaDB, MySQL, PostgreSQL, SQLite3)                                   |
+| Databases           | ✅ LibSQL (Turso), MariaDB, MySQL, PostgreSQL, SQLite3)                    |
 | Embedded PostgreSQL | ✅                                                                         |
 | Syntax Highlighting | ✅                                                                         |
 | Result Highlighting | ✅                                                                         |

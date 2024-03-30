@@ -29,6 +29,7 @@ indexmap = { workspace = true, features = ["serde"] }
 indicatif = { workspace = true }
 indoc = { workspace = true }
 lazy_static = { workspace = true }
+libsql = { workspace = true, optional = true }
 num-format = { workspace = true }
 prettytable = { workspace = true }
 postgresql_archive = { workspace = true, optional = true }
@@ -70,6 +71,9 @@ tokio = { workspace = true }
 [features]
 all = ["mysql", "postgres", "postgresql", "rusqlite", "sqlite"]
 default = []
+libsql = [
+    "dep:libsql"
+]
 mysql = [
     "dep:sqlx",
     "sqlx/mysql",

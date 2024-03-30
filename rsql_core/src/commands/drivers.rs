@@ -80,6 +80,9 @@ mod tests {
         let drivers_output = output.to_string();
         let mut drivers: Vec<&str> = Vec::new();
 
+        #[cfg(feature = "libsql")]
+        drivers.push("libsql");
+
         #[cfg(feature = "mysql")]
         drivers.push("mysql");
 
