@@ -77,7 +77,10 @@ mod test {
         let error = libsql::Error::ConnectionFailed("test".to_string());
         let io_error = Error::from(error);
 
-        assert_eq!(io_error.to_string(), "test");
+        assert_eq!(
+            io_error.to_string(),
+            "Failed to connect to database: `test`"
+        );
     }
 
     #[cfg(any(feature = "postgres", feature = "postgresql"))]

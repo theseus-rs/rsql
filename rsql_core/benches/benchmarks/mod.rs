@@ -1,3 +1,4 @@
+pub mod libsql;
 pub mod postgres;
 pub mod postgresql;
 pub mod rusqlite;
