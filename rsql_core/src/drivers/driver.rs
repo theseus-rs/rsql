@@ -79,6 +79,8 @@ impl Default for DriverManager {
         #[cfg(any(feature = "postgresql", feature = "sqlite"))]
         sqlx::any::install_default_drivers();
 
+        #[cfg(feature = "mysql")]
+        drivers.add(Box::new(crate::drivers::mysql::Driver));
         #[cfg(feature = "postgres")]
         drivers.add(Box::new(crate::drivers::postgres::Driver));
         #[cfg(feature = "postgresql")]
@@ -123,6 +125,9 @@ mod tests {
     fn test_driver_manager_default() {
         let driver_manager = DriverManager::default();
         let driver_count = 0;
+
+        #[cfg(feature = "mysql")]
+        let driver_count = driver_count + 1;
 
         #[cfg(feature = "postgres")]
         let driver_count = driver_count + 1;

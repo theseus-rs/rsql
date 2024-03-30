@@ -64,12 +64,16 @@ criterion = { workspace = true, features = ["async_tokio"] }
 mockall = { workspace = true }
 test-log = { workspace = true }
 testcontainers = { workspace = true }
-testcontainers-modules = { workspace = true, features = ["postgres"] }
+testcontainers-modules = { workspace = true, features = ["mysql", "postgres"] }
 tokio = { workspace = true }
 
 [features]
-all = ["postgres", "postgresql", "rusqlite", "sqlite"]
+all = ["mysql", "postgres", "postgresql", "rusqlite", "sqlite"]
 default = []
+mysql = [
+    "dep:sqlx",
+    "sqlx/mysql",
+]
 postgres = [
     "dep:postgresql_archive",
     "dep:postgresql_embedded",

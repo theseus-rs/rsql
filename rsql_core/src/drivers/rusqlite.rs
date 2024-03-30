@@ -377,7 +377,7 @@ mod test {
     }
 
     #[tokio::test]
-    async fn test_indexes() -> anyhow::Result<()> {
+    async fn test_schema() -> anyhow::Result<()> {
         let configuration = Configuration::default();
         let driver_manager = DriverManager::default();
         let mut connection = driver_manager.connect(&configuration, DATABASE_URL).await?;
@@ -389,48 +389,14 @@ mod test {
             .execute("CREATE TABLE users (id INTEGER PRIMARY KEY, email VARCHAR(20) UNIQUE)")
             .await?;
 
-        let tables = connection.indexes(None).await?;
+        let indexes = connection.indexes(None).await?;
         assert_eq!(
-            tables,
+            indexes,
             vec!["sqlite_autoindex_contacts_1", "sqlite_autoindex_users_1"]
         );
 
-        connection.stop().await?;
-        Ok(())
-    }
-
-    #[tokio::test]
-    async fn test_indexes_table() -> anyhow::Result<()> {
-        let configuration = Configuration::default();
-        let driver_manager = DriverManager::default();
-        let mut connection = driver_manager.connect(&configuration, DATABASE_URL).await?;
-
-        let _ = connection
-            .execute("CREATE TABLE contacts (id INTEGER PRIMARY KEY, email VARCHAR(20) UNIQUE)")
-            .await?;
-        let _ = connection
-            .execute("CREATE TABLE users (id INTEGER PRIMARY KEY, email VARCHAR(20) UNIQUE)")
-            .await?;
-
-        let tables = connection.indexes(Some("users")).await?;
-        assert_eq!(tables, vec!["sqlite_autoindex_users_1"]);
-
-        connection.stop().await?;
-        Ok(())
-    }
-
-    #[tokio::test]
-    async fn test_tables() -> anyhow::Result<()> {
-        let configuration = Configuration::default();
-        let driver_manager = DriverManager::default();
-        let mut connection = driver_manager.connect(&configuration, DATABASE_URL).await?;
-
-        let _ = connection
-            .execute("CREATE TABLE contacts (id INTEGER PRIMARY KEY, email VARCHAR(20))")
-            .await?;
-        let _ = connection
-            .execute("CREATE TABLE users (id INTEGER PRIMARY KEY, email VARCHAR(20))")
-            .await?;
+        let indexes = connection.indexes(Some("users")).await?;
+        assert_eq!(indexes, vec!["sqlite_autoindex_users_1"]);
 
         let tables = connection.tables().await?;
         assert_eq!(tables, vec!["contacts", "users"]);
