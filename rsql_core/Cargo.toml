@@ -69,7 +69,7 @@ testcontainers-modules = { workspace = true, features = ["mysql", "postgres"] }
 tokio = { workspace = true }
 
 [features]
-all = ["libsql", "mysql", "postgres", "postgresql", "rusqlite", "sqlite"]
+all = ["mysql", "postgres", "postgresql", "rusqlite", "sqlite"]
 default = []
 libsql = [
     "dep:libsql"

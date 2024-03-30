@@ -44,12 +44,15 @@ rsql --url '<url>'
 
 | Driver            | URL                                                                           |
 |-------------------|-------------------------------------------------------------------------------|
-| libsql            | `libsql://<host>?[<memory=true>][&file=<database_file>][&auth_token=<token>]` |
+| libsql¹           | `libsql://<host>?[<memory=true>][&file=<database_file>][&auth_token=<token>]` |
 | mysql (sqlx)      | `mysql://<user>[:<password>]@<host>[:<port>]/<database>`                      |
 | postgres          | `postgres://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`   |
 | postgresql (sqlx) | `postgresql://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>` |
 | rusqlite          | `rusqlite://?<memory=true>[&file=<database_file>]`                            |
 | sqlite (sqlx)     | `sqlite://?<memory=true>[&file=<database_file>]`                              |
+
+¹ `libsql` needs to be enabled with the `libsql` feature flag; it is disabled by default as it conflicts
+with `rusqlite`.
 
 ## Features
 
