@@ -3405,7 +3405,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_cli"
-version = "0.7.4"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "clap",
@@ -3423,7 +3423,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_core"
-version = "0.7.4"
+version = "0.8.0"
 dependencies = [
  "ansi_colours",
  "anyhow",
