@@ -68,7 +68,7 @@ jobs:
           RUSTFLAGS: -Cinstrument-coverage
           RUSTDOCFLAGS: -Cinstrument-coverage
         run: |
-          cargo test --workspace --all-features
+          cargo test --workspace --features all
 
       - name: Produce coverage info
         if: ${{ startsWith(matrix.os, 'ubuntu-') }}
