@@ -128,6 +128,9 @@ mod tests {
         let driver_manager = DriverManager::default();
         let driver_count = 0;
 
+        #[cfg(feature = "libsql")]
+        let driver_count = driver_count + 1;
+
         #[cfg(feature = "mysql")]
         let driver_count = driver_count + 1;
 
