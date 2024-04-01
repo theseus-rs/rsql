@@ -1,9 +1,9 @@
-use crate::drivers::Results;
-use crate::drivers::Results::Query;
 use crate::formatters::error::Result;
 use crate::formatters::footer::write_footer;
 use crate::formatters::formatter::FormatterOptions;
 use csv::QuoteStyle;
+use rsql_drivers::Results;
+use rsql_drivers::Results::Query;
 
 pub async fn format<'a>(
     options: &mut FormatterOptions<'a>,
@@ -46,12 +46,11 @@ pub async fn format<'a>(
 mod test {
     use super::*;
     use crate::configuration::Configuration;
-    use crate::drivers::MemoryQueryResult;
-    use crate::drivers::Results::{Execute, Query};
-    use crate::drivers::Value;
     use crate::formatters::formatter::FormatterOptions;
     use crate::writers::Output;
     use indoc::indoc;
+    use rsql_drivers::Results::{Execute, Query};
+    use rsql_drivers::{MemoryQueryResult, Value};
     use std::time::Duration;
 
     #[tokio::test]

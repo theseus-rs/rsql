@@ -1,6 +1,4 @@
 use crate::configuration::Configuration;
-use crate::drivers::Results::Query;
-use crate::drivers::{QueryResult, Results};
 use crate::formatters::error::Result;
 use crate::formatters::footer::write_footer;
 use crate::formatters::formatter::FormatterOptions;
@@ -8,6 +6,8 @@ use colored::Colorize;
 use num_format::Locale;
 use prettytable::format::TableFormat;
 use prettytable::Table;
+use rsql_drivers::Results::Query;
+use rsql_drivers::{QueryResult, Results};
 use std::ops::Deref;
 use std::str::FromStr;
 
@@ -88,11 +88,11 @@ async fn process_data<'a>(
 mod tests {
     use super::*;
     use crate::configuration::Configuration;
-    use crate::drivers::Results::{Execute, Query};
-    use crate::drivers::{MemoryQueryResult, Results, Value};
     use crate::writers::Output;
     use indoc::indoc;
     use prettytable::format::consts::FORMAT_DEFAULT;
+    use rsql_drivers::Results::{Execute, Query};
+    use rsql_drivers::{MemoryQueryResult, Results, Value};
     use std::time::Duration;
 
     const COLUMN_HEADER: &str = "id";

@@ -1,8 +1,7 @@
-use crate::configuration::Configuration;
-use crate::drivers::error::Result;
-use crate::drivers::value::Value;
-use crate::drivers::Error::UnsupportedColumnType;
-use crate::drivers::{MemoryQueryResult, Results};
+use crate::error::Result;
+use crate::value::Value;
+use crate::Error::UnsupportedColumnType;
+use crate::{MemoryQueryResult, Results};
 use async_trait::async_trait;
 use bit_vec::BitVec;
 use chrono::Utc;
@@ -13,6 +12,7 @@ use sqlx::postgres::{PgColumn, PgConnectOptions, PgRow};
 use sqlx::{Column, PgPool, Row};
 use std::collections::HashMap;
 use std::ops::Deref;
+use std::path::PathBuf;
 use std::str::FromStr;
 use std::string::ToString;
 use tracing::debug;
@@ -24,18 +24,17 @@ const POSTGRESQL_EMBEDDED_VERSION: &str = "16.2.3";
 pub struct Driver;
 
 #[async_trait]
-impl crate::drivers::Driver for Driver {
+impl crate::Driver for Driver {
     fn identifier(&self) -> &'static str {
         "postgresql"
     }
 
     async fn connect(
         &self,
-        configuration: &Configuration,
         url: String,
         password: Option<String>,
-    ) -> Result<Box<dyn crate::drivers::Connection>> {
-        let connection = Connection::new(configuration, url, password).await?;
+    ) -> Result<Box<dyn crate::Connection>> {
+        let connection = Connection::new(url, password).await?;
         Ok(Box::new(connection))
     }
 }
@@ -47,11 +46,7 @@ pub(crate) struct Connection {
 }
 
 impl Connection {
-    pub(crate) async fn new(
-        configuration: &Configuration,
-        url: String,
-        password: Option<String>,
-    ) -> Result<Connection> {
+    pub(crate) async fn new(url: String, password: Option<String>) -> Result<Connection> {
         let parsed_url = Url::parse(url.as_str())?;
         let query_parameters: HashMap<String, String> =
             parsed_url.query_pairs().into_owned().collect();
@@ -67,8 +62,8 @@ impl Connection {
             let version = Version::from_str(specified_version)?;
             let mut settings = Settings::from_url(url)?;
 
-            if let Some(config_dir) = &configuration.config_dir {
-                settings.installation_dir = config_dir.clone();
+            if let Some(config_dir) = query_parameters.get("installation_dir") {
+                settings.installation_dir = PathBuf::from(config_dir);
             }
             if let Some(password) = password {
                 settings.password = password;
@@ -97,7 +92,7 @@ impl Connection {
 }
 
 #[async_trait]
-impl crate::drivers::Connection for Connection {
+impl crate::Connection for Connection {
     async fn execute(&self, sql: &str) -> Result<Results> {
         let rows = sqlx::query(sql).execute(&self.pool).await?.rows_affected();
         Ok(Results::Execute(rows))
@@ -290,8 +285,7 @@ impl Connection {
 #[cfg(not(target_os = "windows"))]
 #[cfg(test)]
 mod test {
-    use crate::configuration::Configuration;
-    use crate::drivers::{DriverManager, Results, Value};
+    use crate::{DriverManager, Results, Value};
     use chrono::{NaiveDate, NaiveDateTime, NaiveTime, Utc};
     use serde_json::json;
 
@@ -299,18 +293,16 @@ mod test {
 
     #[tokio::test]
     async fn test_driver_connect() -> anyhow::Result<()> {
-        let configuration = Configuration::default();
         let driver_manager = DriverManager::default();
-        let mut connection = driver_manager.connect(&configuration, DATABASE_URL).await?;
+        let mut connection = driver_manager.connect(DATABASE_URL).await?;
         connection.stop().await?;
         Ok(())
     }
 
     #[tokio::test]
     async fn test_limit_rows() -> anyhow::Result<()> {
-        let configuration = Configuration::default();
         let driver_manager = DriverManager::default();
-        let connection = driver_manager.connect(&configuration, DATABASE_URL).await?;
+        let connection = driver_manager.connect(DATABASE_URL).await?;
         let results = connection.query("SELECT 1 UNION ALL SELECT 2", 1).await?;
         assert!(results.is_query());
         if let Results::Query(query_result) = results {
@@ -321,9 +313,8 @@ mod test {
 
     #[tokio::test]
     async fn test_connection_interface() -> anyhow::Result<()> {
-        let configuration = Configuration::default();
         let driver_manager = DriverManager::default();
-        let mut connection = driver_manager.connect(&configuration, DATABASE_URL).await?;
+        let mut connection = driver_manager.connect(DATABASE_URL).await?;
 
         let _ = connection
             .execute("CREATE TABLE person (id INTEGER, name VARCHAR(20))")
@@ -365,9 +356,8 @@ mod test {
     }
 
     async fn test_data_type(sql: &str) -> anyhow::Result<Option<Value>> {
-        let configuration = Configuration::default();
         let driver_manager = DriverManager::default();
-        let mut connection = driver_manager.connect(&configuration, DATABASE_URL).await?;
+        let mut connection = driver_manager.connect(DATABASE_URL).await?;
 
         let results = connection.query(sql, 0).await?;
         let mut value: Option<Value> = None;
@@ -537,9 +527,8 @@ mod test {
 
     #[tokio::test]
     async fn test_schema() -> anyhow::Result<()> {
-        let configuration = Configuration::default();
         let driver_manager = DriverManager::default();
-        let mut connection = driver_manager.connect(&configuration, DATABASE_URL).await?;
+        let mut connection = driver_manager.connect(DATABASE_URL).await?;
 
         let _ = connection
             .execute("CREATE TABLE contacts (id INTEGER PRIMARY KEY, email VARCHAR(20))")
@@ -572,11 +561,8 @@ mod test {
         let port = container.get_host_port_ipv4(5432);
 
         let database_url = format!("postgresql://postgres:postgres@localhost:{}/postgres", port);
-        let configuration = Configuration::default();
         let driver_manager = DriverManager::default();
-        let connection = driver_manager
-            .connect(&configuration, database_url.as_str())
-            .await?;
+        let connection = driver_manager.connect(database_url.as_str()).await?;
 
         let results = connection.query("SELECT 'foo'::TEXT", 0).await?;
         assert!(results.is_query());

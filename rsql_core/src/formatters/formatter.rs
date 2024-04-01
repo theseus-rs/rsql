@@ -1,8 +1,8 @@
 use crate::configuration::Configuration;
-use crate::drivers::Results;
 use crate::formatters::error::Result;
 use crate::writers::Output;
 use async_trait::async_trait;
+use rsql_drivers::Results;
 use std::collections::BTreeMap;
 use std::fmt::Debug;
 use std::time::Duration;

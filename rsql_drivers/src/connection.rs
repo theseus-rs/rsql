@@ -1,6 +1,8 @@
-use crate::drivers::error::Result;
-use crate::drivers::value::Value;
+use crate::error::Result;
+use crate::value::Value;
 use async_trait::async_trait;
+use mockall::predicate::*;
+use mockall::*;
 use std::fmt::Debug;
 
 /// Results from a query or execute
@@ -52,7 +54,7 @@ impl QueryResult for MemoryQueryResult {
 }
 
 /// Connection to a database
-#[cfg_attr(test, mockall::automock)]
+#[automock]
 #[async_trait]
 pub trait Connection: Debug + Send + Sync {
     async fn execute(&self, sql: &str) -> Result<Results>;

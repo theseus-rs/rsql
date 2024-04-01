@@ -1,9 +1,9 @@
 use crate::commands::error::Result;
 use crate::configuration::Configuration;
-use crate::drivers::{Connection, DriverManager};
 use crate::formatters::FormatterManager;
 use crate::writers::Output;
 use async_trait::async_trait;
+use rsql_drivers::{Connection, DriverManager};
 use rustyline::history::DefaultHistory;
 use std::fmt::Debug;
 
@@ -129,7 +129,7 @@ impl Default for CommandManager {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::drivers::MockConnection;
+    use rsql_drivers::MockConnection;
 
     #[test]
     fn test_debug() {

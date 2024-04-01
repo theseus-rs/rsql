@@ -1,11 +1,11 @@
 use crate::commands::LoopCondition;
 use crate::configuration::Configuration;
-use crate::drivers::{Connection, Results};
 use crate::executors::Result;
 use crate::formatters;
 use crate::formatters::{FormatterManager, FormatterOptions};
 use crate::writers::Output;
 use indicatif::ProgressStyle;
+use rsql_drivers::{Connection, Results};
 use std::fmt;
 use std::fmt::Debug;
 use tracing::{instrument, Span};
@@ -95,8 +95,8 @@ impl Debug for SqlExecutor<'_> {
 mod tests {
     use super::*;
     use crate::configuration::Configuration;
-    use crate::drivers::{MemoryQueryResult, MockConnection};
     use mockall::predicate::eq;
+    use rsql_drivers::{MemoryQueryResult, MockConnection};
 
     #[tokio::test]
     async fn test_debug() {

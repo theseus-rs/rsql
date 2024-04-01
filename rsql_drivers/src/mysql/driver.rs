@@ -1,8 +1,7 @@
-use crate::configuration::Configuration;
-use crate::drivers::error::Result;
-use crate::drivers::value::Value;
-use crate::drivers::Error::UnsupportedColumnType;
-use crate::drivers::{MemoryQueryResult, Results};
+use crate::error::Result;
+use crate::value::Value;
+use crate::Error::UnsupportedColumnType;
+use crate::{MemoryQueryResult, Results};
 use async_trait::async_trait;
 use chrono::NaiveDateTime;
 use indoc::indoc;
@@ -16,18 +15,17 @@ use std::string::ToString;
 pub struct Driver;
 
 #[async_trait]
-impl crate::drivers::Driver for Driver {
+impl crate::Driver for Driver {
     fn identifier(&self) -> &'static str {
         "mysql"
     }
 
     async fn connect(
         &self,
-        configuration: &Configuration,
         url: String,
         password: Option<String>,
-    ) -> Result<Box<dyn crate::drivers::Connection>> {
-        let connection = Connection::new(configuration, url, password).await?;
+    ) -> Result<Box<dyn crate::Connection>> {
+        let connection = Connection::new(url, password).await?;
         Ok(Box::new(connection))
     }
 }
@@ -38,11 +36,7 @@ pub(crate) struct Connection {
 }
 
 impl Connection {
-    pub(crate) async fn new(
-        _configuration: &Configuration,
-        url: String,
-        _password: Option<String>,
-    ) -> Result<Connection> {
+    pub(crate) async fn new(url: String, _password: Option<String>) -> Result<Connection> {
         let options = MySqlConnectOptions::from_str(url.as_str())?;
         let pool = MySqlPool::connect_with(options).await?;
         let connection = Connection { pool };
@@ -52,7 +46,7 @@ impl Connection {
 }
 
 #[async_trait]
-impl crate::drivers::Connection for Connection {
+impl crate::Connection for Connection {
     async fn execute(&self, sql: &str) -> Result<Results> {
         let rows = sqlx::query(sql).execute(&self.pool).await?.rows_affected();
         Ok(Results::Execute(rows))
@@ -215,8 +209,7 @@ impl Connection {
 #[cfg(not(any(target_os = "macos", target_os = "windows")))]
 #[cfg(test)]
 mod test {
-    use crate::configuration::Configuration;
-    use crate::drivers::{Connection, DriverManager, Results, Value};
+    use crate::{Connection, DriverManager, Results, Value};
     use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
     use indoc::indoc;
     use serde_json::json;
@@ -230,11 +223,8 @@ mod test {
         let port = container.get_host_port_ipv4(3306);
 
         let database_url = &format!("mysql://root@127.0.0.1:{port}/mysql");
-        let configuration = Configuration::default();
         let driver_manager = DriverManager::default();
-        let mut connection = driver_manager
-            .connect(&configuration, database_url.as_str())
-            .await?;
+        let mut connection = driver_manager.connect(database_url.as_str()).await?;
 
         test_limit_rows(&*connection).await?;
         test_connection_interface(&*connection).await?;

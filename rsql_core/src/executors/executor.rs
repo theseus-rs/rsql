@@ -1,12 +1,12 @@
 use crate::commands::{CommandManager, LoopCondition};
 use crate::configuration::Configuration;
-use crate::drivers::{Connection, DriverManager};
 use crate::executors::command::CommandExecutor;
 use crate::executors::sql::SqlExecutor;
 use crate::executors::Result;
 use crate::formatters::FormatterManager;
 use crate::writers::Output;
 use regex::Regex;
+use rsql_drivers::{Connection, DriverManager};
 use rustyline::history::DefaultHistory;
 use std::fmt;
 use std::fmt::Debug;
@@ -119,9 +119,9 @@ impl Debug for Executor<'_> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::drivers::{MockConnection, Results};
     use indoc::indoc;
     use mockall::predicate::eq;
+    use rsql_drivers::{MockConnection, Results};
 
     #[tokio::test]
     async fn test_debug() {

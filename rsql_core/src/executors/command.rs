@@ -1,10 +1,10 @@
 use crate::commands::{CommandManager, CommandOptions, LoopCondition};
 use crate::configuration::Configuration;
-use crate::drivers::{Connection, DriverManager};
 use crate::executors::{Error, Result};
 use crate::formatters::FormatterManager;
 use crate::writers::Output;
 use regex::Regex;
+use rsql_drivers::{Connection, DriverManager};
 use rustyline::history::DefaultHistory;
 use std::fmt;
 use std::fmt::Debug;
@@ -107,7 +107,7 @@ fn split_string(input: &str) -> Vec<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::drivers::MockConnection;
+    use rsql_drivers::MockConnection;
 
     #[tokio::test]
     async fn test_debug() {

@@ -1,4 +1,3 @@
-use crate::drivers::Results;
 use crate::formatters::error::Result;
 use crate::formatters::footer::write_footer;
 use crate::formatters::formatter::FormatterOptions;
@@ -7,6 +6,7 @@ use crate::writers::Output;
 use async_trait::async_trait;
 use quick_xml::events::{BytesEnd, BytesStart, BytesText, Event};
 use quick_xml::Writer;
+use rsql_drivers::Results;
 
 /// A formatter for XML
 #[derive(Debug, Default)]
@@ -77,12 +77,11 @@ pub(crate) async fn format_xml(
 mod test {
     use super::*;
     use crate::configuration::Configuration;
-    use crate::drivers::MemoryQueryResult;
-    use crate::drivers::Results::{Execute, Query};
-    use crate::drivers::Value;
     use crate::formatters::formatter::FormatterOptions;
     use crate::formatters::Formatter;
     use indoc::indoc;
+    use rsql_drivers::Results::{Execute, Query};
+    use rsql_drivers::{MemoryQueryResult, Value};
     use std::time::Duration;
 
     #[tokio::test]

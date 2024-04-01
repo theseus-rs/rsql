@@ -86,9 +86,9 @@ mod tests {
     use crate::commands::LoopCondition;
     use crate::commands::{CommandManager, CommandOptions};
     use crate::configuration::Configuration;
-    use crate::drivers::{DriverManager, MockConnection};
     use crate::formatters::FormatterManager;
     use crate::writers::Output;
+    use rsql_drivers::{DriverManager, MockConnection};
     use rustyline::history::{DefaultHistory, History};
     use std::default;
     use std::default::Default;

@@ -1,9 +1,9 @@
-use crate::drivers::Results;
 use crate::formatters::delimited::format;
 use crate::formatters::error::Result;
 use crate::formatters::formatter::FormatterOptions;
 use async_trait::async_trait;
 use csv::QuoteStyle;
+use rsql_drivers::Results;
 
 /// A formatter for Column Separated Values (CSV)
 #[derive(Debug, Default)]
@@ -28,13 +28,12 @@ impl crate::formatters::Formatter for Formatter {
 mod test {
     use super::*;
     use crate::configuration::Configuration;
-    use crate::drivers::MemoryQueryResult;
-    use crate::drivers::Results::Query;
-    use crate::drivers::Value;
     use crate::formatters::formatter::FormatterOptions;
     use crate::formatters::Formatter;
     use crate::writers::Output;
     use indoc::indoc;
+    use rsql_drivers::Results::Query;
+    use rsql_drivers::{MemoryQueryResult, Value};
     use std::time::Duration;
 
     #[tokio::test]
