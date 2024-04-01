@@ -49,6 +49,7 @@ unicode-width = { workspace = true }
 url = { workspace = true }
 
 [dev-dependencies]
+criterion = { workspace = true, features = ["async_tokio"] }
 mockall = { workspace = true }
 test-log = { workspace = true }
 tokio = { workspace = true }
@@ -81,3 +82,7 @@ unwrap_used = "deny"
 [package.metadata.docs.rs]
 features = ["all"]
 targets = ["x86_64-unknown-linux-gnu"]
+
+[[bench]]
+harness = false
+name = "bench_main"
