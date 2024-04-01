@@ -209,10 +209,9 @@ impl Connection {
 #[cfg(not(any(target_os = "macos", target_os = "windows")))]
 #[cfg(test)]
 mod test {
-    use crate::configuration::Configuration;
+    use crate::{Connection, DriverManager, Results, Value};
     use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
     use indoc::indoc;
-    use rsql_drivers::{Connection, DriverManager, Results, Value};
     use serde_json::json;
 
     #[tokio::test]
@@ -224,11 +223,8 @@ mod test {
         let port = container.get_host_port_ipv4(3306);
 
         let database_url = &format!("mysql://root@127.0.0.1:{port}/mysql");
-        let configuration = Configuration::default();
         let driver_manager = DriverManager::default();
-        let mut connection = driver_manager
-            .connect(&configuration, database_url.as_str())
-            .await?;
+        let mut connection = driver_manager.connect(database_url.as_str()).await?;
 
         test_limit_rows(&*connection).await?;
         test_connection_interface(&*connection).await?;
