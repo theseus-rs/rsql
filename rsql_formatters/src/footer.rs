@@ -1,10 +1,10 @@
-use crate::formatters::error::Result;
-use crate::formatters::FormatterOptions;
+use crate::error::Result;
+use crate::writers::Output;
+use crate::FormatterOptions;
 use colored::Colorize;
 use num_format::{Locale, ToFormattedString};
 use rsql_drivers::Results;
 use rsql_drivers::Results::{Execute, Query};
-use std::io::Write;
 use std::str::FromStr;
 
 /// Display the footer of the result set.
@@ -13,21 +13,20 @@ use std::str::FromStr;
 /// The number of rows will be formatted based on the locale.
 ///
 /// Example: "N,NNN,NNN rows (M.MMMs)"
-pub async fn write_footer<'a>(options: &mut FormatterOptions<'a>, results: &Results) -> Result<()> {
-    let configuration = &options.configuration;
-
-    if !configuration.results_footer {
+pub async fn write_footer(
+    options: &FormatterOptions,
+    results: &Results,
+    output: &mut Output,
+) -> Result<()> {
+    if !options.footer {
         return Ok(());
     }
 
     let (display_rows, rows_affected) = match results {
-        Execute(rows_affected) => (configuration.results_changes, *rows_affected),
-        Query(query_result) => (
-            configuration.results_rows,
-            query_result.rows().await.len() as u64,
-        ),
+        Execute(rows_affected) => (options.changes, *rows_affected),
+        Query(query_result) => (options.rows, query_result.rows().await.len() as u64),
     };
-    let locale = &configuration.locale;
+    let locale = &options.locale;
     let num_locale = Locale::from_str(locale).unwrap_or(Locale::en);
     let rows = rows_affected.to_formatted_string(&num_locale);
     let rows_label = if !display_rows {
@@ -37,15 +36,14 @@ pub async fn write_footer<'a>(options: &mut FormatterOptions<'a>, results: &Resu
     } else {
         t!("rows", locale = locale, rows = rows).to_string()
     };
-    let elapsed_display = if configuration.results_timer {
+    let elapsed_display = if options.timer {
         let elapsed = format!("{:?}", options.elapsed);
         t!("elapsed_format", locale = locale, elapsed = elapsed).to_string()
     } else {
         "".to_string()
     };
-    let output = &mut options.output;
 
-    if configuration.color {
+    if options.color {
         let footer = t!(
             "footer_format",
             locale = locale,
@@ -73,7 +71,6 @@ pub async fn write_footer<'a>(options: &mut FormatterOptions<'a>, results: &Resu
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::configuration::Configuration;
     use crate::writers::Output;
     use rsql_drivers::MemoryQueryResult;
     use rsql_drivers::{Results, Value};
@@ -89,17 +86,13 @@ mod tests {
     }
 
     async fn test_write_footer(
-        configuration: &mut Configuration,
+        options: &mut FormatterOptions,
         results: &Results,
     ) -> anyhow::Result<String> {
         let output = &mut Output::default();
-        let mut options = FormatterOptions {
-            configuration,
-            elapsed: Duration::from_nanos(9),
-            output,
-        };
+        options.elapsed = Duration::from_nanos(9);
 
-        write_footer(&mut options, results).await?;
+        write_footer(options, results, output).await?;
 
         let output = output.to_string().replace("\r\n", "\n");
         Ok(output)
@@ -107,19 +100,19 @@ mod tests {
 
     #[tokio::test]
     async fn test_write_footer_disabled() -> anyhow::Result<()> {
-        let mut configuration = Configuration {
-            results_footer: false,
+        let mut options = FormatterOptions {
+            footer: false,
             ..Default::default()
         };
-        let output = test_write_footer(&mut configuration, &query_result(0)).await?;
+        let output = test_write_footer(&mut options, &query_result(0)).await?;
         assert!(!output.contains("row"));
         Ok(())
     }
 
     #[tokio::test]
     async fn test_write_footer_execute() -> anyhow::Result<()> {
-        let mut configuration = Configuration::default();
-        let output = test_write_footer(&mut configuration, &Execute(42)).await?;
+        let mut options = FormatterOptions::default();
+        let output = test_write_footer(&mut options, &Execute(42)).await?;
         assert!(output.contains("42 rows"));
         assert!(output.contains("(9ns)"));
         Ok(())
@@ -127,12 +120,12 @@ mod tests {
 
     #[tokio::test]
     async fn test_write_footer_execute_no_changes() -> anyhow::Result<()> {
-        let mut configuration = Configuration {
-            results_changes: false,
-            results_rows: true,
+        let mut options = FormatterOptions {
+            changes: false,
+            rows: true,
             ..Default::default()
         };
-        let output = test_write_footer(&mut configuration, &Execute(42)).await?;
+        let output = test_write_footer(&mut options, &Execute(42)).await?;
         assert!(!output.contains("42 rows"));
         assert!(output.contains("(9ns)"));
         Ok(())
@@ -140,8 +133,8 @@ mod tests {
 
     #[tokio::test]
     async fn test_write_footer_no_rows() -> anyhow::Result<()> {
-        let mut configuration = Configuration::default();
-        let output = test_write_footer(&mut configuration, &query_result(0)).await?;
+        let mut options = FormatterOptions::default();
+        let output = test_write_footer(&mut options, &query_result(0)).await?;
         assert!(output.contains("0 rows"));
         assert!(output.contains("(9ns)"));
         Ok(())
@@ -149,11 +142,11 @@ mod tests {
 
     #[tokio::test]
     async fn test_write_footer_one_row() -> anyhow::Result<()> {
-        let mut configuration = Configuration {
-            results_changes: false,
+        let mut options = FormatterOptions {
+            changes: false,
             ..Default::default()
         };
-        let output = test_write_footer(&mut configuration, &query_result(1)).await?;
+        let output = test_write_footer(&mut options, &query_result(1)).await?;
         assert!(output.contains("1 row"));
         assert!(output.contains("(9ns)"));
         Ok(())
@@ -161,12 +154,12 @@ mod tests {
 
     #[tokio::test]
     async fn test_write_footer_one_row_no_rows_displayed() -> anyhow::Result<()> {
-        let mut configuration = Configuration {
-            results_changes: true,
-            results_rows: false,
+        let mut options = FormatterOptions {
+            changes: true,
+            rows: false,
             ..Default::default()
         };
-        let output = test_write_footer(&mut configuration, &query_result(1)).await?;
+        let output = test_write_footer(&mut options, &query_result(1)).await?;
         assert!(!output.contains("1 row"));
         assert!(output.contains("(9ns)"));
         Ok(())
@@ -174,12 +167,12 @@ mod tests {
 
     #[tokio::test]
     async fn test_write_footer_no_color_and_no_timer() -> anyhow::Result<()> {
-        let mut configuration = Configuration {
+        let mut options = FormatterOptions {
             color: false,
-            results_timer: false,
+            timer: false,
             ..Default::default()
         };
-        let output = test_write_footer(&mut configuration, &query_result(1)).await?;
+        let output = test_write_footer(&mut options, &query_result(1)).await?;
         assert!(output.contains("1 row"));
         assert!(!output.contains("(9ns)"));
         Ok(())

@@ -1,6 +1,6 @@
 use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
-use crate::writers::{FileWriter, StdoutWriter};
 use async_trait::async_trait;
+use rsql_formatters::writers::{FileWriter, StdoutWriter};
 use rust_i18n::t;
 use std::fs::File;
 
@@ -43,9 +43,9 @@ mod tests {
     use crate::commands::LoopCondition;
     use crate::commands::{CommandManager, CommandOptions};
     use crate::configuration::Configuration;
-    use crate::formatters::FormatterManager;
     use crate::writers::Output;
     use rsql_drivers::{DriverManager, MockConnection};
+    use rsql_formatters::FormatterManager;
     use rustyline::history::DefaultHistory;
     use tempfile::NamedTempFile;
 

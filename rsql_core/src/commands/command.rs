@@ -1,9 +1,9 @@
 use crate::commands::error::Result;
 use crate::configuration::Configuration;
-use crate::formatters::FormatterManager;
-use crate::writers::Output;
 use async_trait::async_trait;
 use rsql_drivers::{Connection, DriverManager};
+use rsql_formatters::writers::Output;
+use rsql_formatters::FormatterManager;
 use rustyline::history::DefaultHistory;
 use std::fmt::Debug;
 

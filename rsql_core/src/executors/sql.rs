@@ -1,11 +1,11 @@
 use crate::commands::LoopCondition;
 use crate::configuration::Configuration;
 use crate::executors::Result;
-use crate::formatters;
-use crate::formatters::{FormatterManager, FormatterOptions};
-use crate::writers::Output;
 use indicatif::ProgressStyle;
 use rsql_drivers::{Connection, Results};
+use rsql_formatters;
+use rsql_formatters::writers::Output;
+use rsql_formatters::FormatterManager;
 use std::fmt;
 use std::fmt::Debug;
 use tracing::{instrument, Span};
@@ -42,21 +42,19 @@ impl<'a> SqlExecutor<'a> {
         let formatter = match self.formatter_manager.get(result_format) {
             Some(formatter) => formatter,
             None => {
-                return Err(formatters::Error::UnknownFormat {
+                return Err(rsql_formatters::Error::UnknownFormat {
                     format: result_format.to_string(),
                 }
                 .into())
             }
         };
+        let mut options = self.configuration.get_formatter_options();
+
         let limit = self.configuration.results_limit;
         let results = &self.execute_sql(sql, limit).await?;
+        options.elapsed = start.elapsed();
 
-        let mut options = FormatterOptions {
-            configuration: &mut self.configuration.clone(),
-            elapsed: start.elapsed(),
-            output: self.output,
-        };
-        formatter.format(&mut options, results).await?;
+        formatter.format(&options, results, self.output).await?;
         Ok(LoopCondition::Continue)
     }
 

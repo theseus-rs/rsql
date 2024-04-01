@@ -1,7 +1,7 @@
-use crate::configuration::Configuration;
-use crate::formatters::error::Result;
-use crate::formatters::footer::write_footer;
-use crate::formatters::formatter::FormatterOptions;
+use crate::error::Result;
+use crate::footer::write_footer;
+use crate::formatter::FormatterOptions;
+use crate::writers::Output;
 use colored::Colorize;
 use num_format::Locale;
 use prettytable::format::TableFormat;
@@ -12,37 +12,35 @@ use std::ops::Deref;
 use std::str::FromStr;
 
 /// Format the results of a query into a table and write to the output.
-pub async fn format<'a>(
+pub async fn format(
     table_format: TableFormat,
-    options: &mut FormatterOptions<'a>,
+    options: &FormatterOptions,
     results: &Results,
+    output: &mut Output,
 ) -> Result<()> {
-    let configuration = &options.configuration;
-    let output = &mut options.output;
-
     if let Query(query_result) = &results {
         if query_result.columns().await.is_empty() {
-            write_footer(options, results).await?;
+            write_footer(options, results, output).await?;
             return Ok(());
         }
 
         let mut table = Table::new();
         table.set_format(table_format);
 
-        if configuration.results_header {
+        if options.header {
             process_headers(query_result.deref(), &mut table).await;
         }
 
-        process_data(configuration, query_result.deref(), &mut table).await?;
+        process_data(options, query_result.deref(), &mut table).await?;
 
         table.print(output)?;
     }
 
-    write_footer(options, results).await?;
+    write_footer(options, results, output).await?;
     Ok(())
 }
 
-async fn process_headers<'a>(query_result: &'a dyn QueryResult, table: &mut Table) {
+async fn process_headers(query_result: &dyn QueryResult, table: &mut Table) {
     let mut column_names = Vec::new();
 
     for column in &query_result.columns().await {
@@ -52,12 +50,12 @@ async fn process_headers<'a>(query_result: &'a dyn QueryResult, table: &mut Tabl
     table.set_titles(prettytable::Row::from(column_names));
 }
 
-async fn process_data<'a>(
-    configuration: &Configuration,
-    query_result: &'a dyn QueryResult,
+async fn process_data(
+    options: &FormatterOptions,
+    query_result: &dyn QueryResult,
     table: &mut Table,
 ) -> Result<()> {
-    let locale = Locale::from_str(&configuration.locale).unwrap_or(Locale::en);
+    let locale = Locale::from_str(options.locale.as_str()).unwrap_or(Locale::en);
     for (i, row) in query_result.rows().await.iter().enumerate() {
         let mut row_data = Vec::new();
 
@@ -67,7 +65,7 @@ async fn process_data<'a>(
                 None => "NULL".to_string(),
             };
 
-            if configuration.color {
+            if options.color {
                 if i % 2 == 0 {
                     row_data.push(data.dimmed().to_string());
                 } else {
@@ -87,7 +85,6 @@ async fn process_data<'a>(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::configuration::Configuration;
     use crate::writers::Output;
     use indoc::indoc;
     use prettytable::format::consts::FORMAT_DEFAULT;
@@ -124,31 +121,27 @@ mod tests {
     }
 
     async fn test_format(
-        configuration: &mut Configuration,
+        options: &mut FormatterOptions,
         results: &Results,
     ) -> anyhow::Result<String> {
         let output = &mut Output::default();
-        let mut options = FormatterOptions {
-            configuration,
-            elapsed: Duration::from_nanos(9),
-            output,
-        };
+        options.elapsed = Duration::from_nanos(9);
 
-        format(*FORMAT_DEFAULT, &mut options, &results).await?;
+        format(*FORMAT_DEFAULT, options, &results, output).await?;
 
         Ok(output.to_string().replace("\r\n", "\n"))
     }
 
     #[tokio::test]
     async fn test_execute_format() -> anyhow::Result<()> {
-        let mut configuration = Configuration {
+        let mut options = FormatterOptions {
             color: false,
             locale: "en".to_string(),
             ..Default::default()
         };
         let results = Execute(42);
 
-        let output = test_format(&mut configuration, &results).await?;
+        let output = test_format(&mut options, &results).await?;
         let expected = "42 rows (9ns)\n";
         assert_eq!(output, expected);
         Ok(())
@@ -156,14 +149,14 @@ mod tests {
 
     #[tokio::test]
     async fn test_query_format_no_rows() -> anyhow::Result<()> {
-        let mut configuration = Configuration {
+        let mut options = FormatterOptions {
             color: false,
             locale: "en".to_string(),
             ..Default::default()
         };
         let results = query_result_no_rows();
 
-        let output = test_format(&mut configuration, &results).await?;
+        let output = test_format(&mut options, &results).await?;
         let expected = indoc! {r#"
             +----+
             | id |
@@ -177,16 +170,16 @@ mod tests {
 
     #[tokio::test]
     async fn test_query_format_footer_no_timer() -> anyhow::Result<()> {
-        let mut configuration = Configuration {
+        let mut options = FormatterOptions {
             color: false,
+            footer: true,
             locale: "en".to_string(),
-            results_footer: true,
-            results_timer: false,
+            timer: false,
             ..Default::default()
         };
         let results = query_result_no_rows();
 
-        let output = test_format(&mut configuration, &results).await?;
+        let output = test_format(&mut options, &results).await?;
         let expected = indoc! {r#"
             +----+
             | id |
@@ -200,14 +193,14 @@ mod tests {
 
     #[tokio::test]
     async fn test_query_format_two_rows_without_color() -> anyhow::Result<()> {
-        let mut configuration = Configuration {
+        let mut options = FormatterOptions {
             color: false,
             locale: "en".to_string(),
             ..Default::default()
         };
         let results = query_result_two_rows();
 
-        let output = test_format(&mut configuration, &results).await?;
+        let output = test_format(&mut options, &results).await?;
         let expected = indoc! {r#"
             +--------+
             | id     |
@@ -224,14 +217,14 @@ mod tests {
 
     #[tokio::test]
     async fn test_query_format_two_rows_with_color() -> anyhow::Result<()> {
-        let mut configuration = Configuration {
+        let mut options = FormatterOptions {
             color: true,
             locale: "en".to_string(),
             ..Default::default()
         };
         let results = query_result_two_rows();
 
-        let output = test_format(&mut configuration, &results).await?;
+        let output = test_format(&mut options, &results).await?;
         assert!(output.contains("id"));
         assert!(output.contains("NULL"));
         assert!(output.contains("12,345"));
@@ -242,16 +235,16 @@ mod tests {
 
     #[tokio::test]
     async fn test_query_format_no_header_and_no_footer() -> anyhow::Result<()> {
-        let mut configuration = Configuration {
+        let mut options = FormatterOptions {
             color: false,
+            footer: false,
+            header: false,
             locale: "en".to_string(),
-            results_header: false,
-            results_footer: false,
             ..Default::default()
         };
         let results = query_result_one_row();
 
-        let output = test_format(&mut configuration, &results).await?;
+        let output = test_format(&mut options, &results).await?;
         let expected = indoc! {r#"
             +--------+
             | 12,345 |
@@ -263,14 +256,14 @@ mod tests {
 
     #[tokio::test]
     async fn test_query_format_no_columns() -> anyhow::Result<()> {
-        let mut configuration = Configuration {
+        let mut options = FormatterOptions {
             color: false,
             locale: "en".to_string(),
             ..Default::default()
         };
         let results = query_result_no_columns();
 
-        let output = test_format(&mut configuration, &results).await?;
+        let output = test_format(&mut options, &results).await?;
         let expected = indoc! {r#"
             0 rows (9ns)
         "#};

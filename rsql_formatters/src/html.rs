@@ -1,8 +1,8 @@
-use crate::formatters::error::Result;
-use crate::formatters::footer::write_footer;
-use crate::formatters::formatter::FormatterOptions;
-use crate::formatters::Highlighter;
+use crate::error::Result;
+use crate::footer::write_footer;
+use crate::formatter::FormatterOptions;
 use crate::writers::Output;
+use crate::Highlighter;
 use async_trait::async_trait;
 use quick_xml::events::{BytesEnd, BytesStart, BytesText, Event};
 use quick_xml::Writer;
@@ -13,31 +13,33 @@ use rsql_drivers::Results;
 pub struct Formatter;
 
 #[async_trait]
-impl crate::formatters::Formatter for Formatter {
+impl crate::Formatter for Formatter {
     fn identifier(&self) -> &'static str {
         "html"
     }
 
-    async fn format<'a>(
+    async fn format(
         &self,
-        options: &mut FormatterOptions<'a>,
+        options: &FormatterOptions,
         results: &Results,
+        output: &mut Output,
     ) -> Result<()> {
-        format_xml(options, results).await
+        format_html(options, results, output).await
     }
 }
 
-pub(crate) async fn format_xml(
-    options: &mut FormatterOptions<'_>,
+pub(crate) async fn format_html(
+    options: &FormatterOptions,
     results: &Results,
+    output: &mut Output,
 ) -> Result<()> {
     let query_result = match results {
         Results::Query(query_result) => query_result,
-        _ => return write_footer(options, results).await,
+        _ => return write_footer(options, results, output).await,
     };
 
-    let mut output = Output::default();
-    let mut writer = Writer::new_with_indent(&mut output, b' ', 2);
+    let mut raw_output = Output::default();
+    let mut writer = Writer::new_with_indent(&mut raw_output, b' ', 2);
 
     writer.write_event(Event::Start(BytesStart::new("table")))?;
     writer.write_event(Event::Start(BytesStart::new("thead")))?;
@@ -73,24 +75,19 @@ pub(crate) async fn format_xml(
     writer.write_event(Event::End(BytesEnd::new("tbody")))?;
     writer.write_event(Event::End(BytesEnd::new("table")))?;
 
-    let html_output = output.to_string();
-    let highlighter = Highlighter::new(options.configuration, "html");
-    writeln!(
-        &mut options.output,
-        "{}",
-        highlighter.highlight(html_output.as_str())?
-    )?;
+    let html_output = raw_output.to_string();
+    let highlighter = Highlighter::new(options, "html");
+    writeln!(output, "{}", highlighter.highlight(html_output.as_str())?)?;
 
-    write_footer(options, results).await
+    write_footer(options, results, output).await
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::configuration::Configuration;
-    use crate::formatters::formatter::FormatterOptions;
-    use crate::formatters::Formatter;
+    use crate::formatter::FormatterOptions;
     use crate::writers::Output;
+    use crate::Formatter;
     use indoc::indoc;
     use rsql_drivers::MemoryQueryResult;
     use rsql_drivers::Results::{Execute, Query};
@@ -99,19 +96,15 @@ mod test {
 
     #[tokio::test]
     async fn test_format_execute() -> anyhow::Result<()> {
-        let configuration = &mut Configuration {
+        let options = FormatterOptions {
             color: false,
+            elapsed: Duration::from_nanos(9),
             ..Default::default()
         };
         let output = &mut Output::default();
-        let mut options = FormatterOptions {
-            configuration,
-            elapsed: Duration::from_nanos(9),
-            output,
-        };
 
         let formatter = Formatter;
-        formatter.format(&mut options, &Execute(1)).await?;
+        formatter.format(&options, &Execute(1), output).await?;
 
         let output = output.to_string().replace("\r\n", "\n");
         let expected = "1 row (9ns)\n";
@@ -121,8 +114,9 @@ mod test {
 
     #[tokio::test]
     async fn test_format_query() -> anyhow::Result<()> {
-        let configuration = &mut Configuration {
+        let options = FormatterOptions {
             color: false,
+            elapsed: Duration::from_nanos(9),
             ..Default::default()
         };
         let query_result = Query(Box::new(MemoryQueryResult::new(
@@ -134,14 +128,9 @@ mod test {
             ],
         )));
         let output = &mut Output::default();
-        let mut options = FormatterOptions {
-            configuration,
-            elapsed: Duration::from_nanos(9),
-            output,
-        };
 
         let formatter = Formatter;
-        formatter.format(&mut options, &query_result).await?;
+        formatter.format(&options, &query_result, output).await?;
 
         let output = output.to_string().replace("\r\n", "\n");
         let expected = indoc! {r#"

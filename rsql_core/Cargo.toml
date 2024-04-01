@@ -11,32 +11,25 @@ version.workspace = true
 
 [dependencies]
 anyhow = { workspace = true }
-ansi_colours = { workspace = true }
 async-trait = { workspace = true }
 clap = { workspace = true, features = ["derive", "env"] }
 clap-stdin = { workspace = true, features = ["tokio"] }
 clearscreen = { workspace = true }
 colored = { workspace = true }
 config = { workspace = true }
-csv = { workspace = true }
 dark-light = { workspace = true }
 dirs = { workspace = true }
-indexmap = { workspace = true, features = ["serde"] }
 indicatif = { workspace = true }
 indoc = { workspace = true }
 lazy_static = { workspace = true }
 num-format = { workspace = true }
-prettytable = { workspace = true }
 regex = { workspace = true }
-rsql_drivers = { path = "../rsql_drivers", version = "0.8.0", features = ["all"] }
+rsql_drivers = { path = "../rsql_drivers", version = "0.8.0" }
+rsql_formatters = { path = "../rsql_formatters", version = "0.8.0" }
 rust-i18n = { workspace = true }
 rustyline = { workspace = true }
-quick-xml = { workspace = true, features = ["serialize"] }
 serde_json = { workspace = true, features = ["preserve_order"] }
-serde_yaml = { workspace = true }
-supports-color = { workspace = true }
 sys-locale = { workspace = true }
-syntect = { workspace = true }
 tempfile = { workspace = true }
 termbg = { workspace = true }
 thiserror = { workspace = true }
@@ -55,26 +48,49 @@ test-log = { workspace = true }
 tokio = { workspace = true }
 
 [features]
-all = ["mysql", "postgres", "postgresql", "rusqlite", "sqlite"]
+all = ["all-drivers", "all-formats"]
 default = []
-libsql = [
-    "rsql_drivers/libsql",
+all-drivers = [
+    "driver-mysql",
+    "driver-postgres",
+    "driver-postgresql",
+    "driver-rusqlite",
+    "driver-sqlite"
 ]
-mysql = [
-    "rsql_drivers/mysql",
+driver-libsql = ["rsql_drivers/libsql"]
+driver-mysql = ["rsql_drivers/mysql"]
+driver-postgres = ["rsql_drivers/postgres"]
+driver-postgresql = ["rsql_drivers/postgresql"]
+driver-rusqlite = ["rsql_drivers/rusqlite"]
+driver-sqlite = ["rsql_drivers/sqlite"]
+all-formats = [
+    "format-ascii",
+    "format-csv",
+    "format-html",
+    "format-json",
+    "format-jsonl",
+    "format-markdown",
+    "format-plain",
+    "format-psql",
+    "format-sqlite",
+    "format-tsv",
+    "format-unicode",
+    "format-xml",
+    "format-yaml"
 ]
-postgres = [
-    "rsql_drivers/postgres",
-]
-postgresql = [
-    "rsql_drivers/postgresql",
-]
-rusqlite = [
-    "rsql_drivers/rusqlite",
-]
-sqlite = [
-    "rsql_drivers/sqlite",
-]
+format-ascii = ["rsql_formatters/ascii"]
+format-csv = ["rsql_formatters/csv"]
+format-html = ["rsql_formatters/html"]
+format-json = ["rsql_formatters/json"]
+format-jsonl = ["rsql_formatters/jsonl"]
+format-markdown = ["rsql_formatters/markdown"]
+format-plain = ["rsql_formatters/plain"]
+format-psql = ["rsql_formatters/psql"]
+format-sqlite = ["rsql_formatters/sqlite"]
+format-tsv = ["rsql_formatters/tsv"]
+format-unicode = ["rsql_formatters/unicode"]
+format-xml = ["rsql_formatters/xml"]
+format-yaml = ["rsql_formatters/yaml"]
 
 [lints.clippy]
 unwrap_used = "deny"

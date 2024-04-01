@@ -39,9 +39,9 @@ mod tests {
     use crate::commands::LoopCondition;
     use crate::commands::{CommandManager, CommandOptions};
     use crate::configuration::Configuration;
-    use crate::formatters::FormatterManager;
     use crate::writers::Output;
     use rsql_drivers::{DriverManager, MockConnection};
+    use rsql_formatters::FormatterManager;
     use rustyline::history::DefaultHistory;
 
     #[test]
@@ -80,22 +80,22 @@ mod tests {
         let drivers_output = output.to_string();
         let mut drivers: Vec<&str> = Vec::new();
 
-        #[cfg(feature = "libsql")]
+        #[cfg(feature = "driver-libsql")]
         drivers.push("libsql");
 
-        #[cfg(feature = "mysql")]
+        #[cfg(feature = "driver-mysql")]
         drivers.push("mysql");
 
-        #[cfg(feature = "postgresql")]
+        #[cfg(feature = "driver-postgresql")]
         drivers.push("postgres");
 
-        #[cfg(feature = "postgresql")]
+        #[cfg(feature = "driver-postgresql")]
         drivers.push("postgresql");
 
-        #[cfg(feature = "rusqlite")]
+        #[cfg(feature = "driver-rusqlite")]
         drivers.push("rusqlite");
 
-        #[cfg(feature = "sqlite")]
+        #[cfg(feature = "driver-sqlite")]
         drivers.push("sqlite");
 
         let available_drivers = drivers.join(", ");

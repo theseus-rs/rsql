@@ -10,7 +10,7 @@ pub enum Error {
     DriverError(#[from] rsql_drivers::Error),
     /// Format error
     #[error(transparent)]
-    FormatError(#[from] crate::formatters::Error),
+    FormatError(#[from] rsql_formatters::Error),
     /// Error when an invalid command is given
     #[error("Invalid command {command_name}")]
     InvalidCommand { command_name: String },
