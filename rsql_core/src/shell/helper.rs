@@ -1,5 +1,5 @@
 use crate::configuration::Configuration;
-use crate::formatters::Highlighter;
+use rsql_formatters::Highlighter;
 use rustyline::hint::{Hinter, HistoryHinter};
 use rustyline::validate::{ValidationContext, ValidationResult, Validator};
 use rustyline::{Context, Helper};
@@ -10,7 +10,8 @@ pub(crate) struct ReplHelper {
 
 impl ReplHelper {
     pub(crate) fn new(configuration: &Configuration) -> Self {
-        let highlighter = Highlighter::new(configuration, "sql");
+        let options = configuration.get_formatter_options();
+        let highlighter = Highlighter::new(&options, "sql");
 
         Self { highlighter }
     }

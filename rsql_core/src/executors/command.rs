@@ -1,10 +1,10 @@
 use crate::commands::{CommandManager, CommandOptions, LoopCondition};
 use crate::configuration::Configuration;
 use crate::executors::{Error, Result};
-use crate::formatters::FormatterManager;
-use crate::writers::Output;
 use regex::Regex;
 use rsql_drivers::{Connection, DriverManager};
+use rsql_formatters::writers::Output;
+use rsql_formatters::FormatterManager;
 use rustyline::history::DefaultHistory;
 use std::fmt;
 use std::fmt::Debug;

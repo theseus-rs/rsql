@@ -1,0 +1,53 @@
+[package]
+name = "rsql_formatters"
+authors.workspace = true
+categories.workspace = true
+edition.workspace = true
+keywords.workspace = true
+license.workspace = true
+repository.workspace = true
+version.workspace = true
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+ansi_colours = { workspace = true }
+anyhow = { workspace = true }
+async-trait = { workspace = true }
+colored = { workspace = true }
+csv = { workspace = true, optional = true }
+indexmap = { workspace = true, features = ["serde"] }
+indoc = { workspace = true }
+lazy_static = { workspace = true }
+num-format = { workspace = true }
+prettytable = { workspace = true, optional = true }
+quick-xml = { workspace = true, features = ["serialize"], optional = true }
+rsql_drivers = { path = "../rsql_drivers", version = "0.8.0" }
+rust-i18n = { workspace = true }
+serde_json = { workspace = true, features = ["preserve_order"], optional = true }
+serde_yaml = { workspace = true, optional = true }
+supports-color = { workspace = true }
+syntect = { workspace = true }
+tempfile = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+test-log = { workspace = true }
+tokio = { workspace = true }
+
+[features]
+all = ["ascii", "csv", "html", "json", "jsonl", "markdown", "plain", "psql", "sqlite", "tsv", "unicode", "xml", "yaml"]
+default = []
+ascii = ["dep:prettytable"]
+csv = ["dep:csv"]
+html = ["dep:quick-xml"]
+json = ["dep:serde_json"]
+jsonl = ["dep:serde_json"]
+markdown = ["dep:prettytable"]
+plain = ["dep:prettytable"]
+psql = ["dep:prettytable"]
+sqlite = ["dep:csv"]
+tsv = ["dep:csv"]
+unicode = ["dep:prettytable"]
+xml = ["dep:quick-xml"]
+yaml = ["dep:serde_yaml"]

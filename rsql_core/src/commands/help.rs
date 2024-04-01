@@ -68,10 +68,10 @@ mod tests {
     use crate::commands::{footer, LoopCondition};
     use crate::commands::{CommandManager, CommandOptions};
     use crate::configuration::Configuration;
-    use crate::formatters::FormatterManager;
     use crate::writers::Output;
     use indoc::indoc;
     use rsql_drivers::{DriverManager, MockConnection};
+    use rsql_formatters::FormatterManager;
     use rustyline::history::DefaultHistory;
 
     #[test]

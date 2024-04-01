@@ -3832,7 +3832,6 @@ dependencies = [
 name = "rsql_core"
 version = "0.8.0"
 dependencies = [
- "ansi_colours",
  "anyhow",
  "async-trait",
  "clap",
@@ -3841,25 +3840,19 @@ dependencies = [
  "colored",
  "config",
  "criterion",
- "csv",
  "dark-light",
  "dirs 5.0.1",
- "indexmap 2.2.6",
  "indicatif",
  "indoc",
  "lazy_static",
  "mockall",
  "num-format",
- "prettytable",
- "quick-xml",
  "regex",
  "rsql_drivers",
+ "rsql_formatters",
  "rust-i18n",
  "rustyline",
  "serde_json",
- "serde_yaml 0.9.34+deprecated",
- "supports-color",
- "syntect",
  "sys-locale",
  "tempfile",
  "termbg",
@@ -3905,6 +3898,33 @@ dependencies = [
  "tracing",
  "url",
  "uuid",
+]
+
+[[package]]
+name = "rsql_formatters"
+version = "0.8.0"
+dependencies = [
+ "ansi_colours",
+ "anyhow",
+ "async-trait",
+ "colored",
+ "csv",
+ "indexmap 2.2.6",
+ "indoc",
+ "lazy_static",
+ "num-format",
+ "prettytable",
+ "quick-xml",
+ "rsql_drivers",
+ "rust-i18n",
+ "serde_json",
+ "serde_yaml 0.9.34+deprecated",
+ "supports-color",
+ "syntect",
+ "tempfile",
+ "test-log",
+ "thiserror",
+ "tokio",
 ]
 
 [[package]]

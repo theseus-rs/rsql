@@ -68,9 +68,9 @@ mod tests {
     use crate::commands::LoopCondition;
     use crate::commands::{CommandManager, CommandOptions};
     use crate::configuration::Configuration;
-    use crate::formatters::FormatterManager;
     use crate::writers::Output;
     use rsql_drivers::{DriverManager, MockConnection};
+    use rsql_formatters::FormatterManager;
     use rustyline::history::DefaultHistory;
     use std::default;
 
@@ -111,12 +111,41 @@ mod tests {
         };
 
         let result = Command.execute(options).await?;
+        let mut formats: Vec<&str> = Vec::new();
 
+        #[cfg(feature = "format-ascii")]
+        formats.push("ascii");
+        #[cfg(feature = "format-csv")]
+        formats.push("csv");
+        #[cfg(feature = "format-html")]
+        formats.push("html");
+        #[cfg(feature = "format-json")]
+        formats.push("json");
+        #[cfg(feature = "format-jsonl")]
+        formats.push("jsonl");
+        #[cfg(feature = "format-markdown")]
+        formats.push("markdown");
+        #[cfg(feature = "format-plain")]
+        formats.push("plain");
+        #[cfg(feature = "format-psql")]
+        formats.push("psql");
+        #[cfg(feature = "format-sqlite")]
+        formats.push("sqlite");
+        #[cfg(feature = "format-tsv")]
+        formats.push("tsv");
+        #[cfg(feature = "format-unicode")]
+        formats.push("unicode");
+        #[cfg(feature = "format-xml")]
+        formats.push("xml");
+        #[cfg(feature = "format-yaml")]
+        formats.push("yaml");
+
+        let available_formats = formats.join(", ");
         assert_eq!(result, LoopCondition::Continue);
         let format_output = output.to_string();
         assert_eq!(
             format_output,
-            "Format: unicode\nFormats: ascii, csv, html, json, jsonl, markdown, plain, psql, sqlite, tsv, unicode, xml, yaml\n"
+            format!("Format: unicode\nFormats: {available_formats}\n").as_str()
         );
         Ok(())
     }

@@ -1,43 +1,47 @@
-use crate::formatters::error::Result;
-use crate::formatters::formatter::FormatterOptions;
+use crate::delimited::format;
+use crate::error::Result;
+use crate::formatter::FormatterOptions;
+use crate::writers::Output;
 use async_trait::async_trait;
+use csv::QuoteStyle;
 use rsql_drivers::Results;
 
-/// A formatter for JSONL
+/// A formatter for Column Separated Values (CSV)
 #[derive(Debug, Default)]
 pub struct Formatter;
 
 #[async_trait]
-impl crate::formatters::Formatter for Formatter {
+impl crate::Formatter for Formatter {
     fn identifier(&self) -> &'static str {
-        "jsonl"
+        "csv"
     }
 
-    async fn format<'a>(
+    async fn format(
         &self,
-        options: &mut FormatterOptions<'a>,
+        options: &FormatterOptions,
         results: &Results,
+        output: &mut Output,
     ) -> Result<()> {
-        crate::formatters::json::format_json(options, true, results).await
+        format(options, b',', QuoteStyle::NonNumeric, results, output).await
     }
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::configuration::Configuration;
-    use crate::formatters::formatter::FormatterOptions;
-    use crate::formatters::Formatter;
+    use crate::formatter::FormatterOptions;
     use crate::writers::Output;
+    use crate::Formatter;
     use indoc::indoc;
     use rsql_drivers::Results::Query;
     use rsql_drivers::{MemoryQueryResult, Value};
     use std::time::Duration;
 
     #[tokio::test]
-    async fn test_format_query() -> anyhow::Result<()> {
-        let configuration = &mut Configuration {
+    async fn test_format() -> anyhow::Result<()> {
+        let mut options = FormatterOptions {
             color: false,
+            elapsed: Duration::from_nanos(9),
             ..Default::default()
         };
         let query_result = Query(Box::new(MemoryQueryResult::new(
@@ -49,20 +53,18 @@ mod test {
             ],
         )));
         let output = &mut Output::default();
-        let mut options = FormatterOptions {
-            configuration,
-            elapsed: Duration::from_nanos(9),
-            output,
-        };
 
         let formatter = Formatter;
-        formatter.format(&mut options, &query_result).await?;
+        formatter
+            .format(&mut options, &query_result, output)
+            .await?;
 
         let output = output.to_string().replace("\r\n", "\n");
         let expected = indoc! {r#"
-            {"id":1,"data":"Ynl0ZXM="}
-            {"id":2,"data":"foo"}
-            {"id":3,"data":null}
+            "id","data"
+            1,"Ynl0ZXM="
+            2,"foo"
+            3,""
             3 rows (9ns)
         "#};
         assert_eq!(output, expected);

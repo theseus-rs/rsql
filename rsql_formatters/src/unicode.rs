@@ -1,6 +1,7 @@
-use crate::formatters::error::Result;
-use crate::formatters::formatter::FormatterOptions;
-use crate::formatters::table;
+use crate::error::Result;
+use crate::formatter::FormatterOptions;
+use crate::table;
+use crate::writers::Output;
 use async_trait::async_trait;
 use lazy_static::lazy_static;
 use prettytable::format::{FormatBuilder, LinePosition, LineSeparator, TableFormat};
@@ -32,26 +33,26 @@ lazy_static! {
 pub(crate) struct Formatter;
 
 #[async_trait]
-impl crate::formatters::Formatter for Formatter {
+impl crate::Formatter for Formatter {
     fn identifier(&self) -> &'static str {
         "unicode"
     }
 
-    async fn format<'a>(
+    async fn format(
         &self,
-        options: &mut FormatterOptions<'a>,
+        options: &FormatterOptions,
         results: &Results,
+        output: &mut Output,
     ) -> Result<()> {
-        table::format(*FORMAT_UNICODE, options, results).await
+        table::format(*FORMAT_UNICODE, options, results, output).await
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::configuration::Configuration;
-    use crate::formatters::Formatter;
     use crate::writers::Output;
+    use crate::Formatter;
     use indoc::indoc;
     use rsql_drivers::{MemoryQueryResult, Results, Value};
     use std::time::Duration;
@@ -65,20 +66,16 @@ mod tests {
 
     #[tokio::test]
     async fn test_format() -> anyhow::Result<()> {
-        let mut configuration = Configuration {
+        let options = FormatterOptions {
             color: false,
+            elapsed: Duration::from_nanos(5678),
             ..Default::default()
         };
         let results = query_result();
         let output = &mut Output::default();
-        let mut options = FormatterOptions {
-            configuration: &mut configuration,
-            elapsed: Duration::from_nanos(5678),
-            output,
-        };
         let formatter = Formatter;
 
-        formatter.format(&mut options, &results).await?;
+        formatter.format(&options, &results, output).await?;
 
         let unicode_output = output.to_string().replace("\r\n", "\n");
         let expected = indoc! {r#"

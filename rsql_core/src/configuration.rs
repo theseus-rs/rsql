@@ -2,6 +2,7 @@ use anyhow::{bail, Result};
 use config::{Config, FileFormat};
 use dirs::home_dir;
 use indicatif::ProgressStyle;
+use rsql_formatters::FormatterOptions;
 use rustyline::EditMode;
 use std::env;
 use std::fs::{create_dir_all, OpenOptions};
@@ -309,6 +310,22 @@ impl Default for Configuration {
             results_limit: 100,
             results_rows: true,
             results_timer: true,
+        }
+    }
+}
+
+impl Configuration {
+    pub fn get_formatter_options(&self) -> FormatterOptions {
+        FormatterOptions {
+            changes: self.results_changes,
+            color: self.color,
+            elapsed: Duration::default(),
+            footer: self.results_footer,
+            header: self.results_header,
+            locale: self.locale.clone(),
+            rows: self.results_rows,
+            theme: self.theme.clone(),
+            timer: self.results_timer,
         }
     }
 }

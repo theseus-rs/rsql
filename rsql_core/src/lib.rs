@@ -5,9 +5,9 @@ extern crate rust_i18n;
 pub mod commands;
 pub mod configuration;
 pub mod executors;
-pub mod formatters;
 pub mod shell;
-pub mod writers;
+
+pub use rsql_formatters::writers;
 
 use rust_i18n::i18n;
 

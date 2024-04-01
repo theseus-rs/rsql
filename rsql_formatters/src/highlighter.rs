@@ -1,5 +1,4 @@
-use crate::configuration::Configuration;
-use crate::formatters::Result;
+use crate::{FormatterOptions, Result};
 use ansi_colours::ansi256_from_rgb;
 use std::borrow::Cow;
 use std::fmt::Write;
@@ -20,15 +19,15 @@ pub struct Highlighter {
 }
 
 impl Highlighter {
-    pub fn new(configuration: &Configuration, syntax_name: &str) -> Self {
-        let color = configuration.color;
+    pub fn new(options: &FormatterOptions, syntax_name: &str) -> Self {
+        let color = options.color;
         let syntax_set = SyntaxSet::load_defaults_newlines();
         let syntax = syntax_set
             .find_syntax_by_extension(syntax_name)
             .expect("syntax")
             .to_owned();
         let theme_set = ThemeSet::load_defaults();
-        let theme_name = &configuration.theme;
+        let theme_name = &options.theme;
         let theme = theme_set
             .themes
             .get(theme_name.as_str())
@@ -88,15 +87,14 @@ impl Highlighter {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::configuration::Configuration;
 
     #[test]
     fn test_highlight_color_disabled() {
-        let configuration = Configuration {
+        let options = FormatterOptions {
             color: false,
             ..Default::default()
         };
-        let helper = Highlighter::new(&configuration, "sql");
+        let helper = Highlighter::new(&options, "sql");
         let line = "SELECT";
         let highlighted = helper.highlight(line).unwrap();
         assert_eq!(highlighted, line);
@@ -104,11 +102,11 @@ mod test {
 
     #[test]
     fn test_highlight_color_forced() {
-        let configuration = Configuration {
+        let options = FormatterOptions {
             color: true,
             ..Default::default()
         };
-        let helper = Highlighter::new(&configuration, "sql");
+        let helper = Highlighter::new(&options, "sql");
         let line = "SELECT";
         let highlighted = helper.highlight(line).unwrap();
         assert!(highlighted.contains(line));

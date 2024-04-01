@@ -1,7 +1,8 @@
-use crate::formatters::error::Result;
-use crate::formatters::footer::write_footer;
-use crate::formatters::formatter::FormatterOptions;
-use crate::formatters::highlighter::Highlighter;
+use crate::error::Result;
+use crate::footer::write_footer;
+use crate::formatter::FormatterOptions;
+use crate::highlighter::Highlighter;
+use crate::writers::Output;
 use async_trait::async_trait;
 use indexmap::IndexMap;
 use rsql_drivers::{Results, Value};
@@ -11,27 +12,29 @@ use rsql_drivers::{Results, Value};
 pub struct Formatter;
 
 #[async_trait]
-impl crate::formatters::Formatter for Formatter {
+impl crate::Formatter for Formatter {
     fn identifier(&self) -> &'static str {
         "yaml"
     }
 
-    async fn format<'a>(
+    async fn format(
         &self,
-        options: &mut FormatterOptions<'a>,
+        options: &FormatterOptions,
         results: &Results,
+        output: &mut Output,
     ) -> Result<()> {
-        format_yaml(options, results).await
+        format_yaml(options, results, output).await
     }
 }
 
 pub(crate) async fn format_yaml(
-    options: &mut FormatterOptions<'_>,
+    options: &FormatterOptions,
     results: &Results,
+    output: &mut Output,
 ) -> Result<()> {
     let query_result = match results {
         Results::Query(query_result) => query_result,
-        _ => return write_footer(options, results).await,
+        _ => return write_footer(options, results, output).await,
     };
 
     let mut yaml_rows: Vec<IndexMap<&String, Option<Value>>> = Vec::new();
@@ -60,19 +63,18 @@ pub(crate) async fn format_yaml(
     }
 
     let yaml = serde_yaml::to_string(&yaml_rows)?;
-    let highlighter = Highlighter::new(options.configuration, "yaml");
-    write!(options.output, "{}", highlighter.highlight(yaml.as_str())?)?;
+    let highlighter = Highlighter::new(options, "yaml");
+    write!(output, "{}", highlighter.highlight(yaml.as_str())?)?;
 
-    write_footer(options, results).await
+    write_footer(options, results, output).await
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::configuration::Configuration;
-    use crate::formatters::formatter::FormatterOptions;
-    use crate::formatters::Formatter;
+    use crate::formatter::FormatterOptions;
     use crate::writers::Output;
+    use crate::Formatter;
     use indoc::indoc;
     use rsql_drivers::MemoryQueryResult;
     use rsql_drivers::Results::{Execute, Query};
@@ -81,19 +83,15 @@ mod test {
 
     #[tokio::test]
     async fn test_format_execute() -> anyhow::Result<()> {
-        let configuration = &mut Configuration {
+        let options = FormatterOptions {
             color: false,
+            elapsed: Duration::from_nanos(9),
             ..Default::default()
         };
         let output = &mut Output::default();
-        let mut options = FormatterOptions {
-            configuration,
-            elapsed: Duration::from_nanos(9),
-            output,
-        };
 
         let formatter = Formatter;
-        formatter.format(&mut options, &Execute(1)).await?;
+        formatter.format(&options, &Execute(1), output).await?;
 
         let output = output.to_string().replace("\r\n", "\n");
         let expected = "1 row (9ns)\n";
@@ -103,8 +101,9 @@ mod test {
 
     #[tokio::test]
     async fn test_format_query() -> anyhow::Result<()> {
-        let configuration = &mut Configuration {
+        let options = FormatterOptions {
             color: false,
+            elapsed: Duration::from_nanos(9),
             ..Default::default()
         };
         let query_result = Query(Box::new(MemoryQueryResult::new(
@@ -116,14 +115,9 @@ mod test {
             ],
         )));
         let output = &mut Output::default();
-        let mut options = FormatterOptions {
-            configuration,
-            elapsed: Duration::from_nanos(9),
-            output,
-        };
 
         let formatter = Formatter;
-        formatter.format(&mut options, &query_result).await?;
+        formatter.format(&options, &query_result, output).await?;
 
         let output = output.to_string().replace("\r\n", "\n");
         let expected = indoc! {r#"
