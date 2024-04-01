@@ -645,11 +645,8 @@ mod test {
         let port = container.get_host_port_ipv4(5432);
 
         let database_url = format!("postgres://postgres:postgres@localhost:{}/postgres", port);
-        let configuration = Configuration::default();
         let driver_manager = DriverManager::default();
-        let connection = driver_manager
-            .connect(&configuration, database_url.as_str())
-            .await?;
+        let connection = driver_manager.connect(database_url.as_str()).await?;
 
         let results = connection.query("SELECT 'foo'::TEXT", 0).await?;
         assert!(results.is_query());
