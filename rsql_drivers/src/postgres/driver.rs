@@ -1,20 +1,20 @@
-use crate::configuration::Configuration;
-use crate::drivers::error::Result;
-use crate::drivers::value::Value;
-use crate::drivers::Error::UnsupportedColumnType;
-use crate::drivers::{MemoryQueryResult, Results};
+use crate::error::Result;
+use crate::value::Value;
+use crate::Error::UnsupportedColumnType;
+use crate::{MemoryQueryResult, Results};
 use async_trait::async_trait;
 use bit_vec::BitVec;
-use chrono::Utc;
+use chrono::{DateTime, NaiveDate, NaiveDateTime, NaiveTime, Utc};
 use indoc::indoc;
 use postgresql_archive::Version;
 use postgresql_embedded::{PostgreSQL, Settings};
-use sqlx::postgres::{PgColumn, PgConnectOptions, PgRow};
-use sqlx::{Column, PgPool, Row};
 use std::collections::HashMap;
-use std::ops::Deref;
+use std::path::PathBuf;
 use std::str::FromStr;
 use std::string::ToString;
+use std::time::SystemTime;
+use tokio_postgres::types::{FromSql, ToSql, Type};
+use tokio_postgres::{Client, Column, NoTls, Row};
 use tracing::debug;
 use url::Url;
 
@@ -24,18 +24,17 @@ const POSTGRESQL_EMBEDDED_VERSION: &str = "16.2.3";
 pub struct Driver;
 
 #[async_trait]
-impl crate::drivers::Driver for Driver {
+impl crate::Driver for Driver {
     fn identifier(&self) -> &'static str {
-        "postgresql"
+        "postgres"
     }
 
     async fn connect(
         &self,
-        configuration: &Configuration,
         url: String,
         password: Option<String>,
-    ) -> Result<Box<dyn crate::drivers::Connection>> {
-        let connection = Connection::new(configuration, url, password).await?;
+    ) -> Result<Box<dyn crate::Connection>> {
+        let connection = Connection::new(url, password).await?;
         Ok(Box::new(connection))
     }
 }
@@ -43,15 +42,11 @@ impl crate::drivers::Driver for Driver {
 #[derive(Debug)]
 pub(crate) struct Connection {
     postgresql: Option<PostgreSQL>,
-    pool: PgPool,
+    client: Client,
 }
 
 impl Connection {
-    pub(crate) async fn new(
-        configuration: &Configuration,
-        url: String,
-        password: Option<String>,
-    ) -> Result<Connection> {
+    pub(crate) async fn new(url: String, password: Option<String>) -> Result<Connection> {
         let parsed_url = Url::parse(url.as_str())?;
         let query_parameters: HashMap<String, String> =
             parsed_url.query_pairs().into_owned().collect();
@@ -59,7 +54,7 @@ impl Connection {
             .get("embedded")
             .map(|v| v == "true")
             .unwrap_or(false);
-        let mut database_url = url.to_string();
+        let mut database_url = url.to_string().replace("postgres://", "postgresql://");
 
         let postgresql = if embedded {
             let default_version = POSTGRESQL_EMBEDDED_VERSION.to_string();
@@ -67,8 +62,8 @@ impl Connection {
             let version = Version::from_str(specified_version)?;
             let mut settings = Settings::from_url(url)?;
 
-            if let Some(config_dir) = &configuration.config_dir {
-                settings.installation_dir = config_dir.clone();
+            if let Some(config_dir) = query_parameters.get("installation_dir") {
+                settings.installation_dir = PathBuf::from(config_dir);
             }
             if let Some(password) = password {
                 settings.password = password;
@@ -88,18 +83,22 @@ impl Connection {
             None
         };
 
-        let options = PgConnectOptions::from_str(database_url.as_str())?;
-        let pool = PgPool::connect_with(options).await?;
-        let connection = Connection { postgresql, pool };
+        let (client, connection) = tokio_postgres::connect(database_url.as_str(), NoTls).await?;
+        tokio::spawn(async move {
+            if let Err(e) = connection.await {
+                eprintln!("connection error: {}", e);
+            }
+        });
+        let connection = Connection { postgresql, client };
 
         Ok(connection)
     }
 }
 
 #[async_trait]
-impl crate::drivers::Connection for Connection {
+impl crate::Connection for Connection {
     async fn execute(&self, sql: &str) -> Result<Results> {
-        let rows = sqlx::query(sql).execute(&self.pool).await?.rows_affected();
+        let rows = self.client.execute(sql, &[]).await?;
         Ok(Results::Execute(rows))
     }
 
@@ -126,18 +125,16 @@ impl crate::drivers::Connection for Connection {
         sql = format!("{sql} ORDER BY index_name").to_string();
         let query_rows = match table {
             Some(table) => {
-                sqlx::query(sql.as_str())
-                    .bind(table)
-                    .fetch_all(&self.pool)
-                    .await?
+                let table: &(dyn ToSql + Sync) = &table;
+                self.client.query(sql.as_str(), &[table]).await?
             }
-            None => sqlx::query(sql.as_str()).fetch_all(&self.pool).await?,
+            None => self.client.query(sql.as_str(), &[]).await?,
         };
         let mut indexes = Vec::new();
 
         for row in query_rows {
             if let Some(column) = row.columns().first() {
-                if let Some(value) = self.convert_to_value(&row, column)? {
+                if let Some(value) = self.convert_to_value(&row, column, 0)? {
                     indexes.push(value.to_string());
                 }
             }
@@ -147,25 +144,22 @@ impl crate::drivers::Connection for Connection {
     }
 
     async fn query(&self, sql: &str, limit: u64) -> Result<Results> {
-        let query_rows = sqlx::query(sql).fetch_all(&self.pool).await?;
-        let columns: Vec<String> = query_rows
-            .first()
-            .map(|row| {
-                row.columns()
-                    .iter()
-                    .map(|column| column.name().to_string())
-                    .collect()
-            })
-            .unwrap_or_default();
+        let statement = self.client.prepare(sql).await?;
+        let query_columns = statement.columns();
+        let columns: Vec<String> = query_columns
+            .iter()
+            .map(|column| column.name().to_string())
+            .collect();
 
+        let query_rows = self.client.query(sql, &[]).await?;
         let mut rows = Vec::new();
-        for row in query_rows {
-            let mut row_data = Vec::new();
-            for column in row.columns() {
-                let value = self.convert_to_value(&row, column)?;
-                row_data.push(value);
+        for query_row in query_rows {
+            let mut row = Vec::new();
+            for (index, column) in query_columns.iter().enumerate() {
+                let value = self.convert_to_value(&query_row, column, index)?;
+                row.push(value);
             }
-            rows.push(row_data);
+            rows.push(row);
 
             if limit > 0 && rows.len() >= limit as usize {
                 break;
@@ -199,8 +193,6 @@ impl crate::drivers::Connection for Connection {
     }
 
     async fn stop(&mut self) -> Result<()> {
-        self.pool.close().await;
-
         if let Some(postgresql) = &self.postgresql {
             match postgresql.stop().await {
                 Ok(_) => Ok(()),
@@ -213,76 +205,115 @@ impl crate::drivers::Connection for Connection {
 }
 
 impl Connection {
-    fn convert_to_value(&self, row: &PgRow, column: &PgColumn) -> Result<Option<Value>> {
-        let column_name = column.name();
-
-        if let Ok(value) = row.try_get(column_name) {
-            let value: Option<Vec<u8>> = value;
-            Ok(value.map(Value::Bytes))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<String> = value;
-            Ok(value.map(Value::String))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<i16> = value;
-            Ok(value.map(Value::I16))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<i32> = value;
-            Ok(value.map(Value::I32))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<i64> = value;
-            Ok(value.map(Value::I64))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<f32> = value;
-            Ok(value.map(Value::F32))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<f64> = value;
-            Ok(value.map(Value::F64))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<rust_decimal::Decimal> = value;
-            Ok(value.map(|v| Value::String(v.to_string())))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<bool> = value;
-            Ok(value.map(Value::Bool))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<chrono::NaiveDate> = value;
-            Ok(value.map(Value::Date))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<chrono::NaiveTime> = value;
-            Ok(value.map(Value::Time))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<chrono::NaiveDateTime> = value;
-            Ok(value.map(Value::DateTime))
-        } else if let Ok(value) = row.try_get(column.name()) {
-            let value: Option<uuid::Uuid> = value;
-            Ok(value.map(Value::Uuid))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<serde_json::Value> = value;
-            Ok(value.map(Value::Json))
-        } else {
-            let column_type = column.type_info();
-            let type_name = format!("{:?}", column_type.deref());
-            match type_name.to_lowercase().as_str() {
-                "bit" | "varbit" => {
-                    let value: Option<BitVec> = row.try_get(column_name)?;
-                    Ok(value.map(|v| {
-                        let bit_string: String =
-                            v.iter().map(|bit| if bit { '1' } else { '0' }).collect();
-                        Value::String(bit_string)
-                    }))
+    pub(crate) fn convert_to_value(
+        &self,
+        row: &Row,
+        column: &Column,
+        column_index: usize,
+    ) -> Result<Option<Value>> {
+        // https://www.postgresql.org/docs/current/datatype.html
+        let column_type = column.type_();
+        let value = match *column_type {
+            Type::BIT | Type::VARBIT => {
+                let bits_value: Option<BitVec> = row.try_get(column_index)?;
+                match bits_value {
+                    Some(value) => {
+                        let bit_string: String = value
+                            .iter()
+                            .map(|bit| if bit { '1' } else { '0' })
+                            .collect();
+                        Some(Value::String(bit_string))
+                    }
+                    None => None,
                 }
-                // "interval" => Ok(None), // TODO: SELECT CAST('1 year' as interval)
-                // "money" => Ok(None), // TODO: SELECT CAST(1.23 as money)
-                "timestamptz" => {
-                    let value: Option<chrono::DateTime<Utc>> = row.try_get(column_name)?;
-                    Ok(value.map(|v| Value::DateTime(v.naive_utc())))
-                }
-                "void" => Ok(None), // pg_sleep() returns void
-                _ => Err(UnsupportedColumnType {
-                    column_name: column_name.to_string(),
-                    column_type: type_name,
-                }),
             }
-        }
+            Type::BOOL => self.get_single(row, column_index, |v: bool| Value::Bool(v))?,
+            Type::BOOL_ARRAY => self.get_array(row, column_index, |v: bool| Value::Bool(v))?,
+            Type::INT2 => self.get_single(row, column_index, |v: i16| Value::I16(v))?,
+            Type::INT2_ARRAY => self.get_array(row, column_index, |v: i16| Value::I16(v))?,
+            Type::INT4 => self.get_single(row, column_index, |v: i32| Value::I32(v))?,
+            Type::INT4_ARRAY => self.get_array(row, column_index, |v: i32| Value::I32(v))?,
+            Type::INT8 => self.get_single(row, column_index, |v: i64| Value::I64(v))?,
+            Type::INT8_ARRAY => self.get_array(row, column_index, |v: i64| Value::I64(v))?,
+            Type::FLOAT4 => self.get_single(row, column_index, |v: f32| Value::F32(v))?,
+            Type::FLOAT4_ARRAY => self.get_array(row, column_index, |v: f32| Value::F32(v))?,
+            Type::FLOAT8 => self.get_single(row, column_index, |v: f64| Value::F64(v))?,
+            Type::FLOAT8_ARRAY => self.get_array(row, column_index, |v: f64| Value::F64(v))?,
+            Type::TEXT | Type::VARCHAR | Type::CHAR | Type::BPCHAR | Type::NAME => {
+                self.get_single(row, column_index, |v: String| Value::String(v))?
+            }
+            Type::TEXT_ARRAY | Type::VARCHAR_ARRAY | Type::CHAR_ARRAY | Type::BPCHAR_ARRAY => {
+                self.get_array(row, column_index, |v: String| Value::String(v))?
+            }
+            Type::JSON | Type::JSONB => {
+                self.get_single(row, column_index, |v: serde_json::Value| Value::Json(v))?
+            }
+            Type::JSON_ARRAY | Type::JSONB_ARRAY => {
+                self.get_array(row, column_index, |v: serde_json::Value| Value::Json(v))?
+            }
+            Type::BYTEA => {
+                let byte_value: Option<&[u8]> = row.try_get(column_index)?;
+                byte_value.map(|value| Value::Bytes(value.to_vec()))
+            }
+            Type::DATE => self.get_single(row, column_index, |v: NaiveDate| Value::Date(v))?,
+            Type::TIME | Type::TIMETZ => {
+                self.get_single(row, column_index, |v: NaiveTime| Value::Time(v))?
+            }
+            Type::TIMESTAMP => {
+                self.get_single(row, column_index, |v: NaiveDateTime| Value::DateTime(v))?
+            }
+            Type::TIMESTAMPTZ => {
+                let system_time: Option<SystemTime> = row.try_get(column_index)?;
+                match system_time {
+                    Some(value) => {
+                        let date_time: DateTime<Utc> = value.into();
+                        Some(Value::DateTime(date_time.naive_utc()))
+                    }
+                    None => None,
+                }
+            }
+            Type::OID => self.get_single(row, column_index, |v: u32| Value::U32(v))?,
+            Type::OID_ARRAY => self.get_array(row, column_index, |v: u32| Value::U32(v))?,
+            Type::VOID => None, // pg_sleep() returns void
+            _ => {
+                return Err(UnsupportedColumnType {
+                    column_name: column.name().to_string(),
+                    column_type: column_type.name().to_string(),
+                });
+            }
+        };
+
+        Ok(value)
+    }
+
+    fn get_single<'a, T: FromSql<'a>>(
+        &self,
+        row: &'a Row,
+        column_index: usize,
+        to_value: impl Fn(T) -> Value,
+    ) -> Result<Option<Value>> {
+        let value = row.try_get::<_, Option<T>>(column_index)?.map(to_value);
+        Ok(value)
+    }
+
+    fn get_array<'a, T: FromSql<'a>>(
+        &self,
+        row: &'a Row,
+        column_index: usize,
+        to_value: impl Fn(T) -> Value,
+    ) -> Result<Option<Value>> {
+        let original_value_array = row.try_get::<_, Option<Vec<T>>>(column_index)?;
+        let result = match original_value_array {
+            Some(value_array) => {
+                let mut values = vec![];
+                for value in value_array {
+                    values.push(to_value(value));
+                }
+                Some(Value::Array(values))
+            }
+            None => None,
+        };
+        Ok(result)
     }
 }
 
@@ -290,27 +321,24 @@ impl Connection {
 #[cfg(not(target_os = "windows"))]
 #[cfg(test)]
 mod test {
-    use crate::configuration::Configuration;
-    use crate::drivers::{DriverManager, Results, Value};
+    use crate::{DriverManager, Results, Value};
     use chrono::{NaiveDate, NaiveDateTime, NaiveTime, Utc};
     use serde_json::json;
 
-    const DATABASE_URL: &str = "postgresql://?embedded=true";
+    const DATABASE_URL: &str = "postgres://?embedded=true";
 
     #[tokio::test]
     async fn test_driver_connect() -> anyhow::Result<()> {
-        let configuration = Configuration::default();
         let driver_manager = DriverManager::default();
-        let mut connection = driver_manager.connect(&configuration, DATABASE_URL).await?;
+        let mut connection = driver_manager.connect(DATABASE_URL).await?;
         connection.stop().await?;
         Ok(())
     }
 
     #[tokio::test]
     async fn test_limit_rows() -> anyhow::Result<()> {
-        let configuration = Configuration::default();
         let driver_manager = DriverManager::default();
-        let connection = driver_manager.connect(&configuration, DATABASE_URL).await?;
+        let connection = driver_manager.connect(DATABASE_URL).await?;
         let results = connection.query("SELECT 1 UNION ALL SELECT 2", 1).await?;
         assert!(results.is_query());
         if let Results::Query(query_result) = results {
@@ -321,9 +349,8 @@ mod test {
 
     #[tokio::test]
     async fn test_connection_interface() -> anyhow::Result<()> {
-        let configuration = Configuration::default();
         let driver_manager = DriverManager::default();
-        let mut connection = driver_manager.connect(&configuration, DATABASE_URL).await?;
+        let mut connection = driver_manager.connect(DATABASE_URL).await?;
 
         let _ = connection
             .execute("CREATE TABLE person (id INTEGER, name VARCHAR(20))")
@@ -365,9 +392,8 @@ mod test {
     }
 
     async fn test_data_type(sql: &str) -> anyhow::Result<Option<Value>> {
-        let configuration = Configuration::default();
         let driver_manager = DriverManager::default();
-        let mut connection = driver_manager.connect(&configuration, DATABASE_URL).await?;
+        let mut connection = driver_manager.connect(DATABASE_URL).await?;
 
         let results = connection.query(sql, 0).await?;
         let mut value: Option<Value> = None;
@@ -405,9 +431,17 @@ mod test {
         let value = result.expect("value is None");
         assert_eq!(value, Value::String("foo".to_string()));
 
-        let result = test_data_type("SELECT CAST('foo' as text)").await?;
+        let result = test_data_type("SELECT 'foo'::TEXT").await?;
         let value = result.expect("value is None");
         assert_eq!(value, Value::String("foo".to_string()));
+
+        let result = test_data_type("SELECT ARRAY['foo','bar']::TEXT[]").await?;
+        assert!(result.is_some());
+        if let Some(Value::Array(value)) = result {
+            assert_eq!(value.len(), 2);
+            assert_eq!(value[0], Value::String("foo".to_string()));
+            assert_eq!(value[1], Value::String("bar".to_string()));
+        }
 
         let result = test_data_type("SELECT CAST(B'101' as bit(3))").await?;
         let value = result.expect("value is None");
@@ -417,62 +451,102 @@ mod test {
         let value = result.expect("value is None");
         assert_eq!(value, Value::String("10101".to_string()));
 
-        let result = test_data_type("SELECT CAST(1.234 as numeric)").await?;
-        let value = result.expect("value is None");
-        assert_eq!(value, Value::String("1.234".to_string()));
-
-        let result = test_data_type("SELECT CAST(1.234 as decimal)").await?;
-        let value = result.expect("value is None");
-        assert_eq!(value, Value::String("1.234".to_string()));
-
         Ok(())
     }
 
     #[tokio::test]
     async fn test_data_type_i16() -> anyhow::Result<()> {
-        let result = test_data_type("SELECT CAST(32767 as smallint)").await?;
+        let result = test_data_type("SELECT 32767::INT2").await?;
         let value = result.expect("value is None");
         assert_eq!(value, Value::I16(32_767));
+
+        let result = test_data_type("SELECT ARRAY[0,32767]::INT2[]").await?;
+        assert!(result.is_some());
+        if let Some(Value::Array(value)) = result {
+            assert_eq!(value.len(), 2);
+            assert_eq!(value[0], Value::I16(0));
+            assert_eq!(value[1], Value::I16(32_767));
+        }
         Ok(())
     }
 
     #[tokio::test]
     async fn test_data_type_i32() -> anyhow::Result<()> {
-        let result = test_data_type("SELECT CAST(2147483647 as integer)").await?;
+        let result = test_data_type("SELECT 2147483647::INT4").await?;
         let value = result.expect("value is None");
         assert_eq!(value, Value::I32(2_147_483_647));
+
+        let result = test_data_type("SELECT ARRAY[0,2147483647]::INT4[]").await?;
+        assert!(result.is_some());
+        if let Some(Value::Array(value)) = result {
+            assert_eq!(value.len(), 2);
+            assert_eq!(value[0], Value::I32(0));
+            assert_eq!(value[1], Value::I32(2_147_483_647));
+        }
         Ok(())
     }
 
     #[tokio::test]
     async fn test_data_type_i64() -> anyhow::Result<()> {
-        let result = test_data_type("SELECT CAST(2147483647 as bigint)").await?;
+        let result = test_data_type("SELECT 2147483647::INT8").await?;
         let value = result.expect("value is None");
         assert_eq!(value, Value::I64(2_147_483_647));
+
+        let result = test_data_type("SELECT ARRAY[0,2147483647]::INT8[]").await?;
+        assert!(result.is_some());
+        if let Some(Value::Array(value)) = result {
+            assert_eq!(value.len(), 2);
+            assert_eq!(value[0], Value::I64(0));
+            assert_eq!(value[1], Value::I64(2_147_483_647));
+        }
         Ok(())
     }
 
     #[tokio::test]
     async fn test_data_type_bool() -> anyhow::Result<()> {
-        let result = test_data_type("SELECT CAST(1 as bool)").await?;
+        let result = test_data_type("SELECT 1::BOOL").await?;
         let value = result.expect("value is None");
         assert_eq!(value, Value::Bool(true));
+
+        let result = test_data_type("SELECT ARRAY[0,1]::BOOL[]").await?;
+        assert!(result.is_some());
+        if let Some(Value::Array(value)) = result {
+            assert_eq!(value.len(), 2);
+            assert_eq!(value[0], Value::Bool(false));
+            assert_eq!(value[1], Value::Bool(true));
+        }
         Ok(())
     }
 
     #[tokio::test]
     async fn test_data_type_f32() -> anyhow::Result<()> {
-        let result = test_data_type("SELECT CAST(1.234 as real)").await?;
+        let result = test_data_type("SELECT 1.234::FLOAT4").await?;
         let value = result.expect("value is None");
         assert_eq!(value, Value::F32(1.234));
+
+        let result = test_data_type("SELECT ARRAY[0,1.234]::FLOAT4[]").await?;
+        assert!(result.is_some());
+        if let Some(Value::Array(value)) = result {
+            assert_eq!(value.len(), 2);
+            assert_eq!(value[0], Value::F32(0.0));
+            assert_eq!(value[1], Value::F32(1.234));
+        }
         Ok(())
     }
 
     #[tokio::test]
     async fn test_data_type_f64() -> anyhow::Result<()> {
-        let result = test_data_type("SELECT CAST(1.234 as double precision)").await?;
+        let result = test_data_type("SELECT 1.234::FLOAT8").await?;
         let value = result.expect("value is None");
         assert_eq!(value, Value::F64(1.234));
+
+        let result = test_data_type("SELECT ARRAY[0,1.234]::FLOAT8[]").await?;
+        assert!(result.is_some());
+        if let Some(Value::Array(value)) = result {
+            assert_eq!(value.len(), 2);
+            assert_eq!(value[0], Value::F64(0.0));
+            assert_eq!(value[1], Value::F64(1.234));
+        }
         Ok(())
     }
 
@@ -537,9 +611,8 @@ mod test {
 
     #[tokio::test]
     async fn test_schema() -> anyhow::Result<()> {
-        let configuration = Configuration::default();
         let driver_manager = DriverManager::default();
-        let mut connection = driver_manager.connect(&configuration, DATABASE_URL).await?;
+        let mut connection = driver_manager.connect(DATABASE_URL).await?;
 
         let _ = connection
             .execute("CREATE TABLE contacts (id INTEGER PRIMARY KEY, email VARCHAR(20))")
@@ -571,7 +644,7 @@ mod test {
         let container = docker.run(postgres_image);
         let port = container.get_host_port_ipv4(5432);
 
-        let database_url = format!("postgresql://postgres:postgres@localhost:{}/postgres", port);
+        let database_url = format!("postgres://postgres:postgres@localhost:{}/postgres", port);
         let configuration = Configuration::default();
         let driver_manager = DriverManager::default();
         let connection = driver_manager

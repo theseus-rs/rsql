@@ -60,10 +60,9 @@ mod tests {
     use crate::commands::LoopCondition;
     use crate::commands::{CommandManager, CommandOptions};
     use crate::configuration::Configuration;
-    use crate::drivers;
-    use crate::drivers::{DriverManager, MockConnection};
     use crate::formatters::FormatterManager;
     use crate::writers::Output;
+    use rsql_drivers::{DriverManager, MockConnection};
     use rustyline::history::DefaultHistory;
     use std::io::Write;
     use tempfile::NamedTempFile;
@@ -142,7 +141,7 @@ mod tests {
         let connection = &mut MockConnection::new();
         connection
             .expect_stop()
-            .returning(|| Err(drivers::Error::IoError(anyhow::anyhow!("Error"))));
+            .returning(|| Err(rsql_drivers::Error::IoError(anyhow::anyhow!("Error"))));
         let options = CommandOptions {
             configuration,
             command_manager: &CommandManager::default(),

@@ -1,6 +1,5 @@
 use crate::commands::{help, CommandManager, LoopCondition, ShellCommand};
 use crate::configuration::Configuration;
-use crate::drivers::{Connection, DriverManager};
 use crate::executors;
 use crate::executors::Executor;
 use crate::formatters::FormatterManager;
@@ -9,6 +8,7 @@ use crate::shell::Result;
 use crate::shell::ShellArgs;
 use crate::writers::Output;
 use colored::Colorize;
+use rsql_drivers::{Connection, DriverManager};
 use rustyline::config::Configurer;
 use rustyline::error::ReadlineError;
 use rustyline::history::{DefaultHistory, FileHistory};
@@ -74,10 +74,7 @@ pub struct Shell {
 impl Shell {
     /// Execute the shell with the provided arguments.
     pub async fn execute(&mut self, args: &ShellArgs) -> Result<i32> {
-        let mut binding = self
-            .driver_manager
-            .connect(&self.configuration, args.url.as_str())
-            .await?;
+        let mut binding = self.driver_manager.connect(args.url.as_str()).await?;
         let connection = binding.as_mut();
         let input = if let Some(file) = &args.file {
             Some(file.clone().contents()?)
@@ -301,7 +298,7 @@ impl Shell {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::drivers::{MockConnection, MockDriver};
+    use rsql_drivers::{MockConnection, MockDriver};
     use rustyline::history::DefaultHistory;
 
     #[test]
@@ -350,7 +347,7 @@ mod test {
         mock_driver
             .expect_identifier()
             .returning(|| driver_identifier);
-        mock_driver.expect_connect().returning(|_, _, _| {
+        mock_driver.expect_connect().returning(|_, _| {
             let mut mock_connection = MockConnection::new();
             mock_connection.expect_stop().returning(|| Ok(()));
             Ok(Box::new(mock_connection))

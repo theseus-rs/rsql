@@ -1,0 +1,85 @@
+[package]
+authors.workspace = true
+categories.workspace = true
+description = "rsql drivers library for accessing databases"
+edition.workspace = true
+keywords.workspace = true
+license.workspace = true
+name = "rsql_drivers"
+repository.workspace = true
+version.workspace = true
+
+[dependencies]
+anyhow = { workspace = true }
+async-trait = { workspace = true }
+base64 = { workspace = true }
+bit-vec = { workspace = true, optional = true }
+chrono = { workspace = true, features = ["serde"] }
+form_urlencoded = { workspace = true, optional = true }
+indoc = { workspace = true }
+libsql = { workspace = true, optional = true }
+mockall = { workspace = true }
+num-format = { workspace = true }
+postgresql_archive = { workspace = true, optional = true }
+postgresql_embedded = { workspace = true, optional = true }
+rusqlite = { workspace = true, features = ["bundled-full"], optional = true }
+rust_decimal = { workspace = true }
+rust-i18n = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true, features = ["preserve_order"] }
+sqlx = { workspace = true, features = ["bit-vec", "chrono", "json", "macros", "runtime-tokio", "rust_decimal", "time", "uuid"], optional = true }
+thiserror = { workspace = true }
+tokio = { workspace = true, features = ["rt", "rt-multi-thread", "macros"] }
+tokio-postgres = { workspace = true, features = ["array-impls", "with-bit-vec-0_6", "with-chrono-0_4", "with-serde_json-1", "with-uuid-1"], optional = true }
+tracing = { workspace = true }
+url = { workspace = true }
+uuid = { workspace = true, features = ["serde", "v4"] }
+
+[dev-dependencies]
+criterion = { workspace = true, features = ["async_tokio"] }
+test-log = { workspace = true }
+testcontainers = { workspace = true }
+testcontainers-modules = { workspace = true, features = ["mysql", "postgres"] }
+tokio = { workspace = true }
+
+[features]
+all = ["mysql", "postgres", "postgresql", "rusqlite", "sqlite"]
+default = []
+libsql = [
+    "dep:libsql"
+]
+mysql = [
+    "dep:sqlx",
+    "sqlx/mysql",
+]
+postgres = [
+    "dep:postgresql_archive",
+    "dep:postgresql_embedded",
+    "dep:tokio-postgres",
+]
+postgresql = [
+    "dep:bit-vec",
+    "dep:postgresql_archive",
+    "dep:postgresql_embedded",
+    "dep:sqlx",
+    "sqlx/postgres",
+]
+rusqlite = [
+    "dep:rusqlite",
+]
+sqlite = [
+    "dep:form_urlencoded",
+    "dep:sqlx",
+    "sqlx/sqlite",
+]
+
+[lints.clippy]
+unwrap_used = "deny"
+
+[package.metadata.docs.rs]
+features = ["all"]
+targets = ["x86_64-unknown-linux-gnu"]
+
+[[bench]]
+harness = false
+name = "bench_main"

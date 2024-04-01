@@ -4,7 +4,6 @@ extern crate rust_i18n;
 
 pub mod commands;
 pub mod configuration;
-pub mod drivers;
 pub mod executors;
 pub mod formatters;
 pub mod shell;

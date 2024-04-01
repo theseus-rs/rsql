@@ -32,7 +32,7 @@ pub enum Value {
 }
 
 impl Value {
-    pub(crate) fn to_formatted_string(&self, locale: &Locale) -> String {
+    pub fn to_formatted_string(&self, locale: &Locale) -> String {
         match self {
             Value::Bool(value) => value.to_string(),
             Value::Bytes(bytes) => STANDARD.encode(bytes),

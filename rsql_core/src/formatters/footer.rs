@@ -1,9 +1,9 @@
-use crate::drivers::Results;
-use crate::drivers::Results::{Execute, Query};
 use crate::formatters::error::Result;
 use crate::formatters::FormatterOptions;
 use colored::Colorize;
 use num_format::{Locale, ToFormattedString};
+use rsql_drivers::Results;
+use rsql_drivers::Results::{Execute, Query};
 use std::io::Write;
 use std::str::FromStr;
 
@@ -74,9 +74,9 @@ pub async fn write_footer<'a>(options: &mut FormatterOptions<'a>, results: &Resu
 mod tests {
     use super::*;
     use crate::configuration::Configuration;
-    use crate::drivers::MemoryQueryResult;
-    use crate::drivers::{Results, Value};
     use crate::writers::Output;
+    use rsql_drivers::MemoryQueryResult;
+    use rsql_drivers::{Results, Value};
     use std::time::Duration;
 
     fn query_result(rows: u8) -> Results {

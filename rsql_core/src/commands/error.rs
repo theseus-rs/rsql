@@ -6,7 +6,7 @@ pub type Result<T = LoopCondition, E = Error> = core::result::Result<T, E>;
 pub enum Error {
     /// Driver error
     #[error(transparent)]
-    DriverError(#[from] crate::drivers::Error),
+    DriverError(#[from] rsql_drivers::Error),
     /// Error when an invalid option is provided for a command
     #[error("Invalid {command_name} option: {option}")]
     InvalidOption {

@@ -66,9 +66,9 @@ mod tests {
 
     use crate::commands::{CommandManager, CommandOptions, LoopCondition};
     use crate::configuration::Configuration;
-    use crate::drivers::{DriverManager, MockConnection};
     use crate::formatters::FormatterManager;
     use crate::writers::Output;
+    use rsql_drivers::{DriverManager, MockConnection};
 
     use super::*;
 

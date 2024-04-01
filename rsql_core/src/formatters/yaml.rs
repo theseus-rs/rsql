@@ -1,10 +1,10 @@
-use crate::drivers::{Results, Value};
 use crate::formatters::error::Result;
 use crate::formatters::footer::write_footer;
 use crate::formatters::formatter::FormatterOptions;
 use crate::formatters::highlighter::Highlighter;
 use async_trait::async_trait;
 use indexmap::IndexMap;
+use rsql_drivers::{Results, Value};
 
 /// A formatter for YAML
 #[derive(Debug, Default)]
@@ -70,13 +70,13 @@ pub(crate) async fn format_yaml(
 mod test {
     use super::*;
     use crate::configuration::Configuration;
-    use crate::drivers::MemoryQueryResult;
-    use crate::drivers::Results::{Execute, Query};
-    use crate::drivers::Value;
     use crate::formatters::formatter::FormatterOptions;
     use crate::formatters::Formatter;
     use crate::writers::Output;
     use indoc::indoc;
+    use rsql_drivers::MemoryQueryResult;
+    use rsql_drivers::Results::{Execute, Query};
+    use rsql_drivers::Value;
     use std::time::Duration;
 
     #[tokio::test]

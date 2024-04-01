@@ -10,12 +10,9 @@ repository.workspace = true
 version.workspace = true
 
 [dependencies]
-ansi_colours = { workspace = true }
 anyhow = { workspace = true }
+ansi_colours = { workspace = true }
 async-trait = { workspace = true }
-base64 = { workspace = true }
-bit-vec = { workspace = true }
-chrono = { workspace = true, features = ["serde"] }
 clap = { workspace = true, features = ["derive", "env"] }
 clap-stdin = { workspace = true, features = ["tokio"] }
 clearscreen = { workspace = true }
@@ -24,26 +21,19 @@ config = { workspace = true }
 csv = { workspace = true }
 dark-light = { workspace = true }
 dirs = { workspace = true }
-form_urlencoded = { workspace = true }
 indexmap = { workspace = true, features = ["serde"] }
 indicatif = { workspace = true }
 indoc = { workspace = true }
 lazy_static = { workspace = true }
-libsql = { workspace = true, optional = true }
 num-format = { workspace = true }
 prettytable = { workspace = true }
-postgresql_archive = { workspace = true, optional = true }
-postgresql_embedded = { workspace = true, optional = true }
 regex = { workspace = true }
-rusqlite = { workspace = true, features = ["bundled-full"], optional = true }
-rust_decimal = { workspace = true }
+rsql_drivers = { path = "../rsql_drivers", version = "0.8.0", features = ["all"] }
 rust-i18n = { workspace = true }
 rustyline = { workspace = true }
 quick-xml = { workspace = true, features = ["serialize"] }
-serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true, features = ["preserve_order"] }
 serde_yaml = { workspace = true }
-sqlx = { workspace = true, features = ["bit-vec", "chrono", "json", "macros", "runtime-tokio", "rust_decimal", "time", "uuid"], optional = true }
 supports-color = { workspace = true }
 sys-locale = { workspace = true }
 syntect = { workspace = true }
@@ -51,50 +41,38 @@ tempfile = { workspace = true }
 termbg = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["rt", "rt-multi-thread", "macros"] }
-tokio-postgres = { workspace = true, features = ["array-impls", "with-bit-vec-0_6", "with-chrono-0_4", "with-serde_json-1", "with-uuid-1"], optional = true }
 tracing = { workspace = true }
 tracing-appender = { workspace = true }
 tracing-indicatif = { workspace = true }
 tracing-subscriber = { workspace = true, features = ["env-filter", "tracing-log"] }
 unicode-width = { workspace = true }
 url = { workspace = true }
-uuid = { workspace = true, features = ["serde", "v4"] }
 
 [dev-dependencies]
-criterion = { workspace = true, features = ["async_tokio"] }
 mockall = { workspace = true }
 test-log = { workspace = true }
-testcontainers = { workspace = true }
-testcontainers-modules = { workspace = true, features = ["mysql", "postgres"] }
 tokio = { workspace = true }
 
 [features]
 all = ["mysql", "postgres", "postgresql", "rusqlite", "sqlite"]
 default = []
 libsql = [
-    "dep:libsql"
+    "rsql_drivers/libsql",
 ]
 mysql = [
-    "dep:sqlx",
-    "sqlx/mysql",
+    "rsql_drivers/mysql",
 ]
 postgres = [
-    "dep:postgresql_archive",
-    "dep:postgresql_embedded",
-    "dep:tokio-postgres",
+    "rsql_drivers/postgres",
 ]
 postgresql = [
-    "dep:postgresql_archive",
-    "dep:postgresql_embedded",
-    "dep:sqlx",
-    "sqlx/postgres",
+    "rsql_drivers/postgresql",
 ]
 rusqlite = [
-    "dep:rusqlite",
+    "rsql_drivers/rusqlite",
 ]
 sqlite = [
-    "dep:sqlx",
-    "sqlx/sqlite",
+    "rsql_drivers/sqlite",
 ]
 
 [lints.clippy]
@@ -103,7 +81,3 @@ unwrap_used = "deny"
 [package.metadata.docs.rs]
 features = ["all"]
 targets = ["x86_64-unknown-linux-gnu"]
-
-[[bench]]
-harness = false
-name = "bench_main"

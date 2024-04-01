@@ -53,9 +53,9 @@ mod tests {
     use super::*;
     use crate::commands::{CommandManager, CommandOptions};
     use crate::configuration::Configuration;
-    use crate::drivers::{DriverManager, MockConnection};
     use crate::formatters::FormatterManager;
     use crate::writers::Output;
+    use rsql_drivers::{DriverManager, MockConnection};
     use rustyline::history::DefaultHistory;
     use std::time::Instant;
 
