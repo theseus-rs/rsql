@@ -2,9 +2,9 @@ use crate::delimited::format;
 use crate::error::Result;
 use crate::formatter::FormatterOptions;
 use crate::writers::Output;
+use crate::Results;
 use async_trait::async_trait;
 use csv::QuoteStyle;
-use rsql_drivers::Results;
 
 /// A formatter for Tab Separated Values (TSV)
 #[derive(Debug, Default)]
@@ -32,10 +32,9 @@ mod test {
     use crate::formatter::FormatterOptions;
     use crate::writers::Output;
     use crate::Formatter;
+    use crate::Results::Query;
     use indoc::indoc;
-    use rsql_drivers::MemoryQueryResult;
-    use rsql_drivers::Results::Query;
-    use rsql_drivers::Value;
+    use rsql_drivers::{MemoryQueryResult, Value};
     use std::time::Duration;
 
     #[tokio::test]

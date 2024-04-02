@@ -5,23 +5,6 @@ use mockall::predicate::*;
 use mockall::*;
 use std::fmt::Debug;
 
-/// Results from a query or execute
-#[derive(Debug)]
-pub enum Results {
-    Query(Box<dyn QueryResult>),
-    Execute(u64),
-}
-
-impl Results {
-    pub fn is_query(&self) -> bool {
-        matches!(self, Results::Query(_))
-    }
-
-    pub fn is_execute(&self) -> bool {
-        matches!(self, Results::Execute(_))
-    }
-}
-
 /// Results from a query
 #[async_trait]
 pub trait QueryResult: Debug + Send + Sync {
@@ -57,9 +40,9 @@ impl QueryResult for MemoryQueryResult {
 #[automock]
 #[async_trait]
 pub trait Connection: Debug + Send + Sync {
-    async fn execute(&self, sql: &str) -> Result<Results>;
+    async fn execute(&self, sql: &str) -> Result<u64>;
     async fn indexes<'table>(&mut self, table: Option<&'table str>) -> Result<Vec<String>>;
-    async fn query(&self, sql: &str, limit: u64) -> Result<Results>;
+    async fn query(&self, sql: &str, limit: u64) -> Result<Box<dyn QueryResult>>;
     async fn tables(&mut self) -> Result<Vec<String>>;
     async fn stop(&mut self) -> Result<()>;
 }
@@ -67,17 +50,6 @@ pub trait Connection: Debug + Send + Sync {
 #[cfg(test)]
 mod test {
     use super::*;
-
-    #[test]
-    fn test_results_is_query() {
-        let query_results = Box::new(MemoryQueryResult::default());
-        assert!(Results::Query(query_results).is_query());
-    }
-
-    #[test]
-    fn test_results_is_execute() {
-        assert!(Results::Execute(42).is_execute());
-    }
 
     #[test]
     fn test_memory_query_result_new() {

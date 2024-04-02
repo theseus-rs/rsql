@@ -2,10 +2,10 @@ use crate::error::Result;
 use crate::footer::write_footer;
 use crate::formatter::FormatterOptions;
 use crate::writers::Output;
-use crate::Highlighter;
+use crate::{Highlighter, Results};
 use async_trait::async_trait;
 use indexmap::IndexMap;
-use rsql_drivers::{Results, Value};
+use rsql_drivers::Value;
 use serde_json::{json, to_string_pretty};
 
 /// A formatter for JSON
@@ -89,8 +89,8 @@ mod test {
     use crate::formatter::FormatterOptions;
     use crate::writers::Output;
     use crate::Formatter;
+    use crate::Results::{Execute, Query};
     use indoc::indoc;
-    use rsql_drivers::Results::{Execute, Query};
     use rsql_drivers::{MemoryQueryResult, Value};
     use std::time::Duration;
 

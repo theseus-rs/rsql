@@ -3,9 +3,10 @@ use crate::footer::write_footer;
 use crate::formatter::FormatterOptions;
 use crate::highlighter::Highlighter;
 use crate::writers::Output;
+use crate::Results;
 use async_trait::async_trait;
 use indexmap::IndexMap;
-use rsql_drivers::{Results, Value};
+use rsql_drivers::Value;
 
 /// A formatter for YAML
 #[derive(Debug, Default)]
@@ -75,9 +76,9 @@ mod test {
     use crate::formatter::FormatterOptions;
     use crate::writers::Output;
     use crate::Formatter;
+    use crate::Results::{Execute, Query};
     use indoc::indoc;
     use rsql_drivers::MemoryQueryResult;
-    use rsql_drivers::Results::{Execute, Query};
     use rsql_drivers::Value;
     use std::time::Duration;
 

@@ -1,7 +1,7 @@
 use crate::error::Result;
 use crate::value::Value;
 use crate::Error::UnsupportedColumnType;
-use crate::{MemoryQueryResult, Results};
+use crate::{MemoryQueryResult, QueryResult};
 use async_trait::async_trait;
 use chrono::NaiveDateTime;
 use indoc::indoc;
@@ -47,9 +47,9 @@ impl Connection {
 
 #[async_trait]
 impl crate::Connection for Connection {
-    async fn execute(&self, sql: &str) -> Result<Results> {
+    async fn execute(&self, sql: &str) -> Result<u64> {
         let rows = sqlx::query(sql).execute(&self.pool).await?.rows_affected();
-        Ok(Results::Execute(rows))
+        Ok(rows)
     }
 
     async fn indexes<'table>(&mut self, table: Option<&'table str>) -> Result<Vec<String>> {
@@ -85,7 +85,7 @@ impl crate::Connection for Connection {
         Ok(indexes)
     }
 
-    async fn query(&self, sql: &str, limit: u64) -> Result<Results> {
+    async fn query(&self, sql: &str, limit: u64) -> Result<Box<dyn QueryResult>> {
         let query_rows = sqlx::query(sql).fetch_all(&self.pool).await?;
         let columns: Vec<String> = query_rows
             .first()
@@ -112,7 +112,7 @@ impl crate::Connection for Connection {
         }
 
         let query_result = MemoryQueryResult::new(columns, rows);
-        Ok(Results::Query(Box::new(query_result)))
+        Ok(Box::new(query_result))
     }
 
     async fn tables(&mut self) -> Result<Vec<String>> {
@@ -122,14 +122,12 @@ impl crate::Connection for Connection {
              WHERE table_schema = DATABASE()
              ORDER BY table_name
         "#};
-        let results = self.query(sql, 0).await?;
+        let query_result = self.query(sql, 0).await?;
         let mut tables = Vec::new();
 
-        if let Results::Query(query_results) = results {
-            for row in query_results.rows().await {
-                if let Some(data) = &row[0] {
-                    tables.push(data.to_string());
-                }
+        for row in query_result.rows().await {
+            if let Some(data) = &row[0] {
+                tables.push(data.to_string());
             }
         }
 
@@ -209,7 +207,7 @@ impl Connection {
 #[cfg(not(any(target_os = "macos", target_os = "windows")))]
 #[cfg(test)]
 mod test {
-    use crate::{Connection, DriverManager, Results, Value};
+    use crate::{Connection, DriverManager, Value};
     use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
     use indoc::indoc;
     use serde_json::json;
@@ -235,11 +233,8 @@ mod test {
     }
 
     async fn test_limit_rows(connection: &dyn Connection) -> anyhow::Result<()> {
-        let results = connection.query("SELECT 1 UNION ALL SELECT 2", 1).await?;
-        assert!(results.is_query());
-        if let Results::Query(query_result) = results {
-            assert_eq!(query_result.rows().await.len(), 1);
-        }
+        let query_result = connection.query("SELECT 1 UNION ALL SELECT 2", 1).await?;
+        assert_eq!(query_result.rows().await.len(), 1);
         Ok(())
     }
 
@@ -248,35 +243,31 @@ mod test {
             .execute("CREATE TABLE person (id INTEGER, name VARCHAR(20))")
             .await?;
 
-        let execute_results = connection
+        let rows = connection
             .execute("INSERT INTO person (id, name) VALUES (1, 'foo')")
             .await?;
-        if let Results::Execute(rows) = execute_results {
-            assert_eq!(rows, 1);
-        }
+        assert_eq!(rows, 1);
 
-        let results = connection.query("SELECT id, name FROM person", 0).await?;
-        if let Results::Query(query_result) = results {
-            assert_eq!(query_result.columns().await, vec!["id", "name"]);
-            assert_eq!(query_result.rows().await.len(), 1);
-            match query_result.rows().await.get(0) {
-                Some(row) => {
-                    assert_eq!(row.len(), 2);
+        let query_result = connection.query("SELECT id, name FROM person", 0).await?;
+        assert_eq!(query_result.columns().await, vec!["id", "name"]);
+        assert_eq!(query_result.rows().await.len(), 1);
+        match query_result.rows().await.get(0) {
+            Some(row) => {
+                assert_eq!(row.len(), 2);
 
-                    if let Some(Value::I16(id)) = &row[0] {
-                        assert_eq!(*id, 1);
-                    } else {
-                        assert!(false);
-                    }
-
-                    if let Some(Value::String(name)) = &row[1] {
-                        assert_eq!(name, "foo");
-                    } else {
-                        assert!(false);
-                    }
+                if let Some(Value::I16(id)) = &row[0] {
+                    assert_eq!(*id, 1);
+                } else {
+                    assert!(false);
                 }
-                None => assert!(false),
+
+                if let Some(Value::String(name)) = &row[1] {
+                    assert_eq!(name, "foo");
+                } else {
+                    assert!(false);
+                }
             }
+            None => assert!(false),
         }
         Ok(())
     }
@@ -329,50 +320,48 @@ mod test {
                    timestamp_type, json_type
               FROM data_types
         "#};
-        let results = connection.query(sql, 0).await?;
+        let query_result = connection.query(sql, 0).await?;
 
-        if let Results::Query(query_result) = results {
-            if let Some(row) = query_result.rows().await.first() {
-                assert_eq!(row[0].clone().unwrap(), Value::String("a".to_string()));
-                assert_eq!(row[1].clone().unwrap(), Value::String("foo".to_string()));
-                assert_eq!(row[2].clone().unwrap(), Value::String("foo".to_string()));
-                assert_eq!(
-                    row[3].clone().unwrap(),
-                    Value::Bytes("foo".as_bytes().to_vec())
-                );
-                assert_eq!(
-                    row[4].clone().unwrap(),
-                    Value::Bytes("foo".as_bytes().to_vec())
-                );
-                assert_eq!(
-                    row[5].clone().unwrap(),
-                    Value::Bytes("foo".as_bytes().to_vec())
-                );
-                assert_eq!(row[6].clone().unwrap(), Value::I16(127));
-                assert_eq!(row[7].clone().unwrap(), Value::I16(32_767));
-                assert_eq!(row[8].clone().unwrap(), Value::I32(8_388_607));
-                assert_eq!(row[9].clone().unwrap(), Value::I32(2_147_483_647));
-                assert_eq!(
-                    row[10].clone().unwrap(),
-                    Value::I64(9_223_372_036_854_775_807)
-                );
-                assert_eq!(
-                    row[11].clone().unwrap(),
-                    Value::String("123.45".to_string())
-                );
-                assert_eq!(row[12].clone().unwrap(), Value::F32(123.0));
-                assert_eq!(row[13].clone().unwrap(), Value::F32(123.0));
-                let date = NaiveDate::from_ymd_opt(2022, 1, 1).expect("invalid date");
-                assert_eq!(row[14].clone().unwrap(), Value::Date(date));
-                let time = NaiveTime::from_hms_opt(14, 30, 00).expect("invalid time");
-                assert_eq!(row[15].clone().unwrap(), Value::Time(time));
-                let date_time =
-                    NaiveDateTime::parse_from_str("2022-01-01 14:30:00", "%Y-%m-%d %H:%M:%S")?;
-                assert_eq!(row[16].clone().unwrap(), Value::DateTime(date_time));
-                // assert_eq!(row[17].clone().unwrap(), Value::Date(date));
-                let json = json!({"key": "value"});
-                assert_eq!(row[18].clone().unwrap(), Value::Json(json));
-            }
+        if let Some(row) = query_result.rows().await.first() {
+            assert_eq!(row[0].clone().unwrap(), Value::String("a".to_string()));
+            assert_eq!(row[1].clone().unwrap(), Value::String("foo".to_string()));
+            assert_eq!(row[2].clone().unwrap(), Value::String("foo".to_string()));
+            assert_eq!(
+                row[3].clone().unwrap(),
+                Value::Bytes("foo".as_bytes().to_vec())
+            );
+            assert_eq!(
+                row[4].clone().unwrap(),
+                Value::Bytes("foo".as_bytes().to_vec())
+            );
+            assert_eq!(
+                row[5].clone().unwrap(),
+                Value::Bytes("foo".as_bytes().to_vec())
+            );
+            assert_eq!(row[6].clone().unwrap(), Value::I16(127));
+            assert_eq!(row[7].clone().unwrap(), Value::I16(32_767));
+            assert_eq!(row[8].clone().unwrap(), Value::I32(8_388_607));
+            assert_eq!(row[9].clone().unwrap(), Value::I32(2_147_483_647));
+            assert_eq!(
+                row[10].clone().unwrap(),
+                Value::I64(9_223_372_036_854_775_807)
+            );
+            assert_eq!(
+                row[11].clone().unwrap(),
+                Value::String("123.45".to_string())
+            );
+            assert_eq!(row[12].clone().unwrap(), Value::F32(123.0));
+            assert_eq!(row[13].clone().unwrap(), Value::F32(123.0));
+            let date = NaiveDate::from_ymd_opt(2022, 1, 1).expect("invalid date");
+            assert_eq!(row[14].clone().unwrap(), Value::Date(date));
+            let time = NaiveTime::from_hms_opt(14, 30, 00).expect("invalid time");
+            assert_eq!(row[15].clone().unwrap(), Value::Time(time));
+            let date_time =
+                NaiveDateTime::parse_from_str("2022-01-01 14:30:00", "%Y-%m-%d %H:%M:%S")?;
+            assert_eq!(row[16].clone().unwrap(), Value::DateTime(date_time));
+            // assert_eq!(row[17].clone().unwrap(), Value::Date(date));
+            let json = json!({"key": "value"});
+            assert_eq!(row[18].clone().unwrap(), Value::Json(json));
         }
 
         Ok(())

@@ -2,9 +2,9 @@ use crate::error::Result;
 use crate::footer::write_footer;
 use crate::formatter::FormatterOptions;
 use crate::writers::Output;
+use crate::Results;
+use crate::Results::Query;
 use csv::QuoteStyle;
-use rsql_drivers::Results;
-use rsql_drivers::Results::Query;
 
 pub async fn format(
     options: &FormatterOptions,
@@ -57,8 +57,8 @@ mod test {
     use super::*;
     use crate::formatter::FormatterOptions;
     use crate::writers::Output;
+    use crate::Results::Execute;
     use indoc::indoc;
-    use rsql_drivers::Results::{Execute, Query};
     use rsql_drivers::{MemoryQueryResult, Value};
     use std::time::Duration;
 

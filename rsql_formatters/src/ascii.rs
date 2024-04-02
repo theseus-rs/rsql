@@ -1,10 +1,9 @@
 use crate::error::Result;
 use crate::formatter::FormatterOptions;
-use crate::table;
 use crate::writers::Output;
+use crate::{table, Results};
 use async_trait::async_trait;
 use prettytable::format::consts::FORMAT_DEFAULT;
-use rsql_drivers::Results;
 
 /// A formatter for ASCII tables
 #[derive(Debug, Default)]
@@ -32,7 +31,7 @@ mod tests {
     use crate::writers::Output;
     use crate::Formatter;
     use indoc::indoc;
-    use rsql_drivers::{MemoryQueryResult, Results, Value};
+    use rsql_drivers::{MemoryQueryResult, Value};
     use std::time::Duration;
 
     fn query_result() -> Results {

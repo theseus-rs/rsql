@@ -2,10 +2,10 @@ use crate::commands::LoopCondition;
 use crate::configuration::Configuration;
 use crate::executors::Result;
 use indicatif::ProgressStyle;
-use rsql_drivers::{Connection, Results};
+use rsql_drivers::Connection;
 use rsql_formatters;
 use rsql_formatters::writers::Output;
-use rsql_formatters::FormatterManager;
+use rsql_formatters::{FormatterManager, Results};
 use std::fmt;
 use std::fmt::Debug;
 use tracing::{instrument, Span};
@@ -70,9 +70,9 @@ impl<'a> SqlExecutor<'a> {
         let command = if sql.len() > 6 { &sql[..6] } else { "" };
 
         let results = if command.to_lowercase() == "select" {
-            self.connection.query(sql, limit).await?
+            Results::Query(self.connection.query(sql, limit).await?)
         } else {
-            self.connection.execute(sql).await?
+            Results::Execute(self.connection.execute(sql).await?)
         };
 
         Ok(results)
@@ -141,7 +141,7 @@ mod tests {
         connection
             .expect_execute()
             .with(eq(sql))
-            .returning(|_| Ok(Results::Execute(42)));
+            .returning(|_| Ok(42));
         let connection = &mut connection as &mut dyn Connection;
         let mut output = Output::default();
 
@@ -165,7 +165,7 @@ mod tests {
         let limit = 42;
         connection
             .expect_query()
-            .returning(|_, _| Ok(Results::Query(Box::new(MemoryQueryResult::default()))));
+            .returning(|_, _| Ok(Box::new(MemoryQueryResult::default())));
         let connection = &mut connection as &mut dyn Connection;
         let output = &mut Output::default();
 
@@ -186,7 +186,7 @@ mod tests {
         connection
             .expect_execute()
             .with(eq(sql))
-            .returning(|_| Ok(Results::Execute(42)));
+            .returning(|_| Ok(42));
         let connection = &mut connection as &mut dyn Connection;
         let output = &mut Output::default();
 

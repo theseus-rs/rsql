@@ -37,7 +37,7 @@ mod xml;
 mod yaml;
 
 pub use error::{Error, Result};
-pub use formatter::{Formatter, FormatterManager, FormatterOptions};
+pub use formatter::{Formatter, FormatterManager, FormatterOptions, Results};
 pub use highlighter::Highlighter;
 
 use rust_i18n::i18n;
