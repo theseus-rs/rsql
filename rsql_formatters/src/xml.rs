@@ -2,11 +2,10 @@ use crate::error::Result;
 use crate::footer::write_footer;
 use crate::formatter::FormatterOptions;
 use crate::writers::Output;
-use crate::Highlighter;
+use crate::{Highlighter, Results};
 use async_trait::async_trait;
 use quick_xml::events::{BytesEnd, BytesStart, BytesText, Event};
 use quick_xml::Writer;
-use rsql_drivers::Results;
 
 /// A formatter for XML
 #[derive(Debug, Default)]
@@ -76,8 +75,8 @@ mod test {
     use super::*;
     use crate::formatter::FormatterOptions;
     use crate::Formatter;
+    use crate::Results::{Execute, Query};
     use indoc::indoc;
-    use rsql_drivers::Results::{Execute, Query};
     use rsql_drivers::{MemoryQueryResult, Value};
     use std::time::Duration;
 

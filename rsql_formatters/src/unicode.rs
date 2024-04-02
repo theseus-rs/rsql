@@ -1,11 +1,10 @@
 use crate::error::Result;
 use crate::formatter::FormatterOptions;
-use crate::table;
 use crate::writers::Output;
+use crate::{table, Results};
 use async_trait::async_trait;
 use lazy_static::lazy_static;
 use prettytable::format::{FormatBuilder, LinePosition, LineSeparator, TableFormat};
-use rsql_drivers::Results;
 
 lazy_static! {
     pub static ref FORMAT_UNICODE: TableFormat = FormatBuilder::new()
@@ -54,7 +53,7 @@ mod tests {
     use crate::writers::Output;
     use crate::Formatter;
     use indoc::indoc;
-    use rsql_drivers::{MemoryQueryResult, Results, Value};
+    use rsql_drivers::{MemoryQueryResult, Value};
     use std::time::Duration;
 
     fn query_result() -> Results {

@@ -1,7 +1,7 @@
 use crate::error::Result;
 use crate::value::Value;
 use crate::Error::UnsupportedColumnType;
-use crate::{MemoryQueryResult, Results};
+use crate::{MemoryQueryResult, QueryResult};
 use async_trait::async_trait;
 use bit_vec::BitVec;
 use chrono::Utc;
@@ -93,9 +93,9 @@ impl Connection {
 
 #[async_trait]
 impl crate::Connection for Connection {
-    async fn execute(&self, sql: &str) -> Result<Results> {
+    async fn execute(&self, sql: &str) -> Result<u64> {
         let rows = sqlx::query(sql).execute(&self.pool).await?.rows_affected();
-        Ok(Results::Execute(rows))
+        Ok(rows)
     }
 
     async fn indexes<'table>(&mut self, table: Option<&'table str>) -> Result<Vec<String>> {
@@ -141,7 +141,7 @@ impl crate::Connection for Connection {
         Ok(indexes)
     }
 
-    async fn query(&self, sql: &str, limit: u64) -> Result<Results> {
+    async fn query(&self, sql: &str, limit: u64) -> Result<Box<dyn QueryResult>> {
         let query_rows = sqlx::query(sql).fetch_all(&self.pool).await?;
         let columns: Vec<String> = query_rows
             .first()
@@ -168,7 +168,7 @@ impl crate::Connection for Connection {
         }
 
         let query_result = MemoryQueryResult::new(columns, rows);
-        Ok(Results::Query(Box::new(query_result)))
+        Ok(Box::new(query_result))
     }
 
     async fn tables(&mut self) -> Result<Vec<String>> {
@@ -179,14 +179,12 @@ impl crate::Connection for Connection {
                AND table_schema = 'public'
              ORDER BY table_name
         "#};
-        let results = self.query(sql, 0).await?;
+        let query_result = self.query(sql, 0).await?;
         let mut tables = Vec::new();
 
-        if let Results::Query(query_results) = results {
-            for row in query_results.rows().await {
-                if let Some(data) = &row[0] {
-                    tables.push(data.to_string());
-                }
+        for row in query_result.rows().await {
+            if let Some(data) = &row[0] {
+                tables.push(data.to_string());
             }
         }
 
@@ -285,7 +283,7 @@ impl Connection {
 #[cfg(not(target_os = "windows"))]
 #[cfg(test)]
 mod test {
-    use crate::{DriverManager, Results, Value};
+    use crate::{DriverManager, Value};
     use chrono::{NaiveDate, NaiveDateTime, NaiveTime, Utc};
     use serde_json::json;
 
@@ -303,11 +301,8 @@ mod test {
     async fn test_limit_rows() -> anyhow::Result<()> {
         let driver_manager = DriverManager::default();
         let connection = driver_manager.connect(DATABASE_URL).await?;
-        let results = connection.query("SELECT 1 UNION ALL SELECT 2", 1).await?;
-        assert!(results.is_query());
-        if let Results::Query(query_result) = results {
-            assert_eq!(query_result.rows().await.len(), 1);
-        }
+        let query_result = connection.query("SELECT 1 UNION ALL SELECT 2", 1).await?;
+        assert_eq!(query_result.rows().await.len(), 1);
         Ok(())
     }
 
@@ -320,35 +315,31 @@ mod test {
             .execute("CREATE TABLE person (id INTEGER, name VARCHAR(20))")
             .await?;
 
-        let execute_results = connection
+        let rows = connection
             .execute("INSERT INTO person (id, name) VALUES (1, 'foo')")
             .await?;
-        if let Results::Execute(rows) = execute_results {
-            assert_eq!(rows, 1);
-        }
+        assert_eq!(rows, 1);
 
-        let results = connection.query("SELECT id, name FROM person", 0).await?;
-        if let Results::Query(query_result) = results {
-            assert_eq!(query_result.columns().await, vec!["id", "name"]);
-            assert_eq!(query_result.rows().await.len(), 1);
-            match query_result.rows().await.get(0) {
-                Some(row) => {
-                    assert_eq!(row.len(), 2);
+        let query_result = connection.query("SELECT id, name FROM person", 0).await?;
+        assert_eq!(query_result.columns().await, vec!["id", "name"]);
+        assert_eq!(query_result.rows().await.len(), 1);
+        match query_result.rows().await.get(0) {
+            Some(row) => {
+                assert_eq!(row.len(), 2);
 
-                    if let Some(Value::I32(id)) = &row[0] {
-                        assert_eq!(*id, 1);
-                    } else {
-                        assert!(false);
-                    }
-
-                    if let Some(Value::String(name)) = &row[1] {
-                        assert_eq!(name, "foo");
-                    } else {
-                        assert!(false);
-                    }
+                if let Some(Value::I32(id)) = &row[0] {
+                    assert_eq!(*id, 1);
+                } else {
+                    assert!(false);
                 }
-                None => assert!(false),
+
+                if let Some(Value::String(name)) = &row[1] {
+                    assert_eq!(name, "foo");
+                } else {
+                    assert!(false);
+                }
             }
+            None => assert!(false),
         }
 
         connection.stop().await?;
@@ -359,18 +350,16 @@ mod test {
         let driver_manager = DriverManager::default();
         let mut connection = driver_manager.connect(DATABASE_URL).await?;
 
-        let results = connection.query(sql, 0).await?;
+        let query_result = connection.query(sql, 0).await?;
         let mut value: Option<Value> = None;
 
-        if let Results::Query(query_result) = results {
-            assert_eq!(query_result.columns().await.len(), 1);
-            assert_eq!(query_result.rows().await.len(), 1);
+        assert_eq!(query_result.columns().await.len(), 1);
+        assert_eq!(query_result.rows().await.len(), 1);
 
-            if let Some(row) = query_result.rows().await.get(0) {
-                assert_eq!(row.len(), 1);
+        if let Some(row) = query_result.rows().await.get(0) {
+            assert_eq!(row.len(), 1);
 
-                value = row[0].clone();
-            }
+            value = row[0].clone();
         }
 
         connection.stop().await?;
@@ -564,15 +553,12 @@ mod test {
         let driver_manager = DriverManager::default();
         let connection = driver_manager.connect(database_url.as_str()).await?;
 
-        let results = connection.query("SELECT 'foo'::TEXT", 0).await?;
-        assert!(results.is_query());
-        if let Results::Query(query_result) = results {
-            let rows = query_result.rows().await;
-            let row = rows.first().expect("row is None");
-            let cell = row.first().expect("cell is None");
-            if let Some(value) = cell.clone() {
-                assert_eq!(value, Value::String("foo".to_string()));
-            }
+        let query_result = connection.query("SELECT 'foo'::TEXT", 0).await?;
+        let rows = query_result.rows().await;
+        let row = rows.first().expect("row is None");
+        let cell = row.first().expect("cell is None");
+        if let Some(value) = cell.clone() {
+            assert_eq!(value, Value::String("foo".to_string()));
         }
 
         Ok(())

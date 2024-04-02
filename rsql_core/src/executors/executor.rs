@@ -121,7 +121,7 @@ mod tests {
     use super::*;
     use indoc::indoc;
     use mockall::predicate::eq;
-    use rsql_drivers::{MockConnection, Results};
+    use rsql_drivers::MockConnection;
 
     #[tokio::test]
     async fn test_debug() {
@@ -378,7 +378,7 @@ mod tests {
         connection
             .expect_execute()
             .with(eq(input))
-            .returning(|_| Ok(Results::Execute(42)));
+            .returning(|_| Ok(42));
         let mut output = Output::default();
 
         let mut executor = Executor::new(

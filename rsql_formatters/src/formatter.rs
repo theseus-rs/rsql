@@ -1,7 +1,7 @@
 use crate::error::Result;
 use crate::writers::Output;
 use async_trait::async_trait;
-use rsql_drivers::Results;
+use rsql_drivers::QueryResult;
 use std::collections::BTreeMap;
 use std::fmt::Debug;
 use std::time::Duration;
@@ -33,6 +33,23 @@ impl Default for FormatterOptions {
             theme: "Solarized (dark)".to_string(),
             timer: true,
         }
+    }
+}
+
+/// Results from a query or execute
+#[derive(Debug)]
+pub enum Results {
+    Query(Box<dyn QueryResult>),
+    Execute(u64),
+}
+
+impl Results {
+    pub fn is_query(&self) -> bool {
+        matches!(self, Results::Query(_))
+    }
+
+    pub fn is_execute(&self) -> bool {
+        matches!(self, Results::Execute(_))
     }
 }
 
@@ -117,6 +134,18 @@ impl Default for FormatterManager {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use rsql_drivers::MemoryQueryResult;
+
+    #[test]
+    fn test_results_is_query() {
+        let query_results = Box::new(MemoryQueryResult::default());
+        assert!(Results::Query(query_results).is_query());
+    }
+
+    #[test]
+    fn test_results_is_execute() {
+        assert!(Results::Execute(42).is_execute());
+    }
 
     #[test]
     fn test_format_manager() {
