@@ -1,10 +1,11 @@
 [package]
-name = "rsql_formatters"
 authors.workspace = true
 categories.workspace = true
+description = "rsql formatters to output rsql results in various formats"
 edition.workspace = true
 keywords.workspace = true
 license.workspace = true
+name = "rsql_formatters"
 repository.workspace = true
 version.workspace = true
 
