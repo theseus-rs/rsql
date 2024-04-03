@@ -134,7 +134,7 @@ impl crate::Connection for Connection {
         Ok(tables)
     }
 
-    async fn stop(&mut self) -> Result<()> {
+    async fn close(&mut self) -> Result<()> {
         self.pool.close().await;
         Ok(())
     }

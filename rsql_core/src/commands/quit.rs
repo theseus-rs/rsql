@@ -18,7 +18,7 @@ impl ShellCommand for Command {
     }
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
-        options.connection.stop().await?;
+        options.connection.close().await?;
 
         info!("Quitting with code 0");
         Ok(LoopCondition::Exit(0))
@@ -51,7 +51,7 @@ mod tests {
     #[tokio::test]
     async fn test_execute() -> anyhow::Result<()> {
         let mock_connection = &mut MockConnection::new();
-        mock_connection.expect_stop().returning(|| Ok(()));
+        mock_connection.expect_close().returning(|| Ok(()));
 
         let options = CommandOptions {
             configuration: &mut Configuration::default(),

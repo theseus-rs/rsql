@@ -299,7 +299,7 @@ mod tests {
         let formatter_manager = FormatterManager::default();
         let history = DefaultHistory::new();
         let mut connection = MockConnection::new();
-        connection.expect_stop().returning(|| Ok(()));
+        connection.expect_close().returning(|| Ok(()));
         let mut output = Output::default();
 
         let mut executor = Executor::new(

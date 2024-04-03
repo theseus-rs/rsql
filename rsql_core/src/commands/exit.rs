@@ -28,7 +28,7 @@ impl ShellCommand for Command {
             options.input[1].parse()?
         };
 
-        options.connection.stop().await?;
+        options.connection.close().await?;
         info!("Exiting with code {exit_code}");
         Ok(LoopCondition::Exit(exit_code))
     }
@@ -66,7 +66,7 @@ mod tests {
     #[tokio::test]
     async fn test_execute_no_argument() -> anyhow::Result<()> {
         let mock_connection = &mut MockConnection::new();
-        mock_connection.expect_stop().returning(|| Ok(()));
+        mock_connection.expect_close().returning(|| Ok(()));
 
         let options = CommandOptions {
             configuration: &mut Configuration::default(),
@@ -88,7 +88,7 @@ mod tests {
     #[tokio::test]
     async fn test_execute_argument() -> anyhow::Result<()> {
         let mock_connection = &mut MockConnection::new();
-        mock_connection.expect_stop().returning(|| Ok(()));
+        mock_connection.expect_close().returning(|| Ok(()));
 
         let options = CommandOptions {
             configuration: &mut Configuration::default(),
