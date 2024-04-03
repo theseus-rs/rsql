@@ -30,7 +30,7 @@ clap = { workspace = true, features = ["derive", "env"] }
 colored = { workspace = true }
 dotenvy = { workspace = true }
 os_info = { workspace = true }
-rsql_core = { path = "../rsql_core", version = "0.8.0", features = ["all"] }
+rsql_core = { path = "../rsql_core", version = "0.9.0", features = ["all"] }
 rust-i18n = { workspace = true }
 tokio = { workspace = true, features = ["rt", "rt-multi-thread", "macros"] }
 tracing = { workspace = true }
