@@ -36,7 +36,7 @@ impl ShellCommand for Command {
             return Ok(LoopCondition::Continue);
         }
 
-        options.configuration.results_limit = options.input[1].parse::<u64>()?;
+        options.configuration.results_limit = options.input[1].parse::<usize>()?;
 
         Ok(LoopCondition::Continue)
     }

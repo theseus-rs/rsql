@@ -19,7 +19,9 @@ pub mod rusqlite;
 pub mod sqlite;
 mod value;
 
-pub use connection::{Connection, MemoryQueryResult, MockConnection, QueryResult};
+pub use connection::{
+    Connection, LimitQueryResult, MemoryQueryResult, MockConnection, QueryResult,
+};
 pub use driver::{Driver, DriverManager, MockDriver};
 pub use error::{Error, Result};
 pub use value::Value;

@@ -2,7 +2,7 @@ use crate::commands::LoopCondition;
 use crate::configuration::Configuration;
 use crate::executors::Result;
 use indicatif::ProgressStyle;
-use rsql_drivers::Connection;
+use rsql_drivers::{Connection, LimitQueryResult};
 use rsql_formatters;
 use rsql_formatters::writers::Output;
 use rsql_formatters::{FormatterManager, Results};
@@ -63,14 +63,21 @@ impl<'a> SqlExecutor<'a> {
     /// This function is split out so that it can be instrumented and a visual progress indicator
     /// can be shown without leaving artifacts in the output when the results are formatted.
     #[instrument(skip(sql, limit))]
-    async fn execute_sql(&mut self, sql: &str, limit: u64) -> Result<Results> {
+    async fn execute_sql(&mut self, sql: &str, limit: usize) -> Result<Results> {
         Span::current().pb_set_style(&ProgressStyle::with_template(
             "{span_child_prefix}{spinner}",
         )?);
         let command = if sql.len() > 6 { &sql[..6] } else { "" };
 
         let results = if command.to_lowercase() == "select" {
-            Results::Query(self.connection.query(sql, limit).await?)
+            let query_results = self.connection.query(sql).await?;
+
+            if limit == 0 {
+                Results::Query(query_results)
+            } else {
+                let limit_query_result = LimitQueryResult::new(query_results, limit);
+                Results::Query(Box::new(limit_query_result))
+            }
         } else {
             Results::Execute(self.connection.execute(sql).await?)
         };
@@ -165,7 +172,7 @@ mod tests {
         let limit = 42;
         connection
             .expect_query()
-            .returning(|_, _| Ok(Box::new(MemoryQueryResult::default())));
+            .returning(|_| Ok(Box::new(MemoryQueryResult::default())));
         let connection = &mut connection as &mut dyn Connection;
         let output = &mut Output::default();
 
