@@ -198,7 +198,7 @@ impl ConfigurationBuilder {
 
     /// Set the limit for the number of results returned.
     #[allow(dead_code)]
-    pub fn with_results_limit(mut self, results_limit: u64) -> Self {
+    pub fn with_results_limit(mut self, results_limit: usize) -> Self {
         self.configuration.results_limit = results_limit;
         self
     }
@@ -278,7 +278,7 @@ pub struct Configuration {
     pub results_footer: bool,
     pub results_format: String,
     pub results_header: bool,
-    pub results_limit: u64,
+    pub results_limit: usize,
     pub results_rows: bool,
     pub results_timer: bool,
 }
@@ -442,7 +442,7 @@ impl ConfigFile {
         if let Ok(results_header) = config.get::<bool>("results.header") {
             configuration.results_header = results_header;
         }
-        if let Ok(results_limit) = config.get::<u64>("results.limit") {
+        if let Ok(results_limit) = config.get::<usize>("results.limit") {
             configuration.results_limit = results_limit;
         }
         if let Ok(results_rows) = config.get::<bool>("results.rows") {
@@ -521,7 +521,7 @@ mod test {
         let results_footer = false;
         let results_format = "unicode".to_string();
         let results_header = false;
-        let results_limit = 42u64;
+        let results_limit = 42;
         let results_rows = false;
         let results_timer = false;
 

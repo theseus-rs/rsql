@@ -85,7 +85,7 @@ impl crate::Connection for Connection {
         Ok(indexes)
     }
 
-    async fn query(&self, sql: &str, limit: u64) -> Result<Box<dyn QueryResult>> {
+    async fn query(&self, sql: &str) -> Result<Box<dyn QueryResult>> {
         let query_rows = sqlx::query(sql).fetch_all(&self.pool).await?;
         let columns: Vec<String> = query_rows
             .first()
@@ -105,10 +105,6 @@ impl crate::Connection for Connection {
                 row_data.push(value);
             }
             rows.push(row_data);
-
-            if limit > 0 && rows.len() >= limit as usize {
-                break;
-            }
         }
 
         let query_result = MemoryQueryResult::new(columns, rows);
@@ -122,7 +118,7 @@ impl crate::Connection for Connection {
              WHERE table_schema = DATABASE()
              ORDER BY table_name
         "#};
-        let query_result = self.query(sql, 0).await?;
+        let query_result = self.query(sql).await?;
         let mut tables = Vec::new();
 
         for row in query_result.rows().await {
@@ -224,17 +220,10 @@ mod test {
         let driver_manager = DriverManager::default();
         let mut connection = driver_manager.connect(database_url.as_str()).await?;
 
-        test_limit_rows(&*connection).await?;
         test_connection_interface(&*connection).await?;
         test_data_types(&*connection).await?;
         test_schema(&mut *connection).await?;
 
-        Ok(())
-    }
-
-    async fn test_limit_rows(connection: &dyn Connection) -> anyhow::Result<()> {
-        let query_result = connection.query("SELECT 1 UNION ALL SELECT 2", 1).await?;
-        assert_eq!(query_result.rows().await.len(), 1);
         Ok(())
     }
 
@@ -248,7 +237,7 @@ mod test {
             .await?;
         assert_eq!(rows, 1);
 
-        let query_result = connection.query("SELECT id, name FROM person", 0).await?;
+        let query_result = connection.query("SELECT id, name FROM person").await?;
         assert_eq!(query_result.columns().await, vec!["id", "name"]);
         assert_eq!(query_result.rows().await.len(), 1);
         match query_result.rows().await.get(0) {
@@ -320,7 +309,7 @@ mod test {
                    timestamp_type, json_type
               FROM data_types
         "#};
-        let query_result = connection.query(sql, 0).await?;
+        let query_result = connection.query(sql).await?;
 
         if let Some(row) = query_result.rows().await.first() {
             assert_eq!(row[0].clone().unwrap(), Value::String("a".to_string()));
