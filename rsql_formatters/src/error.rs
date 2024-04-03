@@ -10,6 +10,13 @@ pub enum Error {
     UnknownFormat { format: String },
 }
 
+#[cfg(any(
+    feature = "ascii",
+    feature = "markdown",
+    feature = "plain",
+    feature = "psql",
+    feature = "unicode"
+))]
 /// Converts a [`csv::Error`] into an [`IoError`](Error::IoError)
 impl From<csv::Error> for Error {
     fn from(error: csv::Error) -> Self {
@@ -17,6 +24,7 @@ impl From<csv::Error> for Error {
     }
 }
 
+#[cfg(any(feature = "html", feature = "xml"))]
 /// Converts a [`quick_xml::Error`] into an [`IoError`](Error::IoError)
 impl From<quick_xml::Error> for Error {
     fn from(error: quick_xml::Error) -> Self {
@@ -24,6 +32,7 @@ impl From<quick_xml::Error> for Error {
     }
 }
 
+#[cfg(any(feature = "json", feature = "jsonl"))]
 /// Converts a [`serde_json::Error`] into an [`IoError`](Error::IoError)
 impl From<serde_json::Error> for Error {
     fn from(error: serde_json::Error) -> Self {
@@ -31,6 +40,7 @@ impl From<serde_json::Error> for Error {
     }
 }
 
+#[cfg(feature = "yaml")]
 /// Converts a [`serde_yaml::Error`] into an [`IoError`](Error::IoError)
 impl From<serde_yaml::Error> for Error {
     fn from(error: serde_yaml::Error) -> Self {
@@ -57,6 +67,13 @@ mod tests {
     use super::*;
     use test_log::test;
 
+    #[cfg(any(
+        feature = "ascii",
+        feature = "markdown",
+        feature = "plain",
+        feature = "psql",
+        feature = "unicode"
+    ))]
     #[test]
     fn test_csv_error() {
         let std_io_error = std::io::Error::new(std::io::ErrorKind::Other, "test");
@@ -65,6 +82,7 @@ mod tests {
         assert_eq!(io_error.to_string(), "test");
     }
 
+    #[cfg(any(feature = "html", feature = "xml"))]
     #[test]
     fn test_quick_xml_error() {
         let error = quick_xml::Error::UnexpectedToken("test".to_string());
@@ -72,6 +90,7 @@ mod tests {
         assert_eq!(io_error.to_string(), "Unexpected token 'test'");
     }
 
+    #[cfg(any(feature = "json", feature = "jsonl"))]
     #[test]
     fn test_serde_json_error() {
         let serde_json_error = serde_json::from_str::<String>(">").unwrap_err();
@@ -79,6 +98,7 @@ mod tests {
         assert_eq!(io_error.to_string(), "expected value at line 1 column 1");
     }
 
+    #[cfg(feature = "yaml")]
     #[test]
     fn test_serde_yaml_error() {
         let serde_yaml_error = serde_yaml::from_str::<String>(">\n@").unwrap_err();

@@ -6,6 +6,7 @@ extern crate rust_i18n;
 mod ascii;
 #[cfg(feature = "csv")]
 mod csv;
+#[cfg(any(feature = "csv", feature = "sqlite", feature = "tsv"))]
 mod delimited;
 mod error;
 mod footer;
@@ -25,6 +26,13 @@ mod plain;
 mod psql;
 #[cfg(feature = "sqlite")]
 mod sqlite;
+#[cfg(any(
+    feature = "ascii",
+    feature = "markdown",
+    feature = "plain",
+    feature = "psql",
+    feature = "unicode"
+))]
 mod table;
 #[cfg(feature = "tsv")]
 mod tsv;
