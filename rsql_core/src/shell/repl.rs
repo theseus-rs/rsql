@@ -96,7 +96,7 @@ impl Shell {
             self.repl(connection).await?
         };
 
-        connection.stop().await?;
+        connection.close().await?;
         Ok(exit_code)
     }
 
@@ -167,7 +167,7 @@ impl Shell {
                     }
                     eprintln!("{}", program_interrupted);
                     error!("Program interrupted");
-                    connection.stop().await?;
+                    connection.close().await?;
                     LoopCondition::Exit(1)
                 }
                 Err(error) => {
@@ -349,7 +349,7 @@ mod test {
             .returning(|| driver_identifier);
         mock_driver.expect_connect().returning(|_, _| {
             let mut mock_connection = MockConnection::new();
-            mock_connection.expect_stop().returning(|| Ok(()));
+            mock_connection.expect_close().returning(|| Ok(()));
             Ok(Box::new(mock_connection))
         });
         let mut driver_manager = DriverManager::new();

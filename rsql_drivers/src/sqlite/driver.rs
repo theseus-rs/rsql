@@ -146,7 +146,7 @@ impl crate::Connection for Connection {
         Ok(tables)
     }
 
-    async fn stop(&mut self) -> Result<()> {
+    async fn close(&mut self) -> Result<()> {
         self.pool.close().await;
         Ok(())
     }
@@ -223,7 +223,7 @@ mod test {
     async fn test_driver_connect() -> anyhow::Result<()> {
         let driver_manager = DriverManager::default();
         let mut connection = driver_manager.connect(DATABASE_URL).await?;
-        connection.stop().await?;
+        connection.close().await?;
         Ok(())
     }
 
@@ -272,7 +272,7 @@ mod test {
             None => assert!(false),
         }
 
-        connection.stop().await?;
+        connection.close().await?;
         Ok(())
     }
 
@@ -336,7 +336,7 @@ mod test {
             None => assert!(false),
         }
 
-        connection.stop().await?;
+        connection.close().await?;
         Ok(())
     }
 
@@ -355,7 +355,7 @@ mod test {
             value = row[0].clone();
         }
 
-        connection.stop().await?;
+        connection.close().await?;
         Ok(value)
     }
 
@@ -437,7 +437,7 @@ mod test {
         let tables = connection.tables().await?;
         assert_eq!(tables, vec!["contacts", "users"]);
 
-        connection.stop().await?;
+        connection.close().await?;
         Ok(())
     }
 }
