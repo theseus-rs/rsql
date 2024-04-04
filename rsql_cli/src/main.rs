@@ -13,17 +13,21 @@ use rsql_core::shell::{ShellArgs, ShellBuilder};
 use rsql_core::writers::{Output, StdoutWriter};
 use rust_i18n::t;
 use semver::Version;
-use std::io;
+use std::{env, io};
 use tracing::{debug, info};
 use version::full_version;
 
 i18n!("locales", fallback = "en");
 
-#[derive(Debug, Parser)]
+#[derive(Debug, Default, Parser)]
 pub(crate) struct Args {
     /// The shell arguments
     #[clap(flatten)]
     pub shell_args: ShellArgs,
+
+    /// Disable the auto update check
+    #[arg(long, env = "DISABLE_AUTO_UPDATE")]
+    disable_auto_update: bool,
 
     /// Display the version of this tool
     #[arg(long)]
@@ -59,7 +63,7 @@ pub(crate) async fn execute(
         0
     } else {
         if args.shell_args.commands.is_empty() && args.shell_args.file.is_none() {
-            welcome_message(&configuration, &mut io::stderr()).await?;
+            welcome_message(&args, &configuration, &mut io::stderr()).await?;
         }
 
         let mut shell = ShellBuilder::default()
@@ -73,7 +77,11 @@ pub(crate) async fn execute(
     Ok(exit_code)
 }
 
-async fn welcome_message(configuration: &Configuration, output: &mut dyn io::Write) -> Result<()> {
+async fn welcome_message(
+    args: &Args,
+    configuration: &Configuration,
+    output: &mut dyn io::Write,
+) -> Result<()> {
     let command_identifier = &configuration.command_identifier;
     let locale = configuration.locale.as_str();
 
@@ -106,7 +114,9 @@ async fn welcome_message(configuration: &Configuration, output: &mut dyn io::Wri
     );
 
     writeln!(output, "{}", banner_version)?;
-    check_for_newer_version(configuration, output).await?;
+    if !args.disable_auto_update {
+        check_for_newer_version(configuration, output).await?;
+    }
     writeln!(output, "{}", banner_message)?;
     Ok(())
 }
@@ -156,8 +166,8 @@ mod tests {
             ..Default::default()
         };
         let args = Args {
-            shell_args: ShellArgs::default(),
             version: true,
+            ..Default::default()
         };
         let output = Output::default();
 
@@ -176,6 +186,7 @@ mod tests {
         };
         let args = Args {
             shell_args,
+            disable_auto_update: false,
             version: false,
         };
         let output = Output::default();
@@ -187,7 +198,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_welcome_message() -> Result<()> {
-        let mut output = Vec::new();
+        let args = Args::default();
         let configuration = Configuration {
             program_name: "rsql".to_string(),
             version: "0.0.0".to_string(),
@@ -196,7 +207,8 @@ mod tests {
             command_identifier: ".".to_string(),
             ..Default::default()
         };
-        welcome_message(&configuration, &mut output).await?;
+        let mut output = Vec::new();
+        welcome_message(&args, &configuration, &mut output).await?;
 
         let command_output = String::from_utf8(output).unwrap();
         assert!(command_output.starts_with("rsql/0.0.0"));
