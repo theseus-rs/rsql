@@ -1,7 +1,7 @@
 [package]
 authors.workspace = true
 build = "build.rs"
-categories.workspace = true
+categories = ["command-line-utilities", "database"]
 description = "rsql is a command line interface for MariaDB, MySQL, PostgreSQL and SQLite3."
 documentation = "https://theseus-rs.github.io/rsql/rsql_cli/"
 edition.workspace = true
@@ -29,9 +29,11 @@ anyhow = { workspace = true }
 clap = { workspace = true, features = ["derive", "env"] }
 colored = { workspace = true }
 dotenvy = { workspace = true }
+octocrab = { workspace = true }
 os_info = { workspace = true }
 rsql_core = { path = "../rsql_core", version = "0.9.0", features = ["all"] }
 rust-i18n = { workspace = true }
+semver = { workspace = true }
 tokio = { workspace = true, features = ["rt", "rt-multi-thread", "macros"] }
 tracing = { workspace = true }
 

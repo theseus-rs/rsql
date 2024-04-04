@@ -12,8 +12,9 @@ use rsql_core::configuration::{Configuration, ConfigurationBuilder};
 use rsql_core::shell::{ShellArgs, ShellBuilder};
 use rsql_core::writers::{Output, StdoutWriter};
 use rust_i18n::t;
+use semver::Version;
 use std::io;
-use tracing::info;
+use tracing::{debug, info};
 use version::full_version;
 
 i18n!("locales", fallback = "en");
@@ -58,7 +59,7 @@ pub(crate) async fn execute(
         0
     } else {
         if args.shell_args.commands.is_empty() && args.shell_args.file.is_none() {
-            welcome_message(&mut io::stderr(), &configuration);
+            welcome_message(&configuration, &mut io::stderr()).await?;
         }
 
         let mut shell = ShellBuilder::default()
@@ -72,7 +73,7 @@ pub(crate) async fn execute(
     Ok(exit_code)
 }
 
-fn welcome_message(output: &mut dyn io::Write, configuration: &Configuration) {
+async fn welcome_message(configuration: &Configuration, output: &mut dyn io::Write) -> Result<()> {
     let command_identifier = &configuration.command_identifier;
     let locale = configuration.locale.as_str();
 
@@ -104,8 +105,43 @@ fn welcome_message(output: &mut dyn io::Write, configuration: &Configuration) {
         quit_command = quit_command
     );
 
-    writeln!(output, "{}", banner_version).expect("failed to banner version");
-    writeln!(output, "{}", banner_message).expect("failed to banner message")
+    writeln!(output, "{}", banner_version)?;
+    check_for_newer_version(configuration, output).await?;
+    writeln!(output, "{}", banner_message)?;
+    Ok(())
+}
+
+async fn check_for_newer_version(
+    configuration: &Configuration,
+    output: &mut dyn io::Write,
+) -> Result<()> {
+    let current = Version::parse(&configuration.version)?;
+    let release = match octocrab::instance()
+        .repos("theseus-rs", "rsql")
+        .releases()
+        .get_latest()
+        .await
+    {
+        Ok(release) => release,
+        Err(error) => {
+            debug!("Failed to get latest release: {error:?}");
+            return Ok(());
+        }
+    };
+    let latest = Version::parse(release.tag_name.trim_start_matches('v'))?;
+
+    if latest > current {
+        let locale = configuration.locale.as_str();
+        let newer_version = t!(
+            "newer_version",
+            locale = locale,
+            version = latest.to_string()
+        );
+
+        writeln!(output, "{}", newer_version)?;
+    }
+
+    Ok(())
 }
 
 #[cfg(test)]
@@ -149,8 +185,8 @@ mod tests {
         Ok(())
     }
 
-    #[test]
-    fn test_welcome_message() {
+    #[tokio::test]
+    async fn test_welcome_message() -> Result<()> {
         let mut output = Vec::new();
         let configuration = Configuration {
             program_name: "rsql".to_string(),
@@ -160,11 +196,12 @@ mod tests {
             command_identifier: ".".to_string(),
             ..Default::default()
         };
-        welcome_message(&mut output, &configuration);
+        welcome_message(&configuration, &mut output).await?;
 
         let command_output = String::from_utf8(output).unwrap();
         assert!(command_output.starts_with("rsql/0.0.0"));
         assert!(command_output.contains(".help"));
         assert!(command_output.contains(".quit"));
+        Ok(())
     }
 }
