@@ -10,7 +10,6 @@ use std::fmt::Debug;
 pub trait QueryResult: Debug + Send + Sync {
     async fn columns(&self) -> Vec<String>;
     async fn next(&mut self) -> Option<Row>;
-    async fn rows(&self) -> Vec<Row>;
 }
 
 /// Query result with a limit
@@ -46,16 +45,6 @@ impl QueryResult for LimitQueryResult {
         self.row_index += 1;
         value
     }
-
-    async fn rows(&self) -> Vec<Row> {
-        let rows = self.inner.rows().await;
-
-        if rows.len() <= self.limit {
-            return rows;
-        }
-
-        rows[0..self.limit].to_vec()
-    }
 }
 
 /// In-memory query result
@@ -86,10 +75,6 @@ impl QueryResult for MemoryQueryResult {
         let result = self.rows.get(self.row_index).cloned();
         self.row_index += 1;
         result
-    }
-
-    async fn rows(&self) -> Vec<Row> {
-        self.rows.clone()
     }
 }
 

@@ -2,6 +2,7 @@ use crate::error::Result;
 use crate::footer::write_footer;
 use crate::formatter::FormatterOptions;
 use crate::writers::Output;
+use crate::Results::Query;
 use crate::{Highlighter, Results};
 use async_trait::async_trait;
 use quick_xml::events::{BytesEnd, BytesStart, BytesText, Event};
@@ -33,8 +34,8 @@ pub(crate) async fn format_html(
     output: &mut Output,
 ) -> Result<()> {
     let query_result = match results {
-        Results::Query(query_result) => query_result,
-        _ => return write_footer(options, results, output).await,
+        Query(query_result) => query_result,
+        _ => return write_footer(options, results, 0, output).await,
     };
 
     let mut raw_output = Output::default();
@@ -52,6 +53,8 @@ pub(crate) async fn format_html(
     writer.write_event(Event::End(BytesEnd::new("thead")))?;
 
     writer.write_event(Event::Start(BytesStart::new("tbody")))?;
+
+    let mut rows: u64 = 0;
     while let Some(row) = query_result.next().await {
         writer.write_event(Event::Start(BytesStart::new("tr")))?;
 
@@ -70,7 +73,9 @@ pub(crate) async fn format_html(
         }
 
         writer.write_event(Event::End(BytesEnd::new("tr")))?;
+        rows += 1;
     }
+
     writer.write_event(Event::End(BytesEnd::new("tbody")))?;
     writer.write_event(Event::End(BytesEnd::new("table")))?;
 
@@ -78,7 +83,7 @@ pub(crate) async fn format_html(
     let highlighter = Highlighter::new(options, "html");
     writeln!(output, "{}", highlighter.highlight(html_output.as_str())?)?;
 
-    write_footer(options, results, output).await
+    write_footer(options, results, rows, output).await
 }
 
 #[cfg(test)]

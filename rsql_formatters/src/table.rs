@@ -18,9 +18,11 @@ pub async fn format(
     results: &mut Results,
     output: &mut Output,
 ) -> Result<()> {
+    let mut rows: u64 = 0;
+
     if let Query(query_result) = results {
         if query_result.columns().await.is_empty() {
-            write_footer(options, results, output).await?;
+            write_footer(options, results, 0, output).await?;
             return Ok(());
         }
 
@@ -31,12 +33,12 @@ pub async fn format(
             process_headers(query_result, &mut table).await;
         }
 
-        process_data(options, query_result, &mut table).await?;
+        rows = process_data(options, query_result, &mut table).await?;
 
         table.print(output)?;
     }
 
-    write_footer(options, results, output).await?;
+    write_footer(options, results, rows, output).await?;
     Ok(())
 }
 
@@ -54,9 +56,9 @@ async fn process_data(
     options: &FormatterOptions,
     query_result: &mut Box<dyn QueryResult>,
     table: &mut Table,
-) -> Result<()> {
+) -> Result<u64> {
     let locale = Locale::from_str(options.locale.as_str()).unwrap_or(Locale::en);
-    let mut index = 0;
+    let mut rows: u64 = 0;
     while let Some(row) = query_result.next().await {
         let mut row_data = Vec::new();
 
@@ -67,7 +69,7 @@ async fn process_data(
             };
 
             if options.color {
-                if index % 2 == 0 {
+                if rows % 2 == 0 {
                     row_data.push(data.dimmed().to_string());
                 } else {
                     row_data.push(data);
@@ -77,11 +79,11 @@ async fn process_data(
             }
         }
 
-        index += 1;
+        rows += 1;
         table.add_row(prettytable::Row::from(row_data));
     }
 
-    Ok(())
+    Ok(rows)
 }
 
 #[cfg(test)]

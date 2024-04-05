@@ -4,6 +4,7 @@ use crate::formatter::FormatterOptions;
 use crate::highlighter::Highlighter;
 use crate::writers::Output;
 use crate::Results;
+use crate::Results::Query;
 use async_trait::async_trait;
 use indexmap::IndexMap;
 use rsql_drivers::Value;
@@ -34,12 +35,14 @@ pub(crate) async fn format_yaml(
     output: &mut Output,
 ) -> Result<()> {
     let query_result = match results {
-        Results::Query(query_result) => query_result,
-        _ => return write_footer(options, results, output).await,
+        Query(query_result) => query_result,
+        _ => return write_footer(options, results, 0, output).await,
     };
 
     let mut yaml_rows: Vec<IndexMap<&String, Option<Value>>> = Vec::new();
     let columns: Vec<String> = query_result.columns().await;
+    let mut rows: u64 = 0;
+
     while let Some(row) = query_result.next().await {
         let mut yaml_row: IndexMap<&String, Option<Value>> = IndexMap::new();
 
@@ -61,13 +64,14 @@ pub(crate) async fn format_yaml(
         }
 
         yaml_rows.push(yaml_row);
+        rows += 1;
     }
 
     let yaml = serde_yaml::to_string(&yaml_rows)?;
     let highlighter = Highlighter::new(options, "yaml");
     write!(output, "{}", highlighter.highlight(yaml.as_str())?)?;
 
-    write_footer(options, results, output).await
+    write_footer(options, results, rows, output).await
 }
 
 #[cfg(test)]
