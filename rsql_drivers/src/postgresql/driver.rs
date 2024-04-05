@@ -541,7 +541,7 @@ mod test {
         let driver_manager = DriverManager::default();
         let connection = driver_manager.connect(database_url.as_str()).await?;
 
-        let query_result = connection.query("SELECT 'foo'::TEXT").await?;
+        let mut query_result = connection.query("SELECT 'foo'::TEXT").await?;
         let row = query_result.next().await.expect("no row");
         let value = row.first().expect("no value");
 
