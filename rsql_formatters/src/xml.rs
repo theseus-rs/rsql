@@ -2,6 +2,7 @@ use crate::error::Result;
 use crate::footer::write_footer;
 use crate::formatter::FormatterOptions;
 use crate::writers::Output;
+use crate::Results::Query;
 use crate::{Highlighter, Results};
 use async_trait::async_trait;
 use quick_xml::events::{BytesEnd, BytesStart, BytesText, Event};
@@ -33,8 +34,8 @@ pub(crate) async fn format_xml(
     output: &mut Output,
 ) -> Result<()> {
     let query_result = match results {
-        Results::Query(query_result) => query_result,
-        _ => return write_footer(options, results, output).await,
+        Query(query_result) => query_result,
+        _ => return write_footer(options, results, 0, output).await,
     };
 
     let mut raw_output = Output::default();
@@ -42,6 +43,8 @@ pub(crate) async fn format_xml(
 
     writer.write_event(Event::Start(BytesStart::new("results")))?;
     let columns: Vec<String> = query_result.columns().await;
+    let mut rows: u64 = 0;
+
     while let Some(row) = query_result.next().await {
         writer.write_event(Event::Start(BytesStart::new("row")))?;
         for (c, data) in row.into_iter().enumerate() {
@@ -60,6 +63,7 @@ pub(crate) async fn format_xml(
             }
         }
         writer.write_event(Event::End(BytesEnd::new("row")))?;
+        rows += 1;
     }
     writer.write_event(Event::End(BytesEnd::new("results")))?;
 
@@ -67,7 +71,7 @@ pub(crate) async fn format_xml(
     let highlighter = Highlighter::new(options, "xml");
     writeln!(output, "{}", highlighter.highlight(xml_output.as_str())?)?;
 
-    write_footer(options, results, output).await
+    write_footer(options, results, rows, output).await
 }
 
 #[cfg(test)]

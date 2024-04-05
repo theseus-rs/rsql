@@ -15,6 +15,7 @@ use std::str::FromStr;
 pub async fn write_footer(
     options: &FormatterOptions,
     results: &Results,
+    query_rows: u64,
     output: &mut Output,
 ) -> Result<()> {
     if !options.footer {
@@ -23,7 +24,7 @@ pub async fn write_footer(
 
     let (display_rows, rows_affected) = match results {
         Execute(rows_affected) => (options.changes, *rows_affected),
-        Query(query_result) => (options.rows, query_result.rows().await.len() as u64),
+        Query(_query_result) => (options.rows, query_rows),
     };
     let locale = &options.locale;
     let num_locale = Locale::from_str(locale).unwrap_or(Locale::en);
@@ -86,11 +87,12 @@ mod tests {
     async fn test_write_footer(
         options: &mut FormatterOptions,
         results: &Results,
+        query_rows: u64,
     ) -> anyhow::Result<String> {
         let output = &mut Output::default();
         options.elapsed = Duration::from_nanos(9);
 
-        write_footer(options, results, output).await?;
+        write_footer(options, results, query_rows, output).await?;
 
         let output = output.to_string().replace("\r\n", "\n");
         Ok(output)
@@ -102,7 +104,7 @@ mod tests {
             footer: false,
             ..Default::default()
         };
-        let output = test_write_footer(&mut options, &query_result(0)).await?;
+        let output = test_write_footer(&mut options, &query_result(0), 0).await?;
         assert!(!output.contains("row"));
         Ok(())
     }
@@ -110,7 +112,7 @@ mod tests {
     #[tokio::test]
     async fn test_write_footer_execute() -> anyhow::Result<()> {
         let mut options = FormatterOptions::default();
-        let output = test_write_footer(&mut options, &Execute(42)).await?;
+        let output = test_write_footer(&mut options, &Execute(42), 0).await?;
         assert!(output.contains("42 rows"));
         assert!(output.contains("(9ns)"));
         Ok(())
@@ -123,7 +125,7 @@ mod tests {
             rows: true,
             ..Default::default()
         };
-        let output = test_write_footer(&mut options, &Execute(42)).await?;
+        let output = test_write_footer(&mut options, &Execute(42), 0).await?;
         assert!(!output.contains("42 rows"));
         assert!(output.contains("(9ns)"));
         Ok(())
@@ -132,7 +134,7 @@ mod tests {
     #[tokio::test]
     async fn test_write_footer_no_rows() -> anyhow::Result<()> {
         let mut options = FormatterOptions::default();
-        let output = test_write_footer(&mut options, &query_result(0)).await?;
+        let output = test_write_footer(&mut options, &query_result(0), 0).await?;
         assert!(output.contains("0 rows"));
         assert!(output.contains("(9ns)"));
         Ok(())
@@ -144,7 +146,7 @@ mod tests {
             changes: false,
             ..Default::default()
         };
-        let output = test_write_footer(&mut options, &query_result(1)).await?;
+        let output = test_write_footer(&mut options, &query_result(1), 1).await?;
         assert!(output.contains("1 row"));
         assert!(output.contains("(9ns)"));
         Ok(())
@@ -157,7 +159,7 @@ mod tests {
             rows: false,
             ..Default::default()
         };
-        let output = test_write_footer(&mut options, &query_result(1)).await?;
+        let output = test_write_footer(&mut options, &query_result(1), 1).await?;
         assert!(!output.contains("1 row"));
         assert!(output.contains("(9ns)"));
         Ok(())
@@ -170,7 +172,7 @@ mod tests {
             timer: false,
             ..Default::default()
         };
-        let output = test_write_footer(&mut options, &query_result(1)).await?;
+        let output = test_write_footer(&mut options, &query_result(1), 1).await?;
         assert!(output.contains("1 row"));
         assert!(!output.contains("(9ns)"));
         Ok(())

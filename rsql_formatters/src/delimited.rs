@@ -13,8 +13,8 @@ pub async fn format(
     results: &mut Results,
     output: &mut Output,
 ) -> Result<()> {
-    format_delimited(options, delimiter, quote_style, results, output).await?;
-    write_footer(options, results, output).await
+    let rows = format_delimited(options, delimiter, quote_style, results, output).await?;
+    write_footer(options, results, rows, output).await
 }
 
 async fn format_delimited(
@@ -23,7 +23,9 @@ async fn format_delimited(
     quote_style: QuoteStyle,
     results: &mut Results,
     output: &mut Output,
-) -> Result<()> {
+) -> Result<u64> {
+    let mut rows: u64 = 0;
+
     if let Query(query_result) = results {
         let mut writer = csv::WriterBuilder::new()
             .delimiter(delimiter)
@@ -46,10 +48,12 @@ async fn format_delimited(
                 csv_row.push(bytes);
             }
             writer.write_record(csv_row)?;
+            rows += 1;
         }
         writer.flush()?;
     }
-    Ok(())
+
+    Ok(rows)
 }
 
 #[cfg(test)]
