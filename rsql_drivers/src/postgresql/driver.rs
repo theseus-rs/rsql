@@ -160,7 +160,7 @@ impl crate::Connection for Connection {
                 let value = self.convert_to_value(&row, column)?;
                 row_data.push(value);
             }
-            rows.push(row_data);
+            rows.push(crate::Row::new(row_data));
         }
 
         let query_result = MemoryQueryResult::new(columns, rows);
@@ -179,7 +179,7 @@ impl crate::Connection for Connection {
         let mut tables = Vec::new();
 
         for row in query_result.rows().await {
-            if let Some(data) = &row[0] {
+            if let Some(data) = row.get(0) {
                 tables.push(data.to_string());
             }
         }
@@ -315,13 +315,13 @@ mod test {
             Some(row) => {
                 assert_eq!(row.len(), 2);
 
-                if let Some(Value::I32(id)) = &row[0] {
+                if let Some(Value::I32(id)) = row.get(0) {
                     assert_eq!(*id, 1);
                 } else {
                     assert!(false);
                 }
 
-                if let Some(Value::String(name)) = &row[1] {
+                if let Some(Value::String(name)) = row.get(1) {
                     assert_eq!(name, "foo");
                 } else {
                     assert!(false);
@@ -347,7 +347,7 @@ mod test {
         if let Some(row) = query_result.rows().await.get(0) {
             assert_eq!(row.len(), 1);
 
-            value = row[0].clone();
+            value = row.get(0).cloned();
         }
 
         connection.close().await?;
@@ -544,10 +544,9 @@ mod test {
         let query_result = connection.query("SELECT 'foo'::TEXT").await?;
         let rows = query_result.rows().await;
         let row = rows.first().expect("row is None");
-        let cell = row.first().expect("cell is None");
-        if let Some(value) = cell.clone() {
-            assert_eq!(value, Value::String("foo".to_string()));
-        }
+        let value = row.first().expect("cell is None");
+
+        assert_eq!(*value, Value::String("foo".to_string()));
 
         Ok(())
     }

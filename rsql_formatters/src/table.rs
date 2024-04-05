@@ -60,7 +60,7 @@ async fn process_data(
     for (i, row) in query_result.rows().await.iter().enumerate() {
         let mut row_data = Vec::new();
 
-        for data in row {
+        for data in row.into_iter() {
             let data = match data {
                 Some(data) => data.to_formatted_string(&locale),
                 None => "NULL".to_string(),
@@ -90,7 +90,7 @@ mod tests {
     use crate::Results::Execute;
     use indoc::indoc;
     use prettytable::format::consts::FORMAT_DEFAULT;
-    use rsql_drivers::{MemoryQueryResult, Value};
+    use rsql_drivers::{MemoryQueryResult, Row, Value};
     use std::time::Duration;
 
     const COLUMN_HEADER: &str = "id";
@@ -108,7 +108,7 @@ mod tests {
     fn query_result_one_row() -> Results {
         let query_result = MemoryQueryResult::new(
             vec![COLUMN_HEADER.to_string()],
-            vec![vec![Some(Value::I64(12345))]],
+            vec![Row::new(vec![Some(Value::I64(12345))])],
         );
         Query(Box::new(query_result))
     }
@@ -116,7 +116,10 @@ mod tests {
     fn query_result_two_rows() -> Results {
         let query_result = MemoryQueryResult::new(
             vec![COLUMN_HEADER.to_string()],
-            vec![vec![None], vec![Some(Value::I64(12345))]],
+            vec![
+                Row::new(vec![None]),
+                Row::new(vec![Some(Value::I64(12345))]),
+            ],
         );
         Query(Box::new(query_result))
     }

@@ -37,7 +37,7 @@ async fn format_delimited(
         for row in &query_result.rows().await {
             let mut csv_row: Vec<Vec<u8>> = Vec::new();
 
-            for data in row {
+            for data in row.into_iter() {
                 let bytes = if let Some(value) = data {
                     Vec::from(value.to_string().as_bytes())
                 } else {
@@ -59,7 +59,7 @@ mod test {
     use crate::writers::Output;
     use crate::Results::Execute;
     use indoc::indoc;
-    use rsql_drivers::{MemoryQueryResult, Value};
+    use rsql_drivers::{MemoryQueryResult, Row, Value};
     use std::time::Duration;
 
     #[tokio::test]
@@ -92,10 +92,10 @@ mod test {
         };
         let query_result = Query(Box::new(MemoryQueryResult::new(
             vec!["id".to_string(), "data".to_string()],
-            vec![vec![
+            vec![Row::new(vec![
                 Some(Value::I64(1)),
                 Some(Value::String("foo".to_string())),
-            ]],
+            ])],
         )));
         let output = &mut Output::default();
 
@@ -127,9 +127,15 @@ mod test {
         let query_result = Query(Box::new(MemoryQueryResult::new(
             vec!["id".to_string(), "data".to_string()],
             vec![
-                vec![Some(Value::I64(1)), Some(Value::Bytes(b"bytes".to_vec()))],
-                vec![Some(Value::I64(2)), Some(Value::String("foo".to_string()))],
-                vec![Some(Value::I64(3)), None],
+                Row::new(vec![
+                    Some(Value::I64(1)),
+                    Some(Value::Bytes(b"bytes".to_vec())),
+                ]),
+                Row::new(vec![
+                    Some(Value::I64(2)),
+                    Some(Value::String("foo".to_string())),
+                ]),
+                Row::new(vec![Some(Value::I64(3)), None]),
             ],
         )));
         let output = &mut Output::default();
