@@ -118,10 +118,10 @@ impl crate::Connection for Connection {
              WHERE table_schema = DATABASE()
              ORDER BY table_name
         "#};
-        let query_result = self.query(sql).await?;
+        let mut query_result = self.query(sql).await?;
         let mut tables = Vec::new();
 
-        for row in query_result.rows().await {
+        while let Some(row) = query_result.next().await {
             if let Some(data) = row.get(0) {
                 tables.push(data.to_string());
             }
@@ -237,10 +237,9 @@ mod test {
             .await?;
         assert_eq!(rows, 1);
 
-        let query_result = connection.query("SELECT id, name FROM person").await?;
+        let mut query_result = connection.query("SELECT id, name FROM person").await?;
         assert_eq!(query_result.columns().await, vec!["id", "name"]);
-        assert_eq!(query_result.rows().await.len(), 1);
-        match query_result.rows().await.get(0) {
+        match query_result.next().await {
             Some(row) => {
                 assert_eq!(row.len(), 2);
 
@@ -258,6 +257,7 @@ mod test {
             }
             None => assert!(false),
         }
+        assert!(query_result.next().await.is_none());
         Ok(())
     }
 
@@ -309,9 +309,9 @@ mod test {
                    timestamp_type, json_type
               FROM data_types
         "#};
-        let query_result = connection.query(sql).await?;
+        let mut query_result = connection.query(sql).await?;
 
-        if let Some(row) = query_result.rows().await.first() {
+        if let Some(row) = query_result.next().await {
             assert_eq!(row.get(0).cloned().unwrap(), Value::String("a".to_string()));
             assert_eq!(
                 row.get(1).cloned().unwrap(),

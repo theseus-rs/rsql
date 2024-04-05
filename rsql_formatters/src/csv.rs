@@ -19,7 +19,7 @@ impl crate::Formatter for Formatter {
     async fn format(
         &self,
         options: &FormatterOptions,
-        results: &Results,
+        results: &mut Results,
         output: &mut Output,
     ) -> Result<()> {
         format(options, b',', QuoteStyle::NonNumeric, results, output).await
@@ -44,7 +44,7 @@ mod test {
             elapsed: Duration::from_nanos(9),
             ..Default::default()
         };
-        let query_result = Query(Box::new(MemoryQueryResult::new(
+        let mut query_result = Query(Box::new(MemoryQueryResult::new(
             vec!["id".to_string(), "data".to_string()],
             vec![
                 Row::new(vec![
@@ -62,7 +62,7 @@ mod test {
 
         let formatter = Formatter;
         formatter
-            .format(&mut options, &query_result, output)
+            .format(&mut options, &mut query_result, output)
             .await?;
 
         let output = output.to_string().replace("\r\n", "\n");

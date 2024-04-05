@@ -20,7 +20,7 @@ impl crate::Formatter for Formatter {
     async fn format(
         &self,
         options: &FormatterOptions,
-        results: &Results,
+        results: &mut Results,
         output: &mut Output,
     ) -> Result<()> {
         format_html(options, results, output).await
@@ -29,7 +29,7 @@ impl crate::Formatter for Formatter {
 
 pub(crate) async fn format_html(
     options: &FormatterOptions,
-    results: &Results,
+    results: &mut Results,
     output: &mut Output,
 ) -> Result<()> {
     let query_result = match results {
@@ -52,7 +52,7 @@ pub(crate) async fn format_html(
     writer.write_event(Event::End(BytesEnd::new("thead")))?;
 
     writer.write_event(Event::Start(BytesStart::new("tbody")))?;
-    for row in &query_result.rows().await {
+    while let Some(row) = query_result.next().await {
         writer.write_event(Event::Start(BytesStart::new("tr")))?;
 
         for data in row.into_iter() {
@@ -102,7 +102,7 @@ mod test {
         let output = &mut Output::default();
 
         let formatter = Formatter;
-        formatter.format(&options, &Execute(1), output).await?;
+        formatter.format(&options, &mut Execute(1), output).await?;
 
         let output = output.to_string().replace("\r\n", "\n");
         let expected = "1 row (9ns)\n";
@@ -117,7 +117,7 @@ mod test {
             elapsed: Duration::from_nanos(9),
             ..Default::default()
         };
-        let query_result = Query(Box::new(MemoryQueryResult::new(
+        let mut query_result = Query(Box::new(MemoryQueryResult::new(
             vec!["id".to_string(), "data".to_string()],
             vec![
                 Row::new(vec![
@@ -134,7 +134,9 @@ mod test {
         let output = &mut Output::default();
 
         let formatter = Formatter;
-        formatter.format(&options, &query_result, output).await?;
+        formatter
+            .format(&options, &mut query_result, output)
+            .await?;
 
         let output = output.to_string().replace("\r\n", "\n");
         let expected = indoc! {r#"

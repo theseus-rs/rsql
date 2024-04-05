@@ -51,10 +51,12 @@ impl<'a> SqlExecutor<'a> {
         let mut options = self.configuration.get_formatter_options();
 
         let limit = self.configuration.results_limit;
-        let results = &self.execute_sql(sql, limit).await?;
+        let mut results = self.execute_sql(sql, limit).await?;
         options.elapsed = start.elapsed();
 
-        formatter.format(&options, results, self.output).await?;
+        formatter
+            .format(&options, &mut results, self.output)
+            .await?;
         Ok(LoopCondition::Continue)
     }
 

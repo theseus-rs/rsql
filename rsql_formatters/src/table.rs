@@ -9,17 +9,16 @@ use num_format::Locale;
 use prettytable::format::TableFormat;
 use prettytable::Table;
 use rsql_drivers::QueryResult;
-use std::ops::Deref;
 use std::str::FromStr;
 
 /// Format the results of a query into a table and write to the output.
 pub async fn format(
     table_format: TableFormat,
     options: &FormatterOptions,
-    results: &Results,
+    results: &mut Results,
     output: &mut Output,
 ) -> Result<()> {
-    if let Query(query_result) = &results {
+    if let Query(query_result) = results {
         if query_result.columns().await.is_empty() {
             write_footer(options, results, output).await?;
             return Ok(());
@@ -29,10 +28,10 @@ pub async fn format(
         table.set_format(table_format);
 
         if options.header {
-            process_headers(query_result.deref(), &mut table).await;
+            process_headers(query_result, &mut table).await;
         }
 
-        process_data(options, query_result.deref(), &mut table).await?;
+        process_data(options, query_result, &mut table).await?;
 
         table.print(output)?;
     }
@@ -41,7 +40,7 @@ pub async fn format(
     Ok(())
 }
 
-async fn process_headers(query_result: &dyn QueryResult, table: &mut Table) {
+async fn process_headers(query_result: &mut Box<dyn QueryResult>, table: &mut Table) {
     let mut column_names = Vec::new();
 
     for column in &query_result.columns().await {
@@ -53,11 +52,12 @@ async fn process_headers(query_result: &dyn QueryResult, table: &mut Table) {
 
 async fn process_data(
     options: &FormatterOptions,
-    query_result: &dyn QueryResult,
+    query_result: &mut Box<dyn QueryResult>,
     table: &mut Table,
 ) -> Result<()> {
     let locale = Locale::from_str(options.locale.as_str()).unwrap_or(Locale::en);
-    for (i, row) in query_result.rows().await.iter().enumerate() {
+    let mut index = 0;
+    while let Some(row) = query_result.next().await {
         let mut row_data = Vec::new();
 
         for data in row.into_iter() {
@@ -67,7 +67,7 @@ async fn process_data(
             };
 
             if options.color {
-                if i % 2 == 0 {
+                if index % 2 == 0 {
                     row_data.push(data.dimmed().to_string());
                 } else {
                     row_data.push(data);
@@ -77,6 +77,7 @@ async fn process_data(
             }
         }
 
+        index += 1;
         table.add_row(prettytable::Row::from(row_data));
     }
 
@@ -126,12 +127,12 @@ mod tests {
 
     async fn test_format(
         options: &mut FormatterOptions,
-        results: &Results,
+        results: &mut Results,
     ) -> anyhow::Result<String> {
         let output = &mut Output::default();
         options.elapsed = Duration::from_nanos(9);
 
-        format(*FORMAT_DEFAULT, options, &results, output).await?;
+        format(*FORMAT_DEFAULT, options, results, output).await?;
 
         Ok(output.to_string().replace("\r\n", "\n"))
     }
@@ -143,9 +144,9 @@ mod tests {
             locale: "en".to_string(),
             ..Default::default()
         };
-        let results = Execute(42);
+        let mut results = Execute(42);
 
-        let output = test_format(&mut options, &results).await?;
+        let output = test_format(&mut options, &mut results).await?;
         let expected = "42 rows (9ns)\n";
         assert_eq!(output, expected);
         Ok(())
@@ -158,9 +159,9 @@ mod tests {
             locale: "en".to_string(),
             ..Default::default()
         };
-        let results = query_result_no_rows();
+        let mut results = query_result_no_rows();
 
-        let output = test_format(&mut options, &results).await?;
+        let output = test_format(&mut options, &mut results).await?;
         let expected = indoc! {r#"
             +----+
             | id |
@@ -181,9 +182,9 @@ mod tests {
             timer: false,
             ..Default::default()
         };
-        let results = query_result_no_rows();
+        let mut results = query_result_no_rows();
 
-        let output = test_format(&mut options, &results).await?;
+        let output = test_format(&mut options, &mut results).await?;
         let expected = indoc! {r#"
             +----+
             | id |
@@ -202,9 +203,9 @@ mod tests {
             locale: "en".to_string(),
             ..Default::default()
         };
-        let results = query_result_two_rows();
+        let mut results = query_result_two_rows();
 
-        let output = test_format(&mut options, &results).await?;
+        let output = test_format(&mut options, &mut results).await?;
         let expected = indoc! {r#"
             +--------+
             | id     |
@@ -226,9 +227,9 @@ mod tests {
             locale: "en".to_string(),
             ..Default::default()
         };
-        let results = query_result_two_rows();
+        let mut results = query_result_two_rows();
 
-        let output = test_format(&mut options, &results).await?;
+        let output = test_format(&mut options, &mut results).await?;
         assert!(output.contains("id"));
         assert!(output.contains("NULL"));
         assert!(output.contains("12,345"));
@@ -246,9 +247,9 @@ mod tests {
             locale: "en".to_string(),
             ..Default::default()
         };
-        let results = query_result_one_row();
+        let mut results = query_result_one_row();
 
-        let output = test_format(&mut options, &results).await?;
+        let output = test_format(&mut options, &mut results).await?;
         let expected = indoc! {r#"
             +--------+
             | 12,345 |
@@ -265,9 +266,9 @@ mod tests {
             locale: "en".to_string(),
             ..Default::default()
         };
-        let results = query_result_no_columns();
+        let mut results = query_result_no_columns();
 
-        let output = test_format(&mut options, &results).await?;
+        let output = test_format(&mut options, &mut results).await?;
         let expected = indoc! {r#"
             0 rows (9ns)
         "#};

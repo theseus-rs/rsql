@@ -18,7 +18,7 @@ impl crate::Formatter for Formatter {
     async fn format(
         &self,
         options: &FormatterOptions,
-        results: &Results,
+        results: &mut Results,
         output: &mut Output,
     ) -> Result<()> {
         table::format(*FORMAT_DEFAULT, options, results, output).await
@@ -45,7 +45,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_format() -> anyhow::Result<()> {
-        let results = query_result();
+        let mut results = query_result();
         let output = &mut Output::default();
         let mut options = FormatterOptions {
             color: false,
@@ -54,7 +54,7 @@ mod tests {
         };
         let formatter = Formatter;
 
-        formatter.format(&mut options, &results, output).await?;
+        formatter.format(&mut options, &mut results, output).await?;
 
         let ascii_output = output.to_string().replace("\r\n", "\n");
         let expected = indoc! {r#"

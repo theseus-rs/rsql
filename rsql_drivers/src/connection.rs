@@ -9,6 +9,7 @@ use std::fmt::Debug;
 #[async_trait]
 pub trait QueryResult: Debug + Send + Sync {
     async fn columns(&self) -> Vec<String>;
+    async fn next(&mut self) -> Option<Row>;
     async fn rows(&self) -> Vec<Row>;
 }
 
@@ -16,12 +17,17 @@ pub trait QueryResult: Debug + Send + Sync {
 #[derive(Debug)]
 pub struct LimitQueryResult {
     inner: Box<dyn QueryResult>,
+    row_index: usize,
     limit: usize,
 }
 
 impl LimitQueryResult {
     pub fn new(inner: Box<dyn QueryResult>, limit: usize) -> Self {
-        Self { inner, limit }
+        Self {
+            inner,
+            row_index: 0,
+            limit,
+        }
     }
 }
 
@@ -29,6 +35,16 @@ impl LimitQueryResult {
 impl QueryResult for LimitQueryResult {
     async fn columns(&self) -> Vec<String> {
         self.inner.columns().await
+    }
+
+    async fn next(&mut self) -> Option<Row> {
+        if self.row_index >= self.limit {
+            return None;
+        }
+
+        let value = self.inner.next().await;
+        self.row_index += 1;
+        value
     }
 
     async fn rows(&self) -> Vec<Row> {
@@ -46,12 +62,17 @@ impl QueryResult for LimitQueryResult {
 #[derive(Clone, Debug, Default)]
 pub struct MemoryQueryResult {
     columns: Vec<String>,
+    row_index: usize,
     rows: Vec<Row>,
 }
 
 impl MemoryQueryResult {
     pub fn new(columns: Vec<String>, rows: Vec<Row>) -> Self {
-        Self { columns, rows }
+        Self {
+            columns,
+            row_index: 0,
+            rows,
+        }
     }
 }
 
@@ -59,6 +80,12 @@ impl MemoryQueryResult {
 impl QueryResult for MemoryQueryResult {
     async fn columns(&self) -> Vec<String> {
         self.columns.clone()
+    }
+
+    async fn next(&mut self) -> Option<Row> {
+        let result = self.rows.get(self.row_index).cloned();
+        self.row_index += 1;
+        result
     }
 
     async fn rows(&self) -> Vec<Row> {
@@ -87,15 +114,14 @@ mod test {
         let columns = vec!["a".to_string()];
         let rows = vec![Row::new(vec![Some(Value::String("foo".to_string()))])];
 
-        let result = MemoryQueryResult::new(columns, rows);
+        let mut result = MemoryQueryResult::new(columns, rows);
 
         let columns = result.columns().await;
         let column = columns.get(0).expect("no column");
         assert_eq!(column, &"a".to_string());
 
-        let rows = result.rows().await;
-        let row = rows.get(0).expect("no rows");
-        let value = row.get(0).expect("no row value");
+        let row = result.next().await.expect("no row");
+        let value = row.first().expect("no value");
         assert_eq!(value, &Value::String("foo".to_string()));
     }
 
@@ -110,22 +136,17 @@ mod test {
             Row::new(vec![Some(Value::I64(5))]),
         ];
         let memory_result = MemoryQueryResult::new(columns, rows);
-        let result = LimitQueryResult::new(Box::new(memory_result), 2);
+        let mut result = LimitQueryResult::new(Box::new(memory_result), 2);
 
         let columns = result.columns().await;
         let column = columns.get(0).expect("no column");
         assert_eq!(column, &"id".to_string());
 
-        let rows = result.rows().await;
-        let data: Vec<String> = rows
-            .iter()
-            .map(|row| {
-                if let Some(value) = row.get(0) {
-                    return value.to_string();
-                }
-                "0".to_string()
-            })
-            .collect();
+        let mut data: Vec<String> = Vec::new();
+        while let Some(row) = result.next().await {
+            let value = row.first().expect("no value");
+            data.push(value.to_string());
+        }
 
         assert_eq!(data, ["1".to_string(), "2".to_string()]);
     }
@@ -135,22 +156,17 @@ mod test {
         let columns = vec!["id".to_string()];
         let rows = vec![Row::new(vec![Some(Value::I64(1))])];
         let memory_result = MemoryQueryResult::new(columns, rows);
-        let result = LimitQueryResult::new(Box::new(memory_result), 100);
+        let mut result = LimitQueryResult::new(Box::new(memory_result), 100);
 
         let columns = result.columns().await;
         let column = columns.get(0).expect("no column");
         assert_eq!(column, &"id".to_string());
 
-        let rows = result.rows().await;
-        let data: Vec<String> = rows
-            .iter()
-            .map(|row| {
-                if let Some(value) = row.get(0) {
-                    return value.to_string();
-                }
-                "0".to_string()
-            })
-            .collect();
+        let mut data: Vec<String> = Vec::new();
+        while let Some(row) = result.next().await {
+            let value = row.first().expect("no value");
+            data.push(value.to_string());
+        }
 
         assert_eq!(data, ["1".to_string()]);
     }
