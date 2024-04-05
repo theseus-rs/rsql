@@ -59,7 +59,7 @@ pub trait Formatter: Debug + Send + Sync {
     async fn format(
         &self,
         options: &FormatterOptions,
-        results: &Results,
+        results: &mut Results,
         output: &mut Output,
     ) -> Result<()>;
 }

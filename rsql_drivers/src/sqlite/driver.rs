@@ -130,10 +130,10 @@ impl crate::Connection for Connection {
 
     async fn tables(&mut self) -> Result<Vec<String>> {
         let sql = "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name";
-        let query_result = self.query(sql).await?;
+        let mut query_result = self.query(sql).await?;
         let mut tables = Vec::new();
 
-        for row in query_result.rows().await {
+        while let Some(row) = query_result.next().await {
             if let Some(data) = row.get(0) {
                 tables.push(data.to_string());
             }
@@ -237,10 +237,9 @@ mod test {
             .await?;
         assert_eq!(rows, 1);
 
-        let query_result = connection.query("SELECT id, name FROM person").await?;
+        let mut query_result = connection.query("SELECT id, name FROM person").await?;
         assert_eq!(query_result.columns().await, vec!["id", "name"]);
-        assert_eq!(query_result.rows().await.len(), 1);
-        match query_result.rows().await.get(0) {
+        match query_result.next().await {
             Some(row) => {
                 assert_eq!(row.len(), 2);
 
@@ -258,6 +257,7 @@ mod test {
             }
             None => assert!(false),
         }
+        assert!(query_result.next().await.is_none());
 
         connection.close().await?;
         Ok(())
@@ -278,13 +278,12 @@ mod test {
             .await?;
         assert_eq!(rows, 1);
 
-        let query_result = connection.query("SELECT t, nu, i, r, no FROM t1").await?;
+        let mut query_result = connection.query("SELECT t, nu, i, r, no FROM t1").await?;
         assert_eq!(
             query_result.columns().await,
             vec!["t", "nu", "i", "r", "no"]
         );
-        assert_eq!(query_result.rows().await.len(), 1);
-        match query_result.rows().await.get(0) {
+        match query_result.next().await {
             Some(row) => {
                 assert_eq!(row.len(), 5);
 
@@ -320,6 +319,7 @@ mod test {
             }
             None => assert!(false),
         }
+        assert!(query_result.next().await.is_none());
 
         connection.close().await?;
         Ok(())
@@ -328,17 +328,18 @@ mod test {
     async fn test_data_type(sql: &str) -> anyhow::Result<Option<Value>> {
         let driver_manager = DriverManager::default();
         let mut connection = driver_manager.connect(DATABASE_URL).await?;
-        let query_result = connection.query(sql).await?;
+        let mut query_result = connection.query(sql).await?;
         let mut value: Option<Value> = None;
 
         assert_eq!(query_result.columns().await.len(), 1);
-        assert_eq!(query_result.rows().await.len(), 1);
 
-        if let Some(row) = query_result.rows().await.get(0) {
+        if let Some(row) = query_result.next().await {
             assert_eq!(row.len(), 1);
 
             value = row.get(0).cloned();
         }
+
+        assert!(query_result.next().await.is_none());
 
         connection.close().await?;
         Ok(value)

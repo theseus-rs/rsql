@@ -21,7 +21,7 @@ impl crate::Formatter for Formatter {
     async fn format(
         &self,
         options: &FormatterOptions,
-        results: &Results,
+        results: &mut Results,
         output: &mut Output,
     ) -> Result<()> {
         format_json(options, false, results, output).await
@@ -31,7 +31,7 @@ impl crate::Formatter for Formatter {
 pub(crate) async fn format_json(
     options: &FormatterOptions,
     jsonl: bool,
-    results: &Results,
+    results: &mut Results,
     output: &mut Output,
 ) -> Result<()> {
     let query_result = match results {
@@ -42,13 +42,14 @@ pub(crate) async fn format_json(
     let highlighter = Highlighter::new(options, "json");
     let mut json_rows: Vec<IndexMap<&String, Option<Value>>> = Vec::new();
     let columns: Vec<String> = query_result.columns().await;
-    let rows = query_result.rows().await;
-    for (i, row) in rows.iter().enumerate() {
+    let mut index = 0;
+    while let Some(row) = query_result.next().await {
         let mut json_row: IndexMap<&String, Option<Value>> = IndexMap::new();
 
-        if i > 0 && jsonl {
+        if index > 0 && jsonl {
             writeln!(output)?;
         }
+        index += 1;
 
         for (c, data) in row.into_iter().enumerate() {
             let column = columns.get(c).expect("column not found");
@@ -104,7 +105,7 @@ mod test {
         let output = &mut Output::default();
 
         let formatter = Formatter;
-        formatter.format(&options, &Execute(1), output).await?;
+        formatter.format(&options, &mut Execute(1), output).await?;
 
         let output = output.to_string().replace("\r\n", "\n");
         let expected = "1 row (9ns)\n";
@@ -119,7 +120,7 @@ mod test {
             elapsed: Duration::from_nanos(9),
             ..Default::default()
         };
-        let query_result = Query(Box::new(MemoryQueryResult::new(
+        let mut query_result = Query(Box::new(MemoryQueryResult::new(
             vec!["id".to_string(), "data".to_string()],
             vec![
                 Row::new(vec![
@@ -136,7 +137,9 @@ mod test {
         let output = &mut Output::default();
 
         let formatter = Formatter;
-        formatter.format(&options, &query_result, output).await?;
+        formatter
+            .format(&options, &mut query_result, output)
+            .await?;
 
         let output = output.to_string().replace("\r\n", "\n");
         let expected = indoc! {r#"

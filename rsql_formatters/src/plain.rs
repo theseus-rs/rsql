@@ -23,7 +23,7 @@ impl crate::Formatter for Formatter {
     async fn format(
         &self,
         options: &FormatterOptions,
-        results: &Results,
+        results: &mut Results,
         output: &mut Output,
     ) -> Result<()> {
         table::format(*FORMAT_PLAIN, options, results, output).await
@@ -55,11 +55,11 @@ mod tests {
             elapsed: Duration::from_nanos(5678),
             ..Default::default()
         };
-        let results = query_result();
+        let mut results = query_result();
         let output = &mut Output::default();
         let formatter = Formatter;
 
-        formatter.format(&options, &results, output).await?;
+        formatter.format(&options, &mut results, output).await?;
 
         let plain_output = output.to_string().replace("\r\n", "\n");
         let expected = indoc! {r#"

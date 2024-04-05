@@ -174,10 +174,10 @@ impl crate::Connection for Connection {
                AND table_schema = 'public'
              ORDER BY table_name
         "#};
-        let query_result = self.query(sql).await?;
+        let mut query_result = self.query(sql).await?;
         let mut tables = Vec::new();
 
-        for row in query_result.rows().await {
+        while let Some(row) = query_result.next().await {
             if let Some(data) = row.get(0) {
                 tables.push(data.to_string());
             }
@@ -344,10 +344,9 @@ mod test {
             .await?;
         assert_eq!(rows, 1);
 
-        let query_result = connection.query("SELECT id, name FROM person").await?;
+        let mut query_result = connection.query("SELECT id, name FROM person").await?;
         assert_eq!(query_result.columns().await, vec!["id", "name"]);
-        assert_eq!(query_result.rows().await.len(), 1);
-        match query_result.rows().await.get(0) {
+        match query_result.next().await {
             Some(row) => {
                 assert_eq!(row.len(), 2);
 
@@ -365,6 +364,7 @@ mod test {
             }
             None => assert!(false),
         }
+        assert!(query_result.next().await.is_none());
 
         connection.close().await?;
         Ok(())
@@ -374,17 +374,17 @@ mod test {
         let driver_manager = DriverManager::default();
         let mut connection = driver_manager.connect(DATABASE_URL).await?;
 
-        let query_result = connection.query(sql).await?;
+        let mut query_result = connection.query(sql).await?;
         let mut value: Option<Value> = None;
 
         assert_eq!(query_result.columns().await.len(), 1);
-        assert_eq!(query_result.rows().await.len(), 1);
 
-        if let Some(row) = query_result.rows().await.get(0) {
+        if let Some(row) = query_result.next().await {
             assert_eq!(row.len(), 1);
 
             value = row.get(0).cloned();
         }
+        assert!(query_result.next().await.is_none());
 
         connection.close().await?;
         Ok(value)
@@ -626,9 +626,8 @@ mod test {
         let connection = driver_manager.connect(database_url.as_str()).await?;
 
         let query_result = connection.query("SELECT 'foo'::TEXT").await?;
-        let rows = query_result.rows().await;
-        let row = rows.first().expect("row is None");
-        let value = row.first().expect("cell is None");
+        let row = query_result.next().await.expect("no row");
+        let value = row.first().expect("no value");
 
         assert_eq!(*value, Value::String("foo".to_string()));
 

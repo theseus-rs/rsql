@@ -10,7 +10,7 @@ pub async fn format(
     options: &FormatterOptions,
     delimiter: u8,
     quote_style: QuoteStyle,
-    results: &Results,
+    results: &mut Results,
     output: &mut Output,
 ) -> Result<()> {
     format_delimited(options, delimiter, quote_style, results, output).await?;
@@ -21,10 +21,10 @@ async fn format_delimited(
     options: &FormatterOptions,
     delimiter: u8,
     quote_style: QuoteStyle,
-    results: &Results,
+    results: &mut Results,
     output: &mut Output,
 ) -> Result<()> {
-    if let Query(query_result) = &results {
+    if let Query(query_result) = results {
         let mut writer = csv::WriterBuilder::new()
             .delimiter(delimiter)
             .quote_style(quote_style)
@@ -34,7 +34,7 @@ async fn format_delimited(
             writer.write_record(query_result.columns().await)?;
         }
 
-        for row in &query_result.rows().await {
+        while let Some(row) = query_result.next().await {
             let mut csv_row: Vec<Vec<u8>> = Vec::new();
 
             for data in row.into_iter() {
@@ -71,9 +71,15 @@ mod test {
         };
         let output = &mut Output::default();
 
-        format(&options, b',', QuoteStyle::NonNumeric, &Execute(1), output)
-            .await
-            .unwrap();
+        format(
+            &options,
+            b',',
+            QuoteStyle::NonNumeric,
+            &mut Execute(1),
+            output,
+        )
+        .await
+        .unwrap();
 
         let output = output.to_string().replace("\r\n", "\n");
         let expected = "1 row (9ns)\n";
@@ -90,7 +96,7 @@ mod test {
             header: false,
             ..Default::default()
         };
-        let query_result = Query(Box::new(MemoryQueryResult::new(
+        let mut query_result = Query(Box::new(MemoryQueryResult::new(
             vec!["id".to_string(), "data".to_string()],
             vec![Row::new(vec![
                 Some(Value::I64(1)),
@@ -103,7 +109,7 @@ mod test {
             &options,
             b',',
             QuoteStyle::NonNumeric,
-            &query_result,
+            &mut query_result,
             output,
         )
         .await
@@ -124,7 +130,7 @@ mod test {
             elapsed: Duration::from_nanos(9),
             ..Default::default()
         };
-        let query_result = Query(Box::new(MemoryQueryResult::new(
+        let mut query_result = Query(Box::new(MemoryQueryResult::new(
             vec!["id".to_string(), "data".to_string()],
             vec![
                 Row::new(vec![
@@ -144,7 +150,7 @@ mod test {
             &options,
             b',',
             QuoteStyle::NonNumeric,
-            &query_result,
+            &mut query_result,
             output,
         )
         .await
