@@ -25,9 +25,9 @@ pub(crate) struct Args {
     #[clap(flatten)]
     pub shell_args: ShellArgs,
 
-    /// Disable the auto update check
-    #[arg(long, env = "DISABLE_AUTO_UPDATE")]
-    disable_auto_update: bool,
+    /// Disable the update check
+    #[arg(long, env = "DISABLE_UPDATE_CHECK")]
+    disable_update_check: bool,
 
     /// Display the version of this tool
     #[arg(long)]
@@ -114,7 +114,7 @@ async fn welcome_message(
     );
 
     writeln!(output, "{}", banner_version)?;
-    if !args.disable_auto_update {
+    if !args.disable_update_check {
         check_for_newer_version(configuration, output).await?;
     }
     writeln!(output, "{}", banner_message)?;
@@ -186,7 +186,7 @@ mod tests {
         };
         let args = Args {
             shell_args,
-            disable_auto_update: false,
+            disable_update_check: false,
             version: false,
         };
         let output = Output::default();
