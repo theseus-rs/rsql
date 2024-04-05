@@ -121,7 +121,7 @@ impl crate::Connection for Connection {
                 let value = self.convert_to_value(&row, column)?;
                 row_data.push(value);
             }
-            rows.push(row_data);
+            rows.push(crate::Row::new(row_data));
         }
 
         let query_result = MemoryQueryResult::new(columns, rows);
@@ -134,7 +134,7 @@ impl crate::Connection for Connection {
         let mut tables = Vec::new();
 
         for row in query_result.rows().await {
-            if let Some(data) = &row[0] {
+            if let Some(data) = row.get(0) {
                 tables.push(data.to_string());
             }
         }
@@ -244,13 +244,13 @@ mod test {
             Some(row) => {
                 assert_eq!(row.len(), 2);
 
-                if let Some(Value::I64(id)) = &row[0] {
+                if let Some(Value::I64(id)) = row.get(0) {
                     assert_eq!(*id, 1);
                 } else {
                     assert!(false);
                 }
 
-                if let Some(Value::String(name)) = &row[1] {
+                if let Some(Value::String(name)) = row.get(1) {
                     assert_eq!(name, "foo");
                 } else {
                     assert!(false);
@@ -288,31 +288,31 @@ mod test {
             Some(row) => {
                 assert_eq!(row.len(), 5);
 
-                if let Some(Value::String(value)) = &row[0] {
+                if let Some(Value::String(value)) = row.get(0) {
                     assert_eq!(value, "foo");
                 } else {
                     assert!(false);
                 }
 
-                if let Some(Value::I8(value)) = &row[1] {
+                if let Some(Value::I8(value)) = row.get(1) {
                     assert_eq!(*value, 123);
                 } else {
                     assert!(false);
                 }
 
-                if let Some(Value::I64(value)) = &row[2] {
+                if let Some(Value::I64(value)) = row.get(2) {
                     assert_eq!(*value, 456);
                 } else {
                     assert!(false);
                 }
 
-                if let Some(Value::F64(value)) = &row[3] {
+                if let Some(Value::F64(value)) = row.get(3) {
                     assert_eq!(*value, 789.123);
                 } else {
                     assert!(false);
                 }
 
-                if let Some(Value::Bytes(value)) = &row[4] {
+                if let Some(Value::Bytes(value)) = row.get(4) {
                     assert_eq!(*value, vec![42]);
                 } else {
                     assert!(false);
@@ -337,7 +337,7 @@ mod test {
         if let Some(row) = query_result.rows().await.get(0) {
             assert_eq!(row.len(), 1);
 
-            value = row[0].clone();
+            value = row.get(0).cloned();
         }
 
         connection.close().await?;

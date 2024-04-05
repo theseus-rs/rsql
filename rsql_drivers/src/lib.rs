@@ -13,6 +13,7 @@ pub mod mysql;
 pub mod postgres;
 #[cfg(feature = "postgresql")]
 pub mod postgresql;
+mod row;
 #[cfg(feature = "rusqlite")]
 pub mod rusqlite;
 #[cfg(feature = "sqlite")]
@@ -24,6 +25,7 @@ pub use connection::{
 };
 pub use driver::{Driver, DriverManager, MockDriver};
 pub use error::{Error, Result};
+pub use row::Row;
 pub use value::Value;
 
 use rust_i18n::i18n;

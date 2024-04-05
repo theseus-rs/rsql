@@ -50,7 +50,7 @@ pub(crate) async fn format_json(
             writeln!(output)?;
         }
 
-        for (c, data) in row.iter().enumerate() {
+        for (c, data) in row.into_iter().enumerate() {
             let column = columns.get(c).expect("column not found");
             match data {
                 Some(value) => {
@@ -91,7 +91,7 @@ mod test {
     use crate::Formatter;
     use crate::Results::{Execute, Query};
     use indoc::indoc;
-    use rsql_drivers::{MemoryQueryResult, Value};
+    use rsql_drivers::{MemoryQueryResult, Row, Value};
     use std::time::Duration;
 
     #[tokio::test]
@@ -122,9 +122,15 @@ mod test {
         let query_result = Query(Box::new(MemoryQueryResult::new(
             vec!["id".to_string(), "data".to_string()],
             vec![
-                vec![Some(Value::I64(1)), Some(Value::Bytes(b"bytes".to_vec()))],
-                vec![Some(Value::I64(2)), Some(Value::String("foo".to_string()))],
-                vec![Some(Value::I64(3)), None],
+                Row::new(vec![
+                    Some(Value::I64(1)),
+                    Some(Value::Bytes(b"bytes".to_vec())),
+                ]),
+                Row::new(vec![
+                    Some(Value::I64(2)),
+                    Some(Value::String("foo".to_string())),
+                ]),
+                Row::new(vec![Some(Value::I64(3)), None]),
             ],
         )));
         let output = &mut Output::default();

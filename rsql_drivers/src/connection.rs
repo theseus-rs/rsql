@@ -1,5 +1,5 @@
 use crate::error::Result;
-use crate::value::Value;
+use crate::row::Row;
 use async_trait::async_trait;
 use mockall::predicate::*;
 use mockall::*;
@@ -9,7 +9,7 @@ use std::fmt::Debug;
 #[async_trait]
 pub trait QueryResult: Debug + Send + Sync {
     async fn columns(&self) -> Vec<String>;
-    async fn rows(&self) -> Vec<Vec<Option<Value>>>;
+    async fn rows(&self) -> Vec<Row>;
 }
 
 /// Query result with a limit
@@ -31,7 +31,7 @@ impl QueryResult for LimitQueryResult {
         self.inner.columns().await
     }
 
-    async fn rows(&self) -> Vec<Vec<Option<Value>>> {
+    async fn rows(&self) -> Vec<Row> {
         let rows = self.inner.rows().await;
 
         if rows.len() <= self.limit {
@@ -46,11 +46,11 @@ impl QueryResult for LimitQueryResult {
 #[derive(Clone, Debug, Default)]
 pub struct MemoryQueryResult {
     columns: Vec<String>,
-    rows: Vec<Vec<Option<Value>>>,
+    rows: Vec<Row>,
 }
 
 impl MemoryQueryResult {
-    pub fn new(columns: Vec<String>, rows: Vec<Vec<Option<Value>>>) -> Self {
+    pub fn new(columns: Vec<String>, rows: Vec<Row>) -> Self {
         Self { columns, rows }
     }
 }
@@ -61,7 +61,7 @@ impl QueryResult for MemoryQueryResult {
         self.columns.clone()
     }
 
-    async fn rows(&self) -> Vec<Vec<Option<Value>>> {
+    async fn rows(&self) -> Vec<Row> {
         self.rows.clone()
     }
 }
@@ -80,11 +80,12 @@ pub trait Connection: Debug + Send + Sync {
 #[cfg(test)]
 mod test {
     use super::*;
+    use crate::Value;
 
     #[tokio::test]
     async fn test_memory_query_result_new() {
         let columns = vec!["a".to_string()];
-        let rows = vec![vec![Some(Value::String("foo".to_string()))]];
+        let rows = vec![Row::new(vec![Some(Value::String("foo".to_string()))])];
 
         let result = MemoryQueryResult::new(columns, rows);
 
@@ -94,8 +95,7 @@ mod test {
 
         let rows = result.rows().await;
         let row = rows.get(0).expect("no rows");
-        let data = row.get(0).expect("no row data");
-        let value = data.as_ref().expect("no value");
+        let value = row.get(0).expect("no row value");
         assert_eq!(value, &Value::String("foo".to_string()));
     }
 
@@ -103,11 +103,11 @@ mod test {
     async fn test_limit_query_result() {
         let columns = vec!["id".to_string()];
         let rows = vec![
-            vec![Some(Value::I64(1))],
-            vec![Some(Value::I64(2))],
-            vec![Some(Value::I64(3))],
-            vec![Some(Value::I64(4))],
-            vec![Some(Value::I64(5))],
+            Row::new(vec![Some(Value::I64(1))]),
+            Row::new(vec![Some(Value::I64(2))]),
+            Row::new(vec![Some(Value::I64(3))]),
+            Row::new(vec![Some(Value::I64(4))]),
+            Row::new(vec![Some(Value::I64(5))]),
         ];
         let memory_result = MemoryQueryResult::new(columns, rows);
         let result = LimitQueryResult::new(Box::new(memory_result), 2);
@@ -120,7 +120,7 @@ mod test {
         let data: Vec<String> = rows
             .iter()
             .map(|row| {
-                if let Some(value) = row.get(0).expect("no row data") {
+                if let Some(value) = row.get(0) {
                     return value.to_string();
                 }
                 "0".to_string()
@@ -133,7 +133,7 @@ mod test {
     #[tokio::test]
     async fn test_limit_query_result_limit_exceeds_rows() {
         let columns = vec!["id".to_string()];
-        let rows = vec![vec![Some(Value::I64(1))]];
+        let rows = vec![Row::new(vec![Some(Value::I64(1))])];
         let memory_result = MemoryQueryResult::new(columns, rows);
         let result = LimitQueryResult::new(Box::new(memory_result), 100);
 
@@ -145,7 +145,7 @@ mod test {
         let data: Vec<String> = rows
             .iter()
             .map(|row| {
-                if let Some(value) = row.get(0).expect("no row data") {
+                if let Some(value) = row.get(0) {
                     return value.to_string();
                 }
                 "0".to_string()
