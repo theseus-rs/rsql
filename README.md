@@ -44,6 +44,7 @@ rsql --url '<url>'
 
 | Driver            | URL                                                                           |
 |-------------------|-------------------------------------------------------------------------------|
+| duckdb            | `duckdb://?<memory=true>[&file=<database_file>]`                              |
 | libsql¹           | `libsql://<host>?[<memory=true>][&file=<database_file>][&auth_token=<token>]` |
 | mysql (sqlx)      | `mysql://<user>[:<password>]@<host>[:<port>]/<database>`                      |
 | postgres          | `postgres://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`   |
@@ -56,17 +57,17 @@ with `rusqlite`.
 
 ## Features
 
-| Feature             |                                                                           |
-|---------------------|---------------------------------------------------------------------------|
-| Databases           | ✅ LibSQL (Turso), MariaDB, MySQL, PostgreSQL, SQLite3)                    |
-| Embedded PostgreSQL | ✅                                                                         |
-| Syntax Highlighting | ✅                                                                         |
-| Result Highlighting | ✅                                                                         |
-| History             | ✅                                                                         |
-| SQL File Execution  | ✅                                                                         |
-| Output Formats      | ✅ (csv, html, json, jsonl, markdown, plain, psql, sqlite, tsv, xml, yaml) |
-| Localized Interface | ✅ (50+ locales)                                                           |
-| Key Bindings        | ✅ (emacs, vi)                                                             |
+| Feature             |                                                                       |
+|---------------------|-----------------------------------------------------------------------|
+| Databases           | DuckDB, LibSQL (Turso), MariaDB, MySQL, PostgreSQL, SQLite3)          |
+| Embedded PostgreSQL | ✅                                                                     |
+| Syntax Highlighting | ✅                                                                     |
+| Result Highlighting | ✅                                                                     |
+| History             | ✅                                                                     |
+| SQL File Execution  | ✅                                                                     |
+| Output Formats      | csv, html, json, jsonl, markdown, plain, psql, sqlite, tsv, xml, yaml |
+| Localized Interface | 50+ locales                                                           |
+| Key Bindings        | emacs, vi                                                             |
 
 ## Safety
 

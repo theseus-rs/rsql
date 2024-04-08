@@ -51,12 +51,14 @@ tokio = { workspace = true }
 all = ["all-drivers", "all-formats"]
 default = []
 all-drivers = [
+    "driver-duckdb",
     "driver-mysql",
     "driver-postgres",
     "driver-postgresql",
     "driver-rusqlite",
     "driver-sqlite"
 ]
+driver-duckdb = ["rsql_drivers/duckdb"]
 driver-libsql = ["rsql_drivers/libsql"]
 driver-mysql = ["rsql_drivers/mysql"]
 driver-postgres = ["rsql_drivers/postgres"]

@@ -4,6 +4,8 @@ extern crate rust_i18n;
 
 mod connection;
 mod driver;
+#[cfg(feature = "duckdb")]
+pub mod duckdb;
 mod error;
 #[cfg(feature = "libsql")]
 pub mod libsql;

@@ -15,6 +15,7 @@ async-trait = { workspace = true }
 base64 = { workspace = true }
 bit-vec = { workspace = true, optional = true }
 chrono = { workspace = true, features = ["serde"] }
+duckdb = { workspace = true, features = ["bundled"], optional = true }
 form_urlencoded = { workspace = true, optional = true }
 indoc = { workspace = true }
 libsql = { workspace = true, optional = true }
@@ -42,8 +43,11 @@ testcontainers-modules = { workspace = true, features = ["mysql", "postgres"] }
 tokio = { workspace = true }
 
 [features]
-all = ["mysql", "postgres", "postgresql", "rusqlite", "sqlite"]
+all = ["duckdb", "mysql", "postgres", "postgresql", "rusqlite", "sqlite"]
 default = []
+duckdb = [
+    "dep:duckdb"
+]
 libsql = [
     "dep:libsql"
 ]
