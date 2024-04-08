@@ -527,7 +527,7 @@ mod test {
         Ok(())
     }
 
-    #[cfg(not(target_os = "macos"))]
+    #[cfg(not(any(target_os = "linux", target_os = "macos")))]
     #[tokio::test]
     async fn test_container() -> anyhow::Result<()> {
         let docker = testcontainers::clients::Cli::default();
