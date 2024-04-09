@@ -87,10 +87,11 @@ jobs:
 
       - name: Upload to codecov.io
         if: ${{ startsWith(matrix.os, 'ubuntu-') }}
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           files: lcov.info
           fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Install benchmarking tools
         if: ${{ github.ref == 'refs/heads/main' && startsWith(matrix.os, 'ubuntu-') }}
