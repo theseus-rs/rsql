@@ -19,6 +19,14 @@ pub enum Error {
     },
 }
 
+/// Converts a [`duckdb::Error`] into an [`IoError`](Error::IoError)
+#[cfg(feature = "duckdb")]
+impl From<duckdb::Error> for Error {
+    fn from(error: duckdb::Error) -> Self {
+        Error::IoError(error.into())
+    }
+}
+
 /// Converts a [`libsql::Error`] into an [`IoError`](Error::IoError)
 #[cfg(feature = "libsql")]
 impl From<libsql::Error> for Error {
@@ -70,6 +78,15 @@ impl From<tokio_postgres::Error> for Error {
 #[cfg(test)]
 mod test {
     use super::*;
+
+    #[cfg(feature = "duckdb")]
+    #[test]
+    fn test_duckdb_error() {
+        let error = duckdb::Error::QueryReturnedNoRows;
+        let io_error = Error::from(error);
+
+        assert_eq!(io_error.to_string(), "Query returned no rows");
+    }
 
     #[cfg(feature = "libsql")]
     #[test]

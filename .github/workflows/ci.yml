@@ -91,6 +91,7 @@ jobs:
         with:
           files: lcov.info
           fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Install benchmarking tools
         if: ${{ github.ref == 'refs/heads/main' && startsWith(matrix.os, 'ubuntu-') }}

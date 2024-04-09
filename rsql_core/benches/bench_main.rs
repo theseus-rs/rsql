@@ -4,6 +4,7 @@ mod benchmarks;
 
 #[cfg(feature = "libsql")]
 criterion_main! {
+    benchmarks::duckdb::all,
     benchmarks::libsql::all,
     benchmarks::postgres::all,
     benchmarks::postgresql::all,
@@ -13,6 +14,7 @@ criterion_main! {
 
 #[cfg(not(feature = "libsql"))]
 criterion_main! {
+    benchmarks::duckdb::all,
     benchmarks::postgres::all,
     benchmarks::postgresql::all,
     benchmarks::rusqlite::all,

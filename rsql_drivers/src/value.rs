@@ -12,6 +12,7 @@ pub enum Value {
     I16(i16),
     I32(i32),
     I64(i64),
+    I128(i128),
     #[allow(dead_code)]
     U8(u8),
     #[allow(dead_code)]
@@ -20,6 +21,8 @@ pub enum Value {
     U32(u32),
     #[allow(dead_code)]
     U64(u64),
+    #[allow(dead_code)]
+    U128(u128),
     F32(f32),
     F64(f64),
     String(String),
@@ -40,10 +43,12 @@ impl Value {
             Value::I16(value) => value.to_formatted_string(locale),
             Value::I32(value) => value.to_formatted_string(locale),
             Value::I64(value) => value.to_formatted_string(locale),
+            Value::I128(value) => value.to_formatted_string(locale),
             Value::U8(value) => value.to_formatted_string(locale),
             Value::U16(value) => value.to_formatted_string(locale),
             Value::U32(value) => value.to_formatted_string(locale),
             Value::U64(value) => value.to_formatted_string(locale),
+            Value::U128(value) => value.to_formatted_string(locale),
             Value::F32(value) => value.to_string(),
             Value::F64(value) => value.to_string(),
             Value::String(value) => value.to_string(),
@@ -73,10 +78,12 @@ impl fmt::Display for Value {
             Value::I16(value) => value.to_string(),
             Value::I32(value) => value.to_string(),
             Value::I64(value) => value.to_string(),
+            Value::I128(value) => value.to_string(),
             Value::U8(value) => value.to_string(),
             Value::U16(value) => value.to_string(),
             Value::U32(value) => value.to_string(),
             Value::U64(value) => value.to_string(),
+            Value::U128(value) => value.to_string(),
             Value::F32(value) => value.to_string(),
             Value::F64(value) => value.to_string(),
             Value::String(value) => value.to_string(),
@@ -107,10 +114,12 @@ impl Serialize for Value {
             Value::I16(value) => serializer.serialize_i16(value),
             Value::I32(value) => serializer.serialize_i32(value),
             Value::I64(value) => serializer.serialize_i64(value),
+            Value::I128(value) => serializer.serialize_str(&value.to_string()),
             Value::U8(value) => serializer.serialize_u8(value),
             Value::U16(value) => serializer.serialize_u16(value),
             Value::U32(value) => serializer.serialize_u32(value),
             Value::U64(value) => serializer.serialize_u64(value),
+            Value::U128(value) => serializer.serialize_str(&value.to_string()),
             Value::F32(value) => serializer.serialize_f32(value),
             Value::F64(value) => serializer.serialize_f64(value),
             Value::String(ref value) => serializer.serialize_str(value),
@@ -228,6 +237,27 @@ mod tests {
     }
 
     #[test]
+    fn test_i128() {
+        assert_eq!(
+            Value::I128(i128::MIN).to_formatted_string(&Locale::en),
+            "-170,141,183,460,469,231,731,687,303,715,884,105,728"
+        );
+        assert_eq!(
+            Value::I128(i128::MAX).to_formatted_string(&Locale::en),
+            "170,141,183,460,469,231,731,687,303,715,884,105,727"
+        );
+
+        assert_eq!(
+            Value::I128(i128::MIN).to_string(),
+            "-170141183460469231731687303715884105728"
+        );
+        assert_eq!(
+            Value::I128(i128::MAX).to_string(),
+            "170141183460469231731687303715884105727"
+        );
+    }
+
+    #[test]
     fn test_u8() {
         assert_eq!(Value::U8(u8::MAX).to_formatted_string(&Locale::en), "255");
         assert_eq!(Value::U8(u8::MAX).to_string(), "255");
@@ -262,6 +292,18 @@ mod tests {
         );
         assert_eq!(Value::U64(u64::MAX).to_string(), "18446744073709551615");
         assert_eq!(json!(Value::U64(u64::MAX)), json!(u64::MAX));
+    }
+
+    #[test]
+    fn test_u128() {
+        assert_eq!(
+            Value::U128(u128::MAX).to_formatted_string(&Locale::en),
+            "340,282,366,920,938,463,463,374,607,431,768,211,455"
+        );
+        assert_eq!(
+            Value::U128(u128::MAX).to_string(),
+            "340282366920938463463374607431768211455"
+        );
     }
 
     #[test]
@@ -374,10 +416,12 @@ mod tests {
             Value::I16(2),
             Value::I32(3),
             Value::I64(12345),
+            Value::I128(128),
             Value::U8(5),
             Value::U16(6),
             Value::U32(7),
             Value::U64(8),
+            Value::U128(128),
             Value::F32(9.1),
             Value::F64(10.42),
             Value::String("foo".to_string()),
@@ -392,11 +436,11 @@ mod tests {
         ];
         assert_eq!(
             Value::Array(array.clone()).to_formatted_string(&Locale::en),
-            r#"true, 1, 2, 3, 12,345, 5, 6, 7, 8, 9.1, 10.42, foo, 2000-12-31, 12:13:14.015, 2000-12-31 12:13:14.015, acf5b3e3-4099-4f34-81c7-5803cbc87a2d, {"foo":"bar","baz":123}"#
+            r#"true, 1, 2, 3, 12,345, 128, 5, 6, 7, 8, 128, 9.1, 10.42, foo, 2000-12-31, 12:13:14.015, 2000-12-31 12:13:14.015, acf5b3e3-4099-4f34-81c7-5803cbc87a2d, {"foo":"bar","baz":123}"#
         );
         assert_eq!(
             Value::Array(array.clone()).to_string(),
-            r#"true, 1, 2, 3, 12345, 5, 6, 7, 8, 9.1, 10.42, foo, 2000-12-31, 12:13:14.015, 2000-12-31 12:13:14.015, acf5b3e3-4099-4f34-81c7-5803cbc87a2d, {"foo":"bar","baz":123}"#
+            r#"true, 1, 2, 3, 12345, 128, 5, 6, 7, 8, 128, 9.1, 10.42, foo, 2000-12-31, 12:13:14.015, 2000-12-31 12:13:14.015, acf5b3e3-4099-4f34-81c7-5803cbc87a2d, {"foo":"bar","baz":123}"#
         );
         assert_eq!(json!(Value::Array(array.clone())), json!(array.clone()));
         Ok(())

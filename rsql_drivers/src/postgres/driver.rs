@@ -598,20 +598,20 @@ mod test {
             .execute("CREATE TABLE users (id INTEGER PRIMARY KEY, email VARCHAR(20))")
             .await?;
 
+        let tables = connection.tables().await?;
+        assert_eq!(tables, vec!["contacts", "users"]);
+
         let indexes = connection.indexes(None).await?;
         assert_eq!(indexes, vec!["contacts_pkey", "users_pkey"]);
 
         let indexes = connection.indexes(Some("users")).await?;
         assert_eq!(indexes, vec!["users_pkey"]);
 
-        let tables = connection.tables().await?;
-        assert_eq!(tables, vec!["contacts", "users"]);
-
         connection.close().await?;
         Ok(())
     }
 
-    #[cfg(not(target_os = "macos"))]
+    #[cfg(not(any(target_os = "linux", target_os = "macos")))]
     #[tokio::test]
     async fn test_container() -> anyhow::Result<()> {
         let docker = testcontainers::clients::Cli::default();

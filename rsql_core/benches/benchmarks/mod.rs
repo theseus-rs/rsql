@@ -1,3 +1,4 @@
+pub mod duckdb;
 #[cfg(feature = "libsql")]
 pub mod libsql;
 pub mod postgres;

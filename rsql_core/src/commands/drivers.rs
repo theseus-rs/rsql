@@ -80,6 +80,9 @@ mod tests {
         let drivers_output = output.to_string();
         let mut drivers: Vec<&str> = Vec::new();
 
+        #[cfg(feature = "driver-duckdb")]
+        drivers.push("duckdb");
+
         #[cfg(feature = "driver-libsql")]
         drivers.push("libsql");
 

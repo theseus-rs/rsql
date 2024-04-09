@@ -370,15 +370,16 @@ mod test {
             .execute("CREATE TABLE users (id INT PRIMARY KEY, email VARCHAR(20))")
             .await?;
 
+        let tables = connection.tables().await?;
+        assert!(tables.contains(&"contacts".to_string()));
+        assert!(tables.contains(&"users".to_string()));
+
         let indexes = connection.indexes(None).await?;
         assert!(indexes.contains(&"PRIMARY".to_string()));
 
         let indexes = connection.indexes(Some("users")).await?;
         assert!(indexes.contains(&"PRIMARY".to_string()));
 
-        let tables = connection.tables().await?;
-        assert!(tables.contains(&"contacts".to_string()));
-        assert!(tables.contains(&"users".to_string()));
         Ok(())
     }
 }
