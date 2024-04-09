@@ -598,14 +598,14 @@ mod test {
             .execute("CREATE TABLE users (id INTEGER PRIMARY KEY, email VARCHAR(20))")
             .await?;
 
+        let tables = connection.tables().await?;
+        assert_eq!(tables, vec!["contacts", "users"]);
+
         let indexes = connection.indexes(None).await?;
         assert_eq!(indexes, vec!["contacts_pkey", "users_pkey"]);
 
         let indexes = connection.indexes(Some("users")).await?;
         assert_eq!(indexes, vec!["users_pkey"]);
-
-        let tables = connection.tables().await?;
-        assert_eq!(tables, vec!["contacts", "users"]);
 
         connection.close().await?;
         Ok(())

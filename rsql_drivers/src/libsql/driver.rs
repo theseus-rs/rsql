@@ -358,6 +358,9 @@ mod test {
             .execute("CREATE TABLE users (id INTEGER PRIMARY KEY, email VARCHAR(20) UNIQUE)")
             .await?;
 
+        let tables = connection.tables().await?;
+        assert_eq!(tables, vec!["contacts", "users"]);
+
         let indexes = connection.indexes(None).await?;
         assert_eq!(
             indexes,
@@ -366,9 +369,6 @@ mod test {
 
         let indexes = connection.indexes(Some("users")).await?;
         assert_eq!(indexes, vec!["sqlite_autoindex_users_1"]);
-
-        let tables = connection.tables().await?;
-        assert_eq!(tables, vec!["contacts", "users"]);
 
         connection.close().await?;
         Ok(())

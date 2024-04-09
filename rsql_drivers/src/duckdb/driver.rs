@@ -69,8 +69,36 @@ impl crate::Connection for Connection {
         Ok(rows as u64)
     }
 
-    async fn indexes<'table>(&mut self, _table: Option<&'table str>) -> Result<Vec<String>> {
-        Ok(Vec::new())
+    async fn indexes<'table>(&mut self, table: Option<&'table str>) -> Result<Vec<String>> {
+        let mut sql = indoc! {r#"
+            SELECT index_name
+              FROM duckdb_indexes()
+        "#}
+        .to_string();
+        if table.is_some() {
+            sql = format!("{sql} WHERE table_name = ?1");
+        }
+        sql = format!("{sql} ORDER BY index_name");
+
+        let connection = match self.connection.lock() {
+            Ok(connection) => connection,
+            Err(error) => return Err(Error::IoError(anyhow!("Error: {:?}", error))),
+        };
+        let mut statement = connection.prepare(sql.as_str())?;
+
+        let mut query_rows = match table {
+            Some(table) => statement.query([table])?,
+            None => statement.query([])?,
+        };
+
+        let mut indexes = Vec::new();
+        while let Some(query_row) = query_rows.next()? {
+            if let Some(value) = self.convert_to_value(query_row, 0)? {
+                indexes.push(value.to_string());
+            }
+        }
+
+        Ok(indexes)
     }
 
     async fn query(&self, sql: &str) -> Result<Box<dyn QueryResult>> {
@@ -341,17 +369,23 @@ mod test {
             .execute("CREATE TABLE contacts (id INTEGER PRIMARY KEY, email VARCHAR(20) UNIQUE)")
             .await?;
         let _ = connection
+            .execute("CREATE INDEX contacts_email_idx ON contacts (email)")
+            .await?;
+        let _ = connection
             .execute("CREATE TABLE users (id INTEGER PRIMARY KEY, email VARCHAR(20) UNIQUE)")
+            .await?;
+        let _ = connection
+            .execute("CREATE INDEX users_email_idx ON users (email)")
             .await?;
 
         let tables = connection.tables().await?;
         assert_eq!(tables, vec!["contacts", "users"]);
 
         let indexes = connection.indexes(None).await?;
-        assert!(indexes.is_empty());
+        assert_eq!(indexes, vec!["contacts_email_idx", "users_email_idx"]);
 
         let indexes = connection.indexes(Some("users")).await?;
-        assert!(indexes.is_empty());
+        assert_eq!(indexes, vec!["users_email_idx"]);
 
         connection.close().await?;
         Ok(())
