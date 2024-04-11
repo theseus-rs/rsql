@@ -66,7 +66,7 @@ impl Connection {
 
 #[async_trait]
 impl crate::Connection for Connection {
-    async fn execute(&self, sql: &str) -> Result<u64> {
+    async fn execute(&mut self, sql: &str) -> Result<u64> {
         let rows = self.connection.execute(sql, ()).await?;
         Ok(rows)
     }
@@ -100,7 +100,7 @@ impl crate::Connection for Connection {
         Ok(indexes)
     }
 
-    async fn query(&self, sql: &str) -> Result<Box<dyn QueryResult>> {
+    async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {
         let mut statement = self.connection.prepare(sql).await?;
         let columns: Vec<String> = statement
             .columns()

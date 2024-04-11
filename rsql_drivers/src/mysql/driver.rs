@@ -47,7 +47,7 @@ impl Connection {
 
 #[async_trait]
 impl crate::Connection for Connection {
-    async fn execute(&self, sql: &str) -> Result<u64> {
+    async fn execute(&mut self, sql: &str) -> Result<u64> {
         let rows = sqlx::query(sql).execute(&self.pool).await?.rows_affected();
         Ok(rows)
     }
@@ -85,7 +85,7 @@ impl crate::Connection for Connection {
         Ok(indexes)
     }
 
-    async fn query(&self, sql: &str) -> Result<Box<dyn QueryResult>> {
+    async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {
         let query_rows = sqlx::query(sql).fetch_all(&self.pool).await?;
         let columns: Vec<String> = query_rows
             .first()
@@ -220,14 +220,14 @@ mod test {
         let driver_manager = DriverManager::default();
         let mut connection = driver_manager.connect(database_url.as_str()).await?;
 
-        test_connection_interface(&*connection).await?;
-        test_data_types(&*connection).await?;
+        test_connection_interface(&mut *connection).await?;
+        test_data_types(&mut *connection).await?;
         test_schema(&mut *connection).await?;
 
         Ok(())
     }
 
-    async fn test_connection_interface(connection: &dyn Connection) -> anyhow::Result<()> {
+    async fn test_connection_interface(connection: &mut dyn Connection) -> anyhow::Result<()> {
         let _ = connection
             .execute("CREATE TABLE person (id INTEGER, name VARCHAR(20))")
             .await?;
@@ -261,7 +261,7 @@ mod test {
         Ok(())
     }
 
-    async fn test_data_types(connection: &dyn Connection) -> anyhow::Result<()> {
+    async fn test_data_types(connection: &mut dyn Connection) -> anyhow::Result<()> {
         let sql = indoc! {r#"
             CREATE TABLE data_types (
                 char_type CHAR,
