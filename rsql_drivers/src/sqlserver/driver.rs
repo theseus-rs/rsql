@@ -94,15 +94,16 @@ impl crate::Connection for Connection {
 
     async fn indexes<'table>(&mut self, table: Option<&'table str>) -> Result<Vec<String>> {
         let mut sql = indoc! {r#"
-            SELECT DISTINCT index_name
-              FROM information_schema.statistics
-             WHERE table_schema = DATABASE()
+            SELECT indexes.name
+              FROM sys.indexes
+             INNER JOIN sys.tables ON indexes.object_id = tables.object_id
+             WHERE tables.is_ms_shipped = 0
         "#}
         .to_string();
         if table.is_some() {
-            sql = format!("{sql} AND table_name = @P1");
+            sql = format!("{sql} AND tables.name = @P1");
         }
-        sql = format!("{sql} ORDER BY index_name").to_string();
+        sql = format!("{sql} ORDER BY indexes.name").to_string();
         let mut query_stream = match table {
             Some(table) => {
                 let table = &table.to_string() as &dyn ToSql;
@@ -155,7 +156,6 @@ impl crate::Connection for Connection {
         let sql = indoc! { r#"
             SELECT table_name
               FROM information_schema.tables
-             WHERE table_schema = DATABASE()
              ORDER BY table_name
         "#};
         let mut query_result = self.query(sql).await?;
