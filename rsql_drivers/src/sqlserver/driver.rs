@@ -224,7 +224,7 @@ fn convert_to_value(row: &Row, column: &Column, index: usize) -> Result<Option<V
     }
 }
 
-#[cfg(not(any(target_os = "macos")))]
+#[cfg(not(any(target_os = "linux", target_os = "macos", target_os = "windows")))]
 #[cfg(test)]
 mod test {
     use super::*;
