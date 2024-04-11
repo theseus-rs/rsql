@@ -268,7 +268,7 @@ mod test {
     #[tokio::test]
     async fn test_table_data_types() -> anyhow::Result<()> {
         let driver_manager = DriverManager::default();
-        let connection = driver_manager.connect(DATABASE_URL).await?;
+        let mut connection = driver_manager.connect(DATABASE_URL).await?;
         let sql = indoc! {r#"
             CREATE TABLE data_types (
                 varchar_type VARCHAR,
