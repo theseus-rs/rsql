@@ -67,7 +67,7 @@ impl From<sqlx::Error> for Error {
     }
 }
 
-/// Converts a [`std::io::Error`] into an [`IoError`](crate::formatters::Error::IoError)
+/// Converts a [`std::io::Error`] into an [`IoError`](Error::IoError)
 impl From<std::io::Error> for Error {
     fn from(error: std::io::Error) -> Self {
         Error::IoError(error.into())
