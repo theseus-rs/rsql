@@ -57,7 +57,7 @@ impl Connection {
 
 #[async_trait]
 impl crate::Connection for Connection {
-    async fn execute(&self, sql: &str) -> Result<u64> {
+    async fn execute(&mut self, sql: &str) -> Result<u64> {
         let connection = match self.connection.lock() {
             Ok(connection) => connection,
             Err(error) => return Err(Error::IoError(anyhow!("Error: {:?}", error))),
@@ -100,7 +100,7 @@ impl crate::Connection for Connection {
         Ok(indexes)
     }
 
-    async fn query(&self, sql: &str) -> Result<Box<dyn QueryResult>> {
+    async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {
         let connection = match self.connection.lock() {
             Ok(connection) => connection,
             Err(error) => return Err(Error::IoError(anyhow!("Error: {:?}", error))),

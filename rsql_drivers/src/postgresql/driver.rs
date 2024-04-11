@@ -93,7 +93,7 @@ impl Connection {
 
 #[async_trait]
 impl crate::Connection for Connection {
-    async fn execute(&self, sql: &str) -> Result<u64> {
+    async fn execute(&mut self, sql: &str) -> Result<u64> {
         let rows = sqlx::query(sql).execute(&self.pool).await?.rows_affected();
         Ok(rows)
     }
@@ -141,7 +141,7 @@ impl crate::Connection for Connection {
         Ok(indexes)
     }
 
-    async fn query(&self, sql: &str) -> Result<Box<dyn QueryResult>> {
+    async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {
         let query_rows = sqlx::query(sql).fetch_all(&self.pool).await?;
         let columns: Vec<String> = query_rows
             .first()

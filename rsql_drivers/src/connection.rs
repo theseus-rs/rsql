@@ -82,9 +82,9 @@ impl QueryResult for MemoryQueryResult {
 #[automock]
 #[async_trait]
 pub trait Connection: Debug + Send + Sync {
-    async fn execute(&self, sql: &str) -> Result<u64>;
+    async fn execute(&mut self, sql: &str) -> Result<u64>;
     async fn indexes<'table>(&mut self, table: Option<&'table str>) -> Result<Vec<String>>;
-    async fn query(&self, sql: &str) -> Result<Box<dyn QueryResult>>;
+    async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>>;
     async fn tables(&mut self) -> Result<Vec<String>>;
     async fn close(&mut self) -> Result<()>;
 }
