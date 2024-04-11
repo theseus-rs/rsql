@@ -220,14 +220,14 @@ mod test {
         let driver_manager = DriverManager::default();
         let mut connection = driver_manager.connect(database_url.as_str()).await?;
 
-        test_connection_interface(&*connection).await?;
-        test_data_types(&*connection).await?;
+        test_connection_interface(&mut *connection).await?;
+        test_data_types(&mut *connection).await?;
         test_schema(&mut *connection).await?;
 
         Ok(())
     }
 
-    async fn test_connection_interface(connection: &dyn Connection) -> anyhow::Result<()> {
+    async fn test_connection_interface(connection: &mut dyn Connection) -> anyhow::Result<()> {
         let _ = connection
             .execute("CREATE TABLE person (id INTEGER, name VARCHAR(20))")
             .await?;
@@ -261,7 +261,7 @@ mod test {
         Ok(())
     }
 
-    async fn test_data_types(connection: &dyn Connection) -> anyhow::Result<()> {
+    async fn test_data_types(connection: &mut dyn Connection) -> anyhow::Result<()> {
         let sql = indoc! {r#"
             CREATE TABLE data_types (
                 char_type CHAR,
