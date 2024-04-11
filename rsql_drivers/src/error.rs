@@ -60,9 +60,16 @@ impl From<rusqlite::Error> for Error {
 }
 
 /// Converts a [`sqlx::Error`] into an [`ParseError`](Error::IoError)
-#[cfg(any(feature = "postgresql", feature = "sqlite"))]
+#[cfg(any(feature = "mysql", feature = "postgresql", feature = "sqlite"))]
 impl From<sqlx::Error> for Error {
     fn from(error: sqlx::Error) -> Self {
+        Error::IoError(error.into())
+    }
+}
+
+/// Converts a [`std::io::Error`] into an [`IoError`](crate::formatters::Error::IoError)
+impl From<std::io::Error> for Error {
+    fn from(error: std::io::Error) -> Self {
         Error::IoError(error.into())
     }
 }
@@ -71,6 +78,14 @@ impl From<sqlx::Error> for Error {
 #[cfg(feature = "postgres")]
 impl From<tokio_postgres::Error> for Error {
     fn from(error: tokio_postgres::Error) -> Self {
+        Error::IoError(error.into())
+    }
+}
+
+/// Converts a [`tiberius::error::Error`] into an [`IoError`](Error::IoError)
+#[cfg(feature = "sqlserver")]
+impl From<tiberius::error::Error> for Error {
+    fn from(error: tiberius::error::Error) -> Self {
         Error::IoError(error.into())
     }
 }
@@ -128,12 +143,29 @@ mod test {
         assert_eq!(io_error.to_string(), "Query returned no rows");
     }
 
-    #[cfg(any(feature = "postgresql", feature = "sqlite"))]
+    #[cfg(any(feature = "mysql", feature = "postgresql", feature = "sqlite"))]
     #[test]
     fn test_sqlx_error() {
         let error = sqlx::Error::RowNotFound;
         let io_error = Error::from(error);
 
         assert!(io_error.to_string().contains("no rows returned"));
+    }
+
+    #[cfg(feature = "sqlserver")]
+    #[test]
+    fn test_sqlserver_error() {
+        let error = tiberius::error::Error::Utf8;
+        let io_error = Error::from(error);
+
+        assert_eq!(io_error.to_string(), "UTF-8 error");
+    }
+
+    #[test]
+    fn test_std_io_error() {
+        let error = std::io::Error::new(std::io::ErrorKind::Other, "test");
+        let io_error = Error::from(error);
+
+        assert_eq!(io_error.to_string(), "test");
     }
 }

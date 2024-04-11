@@ -20,6 +20,8 @@ mod row;
 pub mod rusqlite;
 #[cfg(feature = "sqlite")]
 pub mod sqlite;
+#[cfg(feature = "sqlserver")]
+mod sqlserver;
 mod value;
 
 pub use connection::{

@@ -56,7 +56,8 @@ all-drivers = [
     "driver-postgres",
     "driver-postgresql",
     "driver-rusqlite",
-    "driver-sqlite"
+    "driver-sqlite",
+    "driver-sqlserver",
 ]
 driver-duckdb = ["rsql_drivers/duckdb"]
 driver-libsql = ["rsql_drivers/libsql"]
@@ -65,6 +66,7 @@ driver-postgres = ["rsql_drivers/postgres"]
 driver-postgresql = ["rsql_drivers/postgresql"]
 driver-rusqlite = ["rsql_drivers/rusqlite"]
 driver-sqlite = ["rsql_drivers/sqlite"]
+driver-sqlserver = ["rsql_drivers/sqlserver"]
 all-formats = [
     "format-ascii",
     "format-csv",
