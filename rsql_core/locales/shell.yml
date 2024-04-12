@@ -20,6 +20,7 @@ program_interrupted:
   fi: "Ohjelma keskeytetty"
   fr: "Programme interrompu"
   ga: "Cláraíocht curtha ar fionraí"
+  he: "התוכנית הופסקה"
   hi: "प्रोग्राम बंद किया गया"
   hr: "Program prekinut"
   hu: "A program megszakadt"
@@ -32,6 +33,7 @@ program_interrupted:
   lt: "Programa sustabdyta"
   lv: "Programma pārtraukta"
   mk: "Програмата е прекината"
+  ms: "Program dihentikan"
   mt: "Il-programm intrebbiet"
   nl: "Programma onderbroken"
   no: "Programmet ble avbrutt"
@@ -48,6 +50,7 @@ program_interrupted:
   tr: "Program kesildi"
   uk: "Програма перервана"
   vi: "Chương trình bị gián đoạn"
+  yi: "דער פּראָגראַם אינטעררופטעד"
   zh: "程序中断"
 
 error:
@@ -65,6 +68,7 @@ error:
   fi: "Virhe"
   fr: "Erreur"
   ga: "Earráid"
+  he: "שגיאה"
   hi: "त्रुटि"
   hr: "Greška"
   hu: "Hiba"
@@ -77,6 +81,7 @@ error:
   lt: "Klaida"
   lv: "Kļūda"
   mk: "Грешка"
+  ms: "Ralat"
   mt: "Żball"
   nl: "Fout"
   no: "Feil"
@@ -93,11 +98,14 @@ error:
   tr: "Hata"
   uk: "Помилка"
   vi: "Lỗi"
+  yi: "פֿעהל"
   zh: "错误"
 
 error_format:
   en: "%{error}: %{message}"
   ar: "%{message} :%{error}"
+  he: "%{message} :%{error}"
+  yi: "%{message} :%{error}"
 
 invalid_command:
   en: "Invalid command '%{invalid_command}', for help type '%{help_command}'"
@@ -114,6 +122,7 @@ invalid_command:
   fi: "Virheellinen komento '%{invalid_command}', saadaksesi apua kirjoita '%{help_command}'"
   fr: "Commande invalide '%{invalid_command}', pour obtenir de l'aide tapez '%{help_command}'"
   ga: "Ordú neamhbhailí '%{invalid_command}', chun cuidiú scríobh '%{help_command}'"
+  he: "פקודה לא תקינה '%{invalid_command}', לעזרה הקלד '%{help_command}'"
   hi: "अमान्य कमांड '%{invalid_command}', मदद के लिए '%{help_command}' टाइप करें"
   hr: "Neispravna naredba '%{invalid_command}', za pomoć upišite '%{help_command}'"
   hu: "Érvénytelen parancs '%{invalid_command}', segítségért írja be a '%{help_command}' parancsot"
@@ -126,6 +135,7 @@ invalid_command:
   lt: "Neteisingas komandas '%{invalid_command}', pagalbai įveskite '%{help_command}'"
   lv: "Nederīga komanda '%{invalid_command}', palīdzībai ierakstiet '%{help_command}'"
   mk: "Невалидна команда '%{invalid_command}', за помош внесете '%{help_command}'"
+  ms: "Arahan tidak sah '%{invalid_command}', untuk bantuan taip '%{help_command}'"
   mt: "Kommanda invalida '%{invalid_command}', għall-għajnuna tip ' %{help_command}'"
   nl: "Ongeldige opdracht '%{invalid_command}', voor hulp typ '%{help_command}'"
   no: "Ugyldig kommando '%{invalid_command}', for hjelp skriv '%{help_command}'"
@@ -142,4 +152,5 @@ invalid_command:
   tr: "Geçersiz komut '%{invalid_command}', yardım için '%{help_command}' yazın"
   uk: "Невірна команда '%{invalid_command}', для допомоги введіть '%{help_command}'"
   vi: "Lệnh không hợp lệ '%{invalid_command}', để trợ giúp gõ '%{help_command}'"
+  yi: "אומגילטע קאָמאַנד '%{invalid_command}', פֿאַר הילף טיפֿן '%{help_command}'"
   zh: "无效命令 '%{invalid_command}', 要获取帮助请输入 '%{help_command}'"

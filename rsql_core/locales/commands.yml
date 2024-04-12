@@ -17,6 +17,7 @@ on:
   fi: "päällä"
   fr: "activé"
   ga: "ar"
+  he: "פועל"
   hi: "चालू"
   hr: "uključeno"
   hu: "be"
@@ -29,6 +30,7 @@ on:
   lt: "įjungta"
   lv: "ieslēgts"
   mk: "вклучено"
+  ms: "hidup"
   mt: "fuq"
   nl: "aan"
   no: "på"
@@ -45,6 +47,7 @@ on:
   tr: "açık"
   uk: "увімкнено"
   vi: "bật"
+  yi: "אָן"
   zh: "开"
 
 off:
@@ -62,6 +65,7 @@ off:
   fi: "pois"
   fr: "désactivé"
   ga: "díreach"
+  he: "כבוי"
   hi: "बंद"
   hr: "isključeno"
   hu: "ki"
@@ -74,6 +78,7 @@ off:
   lt: "išjungta"
   lv: "izslēgts"
   mk: "исклучено"
+  ms: "mati"
   mt: "le"
   nl: "uit"
   no: "av"
@@ -90,8 +95,11 @@ off:
   tr: "kapalı"
   uk: "вимкнено"
   vi: "tắt"
+  yi: "אויס"
   zh: "关"
 
 on_off_argument:
   en: "%{on}|%{off}"
   ar: "%{off}|%{on}"
+  he: "%{off}|%{on}"
+  yi: "%{off}|%{on}"

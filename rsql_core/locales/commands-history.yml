@@ -17,6 +17,7 @@ history_command:
   fi: "historia"
   fr: "histoire"
   ga: "stair"
+  he: "היסטוריה"
   hi: "इतिहास"
   hr: "povijest"
   hu: "történelem"
@@ -29,6 +30,7 @@ history_command:
   lt: "istorija"
   lv: "vēsture"
   mk: "историја"
+  ms: "sejarah"
   mt: "istorja"
   nl: "geschiedenis"
   no: "historie"
@@ -45,6 +47,7 @@ history_command:
   tr: "geçmiş"
   uk: "історія"
   vi: "lịch sử"
+  yi: "געשיכטע"
   zh: "历史"
 
 history_description:
@@ -62,6 +65,7 @@ history_description:
   fi: "Näytä komentohistoria"
   fr: "Afficher l'historique des commandes"
   ga: "Taispeáin stair na gceithre"
+  he: "הצג את היסטוריית הפקודות"
   hi: "कमांड इतिहास दिखाएं"
   hr: "Prikaži povijest naredbi"
   hu: "Parancstörténet megjelenítése"
@@ -74,6 +78,7 @@ history_description:
   lt: "Rodyti komandų istoriją"
   lv: "Rādīt komandu vēsturi"
   mk: "Прикажи го историјата на командите"
+  ms: "Tunjukkan sejarah arahan"
   mt: "Uri l-istorja tal-komandi"
   nl: "Toon de opdrachtgeschiedenis"
   no: "Vis kommandohistorikken"
@@ -90,11 +95,14 @@ history_description:
   tr: "Komut geçmişini göster"
   uk: "Показати історію команд"
   vi: "Hiển thị lịch sử lệnh"
+  yi: "ווייזן די קאָמאַנד היסטאָריע"
   zh: "显示命令历史"
 
 history_list_entry:
   en: "%{index}: %{entry}"
   ar: "%{entry} :%{index}"
+  he: "%{entry} :%{index}"
+  yi: "%{entry} :%{index}"
 
 history_setting:
   en: "History: %{history}"
@@ -111,6 +119,7 @@ history_setting:
   fi: "Historia: %{history}"
   fr: "Histoire: %{history}"
   ga: "Stair: %{history}"
+  he: "היסטוריה: %{history}"
   hi: "इतिहास: %{history}"
   hr: "Povijest: %{history}"
   hu: "Történelem: %{history}"
@@ -123,6 +132,7 @@ history_setting:
   lt: "Istorija: %{history}"
   lv: "Vēsture: %{history}"
   mk: "Историја: %{history}"
+  ms: "Sejarah: %{history}"
   mt: "Istorja: %{history}"
   nl: "Geschiedenis: %{history}"
   no: "Historie: %{history}"
@@ -139,4 +149,5 @@ history_setting:
   tr: "Geçmiş: %{history}"
   uk: "Історія: %{history}"
   vi: "Lịch sử: %{history}"
+  yi: "געשיכטע: %{history}"
   zh: "历史: %{history}"

@@ -17,6 +17,7 @@ row:
   fi: "%{rows} rivi"
   fr: "%{rows} ligne"
   ga: "%{rows} líne"
+  he: "%{rows} שורה"
   hi: "%{rows} पंक्ति"
   hr: "%{rows} red"
   hu: "%{rows} sor"
@@ -29,6 +30,7 @@ row:
   lt: "%{rows} eilutė"
   lv: "%{rows} rinda"
   mk: "%{rows} ред"
+  ms: "%{rows} baris"
   mt: "%{rows} linja"
   nl: "%{rows} rij"
   no: "%{rows} rad"
@@ -45,6 +47,7 @@ row:
   tr: "%{rows} satır"
   uk: "%{rows} рядок"
   vi: "%{rows} hàng"
+  yi: "%{rows} רייַ"
   zh: "%{rows} 行"
 
 rows:
@@ -62,6 +65,7 @@ rows:
   fi: "%{rows} riviä"
   fr: "%{rows} lignes"
   ga: "%{rows} línte"
+  he: "%{rows} שורות"
   hi: "%{rows} पंक्तियाँ"
   hr: "%{rows} redova"
   hu: "%{rows} sor"
@@ -74,6 +78,7 @@ rows:
   lt: "%{rows} eilučių"
   lv: "%{rows} rindas"
   mk: "%{rows} редови"
+  ms: "%{rows} baris"
   mt: "%{rows} linji"
   nl: "%{rows} rijen"
   no: "%{rows} rader"
@@ -90,6 +95,7 @@ rows:
   tr: "%{rows} satırlar"
   uk: "%{rows} рядків"
   vi: "%{rows} hàng"
+  yi: "%{rows} רייען"
   zh: "%{rows} 行"
 
 elapsed_format:
@@ -98,3 +104,5 @@ elapsed_format:
 footer_format:
   en: "%{rows} %{elapsed}"
   ar: "%{elapsed} %{rows}"
+  he: "%{elapsed} %{rows}"
+  yi: "%{elapsed} %{rows}"

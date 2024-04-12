@@ -17,6 +17,7 @@ limit_command:
   fi: "raja"
   fr: "limite"
   ga: "limit"
+  he: "הגבלה"
   hi: "सीमा"
   hr: "granica"
   hu: "határ"
@@ -29,6 +30,7 @@ limit_command:
   lt: "limitas"
   lv: "limits"
   mk: "граница"
+  ms: "had"
   mt: "limitu"
   nl: "limiet"
   no: "grense"
@@ -45,6 +47,7 @@ limit_command:
   tr: "sınır"
   uk: "ліміт"
   vi: "giới hạn"
+  yi: "גרענץ"
   zh: "限制"
 
 limit_argument:
@@ -62,6 +65,7 @@ limit_argument:
   fi: "[raja]"
   fr: "[limite]"
   ga: "[limit]"
+  he: "[הגבלה]"
   hi: "[सीमा]"
   hr: "[granica]"
   hu: "[határ]"
@@ -74,6 +78,7 @@ limit_argument:
   lt: "[limitas]"
   lv: "[limits]"
   mk: "[граница]"
+  ms: "[had]"
   mt: "[limitu]"
   nl: "[limiet]"
   no: "[grense]"
@@ -90,6 +95,7 @@ limit_argument:
   tr: "[sınır]"
   uk: "[ліміт]"
   vi: "[giới hạn]"
+  yi: "[גרענץ]"
   zh: "[限制]"
 
 limit_description:
@@ -107,6 +113,7 @@ limit_description:
   fi: "Aseta palautettavien tulosten enimmäismäärä"
   fr: "Définissez le nombre maximum de résultats à renvoyer"
   ga: "Set the maximum number of results to return"
+  he: "הגדר את מספר התוצאות המרבי שישובו"
   hi: "वापस आने वाले परिणामों की अधिकतम संख्या सेट करें"
   hr: "Postavite maksimalan broj rezultata za povratak"
   hu: "Állítsa be a visszatérő eredmények maximális számát"
@@ -119,6 +126,7 @@ limit_description:
   lt: "Nustatykite grąžinamų rezultatų maksimalų skaičių"
   lv: "Iestatiet atgriežamo rezultātu maksimālo skaitu"
   mk: "Поставете максимален број на резултати за враќање"
+  ms: "Tetapkan jumlah maksimum hasil yang akan dikembalikan"
   mt: "Setja l-għadd massimu ta 'riżultati li jridu jirrestitwixxu"
   nl: "Stel het maximale aantal resultaten in dat moet worden geretourneerd"
   no: "Angi det maksimale antallet resultater som skal returneres"
@@ -135,6 +143,7 @@ limit_description:
   tr: "Döndürülecek sonuçların maksimum sayısını ayarlayın"
   uk: "Встановіть максимальну кількість результатів для повернення"
   vi: "Đặt số lượng tối đa của kết quả cần trả lại"
+  yi: "סעט די מאַקסימאַלע נומער פון רעזולטאַטן צו רירן"
   zh: "设置要返回的结果的最大数量"
 
 limit_setting:
@@ -152,6 +161,7 @@ limit_setting:
   fi: "Raja: %{limit}"
   fr: "Limite: %{limit}"
   ga: "Limit: %{limit}"
+  he: "הגבלה: %{limit}"
   hi: "सीमा: %{limit}"
   hr: "Granica: %{limit}"
   hu: "Határ: %{limit}"
@@ -164,6 +174,7 @@ limit_setting:
   lt: "Limitas: %{limit}"
   lv: "Limits: %{limit}"
   mk: "Граница: %{limit}"
+  ms: "Had: %{limit}"
   mt: "Limitu: %{limit}"
   nl: "Limiet: %{limit}"
   no: "Grense: %{limit}"
@@ -180,4 +191,5 @@ limit_setting:
   tr: "Sınır: %{limit}"
   uk: "Ліміт: %{limit}"
   vi: "Giới hạn: %{limit}"
+  yi: "גרענץ: %{limit}"
   zh: "限制: %{limit}"

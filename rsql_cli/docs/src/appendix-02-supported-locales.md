@@ -24,6 +24,7 @@ your contribution to [rsql](https://github.com/theseus-rs/rsql).
 | fi     | Finnish                  |
 | fr     | French                   |
 | ga     | Irish                    |
+| he     | Hebrew                   |
 | hi     | Hindi                    |
 | hr     | Croatian                 |
 | hu     | Hungarian                |
@@ -36,6 +37,7 @@ your contribution to [rsql](https://github.com/theseus-rs/rsql).
 | lt     | Lithuanian               |
 | lv     | Latvian                  |
 | mk     | Macedonian               |
+| ms     | Malay                    |
 | mt     | Maltese                  |
 | nl     | Dutch                    |
 | nl     | Dutch                    |
@@ -53,4 +55,5 @@ your contribution to [rsql](https://github.com/theseus-rs/rsql).
 | tr     | Turkish                  |
 | uk     | Ukrainian                |
 | vi     | Vietnamese               |
+| yi     | Yiddish                  |
 | zh     | Chinese                  |

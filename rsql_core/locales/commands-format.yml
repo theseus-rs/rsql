@@ -17,6 +17,7 @@ format_command:
   fi: "muoto"
   fr: "format"
   ga: "formáid"
+  he: "פורמט"
   hi: "स्वरूप"
   hr: "format"
   hu: "formátum"
@@ -29,6 +30,7 @@ format_command:
   lt: "formatas"
   lv: "formāts"
   mk: "формат"
+  ms: "format"
   mt: "format"
   nl: "formaat"
   no: "format"
@@ -45,6 +47,7 @@ format_command:
   tr: "biçim"
   uk: "формат"
   vi: "định dạng"
+  yi: "פאָרמאַט"
   zh: "格式"
 
 format_argument:
@@ -62,6 +65,7 @@ format_argument:
   fi: "[muoto]"
   fr: "[format]"
   ga: "[formáid]"
+  he: "[פורמט]"
   hi: "[स्वरूप]"
   hr: "[format]"
   hu: "[formátum]"
@@ -74,6 +78,7 @@ format_argument:
   lt: "[formatas]"
   lv: "[formāts]"
   mk: "[формат]"
+  ms: "[format]"
   mt: "[format]"
   nl: "[formaat]"
   no: "[format]"
@@ -90,6 +95,7 @@ format_argument:
   tr: "[biçim]"
   uk: "[формат]"
   vi: "[định dạng]"
+  yi: "[פאָרמאַט]"
   zh: "[格式]"
 
 format_description:
@@ -107,6 +113,7 @@ format_description:
   fi: "Aseta tulosten tulostusmuoto"
   fr: "Définissez le format de sortie pour les résultats"
   ga: "Socraigh an fhoirm amach do na torthaí"
+  he: "קבע את פורמט הפלט לתוצאות"
   hi: "परिणामों के लिए आउटपुट फॉर्मेट सेट करें"
   hr: "Postavite izlazni format za rezultate"
   hu: "Állítsa be a kimeneti formátumot az eredményekhez"
@@ -119,6 +126,7 @@ format_description:
   lt: "Nustatykite rezultatų išvesties formatą"
   lv: "Iestatiet rezultātu izvades formātu"
   mk: "Поставете го форматот на излезот за резултатите"
+  ms: "Tetapkan format output untuk keputusan"
   mt: "Stabbilixxi l-format tal-ħruġ għall-riżultati"
   nl: "Stel het uitvoerformaat in voor de resultaten"
   no: "Angi utdataformatet for resultatene"
@@ -135,6 +143,7 @@ format_description:
   tr: "Sonuçlar için çıktı biçimini ayarlayın"
   uk: "Встановіть формат виводу для результатів"
   vi: "Đặt định dạng đầu ra cho kết quả"
+  yi: "פֿאָרמאַט די אויסגאַבע פֿאַר די רעזולטאַטן"
   zh: "设置结果的输出格式"
 
 format_setting:
@@ -152,6 +161,7 @@ format_setting:
   fi: "Muoto: %{format}"
   fr: "Format: %{format}"
   ga: "Formáid: %{format}"
+  he: "פורמט: %{format}"
   hi: "स्वरूप: %{format}"
   hr: "Format: %{format}"
   hu: "Formátum: %{format}"
@@ -164,6 +174,7 @@ format_setting:
   lt: "Formatas: %{format}"
   lv: "Formāts: %{format}"
   mk: "Формат: %{format}"
+  ms: "Format: %{format}"
   mt: "Format: %{format}"
   nl: "Formaat: %{format}"
   no: "Format: %{format}"
@@ -180,6 +191,7 @@ format_setting:
   tr: "Biçim: %{format}"
   uk: "Формат: %{format}"
   vi: "Định dạng: %{format}"
+  yi: "פֿאָרמאַט: %{format}"
   zh: "格式: %{format}"
 
 format_options:
@@ -197,6 +209,7 @@ format_options:
   fi: "Muodot: %{formats}"
   fr: "Formats: %{formats}"
   ga: "Formáid: %{formats}"
+  he: "פורמטים: %{formats}"
   hi: "स्वरूप: %{formats}"
   hr: "Formati: %{formats}"
   hu: "Formátumok: %{formats}"
@@ -209,6 +222,7 @@ format_options:
   lt: "Formatai: %{formats}"
   lv: "Formāti: %{formats}"
   mk: "Формати: %{formats}"
+  ms: "Format: %{formats}"
   mt: "Formati: %{formats}"
   nl: "Formaten: %{formats}"
   no: "Formater: %{formats}"
@@ -225,4 +239,5 @@ format_options:
   tr: "Biçimler: %{formats}"
   uk: "Формати: %{formats}"
   vi: "Định dạng: %{formats}"
+  yi: "פֿאָרמאַטן: %{formats}"
   zh: "格式: %{formats}"

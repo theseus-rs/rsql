@@ -17,6 +17,7 @@ locale_command:
   fi: "alue"
   fr: "localisation"
   ga: "limistéar"
+  he: "איזור"
   hi: "स्थानीय"
   hr: "lokacija"
   hu: "hely"
@@ -29,6 +30,7 @@ locale_command:
   lt: "vietovė"
   lv: "lokalizācija"
   mk: "локал"
+  ms: "tempatan"
   mt: "lokal"
   nl: "locale"
   no: "lokalisering"
@@ -45,6 +47,7 @@ locale_command:
   tr: "yerel"
   uk: "локалізація"
   vi: "địa phương"
+  yi: "לאָקאַלע"
   zh: "区域"
 
 locale_argument:
@@ -62,6 +65,7 @@ locale_argument:
   fi: "[alue]"
   fr: "[localisation]"
   ga: "[limistéar]"
+  he: "[איזור]"
   hi: "[स्थानीय]"
   hr: "[lokacija]"
   hu: "[hely]"
@@ -74,6 +78,7 @@ locale_argument:
   lt: "[vietovė]"
   lv: "[lokalizācija]"
   mk: "[локал]"
+  ms: "[tempatan]"
   mt: "[lokal]"
   nl: "[locale]"
   no: "[lokalisering]"
@@ -90,6 +95,7 @@ locale_argument:
   tr: "[yerel]"
   uk: "[локалізація]"
   vi: "[địa phương]"
+  yi: "[לאָקאַלע]"
   zh: "[区域]"
 
 locale_description:
@@ -107,6 +113,7 @@ locale_description:
   fi: "Aseta näyttökieli"
   fr: "Définir la langue d'affichage"
   ga: "Socraigh an teanga taispeántais"
+  he: "הגדרת שפת התצוגה"
   hi: "प्रदर्शन लोकेल सेट करें"
   hr: "Postavljanje prikaza lokalnog jezika"
   hu: "Kijelzési nyelv beállítása"
@@ -119,6 +126,7 @@ locale_description:
   lt: "Nustatyti rodyklės vietovę"
   lv: "Iestatiet attēlošanas lokalizāciju"
   mk: "Поставување на приказниот локал"
+  ms: "Tetapkan lokalisasi paparan"
   mt: "Issettja il-lokal ta' dixxiplina"
   nl: "De weergavetaal instellen"
   no: "Angi visningsspråk"
@@ -135,6 +143,7 @@ locale_description:
   tr: "Görüntüleme yerelini ayarlayın"
   uk: "Встановити мову відображення"
   vi: "Thiết lập ngôn ngữ hiển thị"
+  yi: "סעט די אויסגאַבע שפראַך"
   zh: "设置显示区域"
 
 locale_setting:
@@ -152,6 +161,7 @@ locale_setting:
   fi: "Alue: %{locale}"
   fr: "Localisation: %{locale}"
   ga: "Limistéar: %{locale}"
+  he: "איזור: %{locale}"
   hi: "स्थानीय: %{locale}"
   hr: "Lokacija: %{locale}"
   hu: "Hely: %{locale}"
@@ -164,6 +174,7 @@ locale_setting:
   lt: "Vietovė: %{locale}"
   lv: "Lokalizācija: %{locale}"
   mk: "Локал: %{locale}"
+  ms: "Tempatan: %{locale}"
   mt: "Lokal: %{locale}"
   nl: "Locale: %{locale}"
   no: "Lokalisering: %{locale}"
@@ -180,4 +191,5 @@ locale_setting:
   tr: "Yerel: %{locale}"
   uk: "Локалізація: %{locale}"
   vi: "Địa phương: %{locale}"
+  yi: "לאָקאַלע: %{locale}"
   zh: "区域: %{locale}"
