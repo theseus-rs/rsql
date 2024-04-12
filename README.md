@@ -58,17 +58,17 @@ with `rusqlite`.
 
 ## Features
 
-| Feature             |                                                                       |
-|---------------------|-----------------------------------------------------------------------|
-| Databases           | DuckDB, LibSQL (Turso), MariaDB, MySQL, PostgreSQL, SQLite3)          |
-| Embedded PostgreSQL | ✅                                                                     |
-| Syntax Highlighting | ✅                                                                     |
-| Result Highlighting | ✅                                                                     |
-| History             | ✅                                                                     |
-| SQL File Execution  | ✅                                                                     |
-| Output Formats      | csv, html, json, jsonl, markdown, plain, psql, sqlite, tsv, xml, yaml |
-| Localized Interface | 50+ locales                                                           |
-| Key Bindings        | emacs, vi                                                             |
+| Feature             |                                                                         |
+|---------------------|-------------------------------------------------------------------------|
+| Databases           | DuckDB, LibSQL (Turso), MariaDB, MySQL, PostgreSQL, SQLite3, SQL Server |
+| Embedded PostgreSQL | ✅                                                                       |
+| Syntax Highlighting | ✅                                                                       |
+| Result Highlighting | ✅                                                                       |
+| History             | ✅                                                                       |
+| SQL File Execution  | ✅                                                                       |
+| Output Formats      | csv, html, json, jsonl, markdown, plain, psql, sqlite, tsv, xml, yaml   |
+| Localized Interface | 50+ locales                                                             |
+| Key Bindings        | emacs, vi                                                               |
 
 ## Safety
 
