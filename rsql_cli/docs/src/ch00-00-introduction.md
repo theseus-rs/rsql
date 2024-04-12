@@ -1,5 +1,4 @@
 # Introduction
 
-Welcome to `rsql`, a command line interface for SQL databases. `rsql` is engineered to perform
-efficiently across diverse operating systems, CPU architectures and databases, embodying true cross-platform
-functionality.
+Welcome to `rsql`, a command line interface for SQL databases. `rsql` is designed to work with a variety of SQL
+databases, operating systems, and CPU architectures.
