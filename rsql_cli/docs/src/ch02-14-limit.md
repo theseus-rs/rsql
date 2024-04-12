@@ -13,7 +13,7 @@ If the limit is set to 0, then all rows are displayed.
 
 ### Examples
 
-Display the current limit setting
+Display the current limit setting:
 
 ```text
 .limit
@@ -22,11 +22,11 @@ Display the current limit setting
 Set row limit to unlimited:
 
 ```text
-.sleep 0
+.limit 0
 ```
 
 Set row limit to 10:
 
 ```text
-.sleep 10
+.limit 10
 ```
