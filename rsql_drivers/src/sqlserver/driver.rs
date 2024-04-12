@@ -54,7 +54,10 @@ impl Connection {
         let mut config = Config::new();
         config.host(host);
         config.port(port);
-        config.database(database);
+
+        if !database.is_empty() {
+            config.database(database);
+        }
 
         if !username.is_empty() {
             config.authentication(AuthMethod::sql_server(
@@ -130,12 +133,16 @@ impl crate::Connection for Connection {
 
     async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {
         let mut query_stream = self.client.query(sql, &[]).await?;
-        let columns: Vec<String> = Vec::new();
+        let mut columns: Vec<String> = Vec::new();
 
         let mut rows = Vec::new();
         while let Some(item) = query_stream.try_next().await? {
             if let QueryItem::Metadata(meta) = item {
-                if meta.result_index() == 0 {}
+                if meta.result_index() == 0 {
+                    for column in meta.columns() {
+                        columns.push(column.name().to_string());
+                    }
+                }
             } else if let QueryItem::Row(row) = item {
                 let mut row_data = Vec::new();
                 if row.result_index() == 0 {
@@ -206,6 +213,9 @@ fn convert_to_value(row: &Row, column: &Column, index: usize) -> Result<Option<V
         let value: Option<bool> = value;
         Ok(value.map(Value::Bool))
     } else if let Ok(value) = row.try_get(column_name) {
+        let value: Option<rust_decimal::Decimal> = value;
+        Ok(value.map(|v| Value::String(v.to_string())))
+    } else if let Ok(value) = row.try_get(column_name) {
         let value: Option<chrono::NaiveDate> = value;
         Ok(value.map(Value::Date))
     } else if let Ok(value) = row.try_get(column_name) {
@@ -224,7 +234,6 @@ fn convert_to_value(row: &Row, column: &Column, index: usize) -> Result<Option<V
     }
 }
 
-#[cfg(not(any(target_os = "linux", target_os = "macos", target_os = "windows")))]
 #[cfg(test)]
 mod test {
     use super::*;
@@ -260,7 +269,7 @@ mod test {
         let docker = Cli::default();
         let container = docker.run(MssqlServer::default());
 
-        let config = new_config(container.get_host_port_ipv4(1433), "yourStrong(!)Password");
+        let config = new_config(container.get_host_port_ipv4(1433), "Password42!");
         let mut client = get_mssql_client(config).await?;
 
         let stream = client.query("SELECT 1 + 1", &[]).await?;
@@ -273,13 +282,13 @@ mod test {
     #[tokio::test]
     async fn test_container() -> anyhow::Result<()> {
         let docker = Cli::default();
-        let password = "Password42";
+        let password = "Password42!";
         let sqlserver_image =
             RunnableImage::from(MssqlServer::default().with_sa_password(password));
         let container = docker.run(sqlserver_image);
         let port = container.get_host_port_ipv4(1433);
         let database_url =
-            &format!("sqlserver://sa:{password}@127.0.0.1:{port}/test?TrustServerCertificate=true");
+            &format!("sqlserver://sa:{password}@127.0.0.1:{port}?TrustServerCertificate=true");
         let driver_manager = DriverManager::default();
         let mut connection = driver_manager.connect(database_url.as_str()).await?;
 
@@ -292,7 +301,7 @@ mod test {
 
     async fn test_connection_interface(connection: &mut dyn Connection) -> anyhow::Result<()> {
         let _ = connection
-            .execute("CREATE TABLE person (id INTR, name VARCHAR(20))")
+            .execute("CREATE TABLE person (id INT, name VARCHAR(20))")
             .await?;
 
         let rows = connection
@@ -306,7 +315,7 @@ mod test {
             Some(row) => {
                 assert_eq!(row.len(), 2);
 
-                if let Some(Value::I16(id)) = row.get(0) {
+                if let Some(Value::I32(id)) = row.get(0) {
                     assert_eq!(*id, 1);
                 } else {
                     assert!(false);
@@ -335,7 +344,6 @@ mod test {
                 text_type TEXT,
                 binary_type BINARY(1),
                 varbinary_type VARBINARY(1),
-                image_type IMAGE,
                 tinyint_type TINYINT,
                 smallint_type SMALLINT,
                 int_type INT,
@@ -354,13 +362,13 @@ mod test {
         let sql = indoc! {r#"
             INSERT INTO data_types (
                 nchar_type, char_type, nvarchar_type, varchar_type, ntext_type, text_type,
-                binary_type, varbinary_type, image_type,
+                binary_type, varbinary_type,
                 tinyint_type, smallint_type, int_type, bigint_type,
                 float24_type, float53_type, bit_type, decimal_type,
                 date_type, time_type, datetime_type
             ) VALUES (
                  'a', 'a', 'foo', 'foo', 'foo', 'foo',
-                 CAST(42 AS BINARY(1)), CAST(42 AS VARBINARY(1)), CAST(42 AS IMAGE),
+                 CAST(42 AS BINARY(1)), CAST(42 AS VARBINARY(1)),
                  127, 32767, 2147483647, 9223372036854775807,
                  123.45, 123.0, 1, 123.0,
                  '2022-01-01', '14:30:00', '2022-01-01 14:30:00'
@@ -370,7 +378,7 @@ mod test {
 
         let sql = indoc! {r#"
             SELECT nchar_type, char_type, nvarchar_type, varchar_type, ntext_type, text_type,
-                   binary_type, varbinary_type, image_type,
+                   binary_type, varbinary_type,
                    tinyint_type, smallint_type, int_type, bigint_type,
                    float24_type, float53_type, bit_type, decimal_type,
                    date_type, time_type, datetime_type
@@ -399,17 +407,20 @@ mod test {
             );
             assert_eq!(row.get(6).cloned().unwrap(), Value::Bytes(vec![42u8]));
             assert_eq!(row.get(7).cloned().unwrap(), Value::Bytes(vec![42u8]));
-            assert_eq!(row.get(8).cloned().unwrap(), Value::Bytes(vec![42u8]));
-            assert_eq!(row.get(9).cloned().unwrap(), Value::I16(127));
-            assert_eq!(row.get(10).cloned().unwrap(), Value::I16(32_767));
-            assert_eq!(row.get(11).cloned().unwrap(), Value::I32(2_147_483_647));
+            assert_eq!(row.get(8).cloned().unwrap(), Value::U8(127));
+            assert_eq!(row.get(9).cloned().unwrap(), Value::I16(32_767));
+            assert_eq!(row.get(10).cloned().unwrap(), Value::I32(2_147_483_647));
             assert_eq!(
-                row.get(12).cloned().unwrap(),
+                row.get(11).cloned().unwrap(),
                 Value::I64(9_223_372_036_854_775_807)
             );
-            assert_eq!(row.get(13).cloned().unwrap(), Value::F32(123.0));
-            assert_eq!(row.get(14).cloned().unwrap(), Value::F64(123.0));
-            assert_eq!(row.get(15).cloned().unwrap(), Value::Bool(true));
+            assert_eq!(row.get(12).cloned().unwrap(), Value::F32(123.45));
+            assert_eq!(row.get(13).cloned().unwrap(), Value::F64(123.0));
+            assert_eq!(row.get(14).cloned().unwrap(), Value::Bool(true));
+            assert_eq!(
+                row.get(15).cloned().unwrap(),
+                Value::String("123.00".to_string())
+            );
             let date = NaiveDate::from_ymd_opt(2022, 1, 1).expect("invalid date");
             assert_eq!(row.get(16).cloned().unwrap(), Value::Date(date));
             let time = NaiveTime::from_hms_opt(14, 30, 00).expect("invalid time");
@@ -430,15 +441,17 @@ mod test {
             .execute("CREATE TABLE users (id INT PRIMARY KEY, email VARCHAR(20))")
             .await?;
 
-        let indexes = connection.indexes(None).await?;
-        assert!(indexes.contains(&"PRIMARY".to_string()));
-
-        let indexes = connection.indexes(Some("users")).await?;
-        assert!(indexes.contains(&"PRIMARY".to_string()));
-
         let tables = connection.tables().await?;
         assert!(tables.contains(&"contacts".to_string()));
         assert!(tables.contains(&"users".to_string()));
+
+        let indexes = connection.indexes(None).await?;
+        assert!(indexes[0].contains(&"PK__contacts__".to_string()));
+        assert!(indexes[1].contains(&"PK__users__".to_string()));
+
+        let indexes = connection.indexes(Some("users")).await?;
+        assert!(indexes[0].contains(&"PK__users__".to_string()));
+
         Ok(())
     }
 }

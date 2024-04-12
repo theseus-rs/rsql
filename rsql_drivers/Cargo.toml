@@ -31,13 +31,24 @@ serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true, features = ["preserve_order"] }
 sqlx = { workspace = true, features = ["bit-vec", "chrono", "json", "macros", "runtime-tokio", "rust_decimal", "time", "uuid"], optional = true }
 thiserror = { workspace = true }
-tiberius = { workspace = true, features = ["chrono", "time"], optional = true }
 tokio = { workspace = true, features = ["rt", "rt-multi-thread", "macros"] }
 tokio-postgres = { workspace = true, features = ["array-impls", "with-bit-vec-0_6", "with-chrono-0_4", "with-serde_json-1", "with-uuid-1"], optional = true }
 tokio-util = { workspace = true, features = ["compat"], optional = true }
 tracing = { workspace = true }
 url = { workspace = true }
 uuid = { workspace = true, features = ["serde", "v4"] }
+
+[target.'cfg(target_os = "macos")'.dependencies.tiberius]
+default-features = false
+features = ["bigdecimal", "chrono", "rust_decimal", "rustls", "tds73", "time"]
+optional = true
+workspace = true
+
+[target.'cfg(not(target_os = "macos"))'.dependencies.tiberius]
+default-features = false
+features = ["bigdecimal", "chrono", "native-tls", "rust_decimal", "tds73", "time"]
+optional = true
+workspace = true
 
 [dev-dependencies]
 test-log = { workspace = true }
