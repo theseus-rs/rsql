@@ -69,6 +69,7 @@ impl Value {
     }
 
     pub fn is_numeric(&self) -> bool {
+        #[allow(clippy::match_like_matches_macro)]
         match self {
             Value::I8(_) | Value::I16(_) | Value::I32(_) | Value::I64(_) | Value::I128(_) => true,
             Value::U8(_) | Value::U16(_) | Value::U32(_) | Value::U64(_) | Value::U128(_) => true,
