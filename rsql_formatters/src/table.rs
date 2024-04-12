@@ -293,7 +293,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_query_justify_numbers_and_strings() -> anyhow::Result<()> {
+    async fn test_query_align_numbers_and_strings() -> anyhow::Result<()> {
         let mut options = FormatterOptions {
             color: false,
             locale: "en".to_string(),
