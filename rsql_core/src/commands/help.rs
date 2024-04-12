@@ -135,8 +135,8 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_execute_unicode_format_en_us() -> anyhow::Result<()> {
-        let contents = test_execute(false, ".", "us-US", "help").await?;
+    async fn test_execute_unicode_format_en() -> anyhow::Result<()> {
+        let contents = test_execute(false, ".", "en", "help").await?;
         let expected = indoc! {r#"
             .footer on|off  Enable or disable result footer
             .help           Show this help message
@@ -146,8 +146,8 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_execute_unicode_format_de_de() -> anyhow::Result<()> {
-        let contents = test_execute(false, ".", "de-DE", "hilfe").await?;
+    async fn test_execute_unicode_format_de() -> anyhow::Result<()> {
+        let contents = test_execute(false, ".", "de", "hilfe").await?;
         let expected = indoc! {r#"
             .fußzeile ein|aus  Ergebnisfuß aktivieren oder deaktivieren
             .hilfe             Diese Hilfemeldung anzeigen
@@ -158,25 +158,25 @@ mod tests {
 
     #[tokio::test]
     async fn test_execute_rtl() -> anyhow::Result<()> {
-        let _ = test_execute(false, ".", "ar-SA", "مساعدة").await?;
+        let _ = test_execute(false, ".", "ar", "مساعدة").await?;
         Ok(())
     }
 
     #[tokio::test]
-    async fn test_execute_unicode_format_ja_jp() -> anyhow::Result<()> {
-        let _ = test_execute(false, ".", "ja-JP", "ヘルプ").await?;
+    async fn test_execute_unicode_format_ja() -> anyhow::Result<()> {
+        let _ = test_execute(false, ".", "ja", "ヘルプ").await?;
         Ok(())
     }
 
     #[tokio::test]
-    async fn test_execute_unicode_format_ko_kr() -> anyhow::Result<()> {
-        let _ = test_execute(false, ".", "ko-KR", "도움말").await?;
+    async fn test_execute_unicode_format_ko() -> anyhow::Result<()> {
+        let _ = test_execute(false, ".", "ko", "도움말").await?;
         Ok(())
     }
 
     #[tokio::test]
-    async fn test_execute_unicode_format_zh_cn() -> anyhow::Result<()> {
-        let _ = test_execute(false, ".", "zh-CN", "帮助").await?;
+    async fn test_execute_unicode_format_zh() -> anyhow::Result<()> {
+        let _ = test_execute(false, ".", "zh", "帮助").await?;
         Ok(())
     }
 }
