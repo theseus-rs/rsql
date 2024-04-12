@@ -8,16 +8,16 @@ pub struct Command;
 
 #[async_trait]
 impl ShellCommand for Command {
-    fn name(&self, index: &str) -> String {
-        t!("indexes_command", index = index).to_string()
+    fn name(&self, locale: &str) -> String {
+        t!("indexes_command", locale = locale).to_string()
     }
 
-    fn args(&self, index: &str) -> String {
-        t!("indexes_argument", index = index).to_string()
+    fn args(&self, locale: &str) -> String {
+        t!("indexes_argument", locale = locale).to_string()
     }
 
-    fn description(&self, index: &str) -> String {
-        t!("indexes_description", index = index).to_string()
+    fn description(&self, locale: &str) -> String {
+        t!("indexes_description", locale = locale).to_string()
     }
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {

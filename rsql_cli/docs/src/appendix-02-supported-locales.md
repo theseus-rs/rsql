@@ -8,61 +8,52 @@ The following locales have translations available for use. Most of the translati
 often be less than perfect. If you would like to contribute a better translation, or add a new locale, please submit
 your contribution to [rsql](https://github.com/theseus-rs/rsql).
 
-| locale | Description                      |
-|--------|----------------------------------|
-| ar-SA  | Arabic (Saudi Arabia)            |
-| be-BY  | Belarusian (Belarus)             |
-| bg-BG  | Bulgarian (Bulgaria)             |
-| bn-BD  | Bengali (Bangladesh)             |
-| cs-CZ  | Czech (Czechia)                  |
-| da-DK  | Danish (Denmark)                 |
-| de-AT  | German (Austria)                 |
-| de-CH  | German (Switzerland)             |
-| de-DE  | German (Germany)                 |
-| de-LI  | German (Liechtenstein)           |
-| de-LU  | German (Luxembourg)              |
-| el-GR  | Greek (Greece)                   |
-| en-GB  | English (United Kingdom)         |
-| en-US  | English (United States)          |
-| es-ES  | Spanish (Spain)                  |
-| et-EE  | Estonian (Estonia)               |
-| fi-FI  | Finnish (Finland)                |
-| fr-BE  | French (Belgium)                 |
-| fr-CH  | French (Switzerland)             |
-| fr-FR  | French (France)                  |
-| fr-LU  | French (Luxembourg)              |
-| ga-IE  | Irish (Ireland)                  |
-| hi-IN  | Hindi (India)                    |
-| hr-HR  | Croatian (Croatia)               |
-| hu-HU  | Hungarian (Hungary)              |
-| is-IS  | Icelandic (Iceland)              |
-| it-CH  | Italian (Switzerland)            |
-| it-IT  | Italian (Italy)                  |
-| ja-JP  | Japanese (Japan)                 |
-| jv-ID  | Javanese (Indonesia)             |
-| ka-GE  | Georgian (Georgia)               |
-| ko-KR  | Korean (South Korea)             |
-| lt-LT  | Lithuanian (Lithuania)           |
-| lv-LV  | Latvian (Latvia)                 |
-| mk-MK  | Macedonian (North Macedonia)     |
-| mt-MT  | Maltese (Malta)                  |
-| nl-BE  | Dutch (Belgium)                  |
-| nl-NL  | Dutch (Netherlands)              |
-| no-NO  | Norwegian (Norway)               |
-| pl-PL  | Polish (Poland)                  |
-| pt-BR  | Portuguese (Brazil)              |
-| pt-PT  | Portuguese (Portugal)            |
-| ro-RO  | Romanian (Romania)               |
-| ru-RU  | Russian (Russia)                 |
-| sk-SK  | Slovak (Slovakia)                |
-| sl-SI  | Slovenian (Slovenia)             |
-| sq-AL  | Albanian (Albania)               |
-| sr-BA  | Serbian (Bosnia and Herzegovina) |
-| sr-ME  | Serbian (Montenegro)             |
-| sr-RS  | Serbian (Serbia)                 |
-| sv-SE  | Swedish (Sweden)                 |
-| th-TH  | Thai (Thailand)                  |
-| tr-TR  | Turkish (Turkey)                 |
-| uk-UA  | Ukrainian (Ukraine)              |
-| vi-VN  | Vietnamese (Vietnam)             |
-| zh-CN  | Chinese (China)                  |
+| locale | Description              |
+|--------|--------------------------|
+| ar     | Arabic                   |
+| be     | Belarusian               |
+| bg     | Bulgarian                |
+| bn     | Bengali                  |
+| cs     | Czech                    |
+| da     | Danish                   |
+| de     | German                   |
+| el     | Greek                    |
+| en-GB  | English (United Kingdom) |
+| es     | Spanish                  |
+| et     | Estonian                 |
+| fi     | Finnish                  |
+| fr     | French                   |
+| ga     | Irish                    |
+| he     | Hebrew                   |
+| hi     | Hindi                    |
+| hr     | Croatian                 |
+| hu     | Hungarian                |
+| is     | Icelandic                |
+| it     | Italian                  |
+| ja     | Japanese                 |
+| jv     | Javanese                 |
+| ka     | Georgian                 |
+| ko     | Korean (Sout             |
+| lt     | Lithuanian               |
+| lv     | Latvian                  |
+| mk     | Macedonian               |
+| ms     | Malay                    |
+| mt     | Maltese                  |
+| nl     | Dutch                    |
+| nl     | Dutch                    |
+| no     | Norwegian                |
+| pl     | Polish                   |
+| pt     | Portuguese               |
+| ro     | Romanian                 |
+| ru     | Russian                  |
+| sk     | Slovak                   |
+| sl     | Slovenian                |
+| sq     | Albanian                 |
+| sr     | Serbian                  |
+| sv     | Swedish                  |
+| th     | Thai                     |
+| tr     | Turkish                  |
+| uk     | Ukrainian                |
+| vi     | Vietnamese               |
+| yi     | Yiddish                  |
+| zh     | Chinese                  |

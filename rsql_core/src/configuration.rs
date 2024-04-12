@@ -613,7 +613,7 @@ mod test {
             .add_source(config::Environment::with_prefix(prefix).separator("_"))
             .build()?;
         let locale = get_locale(&config);
-        assert_eq!(locale, "de-DE".to_string());
+        assert_eq!(locale, "de".to_string());
         Ok(())
     }
 

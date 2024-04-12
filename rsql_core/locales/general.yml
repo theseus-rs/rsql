@@ -4,6 +4,6 @@ _version: 2
 
 list_delimiter:
   en: ", "
-  ar-SA: "، "
-  ja-JP: "、"
-  zh-CN: "、"
+  ar: "، "
+  ja: "、"
+  zh: "、"

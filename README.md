@@ -67,8 +67,10 @@ with `rusqlite`.
 | History             | ✅                                                                       |
 | SQL File Execution  | ✅                                                                       |
 | Output Formats      | csv, html, json, jsonl, markdown, plain, psql, sqlite, tsv, xml, yaml   |
-| Localized Interface | 50+ locales                                                             |
+| Localized Interface | 40+ languages¹                                                          |
 | Key Bindings        | emacs, vi                                                               |
+
+¹ Computer translations; human translations welcome
 
 ## Safety
 
