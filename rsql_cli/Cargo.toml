@@ -34,6 +34,8 @@ os_info = { workspace = true }
 rsql_core = { path = "../rsql_core", version = "0.11.1", features = ["all"] }
 rust-i18n = { workspace = true }
 semver = { workspace = true }
+serde = { workspace = true }
+supports-color = { workspace = true }
 tokio = { workspace = true, features = ["rt", "rt-multi-thread", "macros"] }
 tracing = { workspace = true }
 

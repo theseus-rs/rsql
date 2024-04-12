@@ -5,7 +5,7 @@ extern crate rust_i18n;
 mod version;
 
 use anyhow::Result;
-use clap::Parser;
+use clap::{Parser, ValueEnum};
 use colored::Colorize;
 use rsql_core::commands::{help, quit, ShellCommand};
 use rsql_core::configuration::{Configuration, ConfigurationBuilder};
@@ -13,17 +13,32 @@ use rsql_core::shell::{ShellArgs, ShellBuilder};
 use rsql_core::writers::{Output, StdoutWriter};
 use rust_i18n::t;
 use semver::Version;
+use serde::Serialize;
 use std::{env, io};
+use supports_color::Stream;
 use tracing::{debug, info};
 use version::full_version;
 
 i18n!("locales", fallback = "en");
+
+#[derive(Clone, Debug, Default, Serialize, ValueEnum)]
+#[serde(rename_all = "kebab-case")]
+enum Color {
+    #[default]
+    Auto,
+    Always,
+    Never,
+}
 
 #[derive(Debug, Default, Parser)]
 pub(crate) struct Args {
     /// The shell arguments
     #[clap(flatten)]
     pub shell_args: ShellArgs,
+
+    /// Enable or disable color output
+    #[arg(long, env = "COLOR", default_value_t, value_enum)]
+    color: Color,
 
     /// Disable the update check
     #[arg(long, env = "DISABLE_UPDATE_CHECK")]
@@ -41,10 +56,17 @@ async fn main() -> Result<()> {
 
     let program_name = "rsql";
     let version = env!("CARGO_PKG_VERSION");
-    let configuration = ConfigurationBuilder::new(program_name, version)
+    let mut configuration = ConfigurationBuilder::new(program_name, version)
         .with_config()
         .build();
     let output = Output::new(Box::<StdoutWriter>::default());
+
+    configuration.color = match args.color {
+        Color::Auto => supports_color::on(Stream::Stdout).is_some(),
+        Color::Always => true,
+        Color::Never => false,
+    };
+
     let exit_code = execute(args, configuration, output).await?;
     std::process::exit(exit_code);
 }
@@ -186,6 +208,7 @@ mod tests {
         };
         let args = Args {
             shell_args,
+            color: Color::Never,
             disable_update_check: false,
             version: false,
         };
