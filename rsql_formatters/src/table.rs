@@ -6,8 +6,8 @@ use crate::Results;
 use crate::Results::Query;
 use colored::Colorize;
 use num_format::Locale;
-use prettytable::format::TableFormat;
-use prettytable::Table;
+use prettytable::format::{Alignment, TableFormat};
+use prettytable::{Cell, Table};
 use rsql_drivers::QueryResult;
 use std::str::FromStr;
 
@@ -60,27 +60,30 @@ async fn process_data(
     let locale = Locale::from_str(options.locale.as_str()).unwrap_or(Locale::en);
     let mut rows: u64 = 0;
     while let Some(row) = query_result.next().await {
-        let mut row_data = Vec::new();
+        let mut row_data = prettytable::Row::default();
 
         for data in row.into_iter() {
-            let data = match data {
-                Some(data) => data.to_formatted_string(&locale),
+            let mut alignment = Alignment::LEFT;
+            let mut data = match data {
+                Some(data) => {
+                    if data.is_numeric() {
+                        alignment = Alignment::RIGHT;
+                    }
+                    data.to_formatted_string(&locale)
+                }
                 None => "NULL".to_string(),
             };
 
-            if options.color {
-                if rows % 2 == 0 {
-                    row_data.push(data.dimmed().to_string());
-                } else {
-                    row_data.push(data);
-                }
-            } else {
-                row_data.push(data);
+            if options.color && rows % 2 == 0 {
+                data = data.dimmed().to_string();
             }
+
+            let cell = Cell::new_align(&data, alignment);
+            row_data.add_cell(cell);
         }
 
         rows += 1;
-        table.add_row(prettytable::Row::from(row_data));
+        table.add_row(row_data);
     }
 
     Ok(rows)
@@ -123,6 +126,17 @@ mod tests {
                 Row::new(vec![None]),
                 Row::new(vec![Some(Value::I64(12345))]),
             ],
+        );
+        Query(Box::new(query_result))
+    }
+
+    fn query_result_number_and_string() -> Results {
+        let query_result = MemoryQueryResult::new(
+            vec!["number".to_string(), "string".to_string()],
+            vec![Row::new(vec![
+                Some(Value::I64(42)),
+                Some(Value::String("foo".to_string())),
+            ])],
         );
         Query(Box::new(query_result))
     }
@@ -273,6 +287,28 @@ mod tests {
         let output = test_format(&mut options, &mut results).await?;
         let expected = indoc! {r#"
             0 rows (9ns)
+        "#};
+        assert_eq!(output, expected);
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_query_justify_numbers_and_strings() -> anyhow::Result<()> {
+        let mut options = FormatterOptions {
+            color: false,
+            locale: "en".to_string(),
+            ..Default::default()
+        };
+        let mut results = query_result_number_and_string();
+
+        let output = test_format(&mut options, &mut results).await?;
+        let expected = indoc! {r#"
+            +--------+--------+
+            | number | string |
+            +========+========+
+            |     42 | foo    |
+            +--------+--------+
+            1 row (9ns)
         "#};
         assert_eq!(output, expected);
         Ok(())
