@@ -8,7 +8,7 @@
 [![License](https://img.shields.io/crates/l/rsql_cli)](https://github.com/theseus-rs/rsql#license)
 [![Semantic Versioning](https://img.shields.io/badge/%E2%9A%99%EF%B8%8F_SemVer-2.0.0-blue)](https://semver.org/spec/v2.0.0.html)
 
-`rsql` is a command line interface for MariaDB, MySQL, PostgreSQL and SQLite3.
+`rsql` is a command line interface for databases.
 
 ## Getting Started
 
