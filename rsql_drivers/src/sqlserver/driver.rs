@@ -243,52 +243,18 @@ mod test {
     use testcontainers::clients::Cli;
     use testcontainers::RunnableImage;
     use testcontainers_modules::mssql_server::MssqlServer;
-    use tiberius::{AuthMethod, Client, Config};
-    use tokio_util::compat::Compat;
 
-    fn new_config(port: u16, password: &str) -> Config {
-        let mut config = Config::new();
-        config.port(port);
-        config.authentication(AuthMethod::sql_server("sa", password));
-        config.trust_cert();
+    const PASSWORD: &str = "Password42!";
 
-        config
-    }
-
-    async fn get_mssql_client(config: Config) -> anyhow::Result<Client<Compat<TcpStream>>> {
-        let tcp = TcpStream::connect(config.get_addr()).await?;
-        tcp.set_nodelay(true)?;
-
-        let client = Client::connect(config, tcp.compat_write()).await?;
-
-        Ok(client)
-    }
-
-    #[tokio::test]
-    async fn one_plus_one() -> anyhow::Result<()> {
-        let docker = Cli::default();
-        let container = docker.run(MssqlServer::default());
-
-        let config = new_config(container.get_host_port_ipv4(1433), "Password42!");
-        let mut client = get_mssql_client(config).await?;
-
-        let stream = client.query("SELECT 1 + 1", &[]).await?;
-        let row = stream.into_row().await?.unwrap();
-
-        assert_eq!(row.get::<i32, _>(0).unwrap(), 2);
-
-        Ok(())
-    }
     #[tokio::test]
     async fn test_container() -> anyhow::Result<()> {
         let docker = Cli::default();
-        let password = "Password42!";
         let sqlserver_image =
-            RunnableImage::from(MssqlServer::default().with_sa_password(password));
+            RunnableImage::from(MssqlServer::default().with_sa_password(PASSWORD));
         let container = docker.run(sqlserver_image);
         let port = container.get_host_port_ipv4(1433);
         let database_url =
-            &format!("sqlserver://sa:{password}@127.0.0.1:{port}?TrustServerCertificate=true");
+            &format!("sqlserver://sa:{PASSWORD}@127.0.0.1:{port}?TrustServerCertificate=true");
         let driver_manager = DriverManager::default();
         let mut connection = driver_manager.connect(database_url.as_str()).await?;
 
