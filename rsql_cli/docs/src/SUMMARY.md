@@ -20,7 +20,7 @@
     - [help](ch02-11-help.md)
     - [history](ch02-12-history.md)
     - [indexes](ch02-13-indexes.md)
-    - [limit](ch02-14-limit.md.md)
+    - [limit](ch02-14-limit.md)
     - [locale](ch02-15-locale.md)
     - [output](ch02-16-output.md)
     - [print](ch02-17-print.md)
