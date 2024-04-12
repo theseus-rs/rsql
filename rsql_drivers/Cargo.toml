@@ -46,7 +46,7 @@ workspace = true
 
 [target.'cfg(not(target_os = "macos"))'.dependencies.tiberius]
 default-features = false
-features = ["bigdecimal", "chrono", "native-tls", "rust_decimal", "tds73", "time"]
+features = ["bigdecimal", "chrono", "rust_decimal", "tds73", "time", "vendored-openssl"]
 optional = true
 workspace = true
 
