@@ -25,8 +25,8 @@ jobs:
           # - { target: arm-linux-androideabi, os: ubuntu-latest }
           - { target: arm-unknown-linux-gnueabi, os: ubuntu-latest }
           - { target: arm-unknown-linux-gnueabihf, os: ubuntu-latest }
-          - { target: arm-unknown-linux-musleabi, os: ubuntu-latest }
-          - { target: arm-unknown-linux-musleabihf, os: ubuntu-latest }
+          # - { target: arm-unknown-linux-musleabi, os: ubuntu-latest }
+          # - { target: arm-unknown-linux-musleabihf, os: ubuntu-latest }
           # - { target: armv5te-unknown-linux-gnueabi, os: ubuntu-latest }
           # - { target: armv5te-unknown-linux-musleabi, os: ubuntu-latest }
           # - { target: armv7-linux-androideabi, os: ubuntu-latest }
@@ -67,8 +67,8 @@ jobs:
           # - { target: wasm32-unknown-emscripten, os: ubuntu-latest }
           - { target: x86_64-apple-darwin, os: macos-12 }
           # - { target: x86_64-linux-android, os: ubuntu-latest }
-          - { target: x86_64-pc-windows-gnu, os: windows-latest }
-          - { target: x86_64-pc-windows-msvc, os: windows-latest }
+          # - { target: x86_64-pc-windows-gnu, os: windows-latest }
+          # - { target: x86_64-pc-windows-msvc, os: windows-latest }
           # - { target: x86_64-sun-solaris, os: ubuntu-latest }
           # - { target: x86_64-unknown-freebsd, os: ubuntu-latest }
           # - { target: x86_64-unknown-dragonfly, os: ubuntu-latest }
