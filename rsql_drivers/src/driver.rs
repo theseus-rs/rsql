@@ -85,6 +85,8 @@ impl Default for DriverManager {
         drivers.add(Box::new(crate::rusqlite::Driver));
         #[cfg(feature = "sqlite")]
         drivers.add(Box::new(crate::sqlite::Driver));
+        #[cfg(feature = "sqlserver")]
+        drivers.add(Box::new(crate::sqlserver::Driver));
 
         drivers
     }
@@ -141,6 +143,9 @@ mod tests {
         let driver_count = driver_count + 1;
 
         #[cfg(feature = "sqlite")]
+        let driver_count = driver_count + 1;
+
+        #[cfg(feature = "sqlserver")]
         let driver_count = driver_count + 1;
 
         assert_eq!(driver_manager.drivers.len(), driver_count);

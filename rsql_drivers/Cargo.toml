@@ -17,6 +17,7 @@ bit-vec = { workspace = true, optional = true }
 chrono = { workspace = true, features = ["serde"] }
 duckdb = { workspace = true, features = ["bundled"], optional = true }
 form_urlencoded = { workspace = true, optional = true }
+futures-util = { workspace = true, optional = true }
 indoc = { workspace = true }
 libsql = { workspace = true, optional = true }
 mockall = { workspace = true }
@@ -32,18 +33,31 @@ sqlx = { workspace = true, features = ["bit-vec", "chrono", "json", "macros", "r
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["rt", "rt-multi-thread", "macros"] }
 tokio-postgres = { workspace = true, features = ["array-impls", "with-bit-vec-0_6", "with-chrono-0_4", "with-serde_json-1", "with-uuid-1"], optional = true }
+tokio-util = { workspace = true, features = ["compat"], optional = true }
 tracing = { workspace = true }
 url = { workspace = true }
 uuid = { workspace = true, features = ["serde", "v4"] }
 
+[target.'cfg(target_os = "macos")'.dependencies.tiberius]
+default-features = false
+features = ["bigdecimal", "chrono", "rust_decimal", "rustls", "tds73", "time"]
+optional = true
+workspace = true
+
+[target.'cfg(not(target_os = "macos"))'.dependencies.tiberius]
+default-features = false
+features = ["bigdecimal", "chrono", "native-tls", "rust_decimal", "tds73", "time"]
+optional = true
+workspace = true
+
 [dev-dependencies]
 test-log = { workspace = true }
 testcontainers = { workspace = true }
-testcontainers-modules = { workspace = true, features = ["mysql", "postgres"] }
+testcontainers-modules = { workspace = true, features = ["mssql_server", "mysql", "postgres"] }
 tokio = { workspace = true }
 
 [features]
-all = ["duckdb", "mysql", "postgres", "postgresql", "rusqlite", "sqlite"]
+all = ["duckdb", "mysql", "postgres", "postgresql", "rusqlite", "sqlite", "sqlserver"]
 default = []
 duckdb = [
     "dep:duckdb"
@@ -74,6 +88,11 @@ sqlite = [
     "dep:form_urlencoded",
     "dep:sqlx",
     "sqlx/sqlite",
+]
+sqlserver = [
+    "dep:futures-util",
+    "dep:tiberius",
+    "dep:tokio-util",
 ]
 
 [lints.clippy]

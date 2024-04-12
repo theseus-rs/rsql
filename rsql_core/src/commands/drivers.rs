@@ -101,6 +101,9 @@ mod tests {
         #[cfg(feature = "driver-sqlite")]
         drivers.push("sqlite");
 
+        #[cfg(feature = "driver-sqlserver")]
+        drivers.push("sqlserver");
+
         let available_drivers = drivers.join(", ");
 
         assert_eq!(

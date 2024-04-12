@@ -11,7 +11,7 @@
 [![License](https://img.shields.io/crates/l/rsql_cli)](https://github.com/theseus-rs/rsql_cli#license)
 [![Semantic Versioning](https://img.shields.io/badge/%E2%9A%99%EF%B8%8F_SemVer-2.0.0-blue)](https://semver.org/spec/v2.0.0.html)
 
-`rsql` is a command line interface for MariaDB, MySQL, PostgreSQL and SQLite3.
+`rsql` is a command line interface for databases.
 
 ## Getting Started
 
@@ -51,6 +51,7 @@ rsql --url '<url>'
 | postgresql (sqlx) | `postgresql://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>` |
 | rusqlite          | `rusqlite://?<memory=true>[&file=<database_file>]`                            |
 | sqlite (sqlx)     | `sqlite://?<memory=true>[&file=<database_file>]`                              |
+| sqlserver         | `sqlserver://<user>[:<password>]@<host>[:<port>]/<database>`                  |
 
 ¹ `libsql` needs to be enabled with the `libsql` feature flag; it is disabled by default as it conflicts
 with `rusqlite`.
