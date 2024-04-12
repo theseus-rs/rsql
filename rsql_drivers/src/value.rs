@@ -67,6 +67,16 @@ impl Value {
             }
         }
     }
+
+    pub fn is_numeric(&self) -> bool {
+        #[allow(clippy::match_like_matches_macro)]
+        match self {
+            Value::I8(_) | Value::I16(_) | Value::I32(_) | Value::I64(_) | Value::I128(_) => true,
+            Value::U8(_) | Value::U16(_) | Value::U32(_) | Value::U64(_) | Value::U128(_) => true,
+            Value::F32(_) | Value::F64(_) => true,
+            _ => false,
+        }
+    }
 }
 
 impl fmt::Display for Value {
@@ -144,6 +154,7 @@ mod tests {
 
     #[test]
     fn test_bool() {
+        assert!(!Value::Bool(true).is_numeric());
         assert_eq!(Value::Bool(true).to_formatted_string(&Locale::en), "true");
         assert_eq!(Value::Bool(true).to_string(), "true");
         assert_eq!(json!(Value::Bool(true)), json!(true));
@@ -151,6 +162,7 @@ mod tests {
 
     #[test]
     fn test_bytes() {
+        assert!(!Value::Bytes(vec![114, 117, 115, 116]).is_numeric());
         assert_eq!(
             Value::Bytes(vec![114, 117, 115, 116]).to_formatted_string(&Locale::en),
             "cnVzdA=="
@@ -172,6 +184,7 @@ mod tests {
 
     #[test]
     fn test_i8() {
+        assert!(Value::I8(i8::MIN).is_numeric());
         assert_eq!(Value::I8(i8::MIN).to_formatted_string(&Locale::en), "-128");
         assert_eq!(Value::I8(i8::MAX).to_formatted_string(&Locale::en), "127");
 
@@ -184,6 +197,7 @@ mod tests {
 
     #[test]
     fn test_i16() {
+        assert!(Value::I16(i16::MIN).is_numeric());
         assert_eq!(
             Value::I16(i16::MIN).to_formatted_string(&Locale::en),
             "-32,768"
@@ -202,6 +216,7 @@ mod tests {
 
     #[test]
     fn test_i32() {
+        assert!(Value::I32(i32::MIN).is_numeric());
         assert_eq!(
             Value::I32(i32::MIN).to_formatted_string(&Locale::en),
             "-2,147,483,648"
@@ -220,6 +235,7 @@ mod tests {
 
     #[test]
     fn test_i64() {
+        assert!(Value::I64(i64::MIN).is_numeric());
         assert_eq!(
             Value::I64(i64::MIN).to_formatted_string(&Locale::en),
             "-9,223,372,036,854,775,808"
@@ -238,6 +254,7 @@ mod tests {
 
     #[test]
     fn test_i128() {
+        assert!(Value::I128(i128::MIN).is_numeric());
         assert_eq!(
             Value::I128(i128::MIN).to_formatted_string(&Locale::en),
             "-170,141,183,460,469,231,731,687,303,715,884,105,728"
@@ -259,6 +276,7 @@ mod tests {
 
     #[test]
     fn test_u8() {
+        assert!(Value::U8(u8::MAX).is_numeric());
         assert_eq!(Value::U8(u8::MAX).to_formatted_string(&Locale::en), "255");
         assert_eq!(Value::U8(u8::MAX).to_string(), "255");
         assert_eq!(json!(Value::U8(u8::MAX)), json!(u8::MAX));
@@ -266,6 +284,7 @@ mod tests {
 
     #[test]
     fn test_u16() {
+        assert!(Value::U16(u16::MAX).is_numeric());
         assert_eq!(
             Value::U16(u16::MAX).to_formatted_string(&Locale::en),
             "65,535"
@@ -276,6 +295,7 @@ mod tests {
 
     #[test]
     fn test_u32() {
+        assert!(Value::U32(u32::MAX).is_numeric());
         assert_eq!(
             Value::U32(u32::MAX).to_formatted_string(&Locale::en),
             "4,294,967,295"
@@ -286,6 +306,7 @@ mod tests {
 
     #[test]
     fn test_u64() {
+        assert!(Value::U64(u64::MAX).is_numeric());
         assert_eq!(
             Value::U64(u64::MAX).to_formatted_string(&Locale::en),
             "18,446,744,073,709,551,615"
@@ -296,6 +317,7 @@ mod tests {
 
     #[test]
     fn test_u128() {
+        assert!(Value::U128(u128::MAX).is_numeric());
         assert_eq!(
             Value::U128(u128::MAX).to_formatted_string(&Locale::en),
             "340,282,366,920,938,463,463,374,607,431,768,211,455"
@@ -308,6 +330,7 @@ mod tests {
 
     #[test]
     fn test_f32() {
+        assert!(Value::F32(12_345.67890).is_numeric());
         assert!(Value::F32(12_345.67890)
             .to_formatted_string(&Locale::en)
             .starts_with("12345."));
@@ -317,6 +340,7 @@ mod tests {
 
     #[test]
     fn test_f64() {
+        assert!(Value::F64(12_345.67890).is_numeric());
         assert!(Value::F64(12_345.67890)
             .to_formatted_string(&Locale::en)
             .starts_with("12345."));
@@ -326,6 +350,7 @@ mod tests {
 
     #[test]
     fn test_string() {
+        assert!(!Value::String("foo".to_string()).is_numeric());
         assert_eq!(
             Value::String("foo".to_string()).to_formatted_string(&Locale::en),
             "foo"
@@ -340,6 +365,7 @@ mod tests {
     #[test]
     fn test_date() {
         let date = NaiveDate::from_ymd_opt(2000, 12, 31).unwrap();
+        assert!(!Value::Date(date).is_numeric());
         assert_eq!(
             Value::Date(date).to_formatted_string(&Locale::en),
             "2000-12-31"
@@ -351,6 +377,7 @@ mod tests {
     #[test]
     fn test_time() {
         let time = NaiveTime::from_hms_milli_opt(12, 13, 14, 15).unwrap();
+        assert!(!Value::Time(time).is_numeric());
         assert_eq!(
             Value::Time(time).to_formatted_string(&Locale::en),
             "12:13:14.015"
@@ -364,6 +391,7 @@ mod tests {
         let date = NaiveDate::from_ymd_opt(2000, 12, 31).unwrap();
         let time = NaiveTime::from_hms_milli_opt(12, 13, 14, 15).unwrap();
         let datetime = NaiveDateTime::new(date, time);
+        assert!(!Value::DateTime(datetime).is_numeric());
         assert_eq!(
             Value::DateTime(datetime).to_formatted_string(&Locale::en),
             "2000-12-31 12:13:14.015"
@@ -381,6 +409,7 @@ mod tests {
     #[test]
     fn test_uuid() -> Result<()> {
         let uuid = "acf5b3e3-4099-4f34-81c7-5803cbc87a2d";
+        assert!(!Value::Uuid(Uuid::from_str(uuid)?).is_numeric());
         assert_eq!(
             Value::Uuid(Uuid::from_str(uuid)?).to_formatted_string(&Locale::en),
             uuid
@@ -393,6 +422,7 @@ mod tests {
     #[test]
     fn test_json() -> Result<()> {
         let original_json = json!({"foo": "bar", "baz": 123});
+        assert!(!Value::Json(original_json.clone()).is_numeric());
         assert_eq!(
             Value::Json(original_json.clone()).to_formatted_string(&Locale::en),
             r#"{"foo":"bar","baz":123}"#
