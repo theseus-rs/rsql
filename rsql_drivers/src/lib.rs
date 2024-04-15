@@ -30,7 +30,7 @@ pub use connection::{
 };
 pub use driver::{Driver, DriverManager, MockDriver};
 pub use error::{Error, Result};
-pub use metadata::{Column, Database, Metadata, Table, Index};
+pub use metadata::{Column, Database, Index, Metadata, Table};
 pub use row::Row;
 pub use value::Value;
 

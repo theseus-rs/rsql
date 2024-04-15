@@ -1,4 +1,5 @@
 use crate::error::{Error, Result};
+use crate::rusqlite::metadata;
 use crate::value::Value;
 use crate::{MemoryQueryResult, Metadata, QueryResult};
 use anyhow::anyhow;
@@ -8,7 +9,6 @@ use rusqlite::Row;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use url::Url;
-use crate::rusqlite::metadata;
 
 #[derive(Debug)]
 pub struct Driver;

@@ -1,3 +1,4 @@
+use crate::duckdb::metadata;
 use crate::error::{Error, Result};
 use crate::value::Value;
 use crate::{MemoryQueryResult, Metadata, QueryResult};
@@ -11,7 +12,6 @@ use std::ops::Add;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 use url::Url;
-use crate::duckdb::metadata;
 
 #[derive(Debug)]
 pub struct Driver;

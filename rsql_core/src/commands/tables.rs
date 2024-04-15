@@ -64,7 +64,9 @@ mod tests {
         metadata.add(database);
 
         let mock_connection = &mut MockConnection::new();
-        mock_connection.expect_metadata().returning(move || Ok(metadata.clone()));
+        mock_connection
+            .expect_metadata()
+            .returning(move || Ok(metadata.clone()));
         let mut output = Output::default();
         let options = CommandOptions {
             configuration: &mut Configuration::default(),

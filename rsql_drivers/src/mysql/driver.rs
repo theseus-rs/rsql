@@ -1,4 +1,5 @@
 use crate::error::Result;
+use crate::mysql::metadata;
 use crate::value::Value;
 use crate::Error::UnsupportedColumnType;
 use crate::{MemoryQueryResult, Metadata, QueryResult};
@@ -9,7 +10,6 @@ use sqlx::types::time;
 use sqlx::{Column, MySqlPool, Row};
 use std::str::FromStr;
 use std::string::ToString;
-use crate::mysql::metadata;
 
 #[derive(Debug)]
 pub struct Driver;

@@ -7,7 +7,9 @@ pub struct Metadata {
 
 impl Metadata {
     pub fn new() -> Self {
-        Self { databases: Vec::new() }
+        Self {
+            databases: Vec::new(),
+        }
     }
 
     pub fn add(&mut self, database: Database) {
@@ -36,7 +38,10 @@ pub struct Database {
 
 impl Database {
     pub fn new<S: Into<String>>(name: S) -> Self {
-        Self { name: name.into(), tables: Vec::new() }
+        Self {
+            name: name.into(),
+            tables: Vec::new(),
+        }
     }
 
     pub fn name(&self) -> &str {

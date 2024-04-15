@@ -1,5 +1,5 @@
-use indoc::indoc;
 use crate::{Connection, Database, Index, Metadata, Result, Table};
+use indoc::indoc;
 
 pub(crate) async fn get_metadata(connection: &mut dyn Connection) -> Result<Metadata> {
     let mut metadata = Metadata::default();
@@ -11,7 +11,8 @@ pub(crate) async fn get_metadata(connection: &mut dyn Connection) -> Result<Meta
 
 async fn retrieve_databases(
     connection: &mut dyn Connection,
-    metadata: &mut Metadata) -> Result<()> {
+    metadata: &mut Metadata,
+) -> Result<()> {
     let databases = vec![Database::new("default")];
 
     for mut database in databases {
@@ -23,9 +24,7 @@ async fn retrieve_databases(
     Ok(())
 }
 
-async fn retrieve_tables(
-    connection: &mut dyn Connection,
-    database: &mut Database) -> Result<()> {
+async fn retrieve_tables(connection: &mut dyn Connection, database: &mut Database) -> Result<()> {
     let sql = indoc! { r#"
             SELECT table_name
               FROM information_schema.tables
@@ -43,9 +42,7 @@ async fn retrieve_tables(
     Ok(())
 }
 
-async fn retrieve_indexes(
-    connection: &mut dyn Connection,
-    database: &mut Database) -> Result<()> {
+async fn retrieve_indexes(connection: &mut dyn Connection, database: &mut Database) -> Result<()> {
     let sql = indoc! {r#"
             SELECT tables.name, indexes.name
               FROM sys.indexes
@@ -76,10 +73,7 @@ async fn retrieve_indexes(
 #[cfg(target_os = "linux")]
 #[cfg(test)]
 mod test {
-    use super::*;
-    use crate::{Connection, DriverManager, Value};
-    use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
-    use indoc::indoc;
+    use crate::{Connection, DriverManager};
     use testcontainers::clients::Cli;
     use testcontainers::RunnableImage;
     use testcontainers_modules::mssql_server::MssqlServer;
@@ -113,15 +107,27 @@ mod test {
 
         let metadata = connection.metadata().await?;
         let database = metadata.current_database().unwrap();
-        let tables = database.tables().iter().map(|table| table.name()).collect::<Vec<_>>();
+        let tables = database
+            .tables()
+            .iter()
+            .map(|table| table.name())
+            .collect::<Vec<_>>();
         assert_eq!(tables, vec!["contacts", "users"]);
 
         let contacts_table = database.get("contacts").unwrap();
-        let contacts_indexes = contacts_table.indexes().iter().map(|index| index.name()).collect::<Vec<_>>();
+        let contacts_indexes = contacts_table
+            .indexes()
+            .iter()
+            .map(|index| index.name())
+            .collect::<Vec<_>>();
         assert!(contacts_indexes[0].contains(&"PK__contacts__".to_string()));
 
         let user_table = database.get("users").unwrap();
-        let user_indexes = user_table.indexes().iter().map(|index| index.name()).collect::<Vec<_>>();
+        let user_indexes = user_table
+            .indexes()
+            .iter()
+            .map(|index| index.name())
+            .collect::<Vec<_>>();
         assert!(user_indexes[0].contains(&"PK__users__".to_string()));
 
         Ok(())

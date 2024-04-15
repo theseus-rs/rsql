@@ -1,4 +1,5 @@
 use crate::error::Result;
+use crate::postgres::metadata;
 use crate::value::Value;
 use crate::Error::UnsupportedColumnType;
 use crate::{MemoryQueryResult, Metadata, QueryResult};
@@ -16,7 +17,6 @@ use tokio_postgres::types::{FromSql, Type};
 use tokio_postgres::{Client, Column, NoTls, Row};
 use tracing::debug;
 use url::Url;
-use crate::postgres::metadata;
 
 const POSTGRESQL_EMBEDDED_VERSION: &str = "16.2.3";
 

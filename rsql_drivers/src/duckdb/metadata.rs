@@ -1,5 +1,5 @@
-use indoc::indoc;
 use crate::{Connection, Database, Index, Metadata, Result, Table};
+use indoc::indoc;
 
 pub(crate) async fn get_metadata(connection: &mut dyn Connection) -> Result<Metadata> {
     let mut metadata = Metadata::default();
@@ -11,7 +11,8 @@ pub(crate) async fn get_metadata(connection: &mut dyn Connection) -> Result<Meta
 
 async fn retrieve_databases(
     connection: &mut dyn Connection,
-    metadata: &mut Metadata) -> Result<()> {
+    metadata: &mut Metadata,
+) -> Result<()> {
     let databases = vec![Database::new("default")];
 
     for mut database in databases {
@@ -23,9 +24,7 @@ async fn retrieve_databases(
     Ok(())
 }
 
-async fn retrieve_tables(
-    connection: &mut dyn Connection,
-    database: &mut Database) -> Result<()> {
+async fn retrieve_tables(connection: &mut dyn Connection, database: &mut Database) -> Result<()> {
     let sql = indoc! { r#"
             SELECT table_name
               FROM information_schema.tables
@@ -43,9 +42,7 @@ async fn retrieve_tables(
     Ok(())
 }
 
-async fn retrieve_indexes(
-    connection: &mut dyn Connection,
-    database: &mut Database) -> Result<()> {
+async fn retrieve_indexes(connection: &mut dyn Connection, database: &mut Database) -> Result<()> {
     let sql = indoc! {r#"
             SELECT table_name, index_name
               FROM duckdb_indexes()
@@ -97,15 +94,27 @@ mod test {
 
         let metadata = connection.metadata().await?;
         let database = metadata.current_database().unwrap();
-        let tables = database.tables().iter().map(|table| table.name()).collect::<Vec<_>>();
+        let tables = database
+            .tables()
+            .iter()
+            .map(|table| table.name())
+            .collect::<Vec<_>>();
         assert_eq!(tables, vec!["contacts", "users"]);
 
         let contacts_table = database.get("contacts").unwrap();
-        let contacts_indexes = contacts_table.indexes().iter().map(|index| index.name()).collect::<Vec<_>>();
+        let contacts_indexes = contacts_table
+            .indexes()
+            .iter()
+            .map(|index| index.name())
+            .collect::<Vec<_>>();
         assert_eq!(contacts_indexes, vec!["contacts_email_idx"]);
 
         let user_table = database.get("users").unwrap();
-        let user_indexes = user_table.indexes().iter().map(|index| index.name()).collect::<Vec<_>>();
+        let user_indexes = user_table
+            .indexes()
+            .iter()
+            .map(|index| index.name())
+            .collect::<Vec<_>>();
         assert_eq!(user_indexes, vec!["users_email_idx"]);
 
         connection.close().await?;

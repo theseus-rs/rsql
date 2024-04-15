@@ -1,10 +1,10 @@
 use crate::error::Result;
 use crate::row::Row;
+use crate::Metadata;
 use async_trait::async_trait;
 use mockall::predicate::*;
 use mockall::*;
 use std::fmt::Debug;
-use crate::Metadata;
 
 /// Results from a query
 #[async_trait]

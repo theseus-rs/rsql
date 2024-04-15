@@ -1,4 +1,5 @@
 use crate::error::Result;
+use crate::postgresql::metadata;
 use crate::value::Value;
 use crate::Error::UnsupportedColumnType;
 use crate::{MemoryQueryResult, Metadata, QueryResult};
@@ -16,7 +17,6 @@ use std::str::FromStr;
 use std::string::ToString;
 use tracing::debug;
 use url::Url;
-use crate::postgresql::metadata;
 
 const POSTGRESQL_EMBEDDED_VERSION: &str = "16.2.3";
 

@@ -1,4 +1,5 @@
 use crate::error::Result;
+use crate::sqlite::metadata;
 use crate::value::Value;
 use crate::Error::UnsupportedColumnType;
 use crate::{MemoryQueryResult, Metadata, QueryResult};
@@ -8,7 +9,6 @@ use sqlx::{Column, Row, SqlitePool, TypeInfo};
 use std::collections::HashMap;
 use std::str::FromStr;
 use url::Url;
-use crate::sqlite::metadata;
 
 #[derive(Debug)]
 pub struct Driver;

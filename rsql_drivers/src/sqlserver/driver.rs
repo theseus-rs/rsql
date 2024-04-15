@@ -1,4 +1,5 @@
 use crate::error::Result;
+use crate::sqlserver::metadata;
 use crate::value::Value;
 use crate::Error::UnsupportedColumnType;
 use crate::{MemoryQueryResult, Metadata, QueryResult};
@@ -9,7 +10,6 @@ use std::string::ToString;
 use tiberius::{AuthMethod, Client, Column, Config, EncryptionLevel, QueryItem, Row};
 use tokio::net::TcpStream;
 use tokio_util::compat::{Compat, TokioAsyncWriteCompatExt};
-use crate::sqlserver::metadata;
 
 #[derive(Debug)]
 pub struct Driver;

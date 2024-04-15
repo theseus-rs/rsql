@@ -1,4 +1,5 @@
 use crate::error::Result;
+use crate::libsql::metadata;
 use crate::value::Value;
 use crate::{MemoryQueryResult, Metadata, QueryResult, Row};
 use async_trait::async_trait;
@@ -7,7 +8,6 @@ use libsql::Builder;
 use std::collections::HashMap;
 use std::fmt::Debug;
 use url::Url;
-use crate::libsql::metadata;
 
 #[derive(Debug)]
 pub struct Driver;
