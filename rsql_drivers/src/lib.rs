@@ -9,6 +9,7 @@ pub mod duckdb;
 mod error;
 #[cfg(feature = "libsql")]
 pub mod libsql;
+mod metadata;
 #[cfg(feature = "mysql")]
 pub mod mysql;
 #[cfg(feature = "postgres")]
@@ -29,6 +30,7 @@ pub use connection::{
 };
 pub use driver::{Driver, DriverManager, MockDriver};
 pub use error::{Error, Result};
+pub use metadata::{Column, Database, Metadata, Table, Index};
 pub use row::Row;
 pub use value::Value;
 
