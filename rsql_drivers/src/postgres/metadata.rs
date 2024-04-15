@@ -67,10 +67,16 @@ async fn retrieve_indexes(
     let mut query_result = connection.query(sql).await?;
 
     while let Some(row) = query_result.next().await {
-        let table_name = row.get(0).unwrap();
-        if let Some(table) = database.get_mut(table_name.to_string()) {
-            let index_name = row.get(1).unwrap();
-            let index = Index::new(index_name.to_string(), vec![], false);
+        let table_name = match row.get(0) {
+            Some(name) => name.to_string(),
+            None => continue,
+        };
+        let index_name = match row.get(1) {
+            Some(name) => name.to_string(),
+            None => continue,
+        };
+        if let Some(table) = database.get_mut(table_name) {
+            let index = Index::new(index_name, vec![], false);
             table.add_index(index);
         }
     }
