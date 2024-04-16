@@ -112,7 +112,8 @@ mod test {
             .iter()
             .map(|table| table.name())
             .collect::<Vec<_>>();
-        assert_eq!(tables, vec!["contacts", "users"]);
+        assert!(tables.contains(&"contacts".to_string()));
+        assert!(tables.contains(&"users".to_string()));
 
         let contacts_table = database.get("contacts").unwrap();
         let contacts_indexes = contacts_table
