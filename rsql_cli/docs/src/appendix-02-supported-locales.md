@@ -40,7 +40,6 @@ your contribution to [rsql](https://github.com/theseus-rs/rsql).
 | ms     | Malay                    |
 | mt     | Maltese                  |
 | nl     | Dutch                    |
-| nl     | Dutch                    |
 | no     | Norwegian                |
 | pl     | Polish                   |
 | pt     | Portuguese               |

@@ -1,13 +1,13 @@
 use crate::error::Result;
+use crate::sqlserver::metadata;
 use crate::value::Value;
 use crate::Error::UnsupportedColumnType;
-use crate::{MemoryQueryResult, QueryResult};
+use crate::{MemoryQueryResult, Metadata, QueryResult};
 use async_trait::async_trait;
 use futures_util::stream::TryStreamExt;
-use indoc::indoc;
 use std::collections::HashMap;
 use std::string::ToString;
-use tiberius::{AuthMethod, Client, Column, Config, EncryptionLevel, QueryItem, Row, ToSql};
+use tiberius::{AuthMethod, Client, Column, Config, EncryptionLevel, QueryItem, Row};
 use tokio::net::TcpStream;
 use tokio_util::compat::{Compat, TokioAsyncWriteCompatExt};
 
@@ -95,40 +95,8 @@ impl crate::Connection for Connection {
         Ok(rows)
     }
 
-    async fn indexes<'table>(&mut self, table: Option<&'table str>) -> Result<Vec<String>> {
-        let mut sql = indoc! {r#"
-            SELECT indexes.name
-              FROM sys.indexes
-             INNER JOIN sys.tables ON indexes.object_id = tables.object_id
-             WHERE tables.is_ms_shipped = 0
-        "#}
-        .to_string();
-        if table.is_some() {
-            sql = format!("{sql} AND tables.name = @P1");
-        }
-        sql = format!("{sql} ORDER BY indexes.name").to_string();
-        let mut query_stream = match table {
-            Some(table) => {
-                let table = &table.to_string() as &dyn ToSql;
-                self.client.query(sql.as_str(), &[table]).await?
-            }
-            None => self.client.query(sql.as_str(), &[]).await?,
-        };
-        let mut indexes = Vec::new();
-
-        while let Some(item) = query_stream.try_next().await? {
-            if let QueryItem::Row(row) = item {
-                if row.result_index() == 0 {
-                    for (index, column) in row.columns().iter().enumerate() {
-                        if let Some(value) = convert_to_value(&row, column, index)? {
-                            indexes.push(value.to_string());
-                        }
-                    }
-                }
-            }
-        }
-
-        Ok(indexes)
+    async fn metadata(&mut self) -> Result<Metadata> {
+        metadata::get_metadata(self).await
     }
 
     async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {
@@ -157,24 +125,6 @@ impl crate::Connection for Connection {
 
         let query_result = MemoryQueryResult::new(columns, rows);
         Ok(Box::new(query_result))
-    }
-
-    async fn tables(&mut self) -> Result<Vec<String>> {
-        let sql = indoc! { r#"
-            SELECT table_name
-              FROM information_schema.tables
-             ORDER BY table_name
-        "#};
-        let mut query_result = self.query(sql).await?;
-        let mut tables = Vec::new();
-
-        while let Some(row) = query_result.next().await {
-            if let Some(data) = row.get(0) {
-                tables.push(data.to_string());
-            }
-        }
-
-        Ok(tables)
     }
 
     async fn close(&mut self) -> Result<()> {
@@ -261,7 +211,6 @@ mod test {
 
         test_connection_interface(&mut *connection).await?;
         test_data_types(&mut *connection).await?;
-        test_schema(&mut *connection).await?;
 
         Ok(())
     }
@@ -396,28 +345,6 @@ mod test {
                 NaiveDateTime::parse_from_str("2022-01-01 14:30:00", "%Y-%m-%d %H:%M:%S")?;
             assert_eq!(row.get(18).cloned().unwrap(), Value::DateTime(date_time));
         }
-
-        Ok(())
-    }
-
-    async fn test_schema(connection: &mut dyn Connection) -> anyhow::Result<()> {
-        let _ = connection
-            .execute("CREATE TABLE contacts (id INT PRIMARY KEY, email VARCHAR(20))")
-            .await?;
-        let _ = connection
-            .execute("CREATE TABLE users (id INT PRIMARY KEY, email VARCHAR(20))")
-            .await?;
-
-        let tables = connection.tables().await?;
-        assert!(tables.contains(&"contacts".to_string()));
-        assert!(tables.contains(&"users".to_string()));
-
-        let indexes = connection.indexes(None).await?;
-        assert!(indexes[0].contains(&"PK__contacts__".to_string()));
-        assert!(indexes[1].contains(&"PK__users__".to_string()));
-
-        let indexes = connection.indexes(Some("users")).await?;
-        assert!(indexes[0].contains(&"PK__users__".to_string()));
 
         Ok(())
     }

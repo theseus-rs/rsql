@@ -1,11 +1,11 @@
 use crate::error::Result;
+use crate::postgres::metadata;
 use crate::value::Value;
 use crate::Error::UnsupportedColumnType;
-use crate::{MemoryQueryResult, QueryResult};
+use crate::{MemoryQueryResult, Metadata, QueryResult};
 use async_trait::async_trait;
 use bit_vec::BitVec;
 use chrono::{DateTime, NaiveDate, NaiveDateTime, NaiveTime, Utc};
-use indoc::indoc;
 use postgresql_archive::Version;
 use postgresql_embedded::{PostgreSQL, Settings, Status};
 use std::collections::HashMap;
@@ -13,7 +13,7 @@ use std::path::PathBuf;
 use std::str::FromStr;
 use std::string::ToString;
 use std::time::SystemTime;
-use tokio_postgres::types::{FromSql, ToSql, Type};
+use tokio_postgres::types::{FromSql, Type};
 use tokio_postgres::{Client, Column, NoTls, Row};
 use tracing::debug;
 use url::Url;
@@ -102,45 +102,8 @@ impl crate::Connection for Connection {
         Ok(rows)
     }
 
-    async fn indexes<'table>(&mut self, table: Option<&'table str>) -> Result<Vec<String>> {
-        let mut sql = indoc! {r#"
-            SELECT i.relname AS index_name
-              FROM pg_class t,
-                   pg_class i,
-                   pg_index ix,
-                   pg_attribute a,
-                   information_schema.tables ist
-             WHERE t.oid = ix.indrelid
-               AND i.oid = ix.indexrelid
-               AND a.attrelid = t.oid
-               AND a.attnum = ANY(ix.indkey)
-               AND t.relkind = 'r'
-               AND ist.table_name = t.relname
-               AND ist.table_schema = current_schema()
-        "#}
-        .to_string();
-        if table.is_some() {
-            sql = format!("{sql} AND ist.table_name = $1");
-        }
-        sql = format!("{sql} ORDER BY index_name").to_string();
-        let query_rows = match table {
-            Some(table) => {
-                let table: &(dyn ToSql + Sync) = &table;
-                self.client.query(sql.as_str(), &[table]).await?
-            }
-            None => self.client.query(sql.as_str(), &[]).await?,
-        };
-        let mut indexes = Vec::new();
-
-        for row in query_rows {
-            if let Some(column) = row.columns().first() {
-                if let Some(value) = self.convert_to_value(&row, column, 0)? {
-                    indexes.push(value.to_string());
-                }
-            }
-        }
-
-        Ok(indexes)
+    async fn metadata(&mut self) -> Result<Metadata> {
+        metadata::get_metadata(self).await
     }
 
     async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {
@@ -164,26 +127,6 @@ impl crate::Connection for Connection {
 
         let query_result = MemoryQueryResult::new(columns, rows);
         Ok(Box::new(query_result))
-    }
-
-    async fn tables(&mut self) -> Result<Vec<String>> {
-        let sql = indoc! { r#"
-            SELECT table_name
-              FROM information_schema.tables
-             WHERE table_catalog = current_database()
-               AND table_schema = 'public'
-             ORDER BY table_name
-        "#};
-        let mut query_result = self.query(sql).await?;
-        let mut tables = Vec::new();
-
-        while let Some(row) = query_result.next().await {
-            if let Some(data) = row.get(0) {
-                tables.push(data.to_string());
-            }
-        }
-
-        Ok(tables)
     }
 
     async fn close(&mut self) -> Result<()> {
@@ -583,31 +526,6 @@ mod test {
     async fn test_data_type_not_supported() -> anyhow::Result<()> {
         let result = test_data_type("SELECT CAST('<a>b</a> as xml)").await;
         assert!(result.is_err());
-        Ok(())
-    }
-
-    #[tokio::test]
-    async fn test_schema() -> anyhow::Result<()> {
-        let driver_manager = DriverManager::default();
-        let mut connection = driver_manager.connect(DATABASE_URL).await?;
-
-        let _ = connection
-            .execute("CREATE TABLE contacts (id INTEGER PRIMARY KEY, email VARCHAR(20))")
-            .await?;
-        let _ = connection
-            .execute("CREATE TABLE users (id INTEGER PRIMARY KEY, email VARCHAR(20))")
-            .await?;
-
-        let tables = connection.tables().await?;
-        assert_eq!(tables, vec!["contacts", "users"]);
-
-        let indexes = connection.indexes(None).await?;
-        assert_eq!(indexes, vec!["contacts_pkey", "users_pkey"]);
-
-        let indexes = connection.indexes(Some("users")).await?;
-        assert_eq!(indexes, vec!["users_pkey"]);
-
-        connection.close().await?;
         Ok(())
     }
 

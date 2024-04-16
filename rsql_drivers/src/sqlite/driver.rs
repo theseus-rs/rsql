@@ -1,9 +1,9 @@
 use crate::error::Result;
+use crate::sqlite::metadata;
 use crate::value::Value;
 use crate::Error::UnsupportedColumnType;
-use crate::{MemoryQueryResult, QueryResult};
+use crate::{MemoryQueryResult, Metadata, QueryResult};
 use async_trait::async_trait;
-use indoc::indoc;
 use sqlx::sqlite::{SqliteAutoVacuum, SqliteColumn, SqliteConnectOptions, SqliteRow};
 use sqlx::{Column, Row, SqlitePool, TypeInfo};
 use std::collections::HashMap;
@@ -69,37 +69,8 @@ impl crate::Connection for Connection {
         Ok(rows)
     }
 
-    async fn indexes<'table>(&mut self, table: Option<&'table str>) -> Result<Vec<String>> {
-        let mut sql = indoc! {r#"
-            SELECT name
-              FROM sqlite_master
-             WHERE type = 'index'
-        "#}
-        .to_string();
-        if table.is_some() {
-            sql = format!("{sql} AND tbl_name = $1");
-        }
-        sql = format!("{sql} ORDER BY name");
-        let query_rows = match table {
-            Some(table) => {
-                sqlx::query(sql.as_str())
-                    .bind(table)
-                    .fetch_all(&self.pool)
-                    .await?
-            }
-            None => sqlx::query(sql.as_str()).fetch_all(&self.pool).await?,
-        };
-        let mut indexes = Vec::new();
-
-        for row in query_rows {
-            if let Some(column) = row.columns().first() {
-                if let Some(value) = self.convert_to_value(&row, column)? {
-                    indexes.push(value.to_string());
-                }
-            }
-        }
-
-        Ok(indexes)
+    async fn metadata(&mut self) -> Result<Metadata> {
+        metadata::get_metadata(self).await
     }
 
     async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {
@@ -126,20 +97,6 @@ impl crate::Connection for Connection {
 
         let query_result = MemoryQueryResult::new(columns, rows);
         Ok(Box::new(query_result))
-    }
-
-    async fn tables(&mut self) -> Result<Vec<String>> {
-        let sql = "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name";
-        let mut query_result = self.query(sql).await?;
-        let mut tables = Vec::new();
-
-        while let Some(row) = query_result.next().await {
-            if let Some(data) = row.get(0) {
-                tables.push(data.to_string());
-            }
-        }
-
-        Ok(tables)
     }
 
     async fn close(&mut self) -> Result<()> {
@@ -396,34 +353,6 @@ mod test {
             Some(value) => assert_eq!(value, Value::String("foo".to_string())),
             _ => assert!(false),
         }
-        Ok(())
-    }
-
-    #[tokio::test]
-    async fn test_schema() -> anyhow::Result<()> {
-        let driver_manager = DriverManager::default();
-        let mut connection = driver_manager.connect(DATABASE_URL).await?;
-
-        let _ = connection
-            .execute("CREATE TABLE contacts (id INTEGER PRIMARY KEY, email VARCHAR(20) UNIQUE)")
-            .await?;
-        let _ = connection
-            .execute("CREATE TABLE users (id INTEGER PRIMARY KEY, email VARCHAR(20) UNIQUE)")
-            .await?;
-
-        let tables = connection.tables().await?;
-        assert_eq!(tables, vec!["contacts", "users"]);
-
-        let indexes = connection.indexes(None).await?;
-        assert_eq!(
-            indexes,
-            vec!["sqlite_autoindex_contacts_1", "sqlite_autoindex_users_1"]
-        );
-
-        let indexes = connection.indexes(Some("users")).await?;
-        assert_eq!(indexes, vec!["sqlite_autoindex_users_1"]);
-
-        connection.close().await?;
         Ok(())
     }
 }

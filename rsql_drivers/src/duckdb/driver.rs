@@ -1,12 +1,12 @@
+use crate::duckdb::metadata;
 use crate::error::{Error, Result};
 use crate::value::Value;
-use crate::{MemoryQueryResult, QueryResult};
+use crate::{MemoryQueryResult, Metadata, QueryResult};
 use anyhow::anyhow;
 use async_trait::async_trait;
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime, TimeDelta};
 use duckdb::types::{TimeUnit, ValueRef};
 use duckdb::Row;
-use indoc::indoc;
 use std::collections::HashMap;
 use std::ops::Add;
 use std::sync::{Arc, Mutex};
@@ -69,36 +69,8 @@ impl crate::Connection for Connection {
         Ok(rows as u64)
     }
 
-    async fn indexes<'table>(&mut self, table: Option<&'table str>) -> Result<Vec<String>> {
-        let mut sql = indoc! {r#"
-            SELECT index_name
-              FROM duckdb_indexes()
-        "#}
-        .to_string();
-        if table.is_some() {
-            sql = format!("{sql} WHERE table_name = ?1");
-        }
-        sql = format!("{sql} ORDER BY index_name");
-
-        let connection = match self.connection.lock() {
-            Ok(connection) => connection,
-            Err(error) => return Err(Error::IoError(anyhow!("Error: {:?}", error))),
-        };
-        let mut statement = connection.prepare(sql.as_str())?;
-
-        let mut query_rows = match table {
-            Some(table) => statement.query([table])?,
-            None => statement.query([])?,
-        };
-
-        let mut indexes = Vec::new();
-        while let Some(query_row) = query_rows.next()? {
-            if let Some(value) = self.convert_to_value(query_row, 0)? {
-                indexes.push(value.to_string());
-            }
-        }
-
-        Ok(indexes)
+    async fn metadata(&mut self) -> Result<Metadata> {
+        metadata::get_metadata(self).await
     }
 
     async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {
@@ -122,24 +94,6 @@ impl crate::Connection for Connection {
 
         let query_result = MemoryQueryResult::new(columns, rows);
         Ok(Box::new(query_result))
-    }
-
-    async fn tables(&mut self) -> Result<Vec<String>> {
-        let sql = indoc! { r#"
-            SELECT table_name
-              FROM information_schema.tables
-             ORDER BY table_name
-        "#};
-        let mut query_result = self.query(sql).await?;
-        let mut tables = Vec::new();
-
-        while let Some(row) = query_result.next().await {
-            if let Some(data) = row.get(0) {
-                tables.push(data.to_string());
-            }
-        }
-
-        Ok(tables)
     }
 
     async fn close(&mut self) -> Result<()> {
@@ -357,37 +311,6 @@ mod test {
             assert_eq!(row.get(17).cloned().unwrap(), Value::DateTime(date_time));
         }
 
-        Ok(())
-    }
-
-    #[tokio::test]
-    async fn test_schema() -> anyhow::Result<()> {
-        let driver_manager = DriverManager::default();
-        let mut connection = driver_manager.connect(DATABASE_URL).await?;
-
-        let _ = connection
-            .execute("CREATE TABLE contacts (id INTEGER PRIMARY KEY, email VARCHAR(20) UNIQUE)")
-            .await?;
-        let _ = connection
-            .execute("CREATE INDEX contacts_email_idx ON contacts (email)")
-            .await?;
-        let _ = connection
-            .execute("CREATE TABLE users (id INTEGER PRIMARY KEY, email VARCHAR(20) UNIQUE)")
-            .await?;
-        let _ = connection
-            .execute("CREATE INDEX users_email_idx ON users (email)")
-            .await?;
-
-        let tables = connection.tables().await?;
-        assert_eq!(tables, vec!["contacts", "users"]);
-
-        let indexes = connection.indexes(None).await?;
-        assert_eq!(indexes, vec!["contacts_email_idx", "users_email_idx"]);
-
-        let indexes = connection.indexes(Some("users")).await?;
-        assert_eq!(indexes, vec!["users_email_idx"]);
-
-        connection.close().await?;
         Ok(())
     }
 }

@@ -18,10 +18,13 @@ impl ShellCommand for Command {
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
         let output = options.output;
-        let tables = options.connection.tables().await?;
+        let metadata = options.connection.metadata().await?;
 
-        for table in tables {
-            writeln!(output, "{}", table)?;
+        if let Some(database) = metadata.current_database() {
+            let tables = database.tables();
+            for table in tables {
+                writeln!(output, "{}", table.name())?;
+            }
         }
 
         Ok(LoopCondition::Continue)
@@ -35,7 +38,7 @@ mod tests {
     use crate::commands::{CommandManager, CommandOptions};
     use crate::configuration::Configuration;
     use crate::writers::Output;
-    use rsql_drivers::{DriverManager, MockConnection};
+    use rsql_drivers::{Database, DriverManager, Metadata, MockConnection, Table};
     use rsql_formatters::FormatterManager;
     use rustyline::history::DefaultHistory;
 
@@ -53,11 +56,17 @@ mod tests {
 
     #[tokio::test]
     async fn test_execute() -> anyhow::Result<()> {
-        let table = "table1";
+        let mut metadata = Metadata::new();
+        let mut database = Database::new("default");
+        let table_name = "table1";
+        let table = Table::new(table_name);
+        database.add(table);
+        metadata.add(database);
+
         let mock_connection = &mut MockConnection::new();
         mock_connection
-            .expect_tables()
-            .returning(|| Ok(vec![table.to_string()]));
+            .expect_metadata()
+            .returning(move || Ok(metadata.clone()));
         let mut output = Output::default();
         let options = CommandOptions {
             configuration: &mut Configuration::default(),
@@ -74,7 +83,7 @@ mod tests {
 
         assert_eq!(result, LoopCondition::Continue);
         let tables = output.to_string();
-        assert!(tables.contains(table));
+        assert!(tables.contains(table_name));
         Ok(())
     }
 }

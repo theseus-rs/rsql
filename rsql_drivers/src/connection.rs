@@ -1,5 +1,6 @@
 use crate::error::Result;
 use crate::row::Row;
+use crate::Metadata;
 use async_trait::async_trait;
 use mockall::predicate::*;
 use mockall::*;
@@ -83,9 +84,10 @@ impl QueryResult for MemoryQueryResult {
 #[async_trait]
 pub trait Connection: Debug + Send + Sync {
     async fn execute(&mut self, sql: &str) -> Result<u64>;
-    async fn indexes<'table>(&mut self, table: Option<&'table str>) -> Result<Vec<String>>;
+    async fn metadata(&mut self) -> Result<Metadata> {
+        unimplemented!()
+    }
     async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>>;
-    async fn tables(&mut self) -> Result<Vec<String>>;
     async fn close(&mut self) -> Result<()>;
 }
 

@@ -1,10 +1,10 @@
 use crate::error::Result;
+use crate::mysql::metadata;
 use crate::value::Value;
 use crate::Error::UnsupportedColumnType;
-use crate::{MemoryQueryResult, QueryResult};
+use crate::{MemoryQueryResult, Metadata, QueryResult};
 use async_trait::async_trait;
 use chrono::NaiveDateTime;
-use indoc::indoc;
 use sqlx::mysql::{MySqlColumn, MySqlConnectOptions, MySqlRow};
 use sqlx::types::time;
 use sqlx::{Column, MySqlPool, Row};
@@ -52,37 +52,8 @@ impl crate::Connection for Connection {
         Ok(rows)
     }
 
-    async fn indexes<'table>(&mut self, table: Option<&'table str>) -> Result<Vec<String>> {
-        let mut sql = indoc! {r#"
-            SELECT DISTINCT index_name
-              FROM information_schema.statistics
-             WHERE table_schema = DATABASE()
-        "#}
-        .to_string();
-        if table.is_some() {
-            sql = format!("{sql} AND table_name = ?");
-        }
-        sql = format!("{sql} ORDER BY index_name").to_string();
-        let query_rows = match table {
-            Some(table) => {
-                sqlx::query(sql.as_str())
-                    .bind(table)
-                    .fetch_all(&self.pool)
-                    .await?
-            }
-            None => sqlx::query(sql.as_str()).fetch_all(&self.pool).await?,
-        };
-        let mut indexes = Vec::new();
-
-        for row in query_rows {
-            if let Some(column) = row.columns().first() {
-                if let Some(value) = self.convert_to_value(&row, column)? {
-                    indexes.push(value.to_string());
-                }
-            }
-        }
-
-        Ok(indexes)
+    async fn metadata(&mut self) -> Result<Metadata> {
+        metadata::get_metadata(self).await
     }
 
     async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {
@@ -109,25 +80,6 @@ impl crate::Connection for Connection {
 
         let query_result = MemoryQueryResult::new(columns, rows);
         Ok(Box::new(query_result))
-    }
-
-    async fn tables(&mut self) -> Result<Vec<String>> {
-        let sql = indoc! { r#"
-            SELECT table_name
-              FROM information_schema.tables
-             WHERE table_schema = DATABASE()
-             ORDER BY table_name
-        "#};
-        let mut query_result = self.query(sql).await?;
-        let mut tables = Vec::new();
-
-        while let Some(row) = query_result.next().await {
-            if let Some(data) = row.get(0) {
-                tables.push(data.to_string());
-            }
-        }
-
-        Ok(tables)
     }
 
     async fn close(&mut self) -> Result<()> {
@@ -222,7 +174,6 @@ mod test {
 
         test_connection_interface(&mut *connection).await?;
         test_data_types(&mut *connection).await?;
-        test_schema(&mut *connection).await?;
 
         Ok(())
     }
@@ -358,27 +309,6 @@ mod test {
             let json = json!({"key": "value"});
             assert_eq!(row.get(18).cloned().unwrap(), Value::Json(json));
         }
-
-        Ok(())
-    }
-
-    async fn test_schema(connection: &mut dyn Connection) -> anyhow::Result<()> {
-        let _ = connection
-            .execute("CREATE TABLE contacts (id INT PRIMARY KEY, email VARCHAR(20))")
-            .await?;
-        let _ = connection
-            .execute("CREATE TABLE users (id INT PRIMARY KEY, email VARCHAR(20))")
-            .await?;
-
-        let tables = connection.tables().await?;
-        assert!(tables.contains(&"contacts".to_string()));
-        assert!(tables.contains(&"users".to_string()));
-
-        let indexes = connection.indexes(None).await?;
-        assert!(indexes.contains(&"PRIMARY".to_string()));
-
-        let indexes = connection.indexes(Some("users")).await?;
-        assert!(indexes.contains(&"PRIMARY".to_string()));
 
         Ok(())
     }
