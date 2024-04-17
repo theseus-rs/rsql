@@ -1,5 +1,7 @@
 use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use async_trait::async_trait;
+use rsql_drivers::{MemoryQueryResult, Row, Value};
+use rsql_formatters::Results;
 use rust_i18n::t;
 
 /// List the tables in the database
@@ -17,15 +19,38 @@ impl ShellCommand for Command {
     }
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
+        let start = std::time::Instant::now();
         let output = options.output;
         let metadata = options.connection.metadata().await?;
+        let configuration = options.configuration;
+        let locale = &configuration.locale;
+        let table_label = t!("table", locale = locale).to_string();
+        let columns = vec![table_label];
+        let mut rows = Vec::new();
 
         if let Some(database) = metadata.current_database() {
             let tables = database.tables();
             for table in tables {
-                writeln!(output, "{}", table.name())?;
+                let value = Value::String(table.name().to_string());
+                let row = Row::new(vec![Some(value)]);
+                rows.push(row);
             }
         }
+
+        let query_result = MemoryQueryResult::new(columns, rows);
+        let mut results = Results::Query(Box::new(query_result));
+        let formatter_options = &mut configuration.get_formatter_options();
+        let result_format = &configuration.results_format;
+        let formatter = options.formatter_manager.get(result_format).ok_or(
+            rsql_formatters::Error::UnknownFormat {
+                format: result_format.to_string(),
+            },
+        )?;
+
+        formatter_options.elapsed = start.elapsed();
+        formatter
+            .format(formatter_options, &mut results, output)
+            .await?;
 
         Ok(LoopCondition::Continue)
     }

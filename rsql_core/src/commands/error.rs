@@ -7,6 +7,9 @@ pub enum Error {
     /// Driver error
     #[error(transparent)]
     DriverError(#[from] rsql_drivers::Error),
+    /// Formatter error
+    #[error(transparent)]
+    FormatterError(#[from] rsql_formatters::Error),
     /// Error when an invalid option is provided for a command
     #[error("Invalid {command_name} option: {option}")]
     InvalidOption {
