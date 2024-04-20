@@ -1,7 +1,6 @@
 use crate::error::{Error, Result};
-use crate::rusqlite::metadata;
 use crate::value::Value;
-use crate::{MemoryQueryResult, Metadata, QueryResult};
+use crate::{MemoryQueryResult, Metadata, QueryResult, sqlite};
 use anyhow::anyhow;
 use async_trait::async_trait;
 use rusqlite::types::ValueRef;
@@ -68,7 +67,7 @@ impl crate::Connection for Connection {
     }
 
     async fn metadata(&mut self) -> Result<Metadata> {
-        metadata::get_metadata(self).await
+        sqlite::metadata::get_metadata(self).await
     }
 
     async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {

@@ -1,4 +1,4 @@
 pub mod driver;
-mod metadata;
+pub(crate) mod metadata;
 
 pub use driver::Driver;
