@@ -1,6 +1,6 @@
 use crate::error::{Error, Result};
 use crate::value::Value;
-use crate::{MemoryQueryResult, Metadata, QueryResult, sqlite};
+use crate::{sqlite, MemoryQueryResult, Metadata, QueryResult};
 use anyhow::anyhow;
 use async_trait::async_trait;
 use rusqlite::types::ValueRef;
