@@ -1,46 +1,57 @@
+use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct Metadata {
-    databases: Vec<Database>,
+    databases: IndexMap<String, Database>,
 }
 
 impl Metadata {
     pub fn new() -> Self {
         Self {
-            databases: Vec::new(),
+            databases: IndexMap::new(),
         }
     }
 
     pub fn add(&mut self, database: Database) {
-        self.databases.push(database);
+        self.databases.insert(database.name.clone(), database);
     }
 
     pub fn get<S: Into<String>>(&self, name: S) -> Option<&Database> {
         let name = name.into();
-        self.databases.iter().find(|d| d.name == name)
+        self.databases.get(&name)
+    }
+
+    pub fn get_mut<S: Into<String>>(&mut self, name: S) -> Option<&mut Database> {
+        let name = name.into();
+        self.databases.get_mut(&name)
     }
 
     pub fn current_database(&self) -> Option<&Database> {
-        self.databases.first()
+        if let Some((_name, database)) = self.databases.first() {
+            Some(database)
+        } else {
+            None
+        }
     }
 
-    pub fn databases(&self) -> &[Database] {
-        &self.databases
+    pub fn databases(&self) -> Vec<&Database> {
+        let values: Vec<&Database> = self.databases.values().collect();
+        values
     }
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct Database {
     name: String,
-    tables: Vec<Table>,
+    tables: IndexMap<String, Table>,
 }
 
 impl Database {
     pub fn new<S: Into<String>>(name: S) -> Self {
         Self {
             name: name.into(),
-            tables: Vec::new(),
+            tables: IndexMap::new(),
         }
     }
 
@@ -49,37 +60,38 @@ impl Database {
     }
 
     pub fn add(&mut self, table: Table) {
-        self.tables.push(table);
+        self.tables.insert(table.name.clone(), table);
     }
 
     pub fn get<S: Into<String>>(&self, name: S) -> Option<&Table> {
         let name = name.into();
-        self.tables.iter().find(|t| t.name == name)
+        self.tables.get(&name)
     }
 
     pub fn get_mut<S: Into<String>>(&mut self, name: S) -> Option<&mut Table> {
         let name = name.into();
-        self.tables.iter_mut().find(|t| t.name == name)
+        self.tables.get_mut(&name)
     }
 
-    pub fn tables(&self) -> &[Table] {
-        &self.tables
+    pub fn tables(&self) -> Vec<&Table> {
+        let values: Vec<&Table> = self.tables.values().collect();
+        values
     }
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct Table {
     name: String,
-    columns: Vec<Column>,
-    indexes: Vec<Index>,
+    columns: IndexMap<String, Column>,
+    indexes: IndexMap<String, Index>,
 }
 
 impl Table {
     pub fn new<S: Into<String>>(name: S) -> Self {
         Self {
             name: name.into(),
-            columns: Vec::new(),
-            indexes: Vec::new(),
+            columns: IndexMap::new(),
+            indexes: IndexMap::new(),
         }
     }
 
@@ -88,29 +100,41 @@ impl Table {
     }
 
     pub fn add_column(&mut self, column: Column) {
-        self.columns.push(column);
+        self.columns.insert(column.name.clone(), column);
     }
 
-    pub fn columns(&self) -> &[Column] {
-        &self.columns
+    pub fn columns(&self) -> Vec<&Column> {
+        let values: Vec<&Column> = self.columns.values().collect();
+        values
     }
 
     pub fn get_column<S: Into<String>>(&self, name: S) -> Option<&Column> {
         let name = name.into();
-        self.columns.iter().find(|c| c.name == name)
+        self.columns.get(&name)
+    }
+
+    pub fn get_column_mut<S: Into<String>>(&mut self, name: S) -> Option<&mut Column> {
+        let name = name.into();
+        self.columns.get_mut(&name)
     }
 
     pub fn add_index(&mut self, index: Index) {
-        self.indexes.push(index);
+        self.indexes.insert(index.name.clone(), index);
     }
 
     pub fn get_index<S: Into<String>>(&self, name: S) -> Option<&Index> {
         let name = name.into();
-        self.indexes.iter().find(|i| i.name == name)
+        self.indexes.get(&name)
     }
 
-    pub fn indexes(&self) -> &[Index] {
-        &self.indexes
+    pub fn get_index_mut<S: Into<String>>(&mut self, name: S) -> Option<&mut Index> {
+        let name = name.into();
+        self.indexes.get_mut(&name)
+    }
+
+    pub fn indexes(&self) -> Vec<&Index> {
+        let values: Vec<&Index> = self.indexes.values().collect();
+        values
     }
 }
 
@@ -185,6 +209,7 @@ mod test {
         metadata.add(database.clone());
         assert_eq!(metadata.databases().len(), 1);
         assert!(metadata.get("default").is_some());
+        assert!(metadata.get_mut("default").is_some());
     }
 
     #[test]
@@ -197,6 +222,7 @@ mod test {
         db.add(table.clone());
         assert_eq!(db.tables().len(), 1);
         assert!(db.get("users").is_some());
+        assert!(db.get_mut("users").is_some());
     }
 
     #[test]
@@ -210,11 +236,13 @@ mod test {
         table.add_column(column);
         assert_eq!(table.columns().len(), 1);
         assert!(table.get_column("id").is_some());
+        assert!(table.get_column_mut("id").is_some());
 
         let index = Index::new("users_id_idx", vec!["id".to_string()], true);
         table.add_index(index);
         assert_eq!(table.indexes().len(), 1);
         assert!(table.get_index("users_id_idx").is_some());
+        assert!(table.get_index_mut("users_id_idx").is_some());
     }
 
     #[test]

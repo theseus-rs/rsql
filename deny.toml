@@ -31,7 +31,7 @@ allow = [
 [advisories]
 ignore = [
     "RUSTSEC-2023-0071",
-    "RUSTSEC-2024-0320",
+    "RUSTSEC-2024-0336"
 ]
 
 # https://embarkstudios.github.io/cargo-deny/checks/bans/cfg.html

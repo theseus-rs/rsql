@@ -18,6 +18,7 @@ chrono = { workspace = true, features = ["serde"] }
 duckdb = { workspace = true, features = ["bundled"], optional = true }
 form_urlencoded = { workspace = true, optional = true }
 futures-util = { workspace = true, optional = true }
+indexmap = { workspace = true, features = ["serde"] }
 indoc = { workspace = true }
 libsql = { workspace = true, optional = true }
 mockall = { workspace = true }

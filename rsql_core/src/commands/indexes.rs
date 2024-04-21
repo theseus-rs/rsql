@@ -37,10 +37,10 @@ impl ShellCommand for Command {
         if let Some(database) = metadata.current_database() {
             let tables = match table_filter {
                 Some(table_name) => match database.get(table_name) {
-                    Some(table) => vec![table.clone()],
+                    Some(table) => vec![table],
                     None => Vec::new(),
                 },
-                None => database.tables().to_vec(),
+                None => database.tables(),
             };
 
             for table in tables {
