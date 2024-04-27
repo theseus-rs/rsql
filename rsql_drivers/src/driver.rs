@@ -76,6 +76,8 @@ impl Default for DriverManager {
         drivers.add(Box::new(crate::duckdb::Driver));
         #[cfg(feature = "libsql")]
         drivers.add(Box::new(crate::libsql::Driver));
+        #[cfg(feature = "mariadb")]
+        drivers.add(Box::new(crate::mariadb::Driver));
         #[cfg(feature = "mysql")]
         drivers.add(Box::new(crate::mysql::Driver));
         #[cfg(feature = "postgres")]
@@ -129,6 +131,9 @@ mod tests {
         let driver_count = driver_count + 1;
 
         #[cfg(feature = "libsql")]
+        let driver_count = driver_count + 1;
+
+        #[cfg(feature = "mariadb")]
         let driver_count = driver_count + 1;
 
         #[cfg(feature = "mysql")]

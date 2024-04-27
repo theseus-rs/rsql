@@ -86,6 +86,9 @@ mod tests {
         #[cfg(feature = "driver-libsql")]
         drivers.push("libsql");
 
+        #[cfg(feature = "driver-mariadb")]
+        drivers.push("mariadb");
+
         #[cfg(feature = "driver-mysql")]
         drivers.push("mysql");
 
