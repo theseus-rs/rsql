@@ -191,7 +191,7 @@ mod test {
     use crate::{Connection, DriverManager, Value};
     use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
     use indoc::indoc;
-    use testcontainers::clients::Cli;
+    use testcontainers::runners::AsyncRunner;
     use testcontainers::RunnableImage;
     use testcontainers_modules::mssql_server::MssqlServer;
 
@@ -199,11 +199,10 @@ mod test {
 
     #[tokio::test]
     async fn test_container() -> anyhow::Result<()> {
-        let docker = Cli::default();
         let sqlserver_image =
             RunnableImage::from(MssqlServer::default().with_sa_password(PASSWORD));
-        let container = docker.run(sqlserver_image);
-        let port = container.get_host_port_ipv4(1433);
+        let container = sqlserver_image.start().await;
+        let port = container.get_host_port_ipv4(1433).await;
         let database_url =
             &format!("sqlserver://sa:{PASSWORD}@127.0.0.1:{port}?TrustServerCertificate=true");
         let driver_manager = DriverManager::default();
