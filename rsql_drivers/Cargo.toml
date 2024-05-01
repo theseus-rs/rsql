@@ -58,13 +58,18 @@ testcontainers-modules = { workspace = true, features = ["mssql_server", "mysql"
 tokio = { workspace = true }
 
 [features]
-all = ["duckdb", "mysql", "postgres", "postgresql", "rusqlite", "sqlite", "sqlserver"]
+all = ["duckdb", "mariadb", "mysql", "postgres", "postgresql", "rusqlite", "sqlite", "sqlserver"]
 default = []
 duckdb = [
     "dep:duckdb"
 ]
 libsql = [
     "dep:libsql"
+]
+mariadb = [
+    "mysql",
+    "dep:sqlx",
+    "sqlx/mysql",
 ]
 mysql = [
     "dep:sqlx",

@@ -9,8 +9,10 @@ pub mod duckdb;
 mod error;
 #[cfg(feature = "libsql")]
 pub mod libsql;
+#[cfg(feature = "mariadb")]
+pub mod mariadb;
 mod metadata;
-#[cfg(feature = "mysql")]
+#[cfg(any(feature = "mariadb", feature = "mysql"))]
 pub mod mysql;
 #[cfg(feature = "postgres")]
 pub mod postgres;

@@ -52,6 +52,7 @@ all = ["all-drivers", "all-formats"]
 default = []
 all-drivers = [
     "driver-duckdb",
+    "driver-mariadb",
     "driver-mysql",
     "driver-postgres",
     "driver-postgresql",
@@ -61,6 +62,7 @@ all-drivers = [
 ]
 driver-duckdb = ["rsql_drivers/duckdb"]
 driver-libsql = ["rsql_drivers/libsql"]
+driver-mariadb = ["rsql_drivers/mariadb"]
 driver-mysql = ["rsql_drivers/mysql"]
 driver-postgres = ["rsql_drivers/postgres"]
 driver-postgresql = ["rsql_drivers/postgresql"]

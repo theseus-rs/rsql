@@ -46,6 +46,7 @@ rsql --url '<url>'
 |-------------------|-------------------------------------------------------------------------------|
 | duckdb            | `duckdb://?<memory=true>[&file=<database_file>]`                              |
 | libsql¹           | `libsql://<host>?[<memory=true>][&file=<database_file>][&auth_token=<token>]` |
+| mariadb (sqlx)    | `mariadb://<user>[:<password>]@<host>[:<port>]/<database>`                    |
 | mysql (sqlx)      | `mysql://<user>[:<password>]@<host>[:<port>]/<database>`                      |
 | postgres          | `postgres://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`   |
 | postgresql (sqlx) | `postgresql://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>` |

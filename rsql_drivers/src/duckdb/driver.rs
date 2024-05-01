@@ -1,6 +1,7 @@
 use crate::duckdb::metadata;
 use crate::error::{Error, Result};
 use crate::value::Value;
+use crate::Error::UnsupportedColumnType;
 use crate::{MemoryQueryResult, Metadata, QueryResult};
 use anyhow::anyhow;
 use async_trait::async_trait;
@@ -86,7 +87,8 @@ impl crate::Connection for Connection {
         while let Some(query_row) = query_rows.next()? {
             let mut row = Vec::new();
             for (index, _column_name) in columns.iter().enumerate() {
-                let value = self.convert_to_value(query_row, index)?;
+                let column_name = columns.get(index).expect("no column");
+                let value = self.convert_to_value(query_row, column_name, index)?;
                 row.push(value);
             }
             rows.push(crate::Row::new(row));
@@ -102,8 +104,14 @@ impl crate::Connection for Connection {
 }
 
 impl Connection {
-    fn convert_to_value(&self, row: &Row, column_index: usize) -> Result<Option<Value>> {
-        let value = match row.get_ref(column_index)? {
+    fn convert_to_value(
+        &self,
+        row: &Row,
+        column_name: &String,
+        column_index: usize,
+    ) -> Result<Option<Value>> {
+        let value_ref = row.get_ref(column_index)?;
+        let value = match value_ref {
             ValueRef::Null => None,
             ValueRef::Boolean(value) => Some(Value::Bool(value)),
             ValueRef::TinyInt(value) => Some(Value::I8(value)),
@@ -155,6 +163,13 @@ impl Connection {
                 };
                 let date_time = start_date_time.add(duration);
                 Some(Value::DateTime(date_time))
+            }
+            _ => {
+                let data_type = value_ref.data_type();
+                return Err(UnsupportedColumnType {
+                    column_name: column_name.to_string(),
+                    column_type: data_type.to_string(),
+                });
             }
         };
 

@@ -261,6 +261,8 @@ mod test {
     use crate::{DriverManager, Value};
     use chrono::{NaiveDate, NaiveDateTime, NaiveTime, Utc};
     use serde_json::json;
+    #[cfg(not(any(target_os = "linux", target_os = "macos")))]
+    use testcontainers::runners::AsyncRunner;
 
     const DATABASE_URL: &str = "postgres://?embedded=true";
 
@@ -531,16 +533,15 @@ mod test {
     #[cfg(not(any(target_os = "linux", target_os = "macos")))]
     #[tokio::test]
     async fn test_container() -> anyhow::Result<()> {
-        let docker = testcontainers::clients::Cli::default();
         let postgres_image = testcontainers::RunnableImage::from(
             testcontainers_modules::postgres::Postgres::default(),
         );
-        let container = docker.run(postgres_image);
-        let port = container.get_host_port_ipv4(5432);
+        let container = postgres_image.start().await;
+        let port = container.get_host_port_ipv4(5432).await;
 
         let database_url = format!("postgres://postgres:postgres@localhost:{}/postgres", port);
         let driver_manager = DriverManager::default();
-        let connection = driver_manager.connect(database_url.as_str()).await?;
+        let mut connection = driver_manager.connect(database_url.as_str()).await?;
 
         let mut query_result = connection.query("SELECT 'foo'::TEXT").await?;
         let row = query_result.next().await.expect("no row");
