@@ -74,14 +74,14 @@ async fn retrieve_indexes(connection: &mut dyn Connection, database: &mut Databa
 #[cfg(test)]
 mod test {
     use crate::{Connection, DriverManager};
+    use testcontainers::runners::AsyncRunner;
 
     #[tokio::test]
     async fn test_container() -> anyhow::Result<()> {
-        let docker = testcontainers::clients::Cli::default();
         let mysql_image =
             testcontainers::RunnableImage::from(testcontainers_modules::mysql::Mysql::default());
-        let container = docker.run(mysql_image);
-        let port = container.get_host_port_ipv4(3306);
+        let container = mysql_image.start().await;
+        let port = container.get_host_port_ipv4(3306).await;
 
         let database_url = &format!("mysql://root@127.0.0.1:{port}/mysql");
         let driver_manager = DriverManager::default();
