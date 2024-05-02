@@ -28,8 +28,9 @@
     - [read](ch02-19-read.md)
     - [rows](ch02-20-rows.md)
     - [sleep](ch02-21-sleep.md)
-    - [tables](ch02-22-tables.md)
-    - [timer](ch02-23-timer.md)
+    - [system](ch02-22-system.md)
+    - [tables](ch02-23-tables.md)
+    - [timer](ch02-24-timer.md)
 
 - [Appendix](appendix-00.md)
     - [A - Configuration File (rsql.toml)](appendix-01-rsql-toml.md)

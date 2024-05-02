@@ -33,7 +33,7 @@ sys-locale = { workspace = true }
 tempfile = { workspace = true }
 termbg = { workspace = true }
 thiserror = { workspace = true }
-tokio = { workspace = true, features = ["rt", "rt-multi-thread", "macros"] }
+tokio = { workspace = true, features = ["macros", "process", "rt", "rt-multi-thread"] }
 tracing = { workspace = true }
 tracing-appender = { workspace = true }
 tracing-indicatif = { workspace = true }

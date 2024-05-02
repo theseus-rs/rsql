@@ -5889,9 +5889,9 @@ dependencies = [
 
 [[package]]
 name = "testcontainers"
-version = "0.16.6"
+version = "0.16.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "576d9d5f497543afe66097a392ac52256ab80870c629fb1a14d5aa21057b437b"
+checksum = "69d47265a44d1035a322691cf0a6cc227d79b62ef86ffb0dbc204b394fee3d07"
 dependencies = [
  "async-trait",
  "bollard",
@@ -5912,9 +5912,9 @@ dependencies = [
 
 [[package]]
 name = "testcontainers-modules"
-version = "0.4.0"
+version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0b65d0c0735921f8d7fd93867dd8add05bd805a77e9a1199e9a00e4de0c062c7"
+checksum = "174f65718996e5c8e6771cc69eab5b5c5b877f1e7db9696800f8b7edf99a7b36"
 dependencies = [
  "testcontainers",
 ]
