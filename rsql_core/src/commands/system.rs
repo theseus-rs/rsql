@@ -22,7 +22,7 @@ impl ShellCommand for Command {
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
         let default = "".to_string();
-        let command_name = options.input.get(1).unwrap_or_else(|| &default);
+        let command_name = options.input.get(1).unwrap_or(&default);
         let mut command = tokio::process::Command::new(command_name);
         let args = options.input.iter().skip(2);
 
