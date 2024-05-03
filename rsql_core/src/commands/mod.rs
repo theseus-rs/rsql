@@ -23,6 +23,7 @@ pub mod rows;
 pub mod sleep;
 pub mod system;
 pub mod tables;
+pub mod tee;
 pub mod timer;
 
 pub use command::{CommandManager, CommandOptions, LoopCondition, ShellCommand};

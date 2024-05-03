@@ -30,7 +30,8 @@
     - [sleep](ch02-21-sleep.md)
     - [system](ch02-22-system.md)
     - [tables](ch02-23-tables.md)
-    - [timer](ch02-24-timer.md)
+    - [tee](ch02-24-tee.md)
+    - [timer](ch02-25-timer.md)
 
 - [Appendix](appendix-00.md)
     - [A - Configuration File (rsql.toml)](appendix-01-rsql-toml.md)
