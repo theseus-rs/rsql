@@ -1,25 +1,25 @@
 use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use async_trait::async_trait;
-use rsql_formatters::writers::{FileWriter, StdoutWriter};
+use rsql_formatters::writers::{FanoutWriter, FileWriter, StdoutWriter};
 use rust_i18n::t;
 use std::fs::File;
 
-/// Command to output results to a file or console
+/// Command to output results to a file and the console
 #[derive(Debug, Default)]
 pub struct Command;
 
 #[async_trait]
 impl ShellCommand for Command {
     fn name(&self, locale: &str) -> String {
-        t!("output_command", locale = locale).to_string()
+        t!("tee_command", locale = locale).to_string()
     }
 
     fn args(&self, locale: &str) -> String {
-        t!("output_argument", locale = locale).to_string()
+        t!("tee_argument", locale = locale).to_string()
     }
 
     fn description(&self, locale: &str) -> String {
-        t!("output_description", locale = locale).to_string()
+        t!("tee_description", locale = locale).to_string()
     }
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
@@ -29,7 +29,8 @@ impl ShellCommand for Command {
             options.output.set(Box::new(StdoutWriter));
         } else {
             let file = File::create(file)?;
-            let writer = FileWriter::new(file);
+            let file_writer = FileWriter::new(file);
+            let writer = FanoutWriter::new(vec![Box::new(StdoutWriter), Box::new(file_writer)]);
             options.output.set(Box::new(writer));
         }
 
@@ -52,7 +53,7 @@ mod tests {
     #[test]
     fn test_name() {
         let name = Command.name("en");
-        assert_eq!(name, "output");
+        assert_eq!(name, "tee");
     }
 
     #[test]
@@ -66,7 +67,7 @@ mod tests {
         let description = Command.description("en");
         assert_eq!(
             description,
-            "Output the contents to a [file] or the console"
+            "Output the contents to a [file] and the console"
         );
     }
 
@@ -81,13 +82,13 @@ mod tests {
             formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".output".to_string()],
+            input: vec![".tee".to_string()],
             output: &mut output,
         };
 
         let result = Command.execute(options).await?;
-        assert_eq!(result, LoopCondition::Continue);
         assert_eq!(output.to_string(), "stdout");
+        assert_eq!(result, LoopCondition::Continue);
         Ok(())
     }
 
@@ -104,13 +105,14 @@ mod tests {
             formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".output".to_string(), path.clone()],
+            input: vec![".tee".to_string(), path.clone()],
             output: &mut output,
         };
 
         let result = Command.execute(options).await?;
-        assert_eq!(result, LoopCondition::Continue);
+        assert!(output.to_string().contains("stdout"));
         assert!(output.to_string().contains("File"));
+        assert_eq!(result, LoopCondition::Continue);
         Ok(())
     }
 }
