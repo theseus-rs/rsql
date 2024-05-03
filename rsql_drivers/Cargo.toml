@@ -54,7 +54,7 @@ workspace = true
 [dev-dependencies]
 test-log = { workspace = true }
 testcontainers = { workspace = true }
-testcontainers-modules = { workspace = true, features = ["mssql_server", "mysql", "postgres"] }
+testcontainers-modules = { workspace = true, features = ["mariadb", "mssql_server", "mysql", "postgres"] }
 tokio = { workspace = true }
 
 [features]
