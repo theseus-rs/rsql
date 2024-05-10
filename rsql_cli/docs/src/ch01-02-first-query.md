@@ -14,6 +14,18 @@ rsql --url 'duckdb://?memory=true' -- "SELECT version();"
 rsql --url 'libsql://?memory=true' -- "SELECT sqlite_version();"
 ```
 
+### MariaDB
+
+```shell
+rsql --url 'mariadb://<user>[:<password>]@<host>[:<port>]/<database>' -- "SELECT version();"
+```
+
+### MySQL
+
+```shell
+rsql --url 'mysql://<user>[:<password>]@<host>[:<port>]/<database>' -- "SELECT version();"
+```
+
 ### Postgres
 
 ```shell

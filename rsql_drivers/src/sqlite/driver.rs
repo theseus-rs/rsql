@@ -106,54 +106,76 @@ impl crate::Connection for Connection {
 }
 
 impl Connection {
-    fn convert_to_value(&self, row: &SqliteRow, column: &SqliteColumn) -> Result<Option<Value>> {
+    fn convert_to_value(&self, row: &SqliteRow, column: &SqliteColumn) -> Result<Value> {
         let column_name = column.name();
         let column_type = column.type_info();
         let column_type_name = column_type.name();
 
         match column_type_name {
             "TEXT" => {
-                let value: Option<String> = row.try_get(column_name)?;
-                return Ok(value.map(Value::String));
+                return match row.try_get(column_name)? {
+                    Some(v) => Ok(Value::String(v)),
+                    None => Ok(Value::Null),
+                };
             }
             // Not currently supported by sqlx
             // "NUMERIC" => {
-            //     let value: Option<String> = row.try_get(column_name)?;
-            //     return Ok(value.map(Value::String));
+            //     return match row.try_get(column_name)? {
+            //         Some(v) => Ok(Value::String(v)),
+            //         None => Ok(Value::Null),
+            //     };
             // }
             "INTEGER" => {
-                let value: Option<i64> = row.try_get(column_name)?;
-                return Ok(value.map(Value::I64));
+                return match row.try_get(column_name)? {
+                    Some(v) => Ok(Value::I64(v)),
+                    None => Ok(Value::Null),
+                };
             }
             "REAL" => {
-                let value: Option<f64> = row.try_get(column_name)?;
-                return Ok(value.map(Value::F64));
+                return match row.try_get(column_name)? {
+                    Some(v) => Ok(Value::F64(v)),
+                    None => Ok(Value::Null),
+                };
             }
             "BLOB" => {
-                let value: Option<Vec<u8>> = row.try_get(column_name)?;
-                return Ok(value.map(Value::Bytes));
+                return match row.try_get(column_name)? {
+                    Some(v) => Ok(Value::Bytes(v)),
+                    None => Ok(Value::Null),
+                };
             }
             _ => {}
         }
 
-        if let Ok(value) = row.try_get(column_name) {
-            let value: Option<String> = value;
-            Ok(value.map(Value::String))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<Vec<u8>> = value;
-            Ok(value.map(Value::Bytes))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<i8> = value;
-            Ok(value.map(Value::I8))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<i16> = value;
-            Ok(value.map(Value::I16))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<i32> = value;
-            Ok(value.map(Value::I32))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<f32> = value;
-            Ok(value.map(Value::F32))
+        if let Ok(value) = row.try_get::<Option<String>, &str>(column_name) {
+            match value {
+                Some(v) => Ok(Value::String(v)),
+                None => Ok(Value::Null),
+            }
+        } else if let Ok(value) = row.try_get::<Option<Vec<u8>>, &str>(column_name) {
+            match value {
+                Some(v) => Ok(Value::Bytes(v)),
+                None => Ok(Value::Null),
+            }
+        } else if let Ok(value) = row.try_get::<Option<i8>, &str>(column_name) {
+            match value {
+                Some(v) => Ok(Value::I8(v)),
+                None => Ok(Value::Null),
+            }
+        } else if let Ok(value) = row.try_get::<Option<i16>, &str>(column_name) {
+            match value {
+                Some(v) => Ok(Value::I16(v)),
+                None => Ok(Value::Null),
+            }
+        } else if let Ok(value) = row.try_get::<Option<i32>, &str>(column_name) {
+            match value {
+                Some(v) => Ok(Value::I32(v)),
+                None => Ok(Value::Null),
+            }
+        } else if let Ok(value) = row.try_get::<Option<f32>, &str>(column_name) {
+            match value {
+                Some(v) => Ok(Value::F32(v)),
+                None => Ok(Value::Null),
+            }
         } else {
             let column_type = column.type_info();
             let type_name = format!("{:?}", column_type);

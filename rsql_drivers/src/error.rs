@@ -19,7 +19,7 @@ pub enum Error {
     },
 }
 
-/// Converts a [`duckdb::Error`] into an [`IoError`](Error::IoError)
+/// Converts a [duckdb::Error] into an [IoError](Error::IoError)
 #[cfg(feature = "duckdb")]
 impl From<duckdb::Error> for Error {
     fn from(error: duckdb::Error) -> Self {
@@ -27,7 +27,7 @@ impl From<duckdb::Error> for Error {
     }
 }
 
-/// Converts a [`libsql::Error`] into an [`IoError`](Error::IoError)
+/// Converts a [libsql::Error] into an [IoError](Error::IoError)
 #[cfg(feature = "libsql")]
 impl From<libsql::Error> for Error {
     fn from(error: libsql::Error) -> Self {
@@ -35,7 +35,7 @@ impl From<libsql::Error> for Error {
     }
 }
 
-/// Converts a [`postgresql_archive::Error`] into an [`IoError`](Error::IoError)
+/// Converts a [postgresql_archive::Error] into an [IoError](Error::IoError)
 #[cfg(any(feature = "postgres", feature = "postgresql"))]
 impl From<postgresql_archive::Error> for Error {
     fn from(error: postgresql_archive::Error) -> Self {
@@ -43,7 +43,7 @@ impl From<postgresql_archive::Error> for Error {
     }
 }
 
-/// Converts a [`postgresql_embedded::Error`] into an [`IoError`](Error::IoError)
+/// Converts a [postgresql_embedded::Error] into an [IoError](Error::IoError)
 #[cfg(any(feature = "postgres", feature = "postgresql"))]
 impl From<postgresql_embedded::Error> for Error {
     fn from(error: postgresql_embedded::Error) -> Self {
@@ -51,7 +51,7 @@ impl From<postgresql_embedded::Error> for Error {
     }
 }
 
-/// Converts a [`rusqlite::Error`] into an [`ParseError`](Error::IoError)
+/// Converts a [rusqlite::Error] into an [ParseError](Error::IoError)
 #[cfg(feature = "rusqlite")]
 impl From<rusqlite::Error> for Error {
     fn from(error: rusqlite::Error) -> Self {
@@ -59,7 +59,7 @@ impl From<rusqlite::Error> for Error {
     }
 }
 
-/// Converts a [`sqlx::Error`] into an [`ParseError`](Error::IoError)
+/// Converts a [sqlx::Error] into an [ParseError](Error::IoError)
 #[cfg(any(feature = "mysql", feature = "postgresql", feature = "sqlite"))]
 impl From<sqlx::Error> for Error {
     fn from(error: sqlx::Error) -> Self {
@@ -67,14 +67,14 @@ impl From<sqlx::Error> for Error {
     }
 }
 
-/// Converts a [`std::io::Error`] into an [`IoError`](Error::IoError)
+/// Converts a [std::io::Error] into an [IoError](Error::IoError)
 impl From<std::io::Error> for Error {
     fn from(error: std::io::Error) -> Self {
         Error::IoError(error.into())
     }
 }
 
-/// Converts a [`tokio_postgres::Error`] into an [`IoError`](Error::IoError)
+/// Converts a [tokio_postgres::Error] into an [IoError](Error::IoError)
 #[cfg(feature = "postgres")]
 impl From<tokio_postgres::Error> for Error {
     fn from(error: tokio_postgres::Error) -> Self {
@@ -82,10 +82,17 @@ impl From<tokio_postgres::Error> for Error {
     }
 }
 
-/// Converts a [`tiberius::error::Error`] into an [`IoError`](Error::IoError)
+/// Converts a [tiberius::error::Error] into an [IoError](Error::IoError)
 #[cfg(feature = "sqlserver")]
 impl From<tiberius::error::Error> for Error {
     fn from(error: tiberius::error::Error) -> Self {
+        Error::IoError(error.into())
+    }
+}
+
+/// Convert [utf8 errors](std::string::FromUtf8Error) to [IoError](Error::IoError)
+impl From<std::string::FromUtf8Error> for Error {
+    fn from(error: std::string::FromUtf8Error) -> Self {
         Error::IoError(error.into())
     }
 }
@@ -167,5 +174,16 @@ mod test {
         let io_error = Error::from(error);
 
         assert_eq!(io_error.to_string(), "test");
+    }
+
+    #[test]
+    fn test_from_utf8_error() {
+        let invalid_utf8: Vec<u8> = vec![0, 159, 146, 150];
+        let utf8_error = String::from_utf8(invalid_utf8).unwrap_err();
+        let error = Error::from(utf8_error);
+        assert_eq!(
+            error.to_string(),
+            "invalid utf-8 sequence of 1 bytes from index 1"
+        );
     }
 }

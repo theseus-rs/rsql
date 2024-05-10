@@ -104,13 +104,13 @@ impl crate::Connection for Connection {
 }
 
 impl Connection {
-    fn convert_to_value(&self, row: &libsql::Row, column_index: i32) -> Result<Option<Value>> {
+    fn convert_to_value(&self, row: &libsql::Row, column_index: i32) -> Result<Value> {
         let value = match row.get_value(column_index)? {
-            libsql::Value::Null => None,
-            libsql::Value::Integer(value) => Some(Value::I64(value)),
-            libsql::Value::Real(value) => Some(Value::F64(value)),
-            libsql::Value::Text(value) => Some(Value::String(value)),
-            libsql::Value::Blob(value) => Some(Value::Bytes(value.to_vec())),
+            libsql::Value::Null => Value::Null,
+            libsql::Value::Integer(value) => Value::I64(value),
+            libsql::Value::Real(value) => Value::F64(value),
+            libsql::Value::Text(value) => Value::String(value),
+            libsql::Value::Blob(value) => Value::Bytes(value.to_vec()),
         };
 
         Ok(value)

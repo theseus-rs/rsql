@@ -147,7 +147,7 @@ impl Connection {
         row: &Row,
         column: &Column,
         column_index: usize,
-    ) -> Result<Option<Value>> {
+    ) -> Result<Value> {
         // https://www.postgresql.org/docs/current/datatype.html
         let column_type = column.type_();
         let value = match *column_type {
@@ -159,9 +159,9 @@ impl Connection {
                             .iter()
                             .map(|bit| if bit { '1' } else { '0' })
                             .collect();
-                        Some(Value::String(bit_string))
+                        Value::String(bit_string)
                     }
-                    None => None,
+                    None => Value::Null,
                 }
             }
             Type::BOOL => self.get_single(row, column_index, |v: bool| Value::Bool(v))?,
@@ -190,7 +190,10 @@ impl Connection {
             }
             Type::BYTEA => {
                 let byte_value: Option<&[u8]> = row.try_get(column_index)?;
-                byte_value.map(|value| Value::Bytes(value.to_vec()))
+                match byte_value {
+                    Some(value) => Value::Bytes(value.to_vec()),
+                    None => Value::Null,
+                }
             }
             Type::DATE => self.get_single(row, column_index, |v: NaiveDate| Value::Date(v))?,
             Type::TIME | Type::TIMETZ => {
@@ -204,14 +207,14 @@ impl Connection {
                 match system_time {
                     Some(value) => {
                         let date_time: DateTime<Utc> = value.into();
-                        Some(Value::DateTime(date_time.naive_utc()))
+                        Value::DateTime(date_time.naive_utc())
                     }
-                    None => None,
+                    None => Value::Null,
                 }
             }
             Type::OID => self.get_single(row, column_index, |v: u32| Value::U32(v))?,
             Type::OID_ARRAY => self.get_array(row, column_index, |v: u32| Value::U32(v))?,
-            Type::VOID => None, // pg_sleep() returns void
+            Type::VOID => Value::Null, // pg_sleep() returns void
             _ => {
                 return Err(UnsupportedColumnType {
                     column_name: column.name().to_string(),
@@ -228,9 +231,11 @@ impl Connection {
         row: &'a Row,
         column_index: usize,
         to_value: impl Fn(T) -> Value,
-    ) -> Result<Option<Value>> {
-        let value = row.try_get::<_, Option<T>>(column_index)?.map(to_value);
-        Ok(value)
+    ) -> Result<Value> {
+        match row.try_get::<_, Option<T>>(column_index)?.map(to_value) {
+            Some(value) => Ok(value),
+            None => Ok(Value::Null),
+        }
     }
 
     fn get_array<'a, T: FromSql<'a>>(
@@ -238,7 +243,7 @@ impl Connection {
         row: &'a Row,
         column_index: usize,
         to_value: impl Fn(T) -> Value,
-    ) -> Result<Option<Value>> {
+    ) -> Result<Value> {
         let original_value_array = row.try_get::<_, Option<Vec<T>>>(column_index)?;
         let result = match original_value_array {
             Some(value_array) => {
@@ -246,9 +251,9 @@ impl Connection {
                 for value in value_array {
                     values.push(to_value(value));
                 }
-                Some(Value::Array(values))
+                Value::Array(values)
             }
-            None => None,
+            None => Value::Null,
         };
         Ok(result)
     }
@@ -517,9 +522,9 @@ mod test {
     }
 
     #[tokio::test]
-    async fn test_data_type_none() -> anyhow::Result<()> {
+    async fn test_data_type_null() -> anyhow::Result<()> {
         let result = test_data_type("SELECT pg_sleep(0)").await?;
-        assert_eq!(result, None);
+        assert_eq!(result, Some(Value::Null));
         Ok(())
     }
 

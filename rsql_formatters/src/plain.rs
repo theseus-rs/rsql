@@ -42,7 +42,7 @@ mod tests {
     fn query_result() -> Results {
         let query_result = MemoryQueryResult::new(
             vec!["id".to_string()],
-            vec![Row::new(vec![Some(Value::I64(12345))])],
+            vec![Row::new(vec![Value::I64(12345)])],
         );
 
         Results::Query(Box::new(query_result))

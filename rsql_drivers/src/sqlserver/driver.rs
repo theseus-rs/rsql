@@ -132,48 +132,87 @@ impl crate::Connection for Connection {
     }
 }
 
-fn convert_to_value(row: &Row, column: &Column, index: usize) -> Result<Option<Value>> {
+fn convert_to_value(row: &Row, column: &Column, index: usize) -> Result<Value> {
     let column_name = column.name();
 
     if let Ok(value) = row.try_get(index) {
         let value: Option<&str> = value;
-        Ok(value.map(|v| Value::String(v.to_string())))
+        match value {
+            Some(v) => Ok(Value::String(v.to_string())),
+            None => Ok(Value::Null),
+        }
     } else if let Ok(value) = row.try_get(column_name) {
         let value: Option<&[u8]> = value;
-        Ok(value.map(|v| Value::Bytes(v.to_vec())))
+        match value {
+            Some(v) => Ok(Value::Bytes(v.to_vec())),
+            None => Ok(Value::Null),
+        }
     } else if let Ok(value) = row.try_get(column_name) {
         let value: Option<u8> = value;
-        Ok(value.map(Value::U8))
+        match value {
+            Some(v) => Ok(Value::U8(v)),
+            None => Ok(Value::Null),
+        }
     } else if let Ok(value) = row.try_get(column_name) {
         let value: Option<i16> = value;
-        Ok(value.map(Value::I16))
+        match value {
+            Some(v) => Ok(Value::I16(v)),
+            None => Ok(Value::Null),
+        }
     } else if let Ok(value) = row.try_get(column_name) {
         let value: Option<i32> = value;
-        Ok(value.map(Value::I32))
+        match value {
+            Some(v) => Ok(Value::I32(v)),
+            None => Ok(Value::Null),
+        }
     } else if let Ok(value) = row.try_get(column_name) {
         let value: Option<i64> = value;
-        Ok(value.map(Value::I64))
+        match value {
+            Some(v) => Ok(Value::I64(v)),
+            None => Ok(Value::Null),
+        }
     } else if let Ok(value) = row.try_get(column_name) {
         let value: Option<f32> = value;
-        Ok(value.map(Value::F32))
+        match value {
+            Some(v) => Ok(Value::F32(v)),
+            None => Ok(Value::Null),
+        }
     } else if let Ok(value) = row.try_get(column_name) {
         let value: Option<f64> = value;
-        Ok(value.map(Value::F64))
+        match value {
+            Some(v) => Ok(Value::F64(v)),
+            None => Ok(Value::Null),
+        }
     } else if let Ok(value) = row.try_get(column_name) {
         let value: Option<bool> = value;
-        Ok(value.map(Value::Bool))
+        match value {
+            Some(v) => Ok(Value::Bool(v)),
+            None => Ok(Value::Null),
+        }
     } else if let Ok(value) = row.try_get(column_name) {
         let value: Option<rust_decimal::Decimal> = value;
-        Ok(value.map(|v| Value::String(v.to_string())))
+        match value {
+            Some(v) => Ok(Value::String(v.to_string())),
+            None => Ok(Value::Null),
+        }
     } else if let Ok(value) = row.try_get(column_name) {
         let value: Option<chrono::NaiveDate> = value;
-        Ok(value.map(Value::Date))
+        match value {
+            Some(v) => Ok(Value::Date(v)),
+            None => Ok(Value::Null),
+        }
     } else if let Ok(value) = row.try_get(column_name) {
         let value: Option<chrono::NaiveTime> = value;
-        Ok(value.map(Value::Time))
+        match value {
+            Some(v) => Ok(Value::Time(v)),
+            None => Ok(Value::Null),
+        }
     } else if let Ok(value) = row.try_get(column_name) {
         let value: Option<chrono::NaiveDateTime> = value;
-        Ok(value.map(Value::DateTime))
+        match value {
+            Some(v) => Ok(Value::DateTime(v)),
+            None => Ok(Value::Null),
+        }
     } else {
         let column_type = format!("{:?}", column.column_type());
         let type_name = format!("{:?}", column_type);

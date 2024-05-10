@@ -99,7 +99,7 @@ mod test {
     #[tokio::test]
     async fn test_memory_query_result_new() {
         let columns = vec!["a".to_string()];
-        let rows = vec![Row::new(vec![Some(Value::String("foo".to_string()))])];
+        let rows = vec![Row::new(vec![Value::String("foo".to_string())])];
 
         let mut result = MemoryQueryResult::new(columns, rows);
 
@@ -116,11 +116,11 @@ mod test {
     async fn test_limit_query_result() {
         let columns = vec!["id".to_string()];
         let rows = vec![
-            Row::new(vec![Some(Value::I64(1))]),
-            Row::new(vec![Some(Value::I64(2))]),
-            Row::new(vec![Some(Value::I64(3))]),
-            Row::new(vec![Some(Value::I64(4))]),
-            Row::new(vec![Some(Value::I64(5))]),
+            Row::new(vec![Value::I64(1)]),
+            Row::new(vec![Value::I64(2)]),
+            Row::new(vec![Value::I64(3)]),
+            Row::new(vec![Value::I64(4)]),
+            Row::new(vec![Value::I64(5)]),
         ];
         let memory_result = MemoryQueryResult::new(columns, rows);
         let mut result = LimitQueryResult::new(Box::new(memory_result), 2);
@@ -141,7 +141,7 @@ mod test {
     #[tokio::test]
     async fn test_limit_query_result_limit_exceeds_rows() {
         let columns = vec!["id".to_string()];
-        let rows = vec![Row::new(vec![Some(Value::I64(1))])];
+        let rows = vec![Row::new(vec![Value::I64(1)])];
         let memory_result = MemoryQueryResult::new(columns, rows);
         let mut result = LimitQueryResult::new(Box::new(memory_result), 100);
 

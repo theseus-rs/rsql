@@ -47,7 +47,7 @@ impl ShellCommand for Command {
                 for index in table.indexes() {
                     let table_value = Value::String(table.name().to_string());
                     let index_value = Value::String(index.name().to_string());
-                    let row = Row::new(vec![Some(table_value), Some(index_value)]);
+                    let row = Row::new(vec![table_value, index_value]);
                     rows.push(row);
                 }
             }

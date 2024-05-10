@@ -89,26 +89,28 @@ mod test {
     use super::*;
 
     #[test]
-    fn test_highlight_color_disabled() {
+    fn test_highlight_color_disabled() -> Result<()> {
         let options = FormatterOptions {
             color: false,
             ..Default::default()
         };
         let helper = Highlighter::new(&options, "sql");
         let line = "SELECT";
-        let highlighted = helper.highlight(line).unwrap();
+        let highlighted = helper.highlight(line)?;
         assert_eq!(highlighted, line);
+        Ok(())
     }
 
     #[test]
-    fn test_highlight_color_forced() {
+    fn test_highlight_color_forced() -> Result<()> {
         let options = FormatterOptions {
             color: true,
             ..Default::default()
         };
         let helper = Highlighter::new(&options, "sql");
         let line = "SELECT";
-        let highlighted = helper.highlight(line).unwrap();
+        let highlighted = helper.highlight(line)?;
         assert!(highlighted.contains(line));
+        Ok(())
     }
 }

@@ -5,6 +5,7 @@ use crate::writers::Output;
 use crate::Results;
 use crate::Results::Query;
 use csv::QuoteStyle;
+use rsql_drivers::Value;
 
 pub async fn format(
     options: &FormatterOptions,
@@ -40,10 +41,9 @@ async fn format_delimited(
             let mut csv_row: Vec<Vec<u8>> = Vec::new();
 
             for data in row.into_iter() {
-                let bytes = if let Some(value) = data {
-                    Vec::from(value.to_string().as_bytes())
-                } else {
-                    Vec::new()
+                let bytes = match data {
+                    Value::Null => Vec::new(),
+                    _ => Vec::from(data.to_string().as_bytes()),
                 };
                 csv_row.push(bytes);
             }
@@ -103,8 +103,8 @@ mod test {
         let mut query_result = Query(Box::new(MemoryQueryResult::new(
             vec!["id".to_string(), "data".to_string()],
             vec![Row::new(vec![
-                Some(Value::I64(1)),
-                Some(Value::String("foo".to_string())),
+                Value::I64(1),
+                Value::String("foo".to_string()),
             ])],
         )));
         let output = &mut Output::default();
@@ -137,15 +137,9 @@ mod test {
         let mut query_result = Query(Box::new(MemoryQueryResult::new(
             vec!["id".to_string(), "data".to_string()],
             vec![
-                Row::new(vec![
-                    Some(Value::I64(1)),
-                    Some(Value::Bytes(b"bytes".to_vec())),
-                ]),
-                Row::new(vec![
-                    Some(Value::I64(2)),
-                    Some(Value::String("foo".to_string())),
-                ]),
-                Row::new(vec![Some(Value::I64(3)), None]),
+                Row::new(vec![Value::I64(1), Value::Bytes(b"bytes".to_vec())]),
+                Row::new(vec![Value::I64(2), Value::String("foo".to_string())]),
+                Row::new(vec![Value::I64(3), Value::Null]),
             ],
         )));
         let output = &mut Output::default();

@@ -16,28 +16,28 @@ pub enum Error {
     UnknownError(anyhow::Error),
 }
 
-/// Converts a [`clap_stdin::StdinError`] into an [`IoError`](Error::IoError)
+/// Converts a [clap_stdin::StdinError] into an [IoError](Error::IoError)
 impl From<clap_stdin::StdinError> for Error {
     fn from(error: clap_stdin::StdinError) -> Self {
         Error::IoError(error.into())
     }
 }
 
-/// Converts a [`indicatif::style::TemplateError`] into an [`IoError`](Error::IoError)
+/// Converts a [indicatif::style::TemplateError] into an [IoError](Error::IoError)
 impl From<indicatif::style::TemplateError> for Error {
     fn from(error: indicatif::style::TemplateError) -> Self {
         Error::IoError(error.into())
     }
 }
 
-/// Converts a [`rustyline::error::ReadlineError`] into an [`IoError`](Error::IoError)
+/// Converts a [rustyline::error::ReadlineError] into an [IoError](Error::IoError)
 impl From<rustyline::error::ReadlineError> for Error {
     fn from(error: rustyline::error::ReadlineError) -> Self {
         Error::IoError(error.into())
     }
 }
 
-/// Converts a [`std::io::Error`] into an [`IoError`](Error::IoError)
+/// Converts a [std::io::Error] into an [IoError](Error::IoError)
 impl From<std::io::Error> for Error {
     fn from(error: std::io::Error) -> Self {
         Error::IoError(error.into())

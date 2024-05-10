@@ -32,7 +32,7 @@ impl ShellCommand for Command {
             let tables = database.tables();
             for table in tables {
                 let value = Value::String(table.name().to_string());
-                let row = Row::new(vec![Some(value)]);
+                let row = Row::new(vec![value]);
                 rows.push(row);
             }
         }
