@@ -3,23 +3,23 @@ use crate::Value;
 /// Result row from a query
 #[derive(Clone, Debug, Default)]
 pub struct Row {
-    values: Vec<Option<Value>>,
+    values: Vec<Value>,
 }
 
 impl Row {
     /// Create a new instance of [Row]
-    pub fn new(values: Vec<Option<Value>>) -> Self {
+    pub fn new(values: Vec<Value>) -> Self {
         Self { values }
     }
 
     /// Get the first value of the row
     pub fn first(&self) -> Option<&Value> {
-        self.values.first().and_then(|v| v.as_ref())
+        self.values.first()
     }
 
     /// Get the value at the given index
     pub fn get(&self, index: usize) -> Option<&Value> {
-        self.values.get(index).and_then(|v| v.as_ref())
+        self.values.get(index)
     }
 
     /// Check if the row is empty
@@ -29,7 +29,7 @@ impl Row {
 
     /// Get the last value of the row
     pub fn last(&self) -> Option<&Value> {
-        self.values.last().and_then(|v| v.as_ref())
+        self.values.last()
     }
 
     /// Get the number of values in the row
@@ -38,14 +38,14 @@ impl Row {
     }
 
     /// Get the values of the row
-    pub fn values(&self) -> &Vec<Option<Value>> {
+    pub fn values(&self) -> &Vec<Value> {
         &self.values
     }
 }
 
 impl<'a> IntoIterator for &'a Row {
-    type Item = &'a Option<Value>;
-    type IntoIter = std::slice::Iter<'a, Option<Value>>;
+    type Item = &'a Value;
+    type IntoIter = std::slice::Iter<'a, Value>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.values.iter()
@@ -58,14 +58,14 @@ mod test {
 
     #[test]
     fn test_row_new() {
-        let values = vec![Some(Value::String("foo".to_string()))];
+        let values = vec![Value::String("foo".to_string())];
         let row = Row::new(values.clone());
         assert_eq!(row.values(), &values);
     }
 
     #[test]
     fn test_row_get() {
-        let values = vec![Some(Value::String("foo".to_string()))];
+        let values = vec![Value::String("foo".to_string())];
         let row = Row::new(values.clone());
         let value = row.get(0).expect("no value");
         assert_eq!(value, &Value::String("foo".to_string()));
@@ -74,8 +74,8 @@ mod test {
     #[test]
     fn test_row_first() {
         let values = vec![
-            Some(Value::String("a".to_string())),
-            Some(Value::String("z".to_string())),
+            Value::String("a".to_string()),
+            Value::String("z".to_string()),
         ];
         let row = Row::new(values.clone());
         let value = row.first().expect("no value");
@@ -92,8 +92,8 @@ mod test {
     #[test]
     fn test_row_last() {
         let values = vec![
-            Some(Value::String("a".to_string())),
-            Some(Value::String("z".to_string())),
+            Value::String("a".to_string()),
+            Value::String("z".to_string()),
         ];
         let row = Row::new(values.clone());
         let value = row.last().expect("no value");
@@ -102,7 +102,7 @@ mod test {
 
     #[test]
     fn test_row_len() {
-        let values = vec![Some(Value::String("foo".to_string()))];
+        let values = vec![Value::String("foo".to_string())];
         let row = Row::new(values.clone());
         assert_eq!(row.len(), 1);
     }

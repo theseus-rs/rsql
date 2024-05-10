@@ -7,6 +7,7 @@ use crate::{Highlighter, Results};
 use async_trait::async_trait;
 use quick_xml::events::{BytesEnd, BytesStart, BytesText, Event};
 use quick_xml::Writer;
+use rsql_drivers::Value;
 
 /// A formatter for HTML
 #[derive(Debug, Default)]
@@ -60,14 +61,14 @@ pub(crate) async fn format_html(
 
         for data in row.into_iter() {
             match data {
-                Some(value) => {
-                    let string_value = value.to_string();
+                Value::Null => {
+                    writer.write_event(Event::Empty(BytesStart::new("td")))?;
+                }
+                _ => {
+                    let string_value = data.to_string();
                     writer.write_event(Event::Start(BytesStart::new("td")))?;
                     writer.write_event(Event::Text(BytesText::new(string_value.as_str())))?;
                     writer.write_event(Event::End(BytesEnd::new("td")))?;
-                }
-                None => {
-                    writer.write_event(Event::Empty(BytesStart::new("td")))?;
                 }
             }
         }
@@ -125,15 +126,9 @@ mod test {
         let mut query_result = Query(Box::new(MemoryQueryResult::new(
             vec!["id".to_string(), "data".to_string()],
             vec![
-                Row::new(vec![
-                    Some(Value::I64(1)),
-                    Some(Value::Bytes(b"bytes".to_vec())),
-                ]),
-                Row::new(vec![
-                    Some(Value::I64(2)),
-                    Some(Value::String("foo".to_string())),
-                ]),
-                Row::new(vec![Some(Value::I64(3)), None]),
+                Row::new(vec![Value::I64(1), Value::Bytes(b"bytes".to_vec())]),
+                Row::new(vec![Value::I64(2), Value::String("foo".to_string())]),
+                Row::new(vec![Value::I64(3), Value::Null]),
             ],
         )));
         let output = &mut Output::default();

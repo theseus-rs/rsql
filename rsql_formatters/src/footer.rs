@@ -77,7 +77,7 @@ mod tests {
 
     fn query_result(rows: u8) -> Results {
         let rows: Vec<Row> = (0..rows)
-            .map(|_| Row::new(vec![None, Some(Value::I64(12345))]))
+            .map(|_| Row::new(vec![Value::Null, Value::I64(12345)]))
             .collect();
         let query_result =
             MemoryQueryResult::new(vec!["id".to_string(), "value".to_string()], rows);

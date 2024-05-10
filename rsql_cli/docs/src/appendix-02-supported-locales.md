@@ -1,10 +1,10 @@
 ## Supported Locales
 
-Each locale code combines an [ISO 639-1](https://www.iso.org/iso-639-language-code) language code and an
+Each locale includes a [ISO 639-1](https://www.iso.org/iso-639-language-code) language code and an optional
 [ISO 3166-1](https://www.iso.org/iso-3166-country-codes.html) country code to specify language and regional
 settings.
 
-The following locales have translations available for use. Most of the translations are "machine translations" are will
+The following locales have translations available for use. Most of the translations are "machine translations" and will
 often be less than perfect. If you would like to contribute a better translation, or add a new locale, please submit
 your contribution to [rsql](https://github.com/theseus-rs/rsql).
 
@@ -33,7 +33,7 @@ your contribution to [rsql](https://github.com/theseus-rs/rsql).
 | ja     | Japanese                 |
 | jv     | Javanese                 |
 | ka     | Georgian                 |
-| ko     | Korean (Sout             |
+| ko     | Korean                   |
 | lt     | Lithuanian               |
 | lv     | Latvian                  |
 | mk     | Macedonian               |

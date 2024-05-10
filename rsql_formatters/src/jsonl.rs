@@ -46,15 +46,9 @@ mod test {
         let mut query_result = Query(Box::new(MemoryQueryResult::new(
             vec!["id".to_string(), "data".to_string()],
             vec![
-                Row::new(vec![
-                    Some(Value::I64(1)),
-                    Some(Value::Bytes(b"bytes".to_vec())),
-                ]),
-                Row::new(vec![
-                    Some(Value::I64(2)),
-                    Some(Value::String("foo".to_string())),
-                ]),
-                Row::new(vec![Some(Value::I64(3)), None]),
+                Row::new(vec![Value::I64(1), Value::Bytes(b"bytes".to_vec())]),
+                Row::new(vec![Value::I64(2), Value::String("foo".to_string())]),
+                Row::new(vec![Value::I64(3), Value::Null]),
             ],
         )));
         let output = &mut Output::default();

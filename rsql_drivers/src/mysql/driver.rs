@@ -4,9 +4,9 @@ use crate::value::Value;
 use crate::Error::UnsupportedColumnType;
 use crate::{MemoryQueryResult, Metadata, QueryResult};
 use async_trait::async_trait;
-use chrono::NaiveDateTime;
+use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 use sqlx::mysql::{MySqlColumn, MySqlConnectOptions, MySqlRow};
-use sqlx::types::time;
+use sqlx::types::time::OffsetDateTime;
 use sqlx::{Column, MySqlPool, Row};
 use std::str::FromStr;
 use std::string::ToString;
@@ -89,58 +89,87 @@ impl crate::Connection for Connection {
 }
 
 impl Connection {
-    fn convert_to_value(&self, row: &MySqlRow, column: &MySqlColumn) -> Result<Option<Value>> {
+    fn convert_to_value(&self, row: &MySqlRow, column: &MySqlColumn) -> Result<Value> {
         let column_name = column.name();
 
-        if let Ok(value) = row.try_get(column_name) {
-            let value: Option<String> = value;
-            Ok(value.map(Value::String))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<Vec<u8>> = value;
-            Ok(value.map(Value::Bytes))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<i16> = value;
-            Ok(value.map(Value::I16))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<i32> = value;
-            Ok(value.map(Value::I32))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<i64> = value;
-            Ok(value.map(Value::I64))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<f32> = value;
-            Ok(value.map(Value::F32))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<f64> = value;
-            Ok(value.map(Value::F64))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<rust_decimal::Decimal> = value;
-            Ok(value.map(|v| Value::String(v.to_string())))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<bool> = value;
-            Ok(value.map(Value::Bool))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<chrono::NaiveDate> = value;
-            Ok(value.map(Value::Date))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<chrono::NaiveTime> = value;
-            Ok(value.map(Value::Time))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<chrono::NaiveDateTime> = value;
-            Ok(value.map(Value::DateTime))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<time::OffsetDateTime> = value;
-            let date_time = value.map(|v| {
-                let date = v.date();
-                let time = v.time();
-                let date_time_string = format!("{} {}", date, time);
-                NaiveDateTime::parse_from_str(&date_time_string, "%Y-%m-%d %H:%M:%S%.f")
-                    .expect("invalid date")
-            });
-            Ok(date_time.map(Value::DateTime))
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<serde_json::Value> = value;
-            Ok(value.map(Value::Json))
+        if let Ok(value) = row.try_get::<Option<String>, &str>(column_name) {
+            match value {
+                Some(v) => Ok(Value::String(v)),
+                None => Ok(Value::Null),
+            }
+        } else if let Ok(value) = row.try_get::<Option<Vec<u8>>, &str>(column_name) {
+            match value {
+                Some(v) => Ok(Value::Bytes(v)),
+                None => Ok(Value::Null),
+            }
+        } else if let Ok(value) = row.try_get::<Option<i16>, &str>(column_name) {
+            match value {
+                Some(v) => Ok(Value::I16(v)),
+                None => Ok(Value::Null),
+            }
+        } else if let Ok(value) = row.try_get::<Option<i32>, &str>(column_name) {
+            match value {
+                Some(v) => Ok(Value::I32(v)),
+                None => Ok(Value::Null),
+            }
+        } else if let Ok(value) = row.try_get::<Option<i64>, &str>(column_name) {
+            match value {
+                Some(v) => Ok(Value::I64(v)),
+                None => Ok(Value::Null),
+            }
+        } else if let Ok(value) = row.try_get::<Option<f32>, &str>(column_name) {
+            match value {
+                Some(v) => Ok(Value::F32(v)),
+                None => Ok(Value::Null),
+            }
+        } else if let Ok(value) = row.try_get::<Option<f64>, &str>(column_name) {
+            match value {
+                Some(v) => Ok(Value::F64(v)),
+                None => Ok(Value::Null),
+            }
+        } else if let Ok(value) = row.try_get::<Option<rust_decimal::Decimal>, &str>(column_name) {
+            match value {
+                Some(v) => Ok(Value::String(v.to_string())),
+                None => Ok(Value::Null),
+            }
+        } else if let Ok(value) = row.try_get::<Option<bool>, &str>(column_name) {
+            match value {
+                Some(v) => Ok(Value::Bool(v)),
+                None => Ok(Value::Null),
+            }
+        } else if let Ok(value) = row.try_get::<Option<NaiveDate>, &str>(column_name) {
+            match value {
+                Some(v) => Ok(Value::Date(v)),
+                None => Ok(Value::Null),
+            }
+        } else if let Ok(value) = row.try_get::<Option<NaiveTime>, &str>(column_name) {
+            match value {
+                Some(v) => Ok(Value::Time(v)),
+                None => Ok(Value::Null),
+            }
+        } else if let Ok(value) = row.try_get::<Option<NaiveDateTime>, &str>(column_name) {
+            match value {
+                Some(v) => Ok(Value::DateTime(v)),
+                None => Ok(Value::Null),
+            }
+        } else if let Ok(value) = row.try_get::<Option<OffsetDateTime>, &str>(column_name) {
+            match value {
+                Some(v) => {
+                    let date = v.date();
+                    let time = v.time();
+                    let date_time_string = format!("{} {}", date, time);
+                    let date_time =
+                        NaiveDateTime::parse_from_str(&date_time_string, "%Y-%m-%d %H:%M:%S%.f")
+                            .expect("invalid date");
+                    Ok(Value::DateTime(date_time))
+                }
+                None => Ok(Value::Null),
+            }
+        } else if let Ok(value) = row.try_get::<Option<serde_json::Value>, &str>(column_name) {
+            match value {
+                Some(v) => Ok(Value::Json(v)),
+                None => Ok(Value::Null),
+            }
         } else {
             let column_type = column.type_info();
             let type_name = format!("{:?}", column_type);

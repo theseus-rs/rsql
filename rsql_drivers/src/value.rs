@@ -6,6 +6,7 @@ use std::fmt;
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Value {
+    Null,
     Bool(bool),
     Bytes(Vec<u8>),
     I8(i8),
@@ -37,6 +38,7 @@ pub enum Value {
 impl Value {
     pub fn to_formatted_string(&self, locale: &Locale) -> String {
         match self {
+            Value::Null => "null".to_string(),
             Value::Bool(value) => value.to_string(),
             Value::Bytes(bytes) => STANDARD.encode(bytes),
             Value::I8(value) => value.to_formatted_string(locale),
@@ -82,6 +84,7 @@ impl Value {
 impl fmt::Display for Value {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let string_value = match self {
+            Value::Null => "null".to_string(),
             Value::Bool(value) => value.to_string(),
             Value::Bytes(bytes) => STANDARD.encode(bytes),
             Value::I8(value) => value.to_string(),
@@ -118,6 +121,7 @@ impl Serialize for Value {
         S: Serializer,
     {
         match *self {
+            Value::Null => serializer.serialize_none(),
             Value::Bool(value) => serializer.serialize_bool(value),
             Value::Bytes(ref value) => serializer.serialize_bytes(value),
             Value::I8(value) => serializer.serialize_i8(value),
@@ -151,6 +155,14 @@ mod tests {
     use serde_json::json;
     use std::str::FromStr;
     use uuid::Uuid;
+
+    #[test]
+    fn test_null() {
+        assert!(!Value::Null.is_numeric());
+        assert_eq!(Value::Null.to_formatted_string(&Locale::en), "null");
+        assert_eq!(Value::Null.to_string(), "null");
+        assert_eq!(json!(Value::Null), json!(serde_json::Value::Null));
+    }
 
     #[test]
     fn test_bool() {
@@ -441,6 +453,7 @@ mod tests {
     #[test]
     fn test_array() -> Result<()> {
         let array = vec![
+            Value::Null,
             Value::Bool(true),
             Value::I8(1),
             Value::I16(2),
@@ -466,11 +479,11 @@ mod tests {
         ];
         assert_eq!(
             Value::Array(array.clone()).to_formatted_string(&Locale::en),
-            r#"true, 1, 2, 3, 12,345, 128, 5, 6, 7, 8, 128, 9.1, 10.42, foo, 2000-12-31, 12:13:14.015, 2000-12-31 12:13:14.015, acf5b3e3-4099-4f34-81c7-5803cbc87a2d, {"foo":"bar","baz":123}"#
+            r#"null, true, 1, 2, 3, 12,345, 128, 5, 6, 7, 8, 128, 9.1, 10.42, foo, 2000-12-31, 12:13:14.015, 2000-12-31 12:13:14.015, acf5b3e3-4099-4f34-81c7-5803cbc87a2d, {"foo":"bar","baz":123}"#
         );
         assert_eq!(
             Value::Array(array.clone()).to_string(),
-            r#"true, 1, 2, 3, 12345, 128, 5, 6, 7, 8, 128, 9.1, 10.42, foo, 2000-12-31, 12:13:14.015, 2000-12-31 12:13:14.015, acf5b3e3-4099-4f34-81c7-5803cbc87a2d, {"foo":"bar","baz":123}"#
+            r#"null, true, 1, 2, 3, 12345, 128, 5, 6, 7, 8, 128, 9.1, 10.42, foo, 2000-12-31, 12:13:14.015, 2000-12-31 12:13:14.015, acf5b3e3-4099-4f34-81c7-5803cbc87a2d, {"foo":"bar","baz":123}"#
         );
         assert_eq!(json!(Value::Array(array.clone())), json!(array.clone()));
         Ok(())

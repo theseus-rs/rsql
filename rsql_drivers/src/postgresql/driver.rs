@@ -144,70 +144,120 @@ impl crate::Connection for Connection {
 }
 
 impl Connection {
-    fn convert_to_value(&self, row: &PgRow, column: &PgColumn) -> Result<Option<Value>> {
+    fn convert_to_value(&self, row: &PgRow, column: &PgColumn) -> Result<Value> {
         let column_name = column.name();
 
         if let Ok(value) = row.try_get(column_name) {
             let value: Option<Vec<u8>> = value;
-            Ok(value.map(Value::Bytes))
+            match value {
+                Some(value) => Ok(Value::Bytes(value)),
+                None => Ok(Value::Null),
+            }
         } else if let Ok(value) = row.try_get(column_name) {
             let value: Option<String> = value;
-            Ok(value.map(Value::String))
+            match value {
+                Some(value) => Ok(Value::String(value)),
+                None => Ok(Value::Null),
+            }
         } else if let Ok(value) = row.try_get(column_name) {
             let value: Option<i16> = value;
-            Ok(value.map(Value::I16))
+            match value {
+                Some(value) => Ok(Value::I16(value)),
+                None => Ok(Value::Null),
+            }
         } else if let Ok(value) = row.try_get(column_name) {
             let value: Option<i32> = value;
-            Ok(value.map(Value::I32))
+            match value {
+                Some(value) => Ok(Value::I32(value)),
+                None => Ok(Value::Null),
+            }
         } else if let Ok(value) = row.try_get(column_name) {
             let value: Option<i64> = value;
-            Ok(value.map(Value::I64))
+            match value {
+                Some(value) => Ok(Value::I64(value)),
+                None => Ok(Value::Null),
+            }
         } else if let Ok(value) = row.try_get(column_name) {
             let value: Option<f32> = value;
-            Ok(value.map(Value::F32))
+            match value {
+                Some(value) => Ok(Value::F32(value)),
+                None => Ok(Value::Null),
+            }
         } else if let Ok(value) = row.try_get(column_name) {
             let value: Option<f64> = value;
-            Ok(value.map(Value::F64))
+            match value {
+                Some(value) => Ok(Value::F64(value)),
+                None => Ok(Value::Null),
+            }
         } else if let Ok(value) = row.try_get(column_name) {
             let value: Option<rust_decimal::Decimal> = value;
-            Ok(value.map(|v| Value::String(v.to_string())))
+            match value {
+                Some(value) => Ok(Value::String(value.to_string())),
+                None => Ok(Value::Null),
+            }
         } else if let Ok(value) = row.try_get(column_name) {
             let value: Option<bool> = value;
-            Ok(value.map(Value::Bool))
+            match value {
+                Some(value) => Ok(Value::Bool(value)),
+                None => Ok(Value::Null),
+            }
         } else if let Ok(value) = row.try_get(column_name) {
             let value: Option<chrono::NaiveDate> = value;
-            Ok(value.map(Value::Date))
+            match value {
+                Some(value) => Ok(Value::Date(value)),
+                None => Ok(Value::Null),
+            }
         } else if let Ok(value) = row.try_get(column_name) {
             let value: Option<chrono::NaiveTime> = value;
-            Ok(value.map(Value::Time))
+            match value {
+                Some(value) => Ok(Value::Time(value)),
+                None => Ok(Value::Null),
+            }
         } else if let Ok(value) = row.try_get(column_name) {
             let value: Option<chrono::NaiveDateTime> = value;
-            Ok(value.map(Value::DateTime))
+            match value {
+                Some(value) => Ok(Value::DateTime(value)),
+                None => Ok(Value::Null),
+            }
         } else if let Ok(value) = row.try_get(column.name()) {
             let value: Option<uuid::Uuid> = value;
-            Ok(value.map(Value::Uuid))
+            match value {
+                Some(value) => Ok(Value::Uuid(value)),
+                None => Ok(Value::Null),
+            }
         } else if let Ok(value) = row.try_get(column_name) {
             let value: Option<serde_json::Value> = value;
-            Ok(value.map(Value::Json))
+            match value {
+                Some(value) => Ok(Value::Json(value)),
+                None => Ok(Value::Null),
+            }
         } else {
             let column_type = column.type_info();
             let type_name = format!("{:?}", column_type.deref());
             match type_name.to_lowercase().as_str() {
                 "bit" | "varbit" => {
                     let value: Option<BitVec> = row.try_get(column_name)?;
-                    Ok(value.map(|v| {
-                        let bit_string: String =
-                            v.iter().map(|bit| if bit { '1' } else { '0' }).collect();
-                        Value::String(bit_string)
-                    }))
+                    match value {
+                        Some(value) => {
+                            let bit_string: String = value
+                                .iter()
+                                .map(|bit| if bit { '1' } else { '0' })
+                                .collect();
+                            Ok(Value::String(bit_string))
+                        }
+                        None => Ok(Value::Null),
+                    }
                 }
                 // "interval" => Ok(None), // TODO: SELECT CAST('1 year' as interval)
                 // "money" => Ok(None), // TODO: SELECT CAST(1.23 as money)
                 "timestamptz" => {
                     let value: Option<chrono::DateTime<Utc>> = row.try_get(column_name)?;
-                    Ok(value.map(|v| Value::DateTime(v.naive_utc())))
+                    match value {
+                        Some(value) => Ok(Value::DateTime(value.naive_utc())),
+                        None => Ok(Value::Null),
+                    }
                 }
-                "void" => Ok(None), // pg_sleep() returns void
+                "void" => Ok(Value::Null), // pg_sleep() returns void
                 _ => Err(UnsupportedColumnType {
                     column_name: column_name.to_string(),
                     column_type: type_name,
@@ -432,9 +482,9 @@ mod test {
     }
 
     #[tokio::test]
-    async fn test_data_type_none() -> anyhow::Result<()> {
+    async fn test_data_type_null() -> anyhow::Result<()> {
         let result = test_data_type("SELECT pg_sleep(0)").await?;
-        assert_eq!(result, None);
+        assert_eq!(result, Some(Value::Null));
         Ok(())
     }
 

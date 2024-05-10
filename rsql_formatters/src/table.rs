@@ -8,7 +8,7 @@ use colored::Colorize;
 use num_format::Locale;
 use prettytable::format::{Alignment, TableFormat};
 use prettytable::{Cell, Table};
-use rsql_drivers::QueryResult;
+use rsql_drivers::{QueryResult, Value};
 use std::str::FromStr;
 
 /// Format the results of a query into a table and write to the output.
@@ -65,13 +65,13 @@ async fn process_data(
         for data in row.into_iter() {
             let mut alignment = Alignment::LEFT;
             let mut data = match data {
-                Some(data) => {
+                Value::Null => "NULL".to_string(),
+                _ => {
                     if data.is_numeric() {
                         alignment = Alignment::RIGHT;
                     }
                     data.to_formatted_string(&locale)
                 }
-                None => "NULL".to_string(),
             };
 
             if options.color && rows % 2 == 0 {
@@ -114,7 +114,7 @@ mod tests {
     fn query_result_one_row() -> Results {
         let query_result = MemoryQueryResult::new(
             vec![COLUMN_HEADER.to_string()],
-            vec![Row::new(vec![Some(Value::I64(12345))])],
+            vec![Row::new(vec![Value::I64(12345)])],
         );
         Query(Box::new(query_result))
     }
@@ -123,8 +123,8 @@ mod tests {
         let query_result = MemoryQueryResult::new(
             vec![COLUMN_HEADER.to_string()],
             vec![
-                Row::new(vec![None]),
-                Row::new(vec![Some(Value::I64(12345))]),
+                Row::new(vec![Value::Null]),
+                Row::new(vec![Value::I64(12345)]),
             ],
         );
         Query(Box::new(query_result))
@@ -134,8 +134,8 @@ mod tests {
         let query_result = MemoryQueryResult::new(
             vec!["number".to_string(), "string".to_string()],
             vec![Row::new(vec![
-                Some(Value::I64(42)),
-                Some(Value::String("foo".to_string())),
+                Value::I64(42),
+                Value::String("foo".to_string()),
             ])],
         );
         Query(Box::new(query_result))

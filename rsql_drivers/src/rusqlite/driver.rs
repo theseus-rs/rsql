@@ -104,19 +104,16 @@ impl crate::Connection for Connection {
 }
 
 impl Connection {
-    fn convert_to_value(&self, row: &Row, column_index: usize) -> Result<Option<Value>> {
+    fn convert_to_value(&self, row: &Row, column_index: usize) -> Result<Value> {
         let value = match row.get_ref(column_index)? {
-            ValueRef::Null => None,
-            ValueRef::Integer(value) => Some(Value::I64(value)),
-            ValueRef::Real(value) => Some(Value::F64(value)),
+            ValueRef::Null => Value::Null,
+            ValueRef::Integer(value) => Value::I64(value),
+            ValueRef::Real(value) => Value::F64(value),
             ValueRef::Text(value) => {
-                let value = match String::from_utf8(value.to_vec()) {
-                    Ok(value) => value,
-                    Err(error) => return Err(Error::IoError(anyhow!("Error: {:?}", error))),
-                };
-                Some(Value::String(value))
+                let value = String::from_utf8(value.to_vec())?;
+                Value::String(value)
             }
-            ValueRef::Blob(value) => Some(Value::Bytes(value.to_vec())),
+            ValueRef::Blob(value) => Value::Bytes(value.to_vec()),
         };
 
         Ok(value)

@@ -50,14 +50,8 @@ mod tests {
         let query_result = MemoryQueryResult::new(
             vec!["id".to_string(), "value".to_string()],
             vec![
-                Row::new(vec![
-                    Some(Value::I64(123)),
-                    Some(Value::String("foo".to_string())),
-                ]),
-                Row::new(vec![
-                    Some(Value::I64(456)),
-                    Some(Value::String("bar".to_string())),
-                ]),
+                Row::new(vec![Value::I64(123), Value::String("foo".to_string())]),
+                Row::new(vec![Value::I64(456), Value::String("bar".to_string())]),
             ],
         );
 

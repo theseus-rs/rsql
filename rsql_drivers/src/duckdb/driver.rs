@@ -109,36 +109,33 @@ impl Connection {
         row: &Row,
         column_name: &String,
         column_index: usize,
-    ) -> Result<Option<Value>> {
+    ) -> Result<Value> {
         let value_ref = row.get_ref(column_index)?;
         let value = match value_ref {
-            ValueRef::Null => None,
-            ValueRef::Boolean(value) => Some(Value::Bool(value)),
-            ValueRef::TinyInt(value) => Some(Value::I8(value)),
-            ValueRef::SmallInt(value) => Some(Value::I16(value)),
-            ValueRef::Int(value) => Some(Value::I32(value)),
-            ValueRef::BigInt(value) => Some(Value::I64(value)),
-            ValueRef::HugeInt(value) => Some(Value::I128(value)),
-            ValueRef::UTinyInt(value) => Some(Value::U8(value)),
-            ValueRef::USmallInt(value) => Some(Value::U16(value)),
-            ValueRef::UInt(value) => Some(Value::U32(value)),
-            ValueRef::UBigInt(value) => Some(Value::U64(value)),
-            ValueRef::Float(value) => Some(Value::F32(value)),
-            ValueRef::Double(value) => Some(Value::F64(value)),
-            ValueRef::Decimal(value) => Some(Value::String(value.to_string())),
+            ValueRef::Null => Value::Null,
+            ValueRef::Boolean(value) => Value::Bool(value),
+            ValueRef::TinyInt(value) => Value::I8(value),
+            ValueRef::SmallInt(value) => Value::I16(value),
+            ValueRef::Int(value) => Value::I32(value),
+            ValueRef::BigInt(value) => Value::I64(value),
+            ValueRef::HugeInt(value) => Value::I128(value),
+            ValueRef::UTinyInt(value) => Value::U8(value),
+            ValueRef::USmallInt(value) => Value::U16(value),
+            ValueRef::UInt(value) => Value::U32(value),
+            ValueRef::UBigInt(value) => Value::U64(value),
+            ValueRef::Float(value) => Value::F32(value),
+            ValueRef::Double(value) => Value::F64(value),
+            ValueRef::Decimal(value) => Value::String(value.to_string()),
             ValueRef::Text(value) => {
-                let value = match String::from_utf8(value.to_vec()) {
-                    Ok(value) => value,
-                    Err(error) => return Err(Error::IoError(anyhow!("Error: {:?}", error))),
-                };
-                Some(Value::String(value))
+                let value = String::from_utf8(value.to_vec())?;
+                Value::String(value)
             }
-            ValueRef::Blob(value) => Some(Value::Bytes(value.to_vec())),
+            ValueRef::Blob(value) => Value::Bytes(value.to_vec()),
             ValueRef::Date32(value) => {
                 let start_date = NaiveDate::from_ymd_opt(1970, 1, 1).expect("invalid date");
                 let delta = TimeDelta::days(value as i64);
                 let date = start_date.add(delta);
-                Some(Value::Date(date))
+                Value::Date(date)
             }
             ValueRef::Time64(unit, value) => {
                 let start_time = NaiveTime::from_hms_opt(0, 0, 0).expect("invalid time");
@@ -149,7 +146,7 @@ impl Connection {
                     TimeUnit::Nanosecond => Duration::from_nanos(value as u64),
                 };
                 let time = start_time.add(duration);
-                Some(Value::Time(time))
+                Value::Time(time)
             }
             ValueRef::Timestamp(unit, value) => {
                 let start_date = NaiveDate::from_ymd_opt(1970, 1, 1).expect("invalid date");
@@ -162,7 +159,7 @@ impl Connection {
                     TimeUnit::Nanosecond => Duration::from_nanos(value as u64),
                 };
                 let date_time = start_date_time.add(duration);
-                Some(Value::DateTime(date_time))
+                Value::DateTime(date_time)
             }
             _ => {
                 let data_type = value_ref.data_type();

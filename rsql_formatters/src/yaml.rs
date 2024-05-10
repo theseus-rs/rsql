@@ -39,27 +39,20 @@ pub(crate) async fn format_yaml(
         _ => return write_footer(options, results, 0, output).await,
     };
 
-    let mut yaml_rows: Vec<IndexMap<&String, Option<Value>>> = Vec::new();
+    let mut yaml_rows: Vec<IndexMap<&String, Value>> = Vec::new();
     let columns: Vec<String> = query_result.columns().await;
     let mut rows: u64 = 0;
 
     while let Some(row) = query_result.next().await {
-        let mut yaml_row: IndexMap<&String, Option<Value>> = IndexMap::new();
+        let mut yaml_row: IndexMap<&String, Value> = IndexMap::new();
 
         for (c, data) in row.into_iter().enumerate() {
             let column = columns.get(c).expect("column not found");
-            match data {
-                Some(value) => {
-                    if let Value::Bytes(_bytes) = value {
-                        let value = Value::String(value.to_string());
-                        yaml_row.insert(column, Some(value));
-                    } else {
-                        yaml_row.insert(column, Some(value.clone()));
-                    }
-                }
-                None => {
-                    yaml_row.insert(column, None);
-                }
+            if let Value::Bytes(_bytes) = data {
+                let value = Value::String(data.to_string());
+                yaml_row.insert(column, value);
+            } else {
+                yaml_row.insert(column, data.clone());
             }
         }
 
@@ -114,15 +107,9 @@ mod test {
         let mut query_result = Query(Box::new(MemoryQueryResult::new(
             vec!["id".to_string(), "data".to_string()],
             vec![
-                Row::new(vec![
-                    Some(Value::I64(1)),
-                    Some(Value::Bytes(b"bytes".to_vec())),
-                ]),
-                Row::new(vec![
-                    Some(Value::I64(2)),
-                    Some(Value::String("foo".to_string())),
-                ]),
-                Row::new(vec![Some(Value::I64(3)), None]),
+                Row::new(vec![Value::I64(1), Value::Bytes(b"bytes".to_vec())]),
+                Row::new(vec![Value::I64(2), Value::String("foo".to_string())]),
+                Row::new(vec![Value::I64(3), Value::Null]),
             ],
         )));
         let output = &mut Output::default();
