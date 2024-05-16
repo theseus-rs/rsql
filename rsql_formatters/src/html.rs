@@ -7,7 +7,6 @@ use crate::{Highlighter, Results};
 use async_trait::async_trait;
 use quick_xml::events::{BytesEnd, BytesStart, BytesText, Event};
 use quick_xml::Writer;
-use rsql_drivers::Value;
 
 /// A formatter for HTML
 #[derive(Debug, Default)]
@@ -60,16 +59,13 @@ pub(crate) async fn format_html(
         writer.write_event(Event::Start(BytesStart::new("tr")))?;
 
         for data in row.into_iter() {
-            match data {
-                Value::Null => {
-                    writer.write_event(Event::Empty(BytesStart::new("td")))?;
-                }
-                _ => {
-                    let string_value = data.to_string();
-                    writer.write_event(Event::Start(BytesStart::new("td")))?;
-                    writer.write_event(Event::Text(BytesText::new(string_value.as_str())))?;
-                    writer.write_event(Event::End(BytesEnd::new("td")))?;
-                }
+            if data.is_null() {
+                writer.write_event(Event::Empty(BytesStart::new("td")))?;
+            } else {
+                let string_value = data.to_string();
+                writer.write_event(Event::Start(BytesStart::new("td")))?;
+                writer.write_event(Event::Text(BytesText::new(string_value.as_str())))?;
+                writer.write_event(Event::End(BytesEnd::new("td")))?;
             }
         }
 

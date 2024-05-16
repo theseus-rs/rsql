@@ -60,7 +60,7 @@ async fn retrieve_indexes(connection: &mut dyn Connection, database: &mut Databa
             None => continue,
         };
         if let Some(table) = database.get_mut(table_name) {
-            let index = Index::new(index_name, vec![], false);
+            let index = Index::new(index_name, vec![], false, false);
             table.add_index(index);
         }
     }
