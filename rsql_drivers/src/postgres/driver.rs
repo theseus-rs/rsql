@@ -155,7 +155,7 @@ impl Connection {
                 Value::String(self.bit_string(v))
             })?,
             Type::BIT_ARRAY | Type::VARBIT_ARRAY => {
-                self.get_single(row, column_index, |v: BitVec| {
+                self.get_array(row, column_index, |v: BitVec| {
                     Value::String(self.bit_string(v))
                 })?
             }
@@ -376,9 +376,29 @@ mod test {
         let value = result.expect("value is None");
         assert_eq!(value, Value::String("101".to_string()));
 
+        let result =
+            test_data_type("SELECT ARRAY[CAST(B'10' as bit(2)), CAST(B'101' as bit(3))]").await?;
+        assert!(result.is_some());
+        if let Some(Value::Array(value)) = result {
+            assert_eq!(value.len(), 2);
+            assert_eq!(value[0], Value::String("10".to_string()));
+            assert_eq!(value[1], Value::String("101".to_string()));
+        }
+
         let result = test_data_type("SELECT CAST(B'10101' as bit varying(5))").await?;
         let value = result.expect("value is None");
         assert_eq!(value, Value::String("10101".to_string()));
+
+        let result = test_data_type(
+            "SELECT ARRAY[CAST(B'10' as bit varying(5)), CAST(B'101' as bit varying(5))]",
+        )
+        .await?;
+        assert!(result.is_some());
+        if let Some(Value::Array(value)) = result {
+            assert_eq!(value.len(), 2);
+            assert_eq!(value[0], Value::String("10".to_string()));
+            assert_eq!(value[1], Value::String("101".to_string()));
+        }
 
         Ok(())
     }
