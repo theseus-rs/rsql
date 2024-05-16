@@ -135,7 +135,7 @@ async fn retrieve_indexes(connection: &mut dyn Connection, database: &mut Databa
         if let Some(index) = table.get_index_mut(&index_name) {
             index.add_column(column_name);
         } else {
-            let index = Index::new(index_name, vec![column_name.clone()], false, unique);
+            let index = Index::new(index_name, vec![column_name.clone()], unique);
             table.add_index(index);
         }
     }
