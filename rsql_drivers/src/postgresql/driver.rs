@@ -435,9 +435,17 @@ mod test {
         let value = result.expect("value is None");
         assert_eq!(value, Value::String("foo".to_string()));
 
-        let result = test_data_type("SELECT CAST('foo' as text)").await?;
+        let result = test_data_type("SELECT 'foo'::TEXT").await?;
         let value = result.expect("value is None");
         assert_eq!(value, Value::String("foo".to_string()));
+
+        let result = test_data_type("SELECT ARRAY['foo','bar']::TEXT[]").await?;
+        assert!(result.is_some());
+        if let Some(Value::Array(value)) = result {
+            assert_eq!(value.len(), 2);
+            assert_eq!(value[0], Value::String("foo".to_string()));
+            assert_eq!(value[1], Value::String("bar".to_string()));
+        }
 
         let result = test_data_type("SELECT CAST(B'101' as bit(3))").await?;
         let value = result.expect("value is None");
@@ -460,49 +468,97 @@ mod test {
 
     #[tokio::test]
     async fn test_data_type_i16() -> anyhow::Result<()> {
-        let result = test_data_type("SELECT CAST(32767 as smallint)").await?;
+        let result = test_data_type("SELECT 32767::INT2").await?;
         let value = result.expect("value is None");
         assert_eq!(value, Value::I16(32_767));
+
+        let result = test_data_type("SELECT ARRAY[0,32767]::INT2[]").await?;
+        assert!(result.is_some());
+        if let Some(Value::Array(value)) = result {
+            assert_eq!(value.len(), 2);
+            assert_eq!(value[0], Value::I16(0));
+            assert_eq!(value[1], Value::I16(32_767));
+        }
         Ok(())
     }
 
     #[tokio::test]
     async fn test_data_type_i32() -> anyhow::Result<()> {
-        let result = test_data_type("SELECT CAST(2147483647 as integer)").await?;
+        let result = test_data_type("SELECT 2147483647::INT4").await?;
         let value = result.expect("value is None");
         assert_eq!(value, Value::I32(2_147_483_647));
+
+        let result = test_data_type("SELECT ARRAY[0,2147483647]::INT4[]").await?;
+        assert!(result.is_some());
+        if let Some(Value::Array(value)) = result {
+            assert_eq!(value.len(), 2);
+            assert_eq!(value[0], Value::I32(0));
+            assert_eq!(value[1], Value::I32(2_147_483_647));
+        }
         Ok(())
     }
 
     #[tokio::test]
     async fn test_data_type_i64() -> anyhow::Result<()> {
-        let result = test_data_type("SELECT CAST(2147483647 as bigint)").await?;
+        let result = test_data_type("SELECT 2147483647::INT8").await?;
         let value = result.expect("value is None");
         assert_eq!(value, Value::I64(2_147_483_647));
+
+        let result = test_data_type("SELECT ARRAY[0,2147483647]::INT8[]").await?;
+        assert!(result.is_some());
+        if let Some(Value::Array(value)) = result {
+            assert_eq!(value.len(), 2);
+            assert_eq!(value[0], Value::I64(0));
+            assert_eq!(value[1], Value::I64(2_147_483_647));
+        }
         Ok(())
     }
 
     #[tokio::test]
     async fn test_data_type_bool() -> anyhow::Result<()> {
-        let result = test_data_type("SELECT CAST(1 as bool)").await?;
+        let result = test_data_type("SELECT 1::BOOL").await?;
         let value = result.expect("value is None");
         assert_eq!(value, Value::Bool(true));
+
+        let result = test_data_type("SELECT ARRAY[0,1]::BOOL[]").await?;
+        assert!(result.is_some());
+        if let Some(Value::Array(value)) = result {
+            assert_eq!(value.len(), 2);
+            assert_eq!(value[0], Value::Bool(false));
+            assert_eq!(value[1], Value::Bool(true));
+        }
         Ok(())
     }
 
     #[tokio::test]
     async fn test_data_type_f32() -> anyhow::Result<()> {
-        let result = test_data_type("SELECT CAST(1.234 as real)").await?;
+        let result = test_data_type("SELECT 1.234::FLOAT4").await?;
         let value = result.expect("value is None");
         assert_eq!(value, Value::F32(1.234));
+
+        let result = test_data_type("SELECT ARRAY[0,1.234]::FLOAT4[]").await?;
+        assert!(result.is_some());
+        if let Some(Value::Array(value)) = result {
+            assert_eq!(value.len(), 2);
+            assert_eq!(value[0], Value::F32(0.0));
+            assert_eq!(value[1], Value::F32(1.234));
+        }
         Ok(())
     }
 
     #[tokio::test]
     async fn test_data_type_f64() -> anyhow::Result<()> {
-        let result = test_data_type("SELECT CAST(1.234 as double precision)").await?;
+        let result = test_data_type("SELECT 1.234::FLOAT8").await?;
         let value = result.expect("value is None");
         assert_eq!(value, Value::F64(1.234));
+
+        let result = test_data_type("SELECT ARRAY[0,1.234]::FLOAT8[]").await?;
+        assert!(result.is_some());
+        if let Some(Value::Array(value)) = result {
+            assert_eq!(value.len(), 2);
+            assert_eq!(value[0], Value::F64(0.0));
+            assert_eq!(value[1], Value::F64(1.234));
+        }
         Ok(())
     }
 
