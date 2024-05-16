@@ -99,8 +99,7 @@ async fn retrieve_indexes(connection: &mut dyn Connection, database: &mut Databa
                 ist.table_name,
                 i.relname AS index_name,
                 a.attname AS column_name,
-                ix.indisunique AS unique,
-                indisprimary AS primary_key
+                ix.indisunique AS unique
             FROM
                 pg_class t
                 JOIN pg_index ix ON ix.indrelid = t.oid
@@ -134,10 +133,6 @@ async fn retrieve_indexes(connection: &mut dyn Connection, database: &mut Databa
             Some(Value::Bool(value)) => *value,
             _ => continue,
         };
-        let primary_key = match row.get(4) {
-            Some(Value::Bool(value)) => *value,
-            _ => continue,
-        };
 
         let table = match database.get_mut(table_name) {
             Some(table) => table,
@@ -147,7 +142,7 @@ async fn retrieve_indexes(connection: &mut dyn Connection, database: &mut Databa
         if let Some(index) = table.get_index_mut(&index_name) {
             index.add_column(column_name);
         } else {
-            let index = Index::new(index_name, vec![column_name.clone()], primary_key, unique);
+            let index = Index::new(index_name, vec![column_name.clone()], unique);
             table.add_index(index);
         }
     }

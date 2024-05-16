@@ -107,7 +107,7 @@ mod tests {
         let mut database = Database::new("default");
         let mut table = Table::new("table1");
         let index_name = "index1";
-        let index = Index::new(index_name, Vec::new(), false, false);
+        let index = Index::new(index_name, Vec::new(), false);
         table.add_index(index);
         database.add(table);
         metadata.add(database);
@@ -143,7 +143,7 @@ mod tests {
         let table_name = "table1";
         let mut table = Table::new(table_name);
         let index_name = "index1";
-        let index = Index::new(index_name, Vec::new(), false, false);
+        let index = Index::new(index_name, Vec::new(), false);
         table.add_index(index);
         database.add(table);
         metadata.add(database);

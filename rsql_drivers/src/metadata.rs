@@ -177,16 +177,14 @@ impl Column {
 pub struct Index {
     name: String,
     columns: Vec<String>,
-    primary_key: bool,
     unique: bool,
 }
 
 impl Index {
-    pub fn new<S: Into<String>>(name: S, columns: Vec<S>, primary_key: bool, unique: bool) -> Self {
+    pub fn new<S: Into<String>>(name: S, columns: Vec<S>, unique: bool) -> Self {
         Self {
             name: name.into(),
             columns: columns.into_iter().map(|column| column.into()).collect(),
-            primary_key,
             unique,
         }
     }
@@ -201,10 +199,6 @@ impl Index {
 
     pub fn columns(&self) -> &[String] {
         &self.columns
-    }
-
-    pub fn primary_key(&self) -> bool {
-        self.primary_key
     }
 
     pub fn unique(&self) -> bool {
@@ -254,7 +248,7 @@ mod test {
         assert!(table.get_column("id").is_some());
         assert!(table.get_column_mut("id").is_some());
 
-        let index = Index::new("users_id_idx", vec!["id"], true, true);
+        let index = Index::new("users_id_idx", vec!["id"], true);
         table.add_index(index);
         assert_eq!(table.indexes().len(), 1);
         assert!(table.get_index("users_id_idx").is_some());
@@ -272,11 +266,10 @@ mod test {
 
     #[test]
     fn test_index() {
-        let mut index = Index::new("users_id_idx", vec!["id"], true, true);
+        let mut index = Index::new("users_id_idx", vec!["id"], true);
         index.add_column("email");
         assert_eq!(index.name(), "users_id_idx");
         assert_eq!(index.columns(), &["id".to_string(), "email".to_string()]);
-        assert!(index.primary_key());
         assert!(index.unique());
     }
 }
