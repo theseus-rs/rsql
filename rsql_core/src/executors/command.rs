@@ -49,7 +49,10 @@ impl<'a> CommandExecutor<'a> {
         let command_name = &input[0][command_identifier.len()..input[0].len()];
         let locale = &self.configuration.locale;
 
-        let loop_condition = match &self.command_manager.get(locale.as_str(), command_name) {
+        let loop_condition = match &self
+            .command_manager
+            .get_starts_with(locale.as_str(), command_name)
+        {
             Some(command) => {
                 let options = CommandOptions {
                     configuration: self.configuration,
