@@ -192,7 +192,7 @@ mod tests {
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        let contents = output.to_string();
+        let contents = output.to_string().replace("\r\n", "\n");
         let expected = indoc! {r#"
             ┌────────┬─────────┬──────────┬─────────┐
             │ Column │ Type    │ Not null │ Default │
