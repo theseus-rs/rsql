@@ -161,9 +161,55 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn test_execute_no_args() -> anyhow::Result<()> {
+        let options = CommandOptions {
+            configuration: &mut Configuration::default(),
+            command_manager: &CommandManager::default(),
+            driver_manager: &DriverManager::default(),
+            formatter_manager: &FormatterManager::default(),
+            connection: &mut MockConnection::new(),
+            history: &DefaultHistory::new(),
+            input: vec![".describe".to_string()],
+            output: &mut Output::default(),
+        };
+
+        let result = Command.execute(options).await;
+        assert!(result.is_err());
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_execute_invalid_table() -> anyhow::Result<()> {
+        let mut metadata = Metadata::default();
+        let database = Database::default();
+        metadata.add(database);
+        let mock_connection = &mut MockConnection::new();
+        mock_connection
+            .expect_metadata()
+            .returning(move || Ok(metadata.clone()));
+
+        let options = CommandOptions {
+            configuration: &mut Configuration::default(),
+            command_manager: &CommandManager::default(),
+            driver_manager: &DriverManager::default(),
+            formatter_manager: &FormatterManager::default(),
+            connection: mock_connection,
+            history: &DefaultHistory::new(),
+            input: vec![".describe".to_string(), "foo".to_string()],
+            output: &mut Output::default(),
+        };
+
+        let result = Command.execute(options).await;
+        assert!(result.is_err());
+
+        Ok(())
+    }
+
+    #[tokio::test]
     async fn test_execute() -> anyhow::Result<()> {
-        let mut metadata = Metadata::new();
-        let mut database = Database::new("default");
+        let mut metadata = Metadata::default();
+        let mut database = Database::default();
         let table_name = "users";
         let mut table = Table::new(table_name);
         table.add_column(Column::new("id", "INTEGER", true, None));
