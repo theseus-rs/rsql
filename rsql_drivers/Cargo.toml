@@ -25,6 +25,7 @@ mockall = { workspace = true }
 num-format = { workspace = true }
 postgresql_archive = { workspace = true, optional = true }
 postgresql_embedded = { workspace = true, optional = true }
+regex = { workspace = true }
 rusqlite = { workspace = true, features = ["bundled-full"], optional = true }
 rust_decimal = { workspace = true }
 rust-i18n = { workspace = true }

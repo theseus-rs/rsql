@@ -51,6 +51,13 @@ impl From<postgresql_embedded::Error> for Error {
     }
 }
 
+/// Converts a [regex::Error] into an [IoError](Error::IoError)
+impl From<regex::Error> for Error {
+    fn from(error: regex::Error) -> Self {
+        Error::IoError(error.into())
+    }
+}
+
 /// Converts a [rusqlite::Error] into an [ParseError](Error::IoError)
 #[cfg(feature = "rusqlite")]
 impl From<rusqlite::Error> for Error {
@@ -136,6 +143,14 @@ mod test {
     fn test_embedded_error() {
         let archive_error = postgresql_archive::Error::Unexpected("test".to_string());
         let error = postgresql_embedded::Error::ArchiveError(archive_error);
+        let io_error = Error::from(error);
+
+        assert_eq!(io_error.to_string(), "test");
+    }
+
+    #[test]
+    fn test_regex_error() {
+        let error = regex::Error::Syntax("test".to_string());
         let io_error = Error::from(error);
 
         assert_eq!(io_error.to_string(), "test");

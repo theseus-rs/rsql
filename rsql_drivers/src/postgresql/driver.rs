@@ -5,11 +5,12 @@ use crate::Error::UnsupportedColumnType;
 use crate::{MemoryQueryResult, Metadata, QueryResult};
 use async_trait::async_trait;
 use bit_vec::BitVec;
-use chrono::Utc;
+use chrono::{NaiveDate, NaiveDateTime, NaiveTime, Utc};
 use postgresql_archive::Version;
 use postgresql_embedded::{PostgreSQL, Settings, Status};
+use sqlx::postgres::types::Oid;
 use sqlx::postgres::{PgColumn, PgConnectOptions, PgRow};
-use sqlx::{Column, PgPool, Row};
+use sqlx::{Column, ColumnIndex, Decode, PgPool, Row, Type};
 use std::collections::HashMap;
 use std::ops::Deref;
 use std::path::PathBuf;
@@ -18,7 +19,7 @@ use std::string::ToString;
 use tracing::debug;
 use url::Url;
 
-const POSTGRESQL_EMBEDDED_VERSION: &str = "16.2.3";
+const POSTGRESQL_EMBEDDED_VERSION: &str = "16.3.0";
 
 #[derive(Debug)]
 pub struct Driver;
@@ -145,125 +146,194 @@ impl crate::Connection for Connection {
 
 impl Connection {
     fn convert_to_value(&self, row: &PgRow, column: &PgColumn) -> Result<Value> {
+        let column_type = column.type_info();
+        let postgresql_type = column_type.deref();
+        let column_type = format!("{:?}", postgresql_type);
+        let column_type_parts: Vec<&str> = column_type.split('(').collect();
         let column_name = column.name();
 
-        if let Ok(value) = row.try_get(column_name) {
-            let value: Option<Vec<u8>> = value;
-            match value {
-                Some(value) => Ok(Value::Bytes(value)),
-                None => Ok(Value::Null),
+        let value = match column_type_parts[0] {
+            "Bool" => self.get_value(row, column_name, |v: bool| Value::Bool(v))?,
+            "BoolArray" => self.get_value(row, column_name, |v: Vec<bool>| {
+                Value::Array(v.into_iter().map(Value::Bool).collect())
+            })?,
+            "Bpchar" | "Char" | "Name" | "Text" | "Varchar" => {
+                self.get_value(row, column_name, |v: String| Value::String(v))?
             }
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<String> = value;
-            match value {
-                Some(value) => Ok(Value::String(value)),
-                None => Ok(Value::Null),
+            "BpcharArray" | "CharArray" | "NameArray" | "TextArray" | "VarcharArray" => self
+                .get_value(row, column_name, |v: Vec<String>| {
+                    Value::Array(v.into_iter().map(Value::String).collect())
+                })?,
+            "Bytea" => self.get_value(row, column_name, |v: Vec<u8>| Value::Bytes(v.to_vec()))?,
+            "ByteaArray" => self.get_value(row, column_name, |v: Vec<Vec<u8>>| {
+                Value::Array(v.into_iter().map(|v| Value::Bytes(v.to_vec())).collect())
+            })?,
+            "Int2" => self.get_value(row, column_name, |v: i16| Value::I16(v))?,
+            "Int2Array" => self.get_value(row, column_name, |v: Vec<i16>| {
+                Value::Array(v.into_iter().map(Value::I16).collect())
+            })?,
+            "Int4" => self.get_value(row, column_name, |v: i32| Value::I32(v))?,
+            "Int4Array" => self.get_value(row, column_name, |v: Vec<i32>| {
+                Value::Array(v.into_iter().map(Value::I32).collect())
+            })?,
+            "Int8" => self.get_value(row, column_name, |v: i64| Value::I64(v))?,
+            "Int8Array" => self.get_value(row, column_name, |v: Vec<i64>| {
+                Value::Array(v.into_iter().map(Value::I64).collect())
+            })?,
+            "Oid" => self.get_value(row, column_name, |v: Oid| Value::U32(v.0))?,
+            "OidArray" => self.get_value(row, column_name, |v: Vec<Oid>| {
+                Value::Array(v.into_iter().map(|v| Value::U32(v.0)).collect())
+            })?,
+            "Json" | "Jsonb" => {
+                self.get_value(row, column_name, |v: serde_json::Value| Value::Json(v))?
             }
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<i16> = value;
-            match value {
-                Some(value) => Ok(Value::I16(value)),
-                None => Ok(Value::Null),
+            "JsonArray" | "JsonbArray" => {
+                self.get_value(row, column_name, |v: Vec<serde_json::Value>| {
+                    Value::Array(v.into_iter().map(Value::Json).collect())
+                })?
             }
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<i32> = value;
-            match value {
-                Some(value) => Ok(Value::I32(value)),
-                None => Ok(Value::Null),
+            // "Point" => Value::Null,
+            // "PointArray" => Value::Null,
+            // "Lseg" => Value::Null,
+            // "LsegArray" => Value::Null,
+            // "Path" => Value::Null,
+            // "PathArray" => Value::Null,
+            // "Box" => Value::Null,
+            // "BoxArray" => Value::Null,
+            // "Polygon" => Value::Null,
+            // "PolygonArray" => Value::Null,
+            // "Line" => Value::Null,
+            // "LineArray" => Value::Null,
+            // "Cidr" => Value::Null,
+            // "CidrArray" => Value::Null,
+            "Float4" => self.get_value(row, column_name, |v: f32| Value::F32(v))?,
+            "Float4Array" => self.get_value(row, column_name, |v: Vec<f32>| {
+                Value::Array(v.into_iter().map(Value::F32).collect())
+            })?,
+            "Float8" => self.get_value(row, column_name, |v: f64| Value::F64(v))?,
+            "Float8Array" => self.get_value(row, column_name, |v: Vec<f64>| {
+                Value::Array(v.into_iter().map(Value::F64).collect())
+            })?,
+            // "Unknown" => Value::Null,
+            // "Circle" => Value::Null,
+            // "CircleArray" => Value::Null,
+            // "Macaddr" => Value::Null,
+            // "MacaddrArray" => Value::Null,
+            // "Macaddr8" => Value::Null,
+            // "Macaddr8Array" => Value::Null,
+            // "Inet" => Value::Null,
+            // "InetArray" => Value::Null,
+            "Date" => self.get_value(row, column_name, |v: NaiveDate| Value::Date(v))?,
+            "DateArray" => self.get_value(row, column_name, |v: Vec<NaiveDate>| {
+                Value::Array(v.into_iter().map(Value::Date).collect())
+            })?,
+            "Time" | "Timetz" => self.get_value(row, column_name, |v: NaiveTime| Value::Time(v))?,
+            "TimeArray" | "TimetzArray" => {
+                self.get_value(row, column_name, |v: Vec<NaiveTime>| {
+                    Value::Array(v.into_iter().map(Value::Time).collect())
+                })?
             }
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<i64> = value;
-            match value {
-                Some(value) => Ok(Value::I64(value)),
-                None => Ok(Value::Null),
+            "Timestamp" => {
+                self.get_value(row, column_name, |v: NaiveDateTime| Value::DateTime(v))?
             }
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<f32> = value;
-            match value {
-                Some(value) => Ok(Value::F32(value)),
-                None => Ok(Value::Null),
+            "TimestampArray" => self.get_value(row, column_name, |v: Vec<NaiveDateTime>| {
+                Value::Array(v.into_iter().map(Value::DateTime).collect())
+            })?,
+            "Timestamptz" => self.get_value(row, column_name, |v: chrono::DateTime<Utc>| {
+                Value::DateTime(v.naive_utc())
+            })?,
+            "TimestamptzArray" => {
+                self.get_value(row, column_name, |v: Vec<chrono::DateTime<Utc>>| {
+                    Value::Array(
+                        v.into_iter()
+                            .map(|v| Value::DateTime(v.naive_utc()))
+                            .collect(),
+                    )
+                })?
             }
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<f64> = value;
-            match value {
-                Some(value) => Ok(Value::F64(value)),
-                None => Ok(Value::Null),
+            // "Interval" => Value::Null,
+            // "IntervalArray" => Value::Null,
+            "Bit" | "Varbit" => self.get_value(row, column_name, |v: BitVec| {
+                Value::String(self.bit_string(v))
+            })?,
+            "BitArray" | "VarbitArray" => self.get_value(row, column_name, |v: Vec<BitVec>| {
+                Value::Array(
+                    v.into_iter()
+                        .map(|v| Value::String(self.bit_string(v)))
+                        .collect(),
+                )
+            })?,
+            "Numeric" => self.get_value(row, column_name, |v: rust_decimal::Decimal| {
+                Value::String(v.to_string())
+            })?,
+            "NumericArray" => {
+                self.get_value(row, column_name, |v: Vec<rust_decimal::Decimal>| {
+                    Value::Array(
+                        v.into_iter()
+                            .map(|v| Value::String(v.to_string()))
+                            .collect(),
+                    )
+                })?
             }
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<rust_decimal::Decimal> = value;
-            match value {
-                Some(value) => Ok(Value::String(value.to_string())),
-                None => Ok(Value::Null),
+            // "Record" => Value::Null,
+            // "RecordArray" => Value::Null,
+            "Uuid" => self.get_value(row, column_name, |v: uuid::Uuid| Value::Uuid(v))?,
+            "UuidArray" => self.get_value(row, column_name, |v: Vec<uuid::Uuid>| {
+                Value::Array(v.into_iter().map(Value::Uuid).collect())
+            })?,
+            // "Int4Range" => Value::Null,
+            // "Int4RangeArray" => Value::Null,
+            // "NumRange" => Value::Null,
+            // "NumRangeArray" => Value::Null,
+            // "TsRange" => Value::Null,
+            // "TsRangeArray" => Value::Null,
+            // "TstzRange" => Value::Null,
+            // "TstzRangeArray" => Value::Null,
+            // "DateRange" => Value::Null,
+            // "DateRangeArray" => Value::Null,
+            // "Int8Range" => Value::Null,
+            // "Int8RangeArray" => Value::Null,
+            // "Jsonpath" => Value::Null,
+            // "JsonpathArray" => Value::Null,
+            // "Money" => Value::Null,
+            // "MoneyArray" => Value::Null,
+            "Void" => Value::Null, // pg_sleep() returns void
+            // "Custom" => Value::Null,
+            // "DeclareWithName" => Value::Null,
+            // "DeclareWithOid" => Value::Null,
+            _ => {
+                return Err(UnsupportedColumnType {
+                    column_name: column.name().to_string(),
+                    column_type: column_type.to_string(),
+                });
             }
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<bool> = value;
-            match value {
-                Some(value) => Ok(Value::Bool(value)),
-                None => Ok(Value::Null),
-            }
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<chrono::NaiveDate> = value;
-            match value {
-                Some(value) => Ok(Value::Date(value)),
-                None => Ok(Value::Null),
-            }
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<chrono::NaiveTime> = value;
-            match value {
-                Some(value) => Ok(Value::Time(value)),
-                None => Ok(Value::Null),
-            }
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<chrono::NaiveDateTime> = value;
-            match value {
-                Some(value) => Ok(Value::DateTime(value)),
-                None => Ok(Value::Null),
-            }
-        } else if let Ok(value) = row.try_get(column.name()) {
-            let value: Option<uuid::Uuid> = value;
-            match value {
-                Some(value) => Ok(Value::Uuid(value)),
-                None => Ok(Value::Null),
-            }
-        } else if let Ok(value) = row.try_get(column_name) {
-            let value: Option<serde_json::Value> = value;
-            match value {
-                Some(value) => Ok(Value::Json(value)),
-                None => Ok(Value::Null),
-            }
-        } else {
-            let column_type = column.type_info();
-            let type_name = format!("{:?}", column_type.deref());
-            match type_name.to_lowercase().as_str() {
-                "bit" | "varbit" => {
-                    let value: Option<BitVec> = row.try_get(column_name)?;
-                    match value {
-                        Some(value) => {
-                            let bit_string: String = value
-                                .iter()
-                                .map(|bit| if bit { '1' } else { '0' })
-                                .collect();
-                            Ok(Value::String(bit_string))
-                        }
-                        None => Ok(Value::Null),
-                    }
-                }
-                // "interval" => Ok(None), // TODO: SELECT CAST('1 year' as interval)
-                // "money" => Ok(None), // TODO: SELECT CAST(1.23 as money)
-                "timestamptz" => {
-                    let value: Option<chrono::DateTime<Utc>> = row.try_get(column_name)?;
-                    match value {
-                        Some(value) => Ok(Value::DateTime(value.naive_utc())),
-                        None => Ok(Value::Null),
-                    }
-                }
-                "void" => Ok(Value::Null), // pg_sleep() returns void
-                _ => Err(UnsupportedColumnType {
-                    column_name: column_name.to_string(),
-                    column_type: type_name,
-                }),
-            }
+        };
+
+        Ok(value)
+    }
+
+    fn get_value<'r, T, I>(
+        &self,
+        row: &'r PgRow,
+        index: I,
+        to_value: impl Fn(T) -> Value,
+    ) -> Result<Value>
+    where
+        T: Decode<'r, <PgRow as Row>::Database> + Type<<PgRow as Row>::Database>,
+        I: ColumnIndex<PgRow>,
+    {
+        match row.try_get::<Option<T>, I>(index)?.map(to_value) {
+            Some(value) => Ok(value),
+            None => Ok(Value::Null),
         }
+    }
+
+    fn bit_string(&self, value: BitVec) -> String {
+        let bit_string: String = value
+            .iter()
+            .map(|bit| if bit { '1' } else { '0' })
+            .collect();
+        bit_string
     }
 }
 
@@ -365,17 +435,45 @@ mod test {
         let value = result.expect("value is None");
         assert_eq!(value, Value::String("foo".to_string()));
 
-        let result = test_data_type("SELECT CAST('foo' as text)").await?;
+        let result = test_data_type("SELECT 'foo'::TEXT").await?;
         let value = result.expect("value is None");
         assert_eq!(value, Value::String("foo".to_string()));
+
+        let result = test_data_type("SELECT ARRAY['foo','bar']::TEXT[]").await?;
+        assert!(result.is_some());
+        if let Some(Value::Array(value)) = result {
+            assert_eq!(value.len(), 2);
+            assert_eq!(value[0], Value::String("foo".to_string()));
+            assert_eq!(value[1], Value::String("bar".to_string()));
+        }
 
         let result = test_data_type("SELECT CAST(B'101' as bit(3))").await?;
         let value = result.expect("value is None");
         assert_eq!(value, Value::String("101".to_string()));
 
+        let result =
+            test_data_type("SELECT ARRAY[CAST(B'10' as bit(2)), CAST(B'101' as bit(3))]").await?;
+        assert!(result.is_some());
+        if let Some(Value::Array(value)) = result {
+            assert_eq!(value.len(), 2);
+            assert_eq!(value[0], Value::String("10".to_string()));
+            assert_eq!(value[1], Value::String("101".to_string()));
+        }
+
         let result = test_data_type("SELECT CAST(B'10101' as bit varying(5))").await?;
         let value = result.expect("value is None");
         assert_eq!(value, Value::String("10101".to_string()));
+
+        let result = test_data_type(
+            "SELECT ARRAY[CAST(B'10' as bit varying(5)), CAST(B'101' as bit varying(5))]",
+        )
+        .await?;
+        assert!(result.is_some());
+        if let Some(Value::Array(value)) = result {
+            assert_eq!(value.len(), 2);
+            assert_eq!(value[0], Value::String("10".to_string()));
+            assert_eq!(value[1], Value::String("101".to_string()));
+        }
 
         let result = test_data_type("SELECT CAST(1.234 as numeric)").await?;
         let value = result.expect("value is None");
@@ -384,55 +482,102 @@ mod test {
         let result = test_data_type("SELECT CAST(1.234 as decimal)").await?;
         let value = result.expect("value is None");
         assert_eq!(value, Value::String("1.234".to_string()));
-
         Ok(())
     }
 
     #[tokio::test]
     async fn test_data_type_i16() -> anyhow::Result<()> {
-        let result = test_data_type("SELECT CAST(32767 as smallint)").await?;
+        let result = test_data_type("SELECT 32767::INT2").await?;
         let value = result.expect("value is None");
         assert_eq!(value, Value::I16(32_767));
+
+        let result = test_data_type("SELECT ARRAY[0,32767]::INT2[]").await?;
+        assert!(result.is_some());
+        if let Some(Value::Array(value)) = result {
+            assert_eq!(value.len(), 2);
+            assert_eq!(value[0], Value::I16(0));
+            assert_eq!(value[1], Value::I16(32_767));
+        }
         Ok(())
     }
 
     #[tokio::test]
     async fn test_data_type_i32() -> anyhow::Result<()> {
-        let result = test_data_type("SELECT CAST(2147483647 as integer)").await?;
+        let result = test_data_type("SELECT 2147483647::INT4").await?;
         let value = result.expect("value is None");
         assert_eq!(value, Value::I32(2_147_483_647));
+
+        let result = test_data_type("SELECT ARRAY[0,2147483647]::INT4[]").await?;
+        assert!(result.is_some());
+        if let Some(Value::Array(value)) = result {
+            assert_eq!(value.len(), 2);
+            assert_eq!(value[0], Value::I32(0));
+            assert_eq!(value[1], Value::I32(2_147_483_647));
+        }
         Ok(())
     }
 
     #[tokio::test]
     async fn test_data_type_i64() -> anyhow::Result<()> {
-        let result = test_data_type("SELECT CAST(2147483647 as bigint)").await?;
+        let result = test_data_type("SELECT 2147483647::INT8").await?;
         let value = result.expect("value is None");
         assert_eq!(value, Value::I64(2_147_483_647));
+
+        let result = test_data_type("SELECT ARRAY[0,2147483647]::INT8[]").await?;
+        assert!(result.is_some());
+        if let Some(Value::Array(value)) = result {
+            assert_eq!(value.len(), 2);
+            assert_eq!(value[0], Value::I64(0));
+            assert_eq!(value[1], Value::I64(2_147_483_647));
+        }
         Ok(())
     }
 
     #[tokio::test]
     async fn test_data_type_bool() -> anyhow::Result<()> {
-        let result = test_data_type("SELECT CAST(1 as bool)").await?;
+        let result = test_data_type("SELECT 1::BOOL").await?;
         let value = result.expect("value is None");
         assert_eq!(value, Value::Bool(true));
+
+        let result = test_data_type("SELECT ARRAY[0,1]::BOOL[]").await?;
+        assert!(result.is_some());
+        if let Some(Value::Array(value)) = result {
+            assert_eq!(value.len(), 2);
+            assert_eq!(value[0], Value::Bool(false));
+            assert_eq!(value[1], Value::Bool(true));
+        }
         Ok(())
     }
 
     #[tokio::test]
     async fn test_data_type_f32() -> anyhow::Result<()> {
-        let result = test_data_type("SELECT CAST(1.234 as real)").await?;
+        let result = test_data_type("SELECT 1.234::FLOAT4").await?;
         let value = result.expect("value is None");
         assert_eq!(value, Value::F32(1.234));
+
+        let result = test_data_type("SELECT ARRAY[0,1.234]::FLOAT4[]").await?;
+        assert!(result.is_some());
+        if let Some(Value::Array(value)) = result {
+            assert_eq!(value.len(), 2);
+            assert_eq!(value[0], Value::F32(0.0));
+            assert_eq!(value[1], Value::F32(1.234));
+        }
         Ok(())
     }
 
     #[tokio::test]
     async fn test_data_type_f64() -> anyhow::Result<()> {
-        let result = test_data_type("SELECT CAST(1.234 as double precision)").await?;
+        let result = test_data_type("SELECT 1.234::FLOAT8").await?;
         let value = result.expect("value is None");
         assert_eq!(value, Value::F64(1.234));
+
+        let result = test_data_type("SELECT ARRAY[0,1.234]::FLOAT8[]").await?;
+        assert!(result.is_some());
+        if let Some(Value::Array(value)) = result {
+            assert_eq!(value.len(), 2);
+            assert_eq!(value[0], Value::F64(0.0));
+            assert_eq!(value[1], Value::F64(1.234));
+        }
         Ok(())
     }
 

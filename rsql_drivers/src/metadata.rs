@@ -142,15 +142,17 @@ impl Table {
 pub struct Column {
     name: String,
     data_type: String,
-    is_nullable: bool,
+    not_null: bool,
+    default: Option<String>,
 }
 
 impl Column {
-    pub fn new<S: Into<String>>(name: S, data_type: S, is_nullable: bool) -> Self {
+    pub fn new<S: Into<String>>(name: S, data_type: S, not_null: bool, default: Option<S>) -> Self {
         Self {
             name: name.into(),
             data_type: data_type.into(),
-            is_nullable,
+            not_null,
+            default: default.map(|value| value.into()),
         }
     }
 
@@ -162,8 +164,12 @@ impl Column {
         &self.data_type
     }
 
-    pub fn is_nullable(&self) -> bool {
-        self.is_nullable
+    pub fn not_null(&self) -> bool {
+        self.not_null
+    }
+
+    pub fn default(&self) -> Option<&str> {
+        self.default.as_deref()
     }
 }
 
@@ -171,15 +177,15 @@ impl Column {
 pub struct Index {
     name: String,
     columns: Vec<String>,
-    is_unique: bool,
+    unique: bool,
 }
 
 impl Index {
-    pub fn new<S: Into<String>>(name: S, columns: Vec<String>, is_unique: bool) -> Self {
+    pub fn new<S: Into<String>>(name: S, columns: Vec<S>, unique: bool) -> Self {
         Self {
             name: name.into(),
-            columns,
-            is_unique,
+            columns: columns.into_iter().map(|column| column.into()).collect(),
+            unique,
         }
     }
 
@@ -187,12 +193,16 @@ impl Index {
         &self.name
     }
 
+    pub fn add_column<S: Into<String>>(&mut self, column: S) {
+        self.columns.push(column.into());
+    }
+
     pub fn columns(&self) -> &[String] {
         &self.columns
     }
 
-    pub fn is_unique(&self) -> bool {
-        self.is_unique
+    pub fn unique(&self) -> bool {
+        self.unique
     }
 }
 
@@ -232,13 +242,13 @@ mod test {
         assert_eq!(table.columns().len(), 0);
         assert_eq!(table.indexes().len(), 0);
 
-        let column = Column::new("id", "INTEGER", false);
+        let column = Column::new("id", "INTEGER", false, None);
         table.add_column(column);
         assert_eq!(table.columns().len(), 1);
         assert!(table.get_column("id").is_some());
         assert!(table.get_column_mut("id").is_some());
 
-        let index = Index::new("users_id_idx", vec!["id".to_string()], true);
+        let index = Index::new("users_id_idx", vec!["id"], true);
         table.add_index(index);
         assert_eq!(table.indexes().len(), 1);
         assert!(table.get_index("users_id_idx").is_some());
@@ -247,17 +257,19 @@ mod test {
 
     #[test]
     fn test_column() {
-        let column = Column::new("id", "INTEGER", false);
+        let column = Column::new("id", "INTEGER", false, None);
         assert_eq!(column.name(), "id");
         assert_eq!(column.data_type(), "INTEGER");
-        assert_eq!(column.is_nullable(), false);
+        assert!(!column.not_null());
+        assert_eq!(column.default(), None);
     }
 
     #[test]
     fn test_index() {
-        let index = Index::new("users_id_idx", vec!["id".to_string()], true);
+        let mut index = Index::new("users_id_idx", vec!["id"], true);
+        index.add_column("email");
         assert_eq!(index.name(), "users_id_idx");
-        assert_eq!(index.columns(), &["id".to_string()]);
-        assert_eq!(index.is_unique(), true);
+        assert_eq!(index.columns(), &["id".to_string(), "email".to_string()]);
+        assert!(index.unique());
     }
 }

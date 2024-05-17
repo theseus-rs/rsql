@@ -17,7 +17,7 @@ use tokio_postgres::{Client, Column, NoTls, Row};
 use tracing::debug;
 use url::Url;
 
-const POSTGRESQL_EMBEDDED_VERSION: &str = "16.2.3";
+const POSTGRESQL_EMBEDDED_VERSION: &str = "16.3.0";
 
 #[derive(Debug)]
 pub struct Driver;
@@ -151,18 +151,13 @@ impl Connection {
         // https://www.postgresql.org/docs/current/datatype.html
         let column_type = column.type_();
         let value = match *column_type {
-            Type::BIT | Type::VARBIT => {
-                let bits_value: Option<BitVec> = row.try_get(column_index)?;
-                match bits_value {
-                    Some(value) => {
-                        let bit_string: String = value
-                            .iter()
-                            .map(|bit| if bit { '1' } else { '0' })
-                            .collect();
-                        Value::String(bit_string)
-                    }
-                    None => Value::Null,
-                }
+            Type::BIT | Type::VARBIT => self.get_single(row, column_index, |v: BitVec| {
+                Value::String(self.bit_string(v))
+            })?,
+            Type::BIT_ARRAY | Type::VARBIT_ARRAY => {
+                self.get_array(row, column_index, |v: BitVec| {
+                    Value::String(self.bit_string(v))
+                })?
             }
             Type::BOOL => self.get_single(row, column_index, |v: bool| Value::Bool(v))?,
             Type::BOOL_ARRAY => self.get_array(row, column_index, |v: bool| Value::Bool(v))?,
@@ -226,9 +221,9 @@ impl Connection {
         Ok(value)
     }
 
-    fn get_single<'a, T: FromSql<'a>>(
+    fn get_single<'r, T: FromSql<'r>>(
         &self,
-        row: &'a Row,
+        row: &'r Row,
         column_index: usize,
         to_value: impl Fn(T) -> Value,
     ) -> Result<Value> {
@@ -238,9 +233,9 @@ impl Connection {
         }
     }
 
-    fn get_array<'a, T: FromSql<'a>>(
+    fn get_array<'r, T: FromSql<'r>>(
         &self,
-        row: &'a Row,
+        row: &'r Row,
         column_index: usize,
         to_value: impl Fn(T) -> Value,
     ) -> Result<Value> {
@@ -256,6 +251,14 @@ impl Connection {
             None => Value::Null,
         };
         Ok(result)
+    }
+
+    fn bit_string(&self, value: BitVec) -> String {
+        let bit_string: String = value
+            .iter()
+            .map(|bit| if bit { '1' } else { '0' })
+            .collect();
+        bit_string
     }
 }
 
@@ -373,9 +376,29 @@ mod test {
         let value = result.expect("value is None");
         assert_eq!(value, Value::String("101".to_string()));
 
+        let result =
+            test_data_type("SELECT ARRAY[CAST(B'10' as bit(2)), CAST(B'101' as bit(3))]").await?;
+        assert!(result.is_some());
+        if let Some(Value::Array(value)) = result {
+            assert_eq!(value.len(), 2);
+            assert_eq!(value[0], Value::String("10".to_string()));
+            assert_eq!(value[1], Value::String("101".to_string()));
+        }
+
         let result = test_data_type("SELECT CAST(B'10101' as bit varying(5))").await?;
         let value = result.expect("value is None");
         assert_eq!(value, Value::String("10101".to_string()));
+
+        let result = test_data_type(
+            "SELECT ARRAY[CAST(B'10' as bit varying(5)), CAST(B'101' as bit varying(5))]",
+        )
+        .await?;
+        assert!(result.is_some());
+        if let Some(Value::Array(value)) = result {
+            assert_eq!(value.len(), 2);
+            assert_eq!(value[0], Value::String("10".to_string()));
+            assert_eq!(value[1], Value::String("101".to_string()));
+        }
 
         Ok(())
     }

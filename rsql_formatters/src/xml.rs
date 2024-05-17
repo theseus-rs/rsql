@@ -7,7 +7,6 @@ use crate::{Highlighter, Results};
 use async_trait::async_trait;
 use quick_xml::events::{BytesEnd, BytesStart, BytesText, Event};
 use quick_xml::Writer;
-use rsql_drivers::Value;
 
 /// A formatter for XML
 #[derive(Debug, Default)]
@@ -51,16 +50,13 @@ pub(crate) async fn format_xml(
         for (c, data) in row.into_iter().enumerate() {
             let column = columns.get(c).expect("column not found");
 
-            match data {
-                Value::Null => {
-                    writer.write_event(Event::Empty(BytesStart::new(column)))?;
-                }
-                _ => {
-                    let string_value = data.to_string();
-                    writer.write_event(Event::Start(BytesStart::new(column)))?;
-                    writer.write_event(Event::Text(BytesText::new(string_value.as_str())))?;
-                    writer.write_event(Event::End(BytesEnd::new(column)))?;
-                }
+            if data.is_null() {
+                writer.write_event(Event::Empty(BytesStart::new(column)))?;
+            } else {
+                let string_value = data.to_string();
+                writer.write_event(Event::Start(BytesStart::new(column)))?;
+                writer.write_event(Event::Text(BytesText::new(string_value.as_str())))?;
+                writer.write_event(Event::End(BytesEnd::new(column)))?;
             }
         }
         writer.write_event(Event::End(BytesEnd::new("row")))?;

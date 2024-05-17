@@ -1,4 +1,4 @@
-use crate::{Connection, Database, Index, Metadata, Result, Table};
+use crate::{Column, Connection, Database, Index, Metadata, Result, Table, Value};
 use indoc::indoc;
 
 pub(crate) async fn get_metadata(connection: &mut dyn Connection) -> Result<Metadata> {
@@ -26,16 +26,65 @@ async fn retrieve_databases(
 
 async fn retrieve_tables(connection: &mut dyn Connection, database: &mut Database) -> Result<()> {
     let sql = indoc! { r#"
-            SELECT table_name
-              FROM information_schema.tables
-             WHERE table_schema = DATABASE()
-             ORDER BY table_name
+            SELECT
+                table_name,
+                column_name,
+                data_type,
+                character_maximum_length,
+                is_nullable,
+                column_default
+            FROM
+                information_schema.columns
+            WHERE
+                table_schema = DATABASE()
+            ORDER BY
+                table_name,
+                ordinal_position
         "#};
     let mut query_result = connection.query(sql).await?;
 
     while let Some(row) = query_result.next().await {
-        if let Some(data) = row.get(0) {
-            let table = Table::new(data.to_string());
+        let table_name = match row.get(0) {
+            Some(value) => value.to_string(),
+            None => continue,
+        };
+        let column_name = match row.get(1) {
+            Some(value) => value.to_string(),
+            None => continue,
+        };
+        let column_type = match row.get(2) {
+            Some(value) => {
+                let character_maximum_length = row.get(3).unwrap_or(&Value::Null);
+
+                if character_maximum_length.is_null() {
+                    value.to_string()
+                } else {
+                    format!("{}({})", value, character_maximum_length)
+                }
+            }
+            None => continue,
+        };
+        let not_null = match row.get(4) {
+            Some(value) => value.to_string() == "NO",
+            None => continue,
+        };
+        let default_value = match row.get(5) {
+            Some(value) => {
+                if value.is_null() {
+                    None
+                } else {
+                    Some(value.to_string())
+                }
+            }
+            None => continue,
+        };
+
+        let column = Column::new(column_name, column_type, not_null, default_value);
+        if let Some(table) = database.get_mut(&table_name) {
+            table.add_column(column);
+        } else {
+            let mut table = Table::new(table_name);
+            table.add_column(column);
             database.add(table);
         }
     }
@@ -45,24 +94,50 @@ async fn retrieve_tables(connection: &mut dyn Connection, database: &mut Databas
 
 async fn retrieve_indexes(connection: &mut dyn Connection, database: &mut Database) -> Result<()> {
     let sql = indoc! {r#"
-            SELECT DISTINCT table_name, index_name
-              FROM information_schema.statistics
-             WHERE table_schema = DATABASE()
-             ORDER BY table_name, index_name
+            SELECT DISTINCT
+                table_name,
+                index_name,
+                column_name,
+                non_unique,
+                seq_in_index
+            FROM
+                information_schema.statistics
+            WHERE
+                table_schema = DATABASE()
+            ORDER BY
+                table_name,
+                index_name,
+                seq_in_index
         "#};
     let mut query_result = connection.query(sql).await?;
 
     while let Some(row) = query_result.next().await {
         let table_name = match row.get(0) {
-            Some(name) => name.to_string(),
+            Some(value) => value.to_string(),
             None => continue,
         };
         let index_name = match row.get(1) {
-            Some(name) => name.to_string(),
+            Some(value) => value.to_string(),
             None => continue,
         };
-        if let Some(table) = database.get_mut(table_name) {
-            let index = Index::new(index_name, vec![], false);
+        let column_name = match row.get(2) {
+            Some(value) => value.to_string(),
+            None => continue,
+        };
+        let unique = match row.get(3) {
+            Some(value) => value.to_string() == "0",
+            _ => continue,
+        };
+
+        let table = match database.get_mut(table_name) {
+            Some(table) => table,
+            None => continue,
+        };
+
+        if let Some(index) = table.get_index_mut(&index_name) {
+            index.add_column(column_name);
+        } else {
+            let index = Index::new(index_name, vec![column_name.clone()], unique);
             table.add_index(index);
         }
     }
@@ -102,29 +177,46 @@ mod test {
 
         let metadata = connection.metadata().await?;
         let database = metadata.current_database().unwrap();
-        let tables = database
-            .tables()
-            .iter()
-            .map(|table| table.name())
-            .collect::<Vec<_>>();
-        assert!(tables.contains(&"contacts"));
-        assert!(tables.contains(&"users"));
 
         let contacts_table = database.get("contacts").unwrap();
-        let contacts_indexes = contacts_table
-            .indexes()
-            .iter()
-            .map(|index| index.name())
-            .collect::<Vec<_>>();
-        assert_eq!(contacts_indexes, vec!["PRIMARY"]);
+        assert_eq!(contacts_table.name(), "contacts");
+        assert_eq!(contacts_table.columns().len(), 2);
+        let id_column = contacts_table.get_column("id").unwrap();
+        assert_eq!(id_column.name(), "id");
+        assert_eq!(id_column.data_type(), "int");
+        assert!(id_column.not_null());
+        assert_eq!(id_column.default(), None);
+        let email_column = contacts_table.get_column("email").unwrap();
+        assert_eq!(email_column.name(), "email");
+        assert_eq!(email_column.data_type(), "varchar(20)");
+        assert!(!email_column.not_null());
+        assert_eq!(email_column.default(), None);
 
-        let user_table = database.get("users").unwrap();
-        let user_indexes = user_table
-            .indexes()
-            .iter()
-            .map(|index| index.name())
-            .collect::<Vec<_>>();
-        assert_eq!(user_indexes, vec!["PRIMARY"]);
+        assert_eq!(contacts_table.indexes().len(), 1);
+        let primary_key_index = contacts_table.get_index("PRIMARY").unwrap();
+        assert_eq!(primary_key_index.name(), "PRIMARY");
+        assert_eq!(primary_key_index.columns(), ["id"]);
+        assert!(primary_key_index.unique());
+
+        let users_table = database.get("users").unwrap();
+        assert_eq!(users_table.name(), "users");
+        assert_eq!(users_table.columns().len(), 2);
+        let id_column = users_table.get_column("id").unwrap();
+        assert_eq!(id_column.name(), "id");
+        assert_eq!(id_column.data_type(), "int");
+        assert!(id_column.not_null());
+        assert_eq!(id_column.default(), None);
+        let email_column = users_table.get_column("email").unwrap();
+        assert_eq!(email_column.name(), "email");
+        assert_eq!(email_column.data_type(), "varchar(20)");
+        assert!(!email_column.not_null());
+        assert_eq!(email_column.default(), None);
+
+        assert_eq!(users_table.indexes().len(), 1);
+        let primary_key_index = users_table.get_index("PRIMARY").unwrap();
+        assert_eq!(primary_key_index.name(), "PRIMARY");
+        assert_eq!(primary_key_index.columns(), ["id"]);
+        assert!(primary_key_index.unique());
 
         Ok(())
     }
