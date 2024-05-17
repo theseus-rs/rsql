@@ -19,6 +19,12 @@ pub enum Error {
     /// IO error
     #[error(transparent)]
     IoError(anyhow::Error),
+    /// Error when a command is missing required arguments
+    #[error("{command_name} is missing a required argument: {arguments}")]
+    MissingArguments {
+        command_name: String,
+        arguments: String,
+    },
 }
 
 /// Converts a [clearscreen::Error] into an [IoError](Error::IoError)
