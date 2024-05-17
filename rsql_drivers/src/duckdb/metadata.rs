@@ -109,10 +109,10 @@ async fn retrieve_indexes(connection: &mut dyn Connection, database: &mut Databa
         let columns = match row.get(2) {
             Some(value) => {
                 let sql = value.to_string();
-                let re = Regex::new(r"\((.*?)\)").unwrap();
+                let regex = Regex::new(r"\((.*?)\)")?;
                 let mut columns: Vec<String> = Vec::new();
 
-                for captures in re.captures_iter(sql.as_str()) {
+                for captures in regex.captures_iter(sql.as_str()) {
                     let column_string = &captures[1];
                     for column in column_string.split(", ") {
                         columns.push(column.to_string());
