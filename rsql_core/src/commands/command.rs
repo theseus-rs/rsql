@@ -87,6 +87,21 @@ impl CommandManager {
         None
     }
 
+    /// Gets a command by starts with prefix if it is unique
+    pub fn get_starts_with(&self, locale: &str, prefix: &str) -> Option<&dyn ShellCommand> {
+        let mut result: Option<&dyn ShellCommand> = None;
+        for command in &self.commands {
+            if command.name(locale).starts_with(prefix) {
+                if result.is_some() {
+                    return None;
+                }
+                result = Some(command.as_ref());
+            }
+        }
+
+        result
+    }
+
     /// Get an iterator over the available commands
     pub(crate) fn iter(&self) -> impl Iterator<Item = &dyn ShellCommand> {
         self.commands.iter().map(|command| command.as_ref())
@@ -177,6 +192,23 @@ mod tests {
             command_count += 1;
         });
         assert_eq!(command_count, 1);
+    }
+
+    #[test]
+    fn test_get_starts_with() {
+        let command_manager = CommandManager::default();
+        let locale = "en";
+        let header_command = command_manager.get(locale, "header");
+        let help_command = command_manager.get(locale, "help");
+
+        assert!(header_command.is_some());
+        assert!(help_command.is_some());
+
+        let result = command_manager.get_starts_with(locale, "he");
+        assert!(result.is_none());
+
+        let result = command_manager.get_starts_with(locale, "head");
+        assert!(result.is_some());
     }
 
     #[test]
