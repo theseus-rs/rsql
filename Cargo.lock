@@ -4592,6 +4592,7 @@ name = "rsql_cli"
 version = "0.12.0"
 dependencies = [
  "anyhow",
+ "chrono",
  "clap",
  "colored",
  "dotenvy",
@@ -4604,6 +4605,7 @@ dependencies = [
  "serde",
  "static_vcruntime",
  "supports-color",
+ "tempfile",
  "tokio",
  "tracing",
  "winres",
