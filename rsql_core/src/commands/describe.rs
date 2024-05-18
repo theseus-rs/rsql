@@ -241,7 +241,7 @@ mod tests {
         let contents = output.to_string().replace("\r\n", "\n");
         let expected = indoc! {r#"
             ┌────────┬─────────┬──────────┬─────────┐
-            │ Column │ Type    │ Not null │ Default │
+            │ Column │  Type   │ Not null │ Default │
             ╞════════╪═════════╪══════════╪═════════╡
             │ id     │ INTEGER │ No       │         │
             ├────────┼─────────┼──────────┼─────────┤
@@ -249,7 +249,7 @@ mod tests {
             └────────┴─────────┴──────────┴─────────┘
             Indexes
             ┌────────────────┬─────────┬────────┐
-            │ Index          │ Columns │ Unique │
+            │     Index      │ Columns │ Unique │
             ╞════════════════╪═════════╪════════╡
             │ users_id_idx   │ id      │ Yes    │
             ├────────────────┼─────────┼────────┤
