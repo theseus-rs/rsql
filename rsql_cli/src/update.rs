@@ -94,6 +94,7 @@ mod tests {
         let config_dir = TempDir::new()?.path().to_owned();
         let file_path = config_dir.join(UPDATE_CHECK_FILE);
 
+        create_dir_all(&config_dir)?;
         let mut file = File::create(&file_path)?;
         let now = (Utc::now() - Duration::hours(25)).to_rfc3339();
         let _ = file.write_all(now.as_bytes());
@@ -117,6 +118,7 @@ mod tests {
         let config_dir = TempDir::new()?.path().to_owned();
         let file_path = config_dir.join(UPDATE_CHECK_FILE);
 
+        create_dir_all(&config_dir)?;
         let mut file = File::create(&file_path)?;
         let now = Utc::now().to_rfc3339();
         let _ = file.write_all(now.as_bytes());
