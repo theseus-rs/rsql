@@ -43,13 +43,14 @@ pub async fn format(
 }
 
 async fn process_headers(query_result: &mut Box<dyn QueryResult>, table: &mut Table) {
-    let mut column_names = Vec::new();
+    let mut row_data = prettytable::Row::default();
 
     for column in &query_result.columns().await {
-        column_names.push(column.to_string());
+        let cell = Cell::new_align(&column.to_string(), Alignment::CENTER);
+        row_data.add_cell(cell);
     }
 
-    table.set_titles(prettytable::Row::from(column_names));
+    table.set_titles(row_data);
 }
 
 async fn process_data(
@@ -132,10 +133,15 @@ mod tests {
 
     fn query_result_number_and_string() -> Results {
         let query_result = MemoryQueryResult::new(
-            vec!["number".to_string(), "string".to_string()],
+            vec![
+                "number".to_string(),
+                "string".to_string(),
+                "text".to_string(),
+            ],
             vec![Row::new(vec![
                 Value::I64(42),
                 Value::String("foo".to_string()),
+                Value::String("Lorem ipsum dolor sit amet".to_string()),
             ])],
         );
         Query(Box::new(query_result))
@@ -303,11 +309,11 @@ mod tests {
 
         let output = test_format(&mut options, &mut results).await?;
         let expected = indoc! {r#"
-            +--------+--------+
-            | number | string |
-            +========+========+
-            |     42 | foo    |
-            +--------+--------+
+            +--------+--------+----------------------------+
+            | number | string |            text            |
+            +========+========+============================+
+            |     42 | foo    | Lorem ipsum dolor sit amet |
+            +--------+--------+----------------------------+
             1 row (9ns)
         "#};
         assert_eq!(output, expected);
