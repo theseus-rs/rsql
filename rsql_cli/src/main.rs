@@ -2,8 +2,10 @@
 #[macro_use]
 extern crate rust_i18n;
 
+mod update;
 mod version;
 
+use crate::update::check_for_newer_version;
 use anyhow::Result;
 use clap::{Parser, ValueEnum};
 use colored::Colorize;
@@ -12,11 +14,10 @@ use rsql_core::configuration::{Configuration, ConfigurationBuilder};
 use rsql_core::shell::{ShellArgs, ShellBuilder};
 use rsql_core::writers::{Output, StdoutWriter};
 use rust_i18n::t;
-use semver::Version;
 use serde::Serialize;
 use std::{env, io};
 use supports_color::Stream;
-use tracing::{debug, info};
+use tracing::info;
 use version::full_version;
 
 i18n!("locales", fallback = "en");
@@ -140,39 +141,6 @@ async fn welcome_message(
         check_for_newer_version(configuration, output).await?;
     }
     writeln!(output, "{}", banner_message)?;
-    Ok(())
-}
-
-async fn check_for_newer_version(
-    configuration: &Configuration,
-    output: &mut dyn io::Write,
-) -> Result<()> {
-    let current = Version::parse(&configuration.version)?;
-    let release = match octocrab::instance()
-        .repos("theseus-rs", "rsql")
-        .releases()
-        .get_latest()
-        .await
-    {
-        Ok(release) => release,
-        Err(error) => {
-            debug!("Failed to get latest release: {error:?}");
-            return Ok(());
-        }
-    };
-    let latest = Version::parse(release.tag_name.trim_start_matches('v'))?;
-
-    if latest > current {
-        let locale = configuration.locale.as_str();
-        let newer_version = t!(
-            "newer_version",
-            locale = locale,
-            version = latest.to_string()
-        );
-
-        writeln!(output, "{}", newer_version)?;
-    }
-
     Ok(())
 }
 
