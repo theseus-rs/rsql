@@ -1,48 +1,48 @@
+use anyhow::Result;
 use chrono::{DateTime, Duration, Utc};
 use rsql_core::configuration::Configuration;
 use semver::Version;
-use std::fs::File;
+use std::fs::{create_dir_all, File};
 use std::io::{Read, Write};
 use tracing::debug;
 
 const UPDATE_CHECK_FILE: &str = "last_update_check";
 
-pub fn should_run_update_check(configuration: &Configuration) -> bool {
-    let path = if let Some(path) = &configuration.config_dir {
+pub fn should_run_update_check(configuration: &Configuration) -> Result<bool> {
+    let config_dir = if let Some(path) = &configuration.config_dir {
         path
     } else {
-        return false;
+        return Ok(false);
     };
 
-    let file_path = path.join(UPDATE_CHECK_FILE);
+    let file_path = config_dir.join(UPDATE_CHECK_FILE);
 
     if let Ok(mut file) = File::open(&file_path) {
         let mut contents = String::new();
-        if file.read_to_string(&mut contents).is_ok() {
-            if let Ok(last_check_time) = DateTime::parse_from_rfc3339(&contents) {
-                let now = Utc::now();
-                let last_check_time_utc = last_check_time.with_timezone(&Utc);
-                if (now - last_check_time_utc) < Duration::hours(24) {
-                    return false;
-                }
+        if file.read_to_string(&mut contents)? > 0 {
+            let last_check_time = DateTime::parse_from_rfc3339(&contents)?;
+            let now = Utc::now();
+            let last_check_time_utc = last_check_time.with_timezone(&Utc);
+            if (now - last_check_time_utc) < Duration::hours(24) {
+                return Ok(false);
             }
         }
     }
 
     // Update the last check time
-    if let Ok(mut file) = File::create(&file_path) {
-        let now = Utc::now().to_rfc3339();
-        let _ = file.write_all(now.as_bytes());
-    }
+    create_dir_all(&config_dir)?;
+    let mut file = File::create(&file_path)?;
+    let now = Utc::now().to_rfc3339();
+    let _ = file.write_all(now.as_bytes());
 
-    true
+    Ok(true)
 }
 
 pub async fn check_for_newer_version(
     configuration: &Configuration,
     output: &mut dyn Write,
-) -> anyhow::Result<()> {
-    if !should_run_update_check(configuration) {
+) -> Result<()> {
+    if !should_run_update_check(configuration)? {
         return Ok(());
     }
 
@@ -78,8 +78,6 @@ pub async fn check_for_newer_version(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use anyhow::Result;
-    use std::fs::create_dir_all;
     use tempfile::TempDir;
 
     #[test]
@@ -87,7 +85,7 @@ mod tests {
         let config_dir = TempDir::new()?.path().to_owned();
         let mut configuration = Configuration::default();
         configuration.config_dir = Some(config_dir);
-        assert!(should_run_update_check(&configuration));
+        assert!(should_run_update_check(&configuration)?);
         Ok(())
     }
 
@@ -96,16 +94,13 @@ mod tests {
         let config_dir = TempDir::new()?.path().to_owned();
         let file_path = config_dir.join(UPDATE_CHECK_FILE);
 
-        create_dir_all(&config_dir)?;
-
-        if let Ok(mut file) = File::create(&file_path) {
-            let now = (Utc::now() - Duration::hours(25)).to_rfc3339();
-            let _ = file.write_all(now.as_bytes());
-        }
+        let mut file = File::create(&file_path)?;
+        let now = (Utc::now() - Duration::hours(25)).to_rfc3339();
+        let _ = file.write_all(now.as_bytes());
 
         let mut configuration = Configuration::default();
         configuration.config_dir = Some(config_dir);
-        assert!(should_run_update_check(&configuration));
+        assert!(should_run_update_check(&configuration)?);
         Ok(())
     }
 
@@ -113,7 +108,7 @@ mod tests {
     fn test_should_not_run_update_check_no_config_dir() -> Result<()> {
         let mut configuration = Configuration::default();
         configuration.config_dir = None;
-        assert!(!should_run_update_check(&configuration));
+        assert!(!should_run_update_check(&configuration)?);
         Ok(())
     }
 
@@ -122,16 +117,13 @@ mod tests {
         let config_dir = TempDir::new()?.path().to_owned();
         let file_path = config_dir.join(UPDATE_CHECK_FILE);
 
-        create_dir_all(&config_dir)?;
-
-        if let Ok(mut file) = File::create(&file_path) {
-            let now = Utc::now().to_rfc3339();
-            let _ = file.write_all(now.as_bytes());
-        }
+        let mut file = File::create(&file_path)?;
+        let now = Utc::now().to_rfc3339();
+        let _ = file.write_all(now.as_bytes());
 
         let mut configuration = Configuration::default();
         configuration.config_dir = Some(config_dir);
-        assert!(!should_run_update_check(&configuration));
+        assert!(!should_run_update_check(&configuration)?);
         Ok(())
     }
 }
