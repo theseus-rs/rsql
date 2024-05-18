@@ -104,4 +104,7 @@ jobs:
           BENCHER_PROJECT: theseus-rs-rsql
           BENCHER_ADAPTER: rust_criterion
         run: |
-          bencher run "cargo bench"
+          cargo build --release
+          bencher run \
+            --file-size ./target/release/rsql \
+            "cargo bench"

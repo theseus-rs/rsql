@@ -35,8 +35,10 @@ jobs:
           BENCHER_PROJECT: theseus-rs-rsql
           BENCHER_ADAPTER: rust_criterion
         run: |
+          cargo build --release
           bencher run \
             --branch $GITHUB_HEAD_REF \
+            --file-size ./target/release/rsql \
             --ci-number "${{ github.event.number }}" \
             --github-actions "${{ secrets.GITHUB_TOKEN }}" \
             --err \
