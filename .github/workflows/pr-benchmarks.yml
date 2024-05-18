@@ -38,7 +38,7 @@ jobs:
           cargo build --release
           bencher run \
             --branch $GITHUB_HEAD_REF \
-            --file-size ./target/release/rsql
+            --file-size ./target/release/rsql \
             --adapter json
           bencher run \
             --branch $GITHUB_HEAD_REF \
