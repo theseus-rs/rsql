@@ -81,7 +81,7 @@ mod tests {
         let unicode_output = output.to_string().replace("\r\n", "\n");
         let expected = indoc! {r#"
             ┌────────┐
-            │ id     │
+            │   id   │
             ╞════════╡
             │ 12,345 │
             └────────┘

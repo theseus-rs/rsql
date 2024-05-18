@@ -50,8 +50,8 @@ mod tests {
         let query_result = MemoryQueryResult::new(
             vec!["id".to_string(), "value".to_string()],
             vec![
-                Row::new(vec![Value::I64(123), Value::String("foo".to_string())]),
-                Row::new(vec![Value::I64(456), Value::String("bar".to_string())]),
+                Row::new(vec![Value::I64(1234), Value::String("foo".to_string())]),
+                Row::new(vec![Value::I64(5678), Value::String("bar".to_string())]),
             ],
         );
 
@@ -73,10 +73,10 @@ mod tests {
 
         let unicode_output = output.to_string().replace("\r\n", "\n");
         let expected = indoc! {r#"
-              id  | value 
-             -----+-------
-              123 | foo 
-              456 | bar 
+               id   | value 
+             -------+-------
+              1,234 | foo 
+              5,678 | bar 
              2 rows (9ns)
         "#};
         assert_eq!(unicode_output, expected);
