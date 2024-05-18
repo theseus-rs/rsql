@@ -23,7 +23,7 @@ pub fn should_run_update_check(configuration: &Configuration) -> Result<bool> {
             let last_check_time = DateTime::parse_from_rfc3339(&contents)?;
             let now = Utc::now();
             let last_check_time_utc = last_check_time.with_timezone(&Utc);
-            if (now - last_check_time_utc) < Duration::hours(24) {
+            if (now - last_check_time_utc) < Duration::weeks(1) {
                 return Ok(false);
             }
         }
@@ -96,7 +96,7 @@ mod tests {
 
         create_dir_all(&config_dir)?;
         let mut file = File::create(&file_path)?;
-        let now = (Utc::now() - Duration::hours(25)).to_rfc3339();
+        let now = (Utc::now() - Duration::weeks(2)).to_rfc3339();
         let _ = file.write_all(now.as_bytes());
 
         let mut configuration = Configuration::default();
