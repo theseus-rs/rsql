@@ -107,4 +107,7 @@ jobs:
           cargo build --release
           bencher run \
             --file-size ./target/release/rsql \
+            --adapter json
+          bencher run \
+            --file-size ./target/release/rsql \
             "cargo bench"
