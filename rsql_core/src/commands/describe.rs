@@ -141,6 +141,7 @@ mod tests {
     use rsql_drivers::{Column, Database, DriverManager, Index, Metadata, MockConnection, Table};
     use rsql_formatters::FormatterManager;
     use rustyline::history::DefaultHistory;
+    use std::default;
 
     #[test]
     fn test_name() {
@@ -208,6 +209,10 @@ mod tests {
 
     #[tokio::test]
     async fn test_execute() -> anyhow::Result<()> {
+        let configuration = &mut Configuration {
+            color: false,
+            ..default::Default::default()
+        };
         let mut metadata = Metadata::default();
         let mut database = Database::default();
         let table_name = "users";
@@ -225,7 +230,7 @@ mod tests {
             .returning(move || Ok(metadata.clone()));
         let mut output = Output::default();
         let options = CommandOptions {
-            configuration: &mut Configuration::default(),
+            configuration,
             command_manager: &CommandManager::default(),
             driver_manager: &DriverManager::default(),
             formatter_manager: &FormatterManager::default(),

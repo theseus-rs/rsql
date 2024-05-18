@@ -71,7 +71,7 @@ mod tests {
 
         let plain_output = output.to_string().replace("\r\n", "\n");
         let expected = indoc! {r#"
-            | id     |
+            |   id   |
             |--------|
             | 12,345 |
             1 row (5.678µs)

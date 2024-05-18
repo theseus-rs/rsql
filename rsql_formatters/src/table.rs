@@ -230,7 +230,7 @@ mod tests {
         let output = test_format(&mut options, &mut results).await?;
         let expected = indoc! {r#"
             +--------+
-            | id     |
+            |   id   |
             +========+
             | NULL   |
             +--------+
