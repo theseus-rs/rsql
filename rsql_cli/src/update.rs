@@ -80,11 +80,11 @@ mod tests {
     use super::*;
     use anyhow::Result;
     use std::fs::create_dir_all;
-    use tempdir::TempDir;
+    use tempfile::TempDir;
 
     #[test]
     fn test_should_run_update_check_first_run() -> Result<()> {
-        let config_dir = TempDir::new("rsql_test")?.path().to_owned();
+        let config_dir = TempDir::new()?.path().to_owned();
         let mut configuration = Configuration::default();
         configuration.config_dir = Some(config_dir);
         assert!(should_run_update_check(&configuration));
@@ -93,7 +93,7 @@ mod tests {
 
     #[test]
     fn test_should_run_update_check_more_than_check_duration() -> Result<()> {
-        let config_dir = TempDir::new("rsql_test")?.path().to_owned();
+        let config_dir = TempDir::new()?.path().to_owned();
         let file_path = config_dir.join(UPDATE_CHECK_FILE);
 
         create_dir_all(&config_dir)?;
@@ -119,7 +119,7 @@ mod tests {
 
     #[test]
     fn test_should_not_run_update_check_less_than_check_duration() -> Result<()> {
-        let config_dir = TempDir::new("rsql_test")?.path().to_owned();
+        let config_dir = TempDir::new()?.path().to_owned();
         let file_path = config_dir.join(UPDATE_CHECK_FILE);
 
         create_dir_all(&config_dir)?;
