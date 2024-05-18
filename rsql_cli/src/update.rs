@@ -30,7 +30,7 @@ pub fn should_run_update_check(configuration: &Configuration) -> Result<bool> {
     }
 
     // Update the last check time
-    create_dir_all(&config_dir)?;
+    create_dir_all(config_dir)?;
     let mut file = File::create(&file_path)?;
     let now = Utc::now().to_rfc3339();
     let _ = file.write_all(now.as_bytes());
