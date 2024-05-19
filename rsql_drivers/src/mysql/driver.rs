@@ -184,7 +184,7 @@ impl Connection {
 #[cfg(target_os = "linux")]
 #[cfg(test)]
 mod test {
-    use crate::{Connection, DriverManager, Value};
+    use crate::{Connection, DriverManager, Row, Value};
     use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
     use indoc::indoc;
     use serde_json::json;
@@ -219,24 +219,13 @@ mod test {
 
         let mut query_result = connection.query("SELECT id, name FROM person").await?;
         assert_eq!(query_result.columns().await, vec!["id", "name"]);
-        match query_result.next().await {
-            Some(row) => {
-                assert_eq!(row.len(), 2);
-
-                if let Some(Value::I16(id)) = row.get(0) {
-                    assert_eq!(*id, 1);
-                } else {
-                    assert!(false);
-                }
-
-                if let Some(Value::String(name)) = row.get(1) {
-                    assert_eq!(name, "foo");
-                } else {
-                    assert!(false);
-                }
-            }
-            None => assert!(false),
-        }
+        assert_eq!(
+            query_result.next().await,
+            Some(Row::new(vec![
+                Value::I16(1),
+                Value::String("foo".to_string())
+            ]))
+        );
         assert!(query_result.next().await.is_none());
         Ok(())
     }
@@ -290,54 +279,37 @@ mod test {
               FROM data_types
         "#};
         let mut query_result = connection.query(sql).await?;
-
-        if let Some(row) = query_result.next().await {
-            assert_eq!(row.get(0).cloned().unwrap(), Value::String("a".to_string()));
-            assert_eq!(
-                row.get(1).cloned().unwrap(),
-                Value::String("foo".to_string())
-            );
-            assert_eq!(
-                row.get(2).cloned().unwrap(),
-                Value::String("foo".to_string())
-            );
-            assert_eq!(
-                row.get(3).cloned().unwrap(),
-                Value::Bytes("foo".as_bytes().to_vec())
-            );
-            assert_eq!(
-                row.get(4).cloned().unwrap(),
-                Value::Bytes("foo".as_bytes().to_vec())
-            );
-            assert_eq!(
-                row.get(5).cloned().unwrap(),
-                Value::Bytes("foo".as_bytes().to_vec())
-            );
-            assert_eq!(row.get(6).cloned().unwrap(), Value::I16(127));
-            assert_eq!(row.get(7).cloned().unwrap(), Value::I16(32_767));
-            assert_eq!(row.get(8).cloned().unwrap(), Value::I32(8_388_607));
-            assert_eq!(row.get(9).cloned().unwrap(), Value::I32(2_147_483_647));
-            assert_eq!(
-                row.get(10).cloned().unwrap(),
-                Value::I64(9_223_372_036_854_775_807)
-            );
-            assert_eq!(
-                row.get(11).cloned().unwrap(),
-                Value::String("123.45".to_string())
-            );
-            assert_eq!(row.get(12).cloned().unwrap(), Value::F32(123.0));
-            assert_eq!(row.get(13).cloned().unwrap(), Value::F32(123.0));
-            let date = NaiveDate::from_ymd_opt(2022, 1, 1).expect("invalid date");
-            assert_eq!(row.get(14).cloned().unwrap(), Value::Date(date));
-            let time = NaiveTime::from_hms_opt(14, 30, 00).expect("invalid time");
-            assert_eq!(row.get(15).cloned().unwrap(), Value::Time(time));
-            let date_time =
-                NaiveDateTime::parse_from_str("2022-01-01 14:30:00", "%Y-%m-%d %H:%M:%S")?;
-            assert_eq!(row.get(16).cloned().unwrap(), Value::DateTime(date_time));
-            // assert_eq!(row.get(17).cloned().unwrap(), Value::Date(date));
-            let json = json!({"key": "value"});
-            assert_eq!(row.get(18).cloned().unwrap(), Value::Json(json));
-        }
+        assert_eq!(
+            query_result.next().await,
+            Some(Row::new(vec![
+                Value::String("a".to_string()),
+                Value::String("foo".to_string()),
+                Value::String("foo".to_string()),
+                Value::Bytes("foo".as_bytes().to_vec()),
+                Value::Bytes("foo".as_bytes().to_vec()),
+                Value::Bytes("foo".as_bytes().to_vec()),
+                Value::I16(127),
+                Value::I16(32_767),
+                Value::I32(8_388_607),
+                Value::I32(2_147_483_647),
+                Value::I64(9_223_372_036_854_775_807),
+                Value::String("123.45".to_string()),
+                Value::F32(123.0),
+                Value::F32(123.0),
+                Value::Date(NaiveDate::from_ymd_opt(2022, 1, 1).expect("invalid date")),
+                Value::Time(NaiveTime::from_hms_opt(14, 30, 00).expect("invalid time")),
+                Value::DateTime(NaiveDateTime::parse_from_str(
+                    "2022-01-01 14:30:00",
+                    "%Y-%m-%d %H:%M:%S"
+                )?),
+                Value::DateTime(NaiveDateTime::parse_from_str(
+                    "2022-01-01 14:30:00",
+                    "%Y-%m-%d %H:%M:%S"
+                )?),
+                Value::Json(json!({"key": "value"}))
+            ]))
+        );
+        assert!(query_result.next().await.is_none());
 
         Ok(())
     }
