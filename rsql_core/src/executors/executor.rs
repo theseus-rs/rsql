@@ -6,7 +6,7 @@ use crate::executors::Result;
 use regex::Regex;
 use rsql_drivers::{Connection, DriverManager};
 use rsql_formatters::writers::Output;
-use rsql_formatters::FormatterManager;
+use rsql_formatters::{FormatterManager, FormatterOptions, Highlighter};
 use rustyline::history::DefaultHistory;
 use std::fmt;
 use std::fmt::Debug;
@@ -72,7 +72,14 @@ impl<'a> Executor<'a> {
             return Ok(LoopCondition::Continue);
         }
 
+        let options = FormatterOptions {
+            color: self.configuration.color,
+            ..Default::default()
+        };
+        let helper = Highlighter::new(&options, "sql");
+
         if self.configuration.echo == EchoMode::On {
+            let input = helper.highlight(input)?;
             writeln!(&mut self.output, "{}", input)?;
         } else if self.configuration.echo == EchoMode::Prompt {
             let locale = self.configuration.locale.as_str();
@@ -81,6 +88,7 @@ impl<'a> Executor<'a> {
                 locale = locale,
                 program_name = self.configuration.program_name,
             );
+            let input = helper.highlight(input)?;
             writeln!(&mut self.output, "{}{}", prompt, input)?;
         }
 
