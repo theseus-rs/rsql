@@ -223,7 +223,7 @@ fn convert_to_value(row: &Row, column: &Column, index: usize) -> Result<Value> {
     }
 }
 
-#[cfg(target_os = "linux")]
+// #[cfg(target_os = "linux")]
 #[cfg(test)]
 mod test {
     use super::*;
@@ -347,8 +347,8 @@ mod test {
                 Value::F64(123.0),
                 Value::Bool(true),
                 Value::String("123.00".to_string()),
-                Value::Date(NaiveDate::from_ymd(2022, 1, 1)).expect("invalid date"),
-                Value::Time(NaiveTime::from_hms(14, 30, 00)).expect("invalid time"),
+                Value::Date(NaiveDate::from_ymd_opt(2022, 1, 1).expect("invalid date")),
+                Value::Time(NaiveTime::from_hms_opt(14, 30, 00).expect("invalid time")),
                 Value::DateTime(NaiveDateTime::parse_from_str(
                     "2022-01-01 14:30:00",
                     "%Y-%m-%d %H:%M:%S"
