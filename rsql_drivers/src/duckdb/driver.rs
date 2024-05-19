@@ -287,7 +287,10 @@ mod test {
         let mut query_result = connection.query(sql).await?;
 
         if let Some(row) = query_result.next().await {
-            assert_eq!(row.get(0).cloned().unwrap(), Value::String("a".to_string()));
+            assert_eq!(
+                row.first().cloned().unwrap(),
+                Value::String("a".to_string())
+            );
             assert_eq!(
                 row.get(1).cloned().unwrap(),
                 Value::Bytes("foo".as_bytes().to_vec())

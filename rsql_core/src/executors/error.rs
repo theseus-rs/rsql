@@ -48,7 +48,7 @@ mod tests {
         let result = indicatif::ProgressStyle::with_template("{:^3");
         let error = result.err().expect("Error");
         let template_error = Error::from(error);
-        assert!(template_error.to_string().contains(":"));
+        assert!(template_error.to_string().contains(':'));
     }
 
     #[test]

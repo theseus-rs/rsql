@@ -111,34 +111,34 @@ mod tests {
         };
 
         let result = Command.execute(options).await?;
-        let mut formats: Vec<&str> = Vec::new();
-
-        #[cfg(feature = "format-ascii")]
-        formats.push("ascii");
-        #[cfg(feature = "format-csv")]
-        formats.push("csv");
-        #[cfg(feature = "format-html")]
-        formats.push("html");
-        #[cfg(feature = "format-json")]
-        formats.push("json");
-        #[cfg(feature = "format-jsonl")]
-        formats.push("jsonl");
-        #[cfg(feature = "format-markdown")]
-        formats.push("markdown");
-        #[cfg(feature = "format-plain")]
-        formats.push("plain");
-        #[cfg(feature = "format-psql")]
-        formats.push("psql");
-        #[cfg(feature = "format-sqlite")]
-        formats.push("sqlite");
-        #[cfg(feature = "format-tsv")]
-        formats.push("tsv");
-        #[cfg(feature = "format-unicode")]
-        formats.push("unicode");
-        #[cfg(feature = "format-xml")]
-        formats.push("xml");
-        #[cfg(feature = "format-yaml")]
-        formats.push("yaml");
+        let formats: Vec<&str> = vec![
+            #[cfg(feature = "format-ascii")]
+            "ascii",
+            #[cfg(feature = "format-csv")]
+            "csv",
+            #[cfg(feature = "format-html")]
+            "html",
+            #[cfg(feature = "format-json")]
+            "json",
+            #[cfg(feature = "format-jsonl")]
+            "jsonl",
+            #[cfg(feature = "format-markdown")]
+            "markdown",
+            #[cfg(feature = "format-plain")]
+            "plain",
+            #[cfg(feature = "format-psql")]
+            "psql",
+            #[cfg(feature = "format-sqlite")]
+            "sqlite",
+            #[cfg(feature = "format-tsv")]
+            "tsv",
+            #[cfg(feature = "format-unicode")]
+            "unicode",
+            #[cfg(feature = "format-xml")]
+            "xml",
+            #[cfg(feature = "format-yaml")]
+            "yaml",
+        ];
 
         let available_formats = formats.join(", ");
         assert_eq!(result, LoopCondition::Continue);

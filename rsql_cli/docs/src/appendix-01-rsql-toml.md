@@ -39,6 +39,7 @@ command_identifier = "."
 #
 # Possible values:
 #   true - echo executed commands
+#   prompt - echo prompt and executed commands 
 #   false - don't echo executed commands
 echo = false
 

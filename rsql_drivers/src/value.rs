@@ -359,24 +359,24 @@ mod tests {
 
     #[test]
     fn test_f32() {
-        assert!(!Value::F32(12_345.67890).is_null());
-        assert!(Value::F32(12_345.67890).is_numeric());
-        assert!(Value::F32(12_345.67890)
+        assert!(!Value::F32(12_345.678).is_null());
+        assert!(Value::F32(12_345.678).is_numeric());
+        assert!(Value::F32(12_345.678)
             .to_formatted_string(&Locale::en)
             .starts_with("12345."));
-        assert!(Value::F32(12_345.67890).to_string().starts_with("12345."));
+        assert!(Value::F32(12_345.678).to_string().starts_with("12345."));
         assert_eq!(json!(Value::F32(12_345.0)), json!(12_345.0));
     }
 
     #[test]
     fn test_f64() {
-        assert!(!Value::F64(12_345.67890).is_null());
-        assert!(Value::F64(12_345.67890).is_numeric());
-        assert!(Value::F64(12_345.67890)
+        assert!(!Value::F64(12_345.678_90).is_null());
+        assert!(Value::F64(12_345.678_90).is_numeric());
+        assert!(Value::F64(12_345.678_90)
             .to_formatted_string(&Locale::en)
             .starts_with("12345."));
-        assert!(Value::F64(12_345.67890).to_string().starts_with("12345."));
-        assert_eq!(json!(Value::F64(12_345.67890)), json!(12_345.67890));
+        assert!(Value::F64(12_345.678_90).to_string().starts_with("12345."));
+        assert_eq!(json!(Value::F64(12_345.678_90)), json!(12_345.678_90));
     }
 
     #[test]

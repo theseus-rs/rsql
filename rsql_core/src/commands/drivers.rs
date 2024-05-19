@@ -78,34 +78,26 @@ mod tests {
 
         assert_eq!(result, LoopCondition::Continue);
         let drivers_output = output.to_string();
-        let mut drivers: Vec<&str> = Vec::new();
-
-        #[cfg(feature = "driver-duckdb")]
-        drivers.push("duckdb");
-
-        #[cfg(feature = "driver-libsql")]
-        drivers.push("libsql");
-
-        #[cfg(feature = "driver-mariadb")]
-        drivers.push("mariadb");
-
-        #[cfg(feature = "driver-mysql")]
-        drivers.push("mysql");
-
-        #[cfg(feature = "driver-postgresql")]
-        drivers.push("postgres");
-
-        #[cfg(feature = "driver-postgresql")]
-        drivers.push("postgresql");
-
-        #[cfg(feature = "driver-rusqlite")]
-        drivers.push("rusqlite");
-
-        #[cfg(feature = "driver-sqlite")]
-        drivers.push("sqlite");
-
-        #[cfg(feature = "driver-sqlserver")]
-        drivers.push("sqlserver");
+        let drivers: Vec<&str> = vec![
+            #[cfg(feature = "driver-duckdb")]
+            "duckdb",
+            #[cfg(feature = "driver-libsql")]
+            "libsql",
+            #[cfg(feature = "driver-mariadb")]
+            "mariadb",
+            #[cfg(feature = "driver-mysql")]
+            "mysql",
+            #[cfg(feature = "driver-postgresql")]
+            "postgres",
+            #[cfg(feature = "driver-postgresql")]
+            "postgresql",
+            #[cfg(feature = "driver-rusqlite")]
+            "rusqlite",
+            #[cfg(feature = "driver-sqlite")]
+            "sqlite",
+            #[cfg(feature = "driver-sqlserver")]
+            "sqlserver",
+        ];
 
         let available_drivers = drivers.join(", ");
 

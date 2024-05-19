@@ -190,7 +190,7 @@ mod tests {
         let command = format!("{command_identifier}bail on");
         let result = executor.execute(command.as_str()).await?;
         assert_eq!(result, LoopCondition::Continue);
-        assert_eq!(configuration.bail_on_error, true);
+        assert!(configuration.bail_on_error);
         Ok(())
     }
 

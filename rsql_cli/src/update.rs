@@ -83,8 +83,10 @@ mod tests {
     #[test]
     fn test_should_run_update_check_first_run() -> Result<()> {
         let config_dir = TempDir::new()?.path().to_owned();
-        let mut configuration = Configuration::default();
-        configuration.config_dir = Some(config_dir);
+        let configuration = Configuration {
+            config_dir: Some(config_dir),
+            ..Default::default()
+        };
         assert!(should_run_update_check(&configuration)?);
         Ok(())
     }
@@ -95,20 +97,24 @@ mod tests {
         let file_path = config_dir.join(UPDATE_CHECK_FILE);
 
         create_dir_all(&config_dir)?;
-        let mut file = File::create(&file_path)?;
+        let mut file = File::create(file_path)?;
         let now = (Utc::now() - Duration::weeks(2)).to_rfc3339();
         let _ = file.write_all(now.as_bytes());
 
-        let mut configuration = Configuration::default();
-        configuration.config_dir = Some(config_dir);
+        let configuration = Configuration {
+            config_dir: Some(config_dir),
+            ..Default::default()
+        };
         assert!(should_run_update_check(&configuration)?);
         Ok(())
     }
 
     #[test]
     fn test_should_not_run_update_check_no_config_dir() -> Result<()> {
-        let mut configuration = Configuration::default();
-        configuration.config_dir = None;
+        let configuration = Configuration {
+            config_dir: None,
+            ..Default::default()
+        };
         assert!(!should_run_update_check(&configuration)?);
         Ok(())
     }
@@ -119,12 +125,14 @@ mod tests {
         let file_path = config_dir.join(UPDATE_CHECK_FILE);
 
         create_dir_all(&config_dir)?;
-        let mut file = File::create(&file_path)?;
+        let mut file = File::create(file_path)?;
         let now = Utc::now().to_rfc3339();
         let _ = file.write_all(now.as_bytes());
 
-        let mut configuration = Configuration::default();
-        configuration.config_dir = Some(config_dir);
+        let configuration = Configuration {
+            config_dir: Some(config_dir),
+            ..Default::default()
+        };
         assert!(!should_run_update_check(&configuration)?);
         Ok(())
     }

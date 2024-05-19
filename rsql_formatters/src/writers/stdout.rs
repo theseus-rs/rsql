@@ -29,7 +29,7 @@ mod tests {
 
     #[test]
     fn test_writer() -> anyhow::Result<()> {
-        let mut writer = StdoutWriter::default();
+        let mut writer = StdoutWriter;
         writer.write_all(b"Hello, world!")?;
         writer.flush()?;
         assert_eq!(writer.to_string(), "stdout");
