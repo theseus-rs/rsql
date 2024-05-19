@@ -127,7 +127,7 @@ impl Debug for Connection {
 
 #[cfg(test)]
 mod test {
-    use crate::{DriverManager, Value};
+    use crate::{DriverManager, Row, Value};
 
     const DATABASE_URL: &str = "libsql://?memory=true";
 
@@ -165,25 +165,13 @@ mod test {
 
         let mut query_result = connection.query("SELECT id, name FROM person").await?;
         assert_eq!(query_result.columns().await, vec!["id", "name"]);
-
-        match query_result.next().await {
-            Some(row) => {
-                assert_eq!(row.len(), 2);
-
-                if let Some(Value::I64(id)) = row.get(0) {
-                    assert_eq!(*id, 1);
-                } else {
-                    assert!(false);
-                }
-
-                if let Some(Value::String(name)) = row.get(1) {
-                    assert_eq!(name, "foo");
-                } else {
-                    assert!(false);
-                }
-            }
-            None => assert!(false),
-        }
+        assert_eq!(
+            query_result.next().await,
+            Some(Row::new(vec![
+                Value::I64(1),
+                Value::String("foo".to_string())
+            ]))
+        );
         assert!(query_result.next().await.is_none());
 
         connection.close().await?;
@@ -210,42 +198,16 @@ mod test {
             query_result.columns().await,
             vec!["t", "nu", "i", "r", "no"]
         );
-        match query_result.next().await {
-            Some(row) => {
-                assert_eq!(row.len(), 5);
-
-                if let Some(Value::String(value)) = row.get(0) {
-                    assert_eq!(value, "foo");
-                } else {
-                    assert!(false);
-                }
-
-                if let Some(Value::I64(value)) = row.get(1) {
-                    assert_eq!(*value, 123);
-                } else {
-                    assert!(false);
-                }
-
-                if let Some(Value::I64(value)) = row.get(2) {
-                    assert_eq!(*value, 456);
-                } else {
-                    assert!(false);
-                }
-
-                if let Some(Value::F64(value)) = row.get(3) {
-                    assert_eq!(*value, 789.123);
-                } else {
-                    assert!(false);
-                }
-
-                if let Some(Value::Bytes(value)) = row.get(4) {
-                    assert_eq!(*value, vec![42]);
-                } else {
-                    assert!(false);
-                }
-            }
-            None => assert!(false),
-        }
+        assert_eq!(
+            query_result.next().await,
+            Some(Row::new(vec![
+                Value::String("foo".to_string()),
+                Value::I64(123),
+                Value::I64(456),
+                Value::F64(789.123),
+                Value::Bytes(vec![42])
+            ]))
+        );
         assert!(query_result.next().await.is_none());
 
         connection.close().await?;
@@ -273,37 +235,37 @@ mod test {
 
     #[tokio::test]
     async fn test_data_type_bytes() -> anyhow::Result<()> {
-        match test_data_type("SELECT x'2a'").await? {
-            Some(value) => assert_eq!(value, Value::Bytes(vec![42])),
-            _ => assert!(false),
-        }
+        assert_eq!(
+            test_data_type("SELECT x'2a'").await?,
+            Some(Value::Bytes(vec![42]))
+        );
         Ok(())
     }
 
     #[tokio::test]
     async fn test_data_type_i64() -> anyhow::Result<()> {
-        match test_data_type("SELECT 2147483647").await? {
-            Some(value) => assert_eq!(value, Value::I64(2_147_483_647)),
-            _ => assert!(false),
-        }
+        assert_eq!(
+            test_data_type("SELECT 2147483647").await?,
+            Some(Value::I64(2_147_483_647))
+        );
         Ok(())
     }
 
     #[tokio::test]
     async fn test_data_type_f64() -> anyhow::Result<()> {
-        match test_data_type("SELECT 12345.6789").await? {
-            Some(value) => assert_eq!(value, Value::F64(12_345.678_9)),
-            _ => assert!(false),
-        }
+        assert_eq!(
+            test_data_type("SELECT 12345.6789").await?,
+            Some(Value::F64(12_345.678_9))
+        );
         Ok(())
     }
 
     #[tokio::test]
     async fn test_data_type_string() -> anyhow::Result<()> {
-        match test_data_type("SELECT 'foo'").await? {
-            Some(value) => assert_eq!(value, Value::String("foo".to_string())),
-            _ => assert!(false),
-        }
+        assert_eq!(
+            test_data_type("SELECT 'foo'").await?,
+            Some(Value::String("foo".to_string()))
+        );
         Ok(())
     }
 }

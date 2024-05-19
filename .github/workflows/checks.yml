@@ -54,7 +54,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         run: |
-          cargo clippy --workspace --all-features
+          cargo clippy --all-targets --all-features --examples --tests
 
   deny:
     runs-on: ubuntu-22.04

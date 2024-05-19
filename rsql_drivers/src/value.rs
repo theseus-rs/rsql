@@ -396,7 +396,7 @@ mod tests {
 
     #[test]
     fn test_date() {
-        let date = NaiveDate::from_ymd_opt(2000, 12, 31).unwrap();
+        let date = NaiveDate::from_ymd_opt(2000, 12, 31).expect("Invalid date");
         assert!(!Value::Date(date).is_null());
         assert!(!Value::Date(date).is_numeric());
         assert_eq!(
@@ -409,7 +409,7 @@ mod tests {
 
     #[test]
     fn test_time() {
-        let time = NaiveTime::from_hms_milli_opt(12, 13, 14, 15).unwrap();
+        let time = NaiveTime::from_hms_milli_opt(12, 13, 14, 15).expect("Invalid time");
         assert!(!Value::Time(time).is_null());
         assert!(!Value::Time(time).is_numeric());
         assert_eq!(
@@ -422,8 +422,8 @@ mod tests {
 
     #[test]
     fn test_datetime() {
-        let date = NaiveDate::from_ymd_opt(2000, 12, 31).unwrap();
-        let time = NaiveTime::from_hms_milli_opt(12, 13, 14, 15).unwrap();
+        let date = NaiveDate::from_ymd_opt(2000, 12, 31).expect("Invalid date");
+        let time = NaiveTime::from_hms_milli_opt(12, 13, 14, 15).expect("Invalid time");
         let datetime = NaiveDateTime::new(date, time);
         assert!(!Value::DateTime(datetime).is_null());
         assert!(!Value::DateTime(datetime).is_numeric());
@@ -493,11 +493,11 @@ mod tests {
             Value::F32(9.1),
             Value::F64(10.42),
             Value::String("foo".to_string()),
-            Value::Date(NaiveDate::from_ymd_opt(2000, 12, 31).unwrap()),
-            Value::Time(NaiveTime::from_hms_milli_opt(12, 13, 14, 15).unwrap()),
+            Value::Date(NaiveDate::from_ymd_opt(2000, 12, 31).expect("Invalid date")),
+            Value::Time(NaiveTime::from_hms_milli_opt(12, 13, 14, 15).expect("Invalid time")),
             Value::DateTime(NaiveDateTime::new(
-                NaiveDate::from_ymd_opt(2000, 12, 31).unwrap(),
-                NaiveTime::from_hms_milli_opt(12, 13, 14, 15).unwrap(),
+                NaiveDate::from_ymd_opt(2000, 12, 31).expect("Invalid date"),
+                NaiveTime::from_hms_milli_opt(12, 13, 14, 15).expect("Invalid time"),
             )),
             Value::Uuid(Uuid::from_str("acf5b3e3-4099-4f34-81c7-5803cbc87a2d")?),
             Value::Json(json!({"foo": "bar", "baz": 123})),

@@ -577,13 +577,19 @@ mod test {
         assert_eq!(configuration.command_identifier, command_identifier);
         assert_eq!(configuration.echo, echo);
         assert_eq!(configuration.log_level, log_level);
-        assert_eq!(configuration.log_dir.unwrap().to_string_lossy(), log_dir);
+        assert_eq!(
+            configuration.log_dir.expect("log_dir").to_string_lossy(),
+            log_dir
+        );
         assert_eq!(configuration.log_rotation, log_rotation);
         assert_eq!(configuration.locale, locale);
         assert_eq!(configuration.edit_mode, edit_mode);
         assert_eq!(configuration.history, history);
         assert_eq!(
-            configuration.history_file.unwrap().to_string_lossy(),
+            configuration
+                .history_file
+                .expect("history_file")
+                .to_string_lossy(),
             history_file
         );
         assert_eq!(configuration.history_limit, history_limit);
