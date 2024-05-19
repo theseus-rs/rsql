@@ -65,7 +65,7 @@ mod tests {
 
     #[test]
     fn test_parse_int_error() {
-        let error = u64::from_str("foo").unwrap_err();
+        let error = u64::from_str("foo").expect_err("expected ParseIntError");
         let io_error = Error::from(error);
 
         assert_eq!(io_error.to_string(), "invalid digit found in string");

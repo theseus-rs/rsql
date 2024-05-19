@@ -265,24 +265,13 @@ mod test {
 
         let mut query_result = connection.query("SELECT id, name FROM person").await?;
         assert_eq!(query_result.columns().await, vec!["id", "name"]);
-        match query_result.next().await {
-            Some(row) => {
-                assert_eq!(row.len(), 2);
-
-                if let Some(Value::I32(id)) = row.get(0) {
-                    assert_eq!(*id, 1);
-                } else {
-                    assert!(false);
-                }
-
-                if let Some(Value::String(name)) = row.get(1) {
-                    assert_eq!(name, "foo");
-                } else {
-                    assert!(false);
-                }
-            }
-            None => assert!(false),
-        }
+        assert_eq!(
+            query_result.next().await,
+            Some(crate::Row::new(vec![
+                Value::I32(1),
+                Value::String("foo".to_string())
+            ]))
+        );
         assert!(query_result.next().await.is_none());
         Ok(())
     }
@@ -339,50 +328,34 @@ mod test {
               FROM data_types
         "#};
         let mut query_result = connection.query(sql).await?;
-
-        if let Some(row) = query_result.next().await {
-            assert_eq!(row.get(0).cloned().unwrap(), Value::String("a".to_string()));
-            assert_eq!(row.get(1).cloned().unwrap(), Value::String("a".to_string()));
-            assert_eq!(
-                row.get(2).cloned().unwrap(),
-                Value::String("foo".to_string())
-            );
-            assert_eq!(
-                row.get(3).cloned().unwrap(),
-                Value::String("foo".to_string())
-            );
-            assert_eq!(
-                row.get(4).cloned().unwrap(),
-                Value::String("foo".to_string())
-            );
-            assert_eq!(
-                row.get(5).cloned().unwrap(),
-                Value::String("foo".to_string())
-            );
-            assert_eq!(row.get(6).cloned().unwrap(), Value::Bytes(vec![42u8]));
-            assert_eq!(row.get(7).cloned().unwrap(), Value::Bytes(vec![42u8]));
-            assert_eq!(row.get(8).cloned().unwrap(), Value::U8(127));
-            assert_eq!(row.get(9).cloned().unwrap(), Value::I16(32_767));
-            assert_eq!(row.get(10).cloned().unwrap(), Value::I32(2_147_483_647));
-            assert_eq!(
-                row.get(11).cloned().unwrap(),
-                Value::I64(9_223_372_036_854_775_807)
-            );
-            assert_eq!(row.get(12).cloned().unwrap(), Value::F32(123.45));
-            assert_eq!(row.get(13).cloned().unwrap(), Value::F64(123.0));
-            assert_eq!(row.get(14).cloned().unwrap(), Value::Bool(true));
-            assert_eq!(
-                row.get(15).cloned().unwrap(),
-                Value::String("123.00".to_string())
-            );
-            let date = NaiveDate::from_ymd_opt(2022, 1, 1).expect("invalid date");
-            assert_eq!(row.get(16).cloned().unwrap(), Value::Date(date));
-            let time = NaiveTime::from_hms_opt(14, 30, 00).expect("invalid time");
-            assert_eq!(row.get(17).cloned().unwrap(), Value::Time(time));
-            let date_time =
-                NaiveDateTime::parse_from_str("2022-01-01 14:30:00", "%Y-%m-%d %H:%M:%S")?;
-            assert_eq!(row.get(18).cloned().unwrap(), Value::DateTime(date_time));
-        }
+        assert_eq!(
+            query_result.next().await,
+            Some(crate::Row::new(vec![
+                Value::String("a".to_string()),
+                Value::String("a".to_string()),
+                Value::String("foo".to_string()),
+                Value::String("foo".to_string()),
+                Value::String("foo".to_string()),
+                Value::String("foo".to_string()),
+                Value::Bytes(vec![42u8]),
+                Value::Bytes(vec![42u8]),
+                Value::U8(127),
+                Value::I16(32_767),
+                Value::I32(2_147_483_647),
+                Value::I64(9_223_372_036_854_775_807),
+                Value::F32(123.45),
+                Value::F64(123.0),
+                Value::Bool(true),
+                Value::String("123.00".to_string()),
+                Value::Date(NaiveDate::from_ymd_opt(2022, 1, 1).expect("invalid date")),
+                Value::Time(NaiveTime::from_hms_opt(14, 30, 00).expect("invalid time")),
+                Value::DateTime(NaiveDateTime::parse_from_str(
+                    "2022-01-01 14:30:00",
+                    "%Y-%m-%d %H:%M:%S"
+                )?)
+            ]))
+        );
+        assert!(query_result.next().await.is_none());
 
         Ok(())
     }

@@ -1,7 +1,7 @@
 use crate::Value;
 
 /// Result row from a query
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct Row {
     values: Vec<Value>,
 }

@@ -184,53 +184,55 @@ mod test {
             .await?;
 
         let metadata = connection.metadata().await?;
-        let database = metadata.current_database().unwrap();
+        let database = metadata.current_database().expect("database");
         assert_eq!(database.tables().len(), 2);
 
-        let contacts_table = database.get("contacts").unwrap();
+        let contacts_table = database.get("contacts").expect("contacts table");
         assert_eq!(contacts_table.name(), "contacts");
         assert_eq!(contacts_table.columns().len(), 2);
-        let id_column = contacts_table.get_column("id").unwrap();
+        let id_column = contacts_table.get_column("id").expect("id column");
         assert_eq!(id_column.name(), "id");
         assert_eq!(id_column.data_type(), "int4");
         assert!(id_column.not_null());
         assert_eq!(id_column.default(), None);
-        let email_column = contacts_table.get_column("email").unwrap();
+        let email_column = contacts_table.get_column("email").expect("email column");
         assert_eq!(email_column.name(), "email");
         assert_eq!(email_column.data_type(), "varchar(20)");
         assert!(!email_column.not_null());
         assert_eq!(email_column.default(), None);
 
         assert_eq!(contacts_table.indexes().len(), 2);
-        let primary_key_index = contacts_table.get_index("contacts_pkey").unwrap();
+        let primary_key_index = contacts_table.get_index("contacts_pkey").expect("index");
         assert_eq!(primary_key_index.name(), "contacts_pkey");
         assert_eq!(primary_key_index.columns(), ["id"]);
         assert!(primary_key_index.unique());
-        let email_index = contacts_table.get_index("contacts_email_key").unwrap();
+        let email_index = contacts_table
+            .get_index("contacts_email_key")
+            .expect("index");
         assert_eq!(email_index.name(), "contacts_email_key");
         assert_eq!(email_index.columns(), ["email"]);
         assert!(email_index.unique());
 
-        let users_table = database.get("users").unwrap();
+        let users_table = database.get("users").expect("users table");
         assert_eq!(users_table.name(), "users");
         assert_eq!(users_table.columns().len(), 2);
-        let id_column = users_table.get_column("id").unwrap();
+        let id_column = users_table.get_column("id").expect("id column");
         assert_eq!(id_column.name(), "id");
         assert_eq!(id_column.data_type(), "int4");
         assert!(id_column.not_null());
         assert_eq!(id_column.default(), None);
-        let email_column = users_table.get_column("email").unwrap();
+        let email_column = users_table.get_column("email").expect("email column");
         assert_eq!(email_column.name(), "email");
         assert_eq!(email_column.data_type(), "varchar(20)");
         assert!(!email_column.not_null());
         assert_eq!(email_column.default(), None);
 
         assert_eq!(users_table.indexes().len(), 2);
-        let primary_key_index = users_table.get_index("users_pkey").unwrap();
+        let primary_key_index = users_table.get_index("users_pkey").expect("index");
         assert_eq!(primary_key_index.name(), "users_pkey");
         assert_eq!(primary_key_index.columns(), ["id"]);
         assert!(primary_key_index.unique());
-        let email_index = users_table.get_index("users_email_key").unwrap();
+        let email_index = users_table.get_index("users_email_key").expect("index");
         assert_eq!(email_index.name(), "users_email_key");
         assert_eq!(email_index.columns(), ["email"]);
         assert!(email_index.unique());

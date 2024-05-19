@@ -178,17 +178,17 @@ mod test {
             .await?;
 
         let metadata = connection.metadata().await?;
-        let database = metadata.current_database().unwrap();
+        let database = metadata.current_database().expect("database");
 
-        let contacts_table = database.get("contacts").unwrap();
+        let contacts_table = database.get("contacts").expect("contacts table");
         assert_eq!(contacts_table.name(), "contacts");
         assert_eq!(contacts_table.columns().len(), 2);
-        let id_column = contacts_table.get_column("id").unwrap();
+        let id_column = contacts_table.get_column("id").expect("id column");
         assert_eq!(id_column.name(), "id");
         assert_eq!(id_column.data_type(), "int");
         assert!(id_column.not_null());
         assert_eq!(id_column.default(), None);
-        let email_column = contacts_table.get_column("email").unwrap();
+        let email_column = contacts_table.get_column("email").expect("email column");
         assert_eq!(email_column.name(), "email");
         assert_eq!(email_column.data_type(), "varchar(20)");
         assert!(!email_column.not_null());
@@ -201,15 +201,15 @@ mod test {
             .collect::<Vec<_>>();
         assert!(contacts_indexes[0].contains(&"PK__contacts__".to_string()));
 
-        let users_table = database.get("users").unwrap();
+        let users_table = database.get("users").expect("users table");
         assert_eq!(users_table.name(), "users");
         assert_eq!(users_table.columns().len(), 2);
-        let id_column = users_table.get_column("id").unwrap();
+        let id_column = users_table.get_column("id").expect("id column");
         assert_eq!(id_column.name(), "id");
         assert_eq!(id_column.data_type(), "int");
         assert!(id_column.not_null());
         assert_eq!(id_column.default(), None);
-        let email_column = users_table.get_column("email").unwrap();
+        let email_column = users_table.get_column("email").expect("email column");
         assert_eq!(email_column.name(), "email");
         assert_eq!(email_column.data_type(), "varchar(20)");
         assert!(!email_column.not_null());

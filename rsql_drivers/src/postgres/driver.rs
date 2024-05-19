@@ -266,7 +266,7 @@ impl Connection {
 #[cfg(not(target_os = "windows"))]
 #[cfg(test)]
 mod test {
-    use crate::{DriverManager, Value};
+    use crate::{DriverManager, Row, Value};
     use chrono::{NaiveDate, NaiveDateTime, NaiveTime, Utc};
     use serde_json::json;
     #[cfg(not(any(target_os = "linux", target_os = "macos")))]
@@ -298,24 +298,13 @@ mod test {
 
         let mut query_result = connection.query("SELECT id, name FROM person").await?;
         assert_eq!(query_result.columns().await, vec!["id", "name"]);
-        match query_result.next().await {
-            Some(row) => {
-                assert_eq!(row.len(), 2);
-
-                if let Some(Value::I32(id)) = row.get(0) {
-                    assert_eq!(*id, 1);
-                } else {
-                    assert!(false);
-                }
-
-                if let Some(Value::String(name)) = row.get(1) {
-                    assert_eq!(name, "foo");
-                } else {
-                    assert!(false);
-                }
-            }
-            None => assert!(false),
-        }
+        assert_eq!(
+            query_result.next().await,
+            Some(Row::new(vec![
+                Value::I32(1),
+                Value::String("foo".to_string())
+            ]))
+        );
         assert!(query_result.next().await.is_none());
 
         connection.close().await?;
@@ -529,8 +518,6 @@ mod test {
         let value = result.expect("value is None");
         if let Value::DateTime(value) = value {
             assert!(value > now);
-        } else {
-            assert!(false);
         }
 
         Ok(())
