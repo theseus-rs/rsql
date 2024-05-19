@@ -358,9 +358,11 @@ mod test {
             .with_configuration(configuration)
             .with_driver_manager(driver_manager)
             .build();
-        let mut args = ShellArgs::default();
-        args.url = format!("{driver_identifier}://");
-        args.commands = vec![".bail on".to_string()];
+        let args = ShellArgs {
+            url: format!("{driver_identifier}://"),
+            commands: vec![".bail on".to_string()],
+            ..Default::default()
+        };
 
         assert_eq!(0, shell.execute(&args).await?);
 

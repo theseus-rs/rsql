@@ -104,7 +104,7 @@ mod test {
         let mut result = MemoryQueryResult::new(columns, rows);
 
         let columns = result.columns().await;
-        let column = columns.get(0).expect("no column");
+        let column = columns.first().expect("no column");
         assert_eq!(column, &"a".to_string());
 
         let row = result.next().await.expect("no row");
@@ -126,7 +126,7 @@ mod test {
         let mut result = LimitQueryResult::new(Box::new(memory_result), 2);
 
         let columns = result.columns().await;
-        let column = columns.get(0).expect("no column");
+        let column = columns.first().expect("no column");
         assert_eq!(column, &"id".to_string());
 
         let mut data: Vec<String> = Vec::new();
@@ -146,7 +146,7 @@ mod test {
         let mut result = LimitQueryResult::new(Box::new(memory_result), 100);
 
         let columns = result.columns().await;
-        let column = columns.get(0).expect("no column");
+        let column = columns.first().expect("no column");
         assert_eq!(column, &"id".to_string());
 
         let mut data: Vec<String> = Vec::new();
