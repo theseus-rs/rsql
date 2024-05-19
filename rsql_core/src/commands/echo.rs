@@ -1,5 +1,6 @@
 use crate::commands::Error::InvalidOption;
 use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
+use crate::configuration::EchoMode;
 use async_trait::async_trait;
 use rust_i18n::t;
 
@@ -15,8 +16,16 @@ impl ShellCommand for Command {
 
     fn args(&self, locale: &str) -> String {
         let on = t!("on", locale = locale).to_string();
+        let prompt = t!("echo_prompt", locale = locale).to_string();
         let off = t!("off", locale = locale).to_string();
-        t!("on_off_argument", locale = locale, on = on, off = off).to_string()
+        t!(
+            "echo_argument",
+            locale = locale,
+            on = on,
+            prompt = prompt,
+            off = off
+        )
+        .to_string()
     }
 
     fn description(&self, locale: &str) -> String {
@@ -26,24 +35,31 @@ impl ShellCommand for Command {
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
         let locale = options.configuration.locale.as_str();
         let on = t!("on", locale = locale).to_string();
+        let prompt = t!("echo_prompt", locale = locale).to_string();
         let off = t!("off", locale = locale).to_string();
 
         if options.input.len() <= 1 {
-            let echo = if options.configuration.echo { on } else { off };
+            let echo = match options.configuration.echo {
+                EchoMode::On => on,
+                EchoMode::Prompt => prompt,
+                EchoMode::Off => off,
+            };
             let echo_setting = t!("echo_setting", locale = locale, echo = echo).to_string();
             writeln!(options.output, "{}", echo_setting)?;
             return Ok(LoopCondition::Continue);
         }
 
-        let argument = options.input[1].to_lowercase().to_string();
+        let argument = options.input[1].to_lowercase();
         let echo = if argument == on {
-            true
+            EchoMode::On
+        } else if argument == prompt {
+            EchoMode::Prompt
         } else if argument == off {
-            false
+            EchoMode::Off
         } else {
             return Err(InvalidOption {
                 command_name: self.name(locale).to_string(),
-                option: argument,
+                option: argument.to_string(),
             });
         };
 
@@ -74,7 +90,7 @@ mod tests {
     #[test]
     fn test_args() {
         let args = Command.args("en");
-        assert_eq!(args, "on|off");
+        assert_eq!(args, "on|prompt|off");
     }
 
     #[test]
@@ -83,10 +99,10 @@ mod tests {
         assert_eq!(description, "Enable or disable echoing commands");
     }
 
-    async fn test_execute_no_args(echo: bool) -> anyhow::Result<()> {
+    async fn test_execute_no_args(echo: EchoMode) -> anyhow::Result<()> {
         let mut output = Output::default();
         let configuration = &mut Configuration {
-            echo,
+            echo: echo.clone(),
             ..default::Default::default()
         };
         let options = CommandOptions {
@@ -105,28 +121,33 @@ mod tests {
         assert_eq!(result, LoopCondition::Continue);
         let echo_output = output.to_string();
 
-        if echo {
-            assert_eq!(echo_output, "Echo: on\n");
-        } else {
-            assert_eq!(echo_output, "Echo: off\n");
+        match echo {
+            EchoMode::On => assert_eq!(echo_output, "Echo: on\n"),
+            EchoMode::Prompt => assert_eq!(echo_output, "Echo: prompt\n"),
+            EchoMode::Off => assert_eq!(echo_output, "Echo: off\n"),
         }
         Ok(())
     }
 
     #[tokio::test]
     async fn test_execute_no_args_on() -> anyhow::Result<()> {
-        test_execute_no_args(true).await
+        test_execute_no_args(EchoMode::On).await
+    }
+
+    #[tokio::test]
+    async fn test_execute_no_args_prompt() -> anyhow::Result<()> {
+        test_execute_no_args(EchoMode::Prompt).await
     }
 
     #[tokio::test]
     async fn test_execute_no_args_off() -> anyhow::Result<()> {
-        test_execute_no_args(false).await
+        test_execute_no_args(EchoMode::Off).await
     }
 
     #[tokio::test]
     async fn test_execute_set_on() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
-            echo: false,
+            echo: EchoMode::Off,
             ..default::Default::default()
         };
         let options = CommandOptions {
@@ -143,14 +164,38 @@ mod tests {
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        assert!(configuration.echo);
+        assert_eq!(configuration.echo, EchoMode::On);
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_execute_set_prompt() -> anyhow::Result<()> {
+        let configuration = &mut Configuration {
+            echo: EchoMode::Off,
+            ..default::Default::default()
+        };
+        let options = CommandOptions {
+            configuration,
+            command_manager: &CommandManager::default(),
+            driver_manager: &DriverManager::default(),
+            formatter_manager: &FormatterManager::default(),
+            connection: &mut MockConnection::new(),
+            history: &DefaultHistory::new(),
+            input: vec![".echo".to_string(), "prompt".to_string()],
+            output: &mut Output::default(),
+        };
+
+        let result = Command.execute(options).await?;
+
+        assert_eq!(result, LoopCondition::Continue);
+        assert_eq!(configuration.echo, EchoMode::Prompt);
         Ok(())
     }
 
     #[tokio::test]
     async fn test_execute_set_off() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
-            echo: true,
+            echo: EchoMode::On,
             ..default::Default::default()
         };
         let options = CommandOptions {
@@ -167,7 +212,7 @@ mod tests {
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        assert!(!configuration.echo);
+        assert_eq!(configuration.echo, EchoMode::Off);
         Ok(())
     }
 

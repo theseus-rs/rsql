@@ -138,7 +138,7 @@ mod tests {
 
     #[test]
     fn test_results_is_query() {
-        let query_results = Box::new(MemoryQueryResult::default());
+        let query_results = Box::<MemoryQueryResult>::default();
         assert!(Results::Query(query_results).is_query());
     }
 

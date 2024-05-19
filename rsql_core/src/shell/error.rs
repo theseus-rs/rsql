@@ -64,7 +64,7 @@ mod tests {
             Ok(_) => panic!("expected error"),
             Err(error) => {
                 let template_error = Error::from(error);
-                assert!(template_error.to_string().contains(":"));
+                assert!(template_error.to_string().contains(':'));
             }
         }
     }

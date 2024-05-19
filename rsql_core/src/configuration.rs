@@ -93,7 +93,7 @@ impl ConfigurationBuilder {
 
     /// Set the echo value.
     #[allow(dead_code)]
-    pub fn with_echo(mut self, echo: bool) -> Self {
+    pub fn with_echo(mut self, echo: EchoMode) -> Self {
         self.configuration.echo = echo;
         self
     }
@@ -254,6 +254,27 @@ impl ConfigurationBuilder {
     }
 }
 
+/// The echo mode for the application.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub enum EchoMode {
+    On,
+    Prompt,
+    Off,
+}
+
+impl FromStr for EchoMode {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "true" => Ok(Self::On),
+            "prompt" => Ok(Self::Prompt),
+            "false" => Ok(Self::Off),
+            _ => Err(format!("Invalid echo mode: {s}")),
+        }
+    }
+}
+
 /// The configuration for the application.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Configuration {
@@ -263,7 +284,7 @@ pub struct Configuration {
     pub bail_on_error: bool,
     pub color: bool,
     pub command_identifier: String,
-    pub echo: bool,
+    pub echo: EchoMode,
     pub log_level: LevelFilter,
     pub log_dir: Option<PathBuf>,
     pub log_rotation: Rotation,
@@ -292,7 +313,7 @@ impl Default for Configuration {
             bail_on_error: false,
             color: true,
             command_identifier: ".".to_string(),
-            echo: false,
+            echo: EchoMode::Off,
             log_level: LevelFilter::OFF,
             log_dir: None,
             log_rotation: Rotation::DAILY,
@@ -390,8 +411,8 @@ impl ConfigFile {
         if let Ok(command_identifier) = config.get::<String>("global.command_identifier") {
             configuration.command_identifier = command_identifier;
         }
-        if let Ok(echo) = config.get::<bool>("global.echo") {
-            configuration.echo = echo;
+        if let Ok(echo) = config.get::<String>("global.echo") {
+            configuration.echo = EchoMode::from_str(echo.as_str()).unwrap_or(EchoMode::Off);
         }
 
         if let Ok(log_level) = config.get::<String>("log.level") {
@@ -506,7 +527,7 @@ mod test {
         let bail_on_error = true;
         let color = true;
         let command_identifier = "\\";
-        let echo = true;
+        let echo = EchoMode::On;
         let log_level = LevelFilter::OFF;
         let log_dir = ".rsql/logs";
         let log_rotation = Rotation::MINUTELY;
@@ -529,7 +550,7 @@ mod test {
             .with_bail_on_error(bail_on_error)
             .with_color(color)
             .with_command_identifier(command_identifier)
-            .with_echo(echo)
+            .with_echo(echo.clone())
             .with_log_level(log_level)
             .with_log_dir(log_dir)
             .with_log_rotation(log_rotation.clone())
@@ -583,26 +604,26 @@ mod test {
         assert!(configuration.program_name.is_empty());
         assert!(configuration.version.is_empty());
         assert_eq!(configuration.config_dir, None);
-        assert_eq!(configuration.bail_on_error, false);
-        assert_eq!(configuration.color, true);
+        assert!(!configuration.bail_on_error);
+        assert!(configuration.color);
         assert_eq!(configuration.command_identifier, ".");
         assert_eq!(configuration.log_level, LevelFilter::OFF);
         assert_eq!(configuration.log_dir, None);
         assert_eq!(configuration.log_rotation, Rotation::DAILY);
         assert_eq!(configuration.locale, "en".to_string());
         assert_eq!(configuration.edit_mode, EditMode::Emacs);
-        assert_eq!(configuration.history, false);
+        assert!(!configuration.history);
         assert_eq!(configuration.history_file, None);
         assert_eq!(configuration.history_limit, 1000);
-        assert_eq!(configuration.history_ignore_dups, true);
+        assert!(configuration.history_ignore_dups);
         assert_eq!(configuration.theme, "Solarized (dark)");
-        assert_eq!(configuration.results_changes, true);
-        assert_eq!(configuration.results_footer, true);
+        assert!(configuration.results_changes);
+        assert!(configuration.results_footer);
         assert_eq!(configuration.results_format, "unicode".to_string());
-        assert_eq!(configuration.results_header, true);
+        assert!(configuration.results_header);
         assert_eq!(configuration.results_limit, 100);
-        assert_eq!(configuration.results_rows, true);
-        assert_eq!(configuration.results_timer, true);
+        assert!(configuration.results_rows);
+        assert!(configuration.results_timer);
     }
 
     #[test]

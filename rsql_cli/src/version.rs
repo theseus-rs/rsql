@@ -21,9 +21,11 @@ mod tests {
 
     #[test]
     fn test_full_version() -> anyhow::Result<()> {
-        let mut configuration = Configuration::default();
-        configuration.program_name = TEST_PROGRAM_NAME.to_string();
-        configuration.version = TEST_VERSION.to_string();
+        let configuration = Configuration {
+            program_name: TEST_PROGRAM_NAME.to_string(),
+            version: TEST_VERSION.to_string(),
+            ..Default::default()
+        };
         let version_prefix = format!("{TEST_PROGRAM_NAME}/{TEST_VERSION}");
         let version = full_version(&configuration);
         assert!(version.starts_with(version_prefix.as_str()));

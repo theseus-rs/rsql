@@ -174,7 +174,7 @@ mod tests {
         let limit = 42;
         connection
             .expect_query()
-            .returning(|_| Ok(Box::new(MemoryQueryResult::default())));
+            .returning(|_| Ok(Box::<MemoryQueryResult>::default()));
         let connection = &mut connection as &mut dyn Connection;
         let output = &mut Output::default();
 

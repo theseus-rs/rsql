@@ -39,7 +39,7 @@ mod test {
 
     #[tokio::test]
     async fn test_format() -> anyhow::Result<()> {
-        let mut options = FormatterOptions {
+        let options = FormatterOptions {
             color: false,
             elapsed: Duration::from_nanos(9),
             ..Default::default()
@@ -56,7 +56,7 @@ mod test {
 
         let formatter = Formatter;
         formatter
-            .format(&mut options, &mut query_result, output)
+            .format(&options, &mut query_result, output)
             .await?;
 
         let output = output.to_string().replace("\r\n", "\n");

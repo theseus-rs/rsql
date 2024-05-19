@@ -47,14 +47,14 @@ mod tests {
     async fn test_format() -> anyhow::Result<()> {
         let mut results = query_result();
         let output = &mut Output::default();
-        let mut options = FormatterOptions {
+        let options = FormatterOptions {
             color: false,
             elapsed: Duration::from_nanos(5678),
             ..Default::default()
         };
         let formatter = Formatter;
 
-        formatter.format(&mut options, &mut results, output).await?;
+        formatter.format(&options, &mut results, output).await?;
 
         let ascii_output = output.to_string().replace("\r\n", "\n");
         let expected = indoc! {r#"

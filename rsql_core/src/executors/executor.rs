@@ -1,5 +1,5 @@
 use crate::commands::{CommandManager, LoopCondition};
-use crate::configuration::Configuration;
+use crate::configuration::{Configuration, EchoMode};
 use crate::executors::command::CommandExecutor;
 use crate::executors::sql::SqlExecutor;
 use crate::executors::Result;
@@ -72,8 +72,16 @@ impl<'a> Executor<'a> {
             return Ok(LoopCondition::Continue);
         }
 
-        if self.configuration.echo {
+        if self.configuration.echo == EchoMode::On {
             writeln!(&mut self.output, "{}", input)?;
+        } else if self.configuration.echo == EchoMode::Prompt {
+            let locale = self.configuration.locale.as_str();
+            let prompt = t!(
+                "prompt",
+                locale = locale,
+                program_name = self.configuration.program_name,
+            );
+            writeln!(&mut self.output, "{}{}", prompt, input)?;
         }
 
         let command_identifier = &self.configuration.command_identifier;
@@ -122,6 +130,7 @@ mod tests {
     use indoc::indoc;
     use mockall::predicate::eq;
     use rsql_drivers::MockConnection;
+    use std::ops::Deref;
 
     #[tokio::test]
     async fn test_debug() {
@@ -317,11 +326,11 @@ mod tests {
         Ok(())
     }
 
-    async fn test_execute_command(command_identifier: &str, echo: bool) -> anyhow::Result<()> {
+    async fn test_execute_command(command_identifier: &str, echo: EchoMode) -> anyhow::Result<()> {
         let mut configuration = Configuration {
             bail_on_error: false,
             command_identifier: command_identifier.to_string(),
-            echo,
+            echo: echo.clone(),
             ..Default::default()
         };
         let command_manager = CommandManager::default();
@@ -345,10 +354,19 @@ mod tests {
         let result = executor.execute_command(input.as_str()).await?;
         assert_eq!(result, LoopCondition::Continue);
         let execute_output = output.to_string();
-        if echo {
-            assert!(execute_output.contains(input.as_str()));
-        } else {
-            assert!(!execute_output.contains(input.as_str()));
+        match echo {
+            EchoMode::On => assert!(execute_output.contains(input.as_str())),
+            EchoMode::Prompt => {
+                let locale = configuration.locale.as_str();
+                let prompt = t!(
+                    "prompt",
+                    locale = locale,
+                    program_name = configuration.program_name,
+                );
+                assert!(execute_output.contains(prompt.deref()));
+                assert!(execute_output.contains(input.as_str()));
+            }
+            EchoMode::Off => assert!(!execute_output.contains(input.as_str())),
         }
         assert!(configuration.bail_on_error);
         Ok(())
@@ -356,17 +374,22 @@ mod tests {
 
     #[tokio::test]
     async fn test_execute_command_echo_on() -> anyhow::Result<()> {
-        test_execute_command("!", true).await
+        test_execute_command("!", EchoMode::On).await
+    }
+
+    #[tokio::test]
+    async fn test_execute_command_echo_prompt() -> anyhow::Result<()> {
+        test_execute_command("!", EchoMode::Prompt).await
     }
 
     #[tokio::test]
     async fn test_execute_command_echo_off() -> anyhow::Result<()> {
-        test_execute_command("\\", false).await
+        test_execute_command("\\", EchoMode::Off).await
     }
 
-    async fn test_execute_command_sql(echo: bool) -> anyhow::Result<()> {
+    async fn test_execute_command_sql(echo: EchoMode) -> anyhow::Result<()> {
         let mut configuration = Configuration {
-            echo,
+            echo: echo.clone(),
             ..Default::default()
         };
         let command_manager = CommandManager::default();
@@ -394,10 +417,19 @@ mod tests {
         let result = executor.execute_command(input).await?;
         assert_eq!(result, LoopCondition::Continue);
         let execute_output = output.to_string();
-        if echo {
-            assert!(execute_output.contains(input));
-        } else {
-            assert!(!execute_output.contains(input));
+        match echo {
+            EchoMode::On => assert!(execute_output.contains(input)),
+            EchoMode::Prompt => {
+                let locale = configuration.locale.as_str();
+                let prompt = t!(
+                    "prompt",
+                    locale = locale,
+                    program_name = configuration.program_name,
+                );
+                assert!(execute_output.contains(prompt.deref()));
+                assert!(execute_output.contains(input));
+            }
+            EchoMode::Off => assert!(!execute_output.contains(input)),
         }
         assert!(execute_output.contains("42"));
         Ok(())
@@ -405,11 +437,16 @@ mod tests {
 
     #[tokio::test]
     async fn test_execute_sql_echo_on() -> anyhow::Result<()> {
-        test_execute_command_sql(true).await
+        test_execute_command_sql(EchoMode::On).await
+    }
+
+    #[tokio::test]
+    async fn test_execute_sql_echo_prompt() -> anyhow::Result<()> {
+        test_execute_command_sql(EchoMode::Prompt).await
     }
 
     #[tokio::test]
     async fn test_execute_sql_echo_off() -> anyhow::Result<()> {
-        test_execute_command_sql(false).await
+        test_execute_command_sql(EchoMode::Off).await
     }
 }

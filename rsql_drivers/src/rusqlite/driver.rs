@@ -276,7 +276,7 @@ mod test {
     #[tokio::test]
     async fn test_data_type_f64() -> anyhow::Result<()> {
         match test_data_type("SELECT 12345.6789").await? {
-            Some(value) => assert_eq!(value, Value::F64(12_345.6789)),
+            Some(value) => assert_eq!(value, Value::F64(12_345.678_9)),
             _ => assert!(false),
         }
         Ok(())

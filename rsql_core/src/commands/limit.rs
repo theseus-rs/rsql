@@ -104,7 +104,7 @@ mod tests {
             ..default::Default::default()
         };
         let options = CommandOptions {
-            configuration: configuration,
+            configuration,
             command_manager: &CommandManager::default(),
             driver_manager: &DriverManager::default(),
             formatter_manager: &FormatterManager::default(),
