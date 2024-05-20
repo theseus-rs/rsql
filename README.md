@@ -30,11 +30,11 @@ irm https://github.com/theseus-rs/rsql/releases/latest/download/rsql_cli-install
 ```
 
 For more information, and additional installations instructions (cargo, homebrew, msi),
-visit the [RSQL](https://theseus-rs.github.io/rsql/rsql_cli/) site.
+visit the [rsql](https://theseus-rs.github.io/rsql/rsql_cli/) site.
 
 ## Quick Demo
 
-[![asciicast](https://asciinema.org/a/647597.svg)](https://asciinema.org/a/647597)
+![](./rsql_cli/resources/demo.gif)
 
 ## Usage
 

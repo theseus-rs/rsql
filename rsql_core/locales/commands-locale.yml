@@ -12,7 +12,7 @@ locale_command:
   da: "lokalitet"
   de: "lokalisierung"
   el: "τοπικοποίηση"
-  es: "configuración regional"
+  es: "lugar"
   et: "lokaat"
   fi: "alue"
   fr: "localisation"
@@ -46,7 +46,7 @@ locale_command:
   th: "ภูมิภาค"
   tr: "yerel"
   uk: "локалізація"
-  vi: "địa phương"
+  vi: "tiếng"
   yi: "לאָקאַלע"
   zh: "区域"
 

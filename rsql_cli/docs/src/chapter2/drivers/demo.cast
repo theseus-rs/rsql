@@ -1,0 +1,6 @@
+{"version": 2, "width": 120, "height": 30, "timestamp": 1716213618, "env": {"SHELL": "/bin/zsh", "TERM": "xterm-256color"}}
+[0.023105, "o", "\u001b]11;?\u001b\\"]
+[0.031956, "o", "⠁ connect                                                                                                               "]
+[0.031973, "o", "\r\u001b[2K"]
+[0.039782, "o", "rsql> \u001b[38;2;131;148;150m.drivers\u001b[0m\r\n"]
+[0.039958, "o", "Drivers: duckdb, mariadb, mysql, postgres, postgresql, rusqlite, sqlite, sqlserver\r\n"]
