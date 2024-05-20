@@ -14,7 +14,7 @@
 
 Install `rsql` from https://theseus-rs.github.io/rsql/rsql_cli/
 
-![](https://theseus-rs.github.io/rsql/rsql_cli/resource.demo.gif)
+![](https://github.com/theseus-rs/rsql/blob/main/rsql_cli/resources/demo.gif)
 
 ## Safety
 
