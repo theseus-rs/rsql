@@ -2,7 +2,7 @@
 
 root_dir="$(cd "$(dirname "$0")"; pwd)"
 echo "root_dir: $root_dir"
-#cargo build --release
+cargo build --release
 rsql="$root_dir/../target/release/rsql"
 clear
 
