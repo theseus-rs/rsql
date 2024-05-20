@@ -951,9 +951,9 @@ dependencies = [
 
 [[package]]
 name = "cc"
-version = "1.0.97"
+version = "1.0.98"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "099a5357d84c4c61eb35fc8eafa9a79a902c2f76911e5747ced4e032edd8d9b4"
+checksum = "41c270e7540d725e65ac7f1b212ac8ce349719624d7bcff99f8e2e488e8cf03f"
 dependencies = [
  "jobserver",
  "libc",
@@ -1315,9 +1315,9 @@ dependencies = [
 
 [[package]]
 name = "crossbeam-channel"
-version = "0.5.12"
+version = "0.5.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ab3db02a9c5b5121e1e42fbdb1aeb65f5e02624cc58c43f2884c6ccac0b82f95"
+checksum = "33480d6946193aa8033910124896ca395333cae7e2d1113d1fef6c3272217df2"
 dependencies = [
  "crossbeam-utils",
 ]
@@ -1352,9 +1352,9 @@ dependencies = [
 
 [[package]]
 name = "crossbeam-utils"
-version = "0.8.19"
+version = "0.8.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "248e3bacc7dc6baa3b21e405ee045c3047101a49145e7e9eca583ab4c2ca5345"
+checksum = "22ec99545bb0ed0ea7bb9b8e1e9122ea386ff8a48c0922e43f36d45ab09e0e80"
 
 [[package]]
 name = "crossterm"
@@ -3994,9 +3994,9 @@ dependencies = [
 
 [[package]]
 name = "postgresql_archive"
-version = "0.9.1"
+version = "0.9.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d2c24ed869f7a6325ed073fbd850ff9faaf21bba6e6e41cbb09d8dcc24799977"
+checksum = "7f72973029ea4c9fb4809542a6fe7244ec81c9d8d05fa3192371e5dced80f8c2"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -4025,9 +4025,9 @@ dependencies = [
 
 [[package]]
 name = "postgresql_commands"
-version = "0.9.1"
+version = "0.9.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a9baece325b56a3a7e3fd4c8b3345f2e89a5e64e7f3944b37594200533e6e537"
+checksum = "0beadfd6c745ddd7673230ff3d10b0ee895236b623a1818f45dc731a3afffb48"
 dependencies = [
  "anyhow",
  "thiserror",
@@ -4036,9 +4036,9 @@ dependencies = [
 
 [[package]]
 name = "postgresql_embedded"
-version = "0.9.1"
+version = "0.9.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "62afd1aea4acb10d413462a9d04f799a7b7cf3c6a95a08f8492de497d1ff488d"
+checksum = "e500a0bdcfb7a9cffb60c8a8463f41b8fd12f168fcfa64af7aa3e3aa4d6d90b1"
 dependencies = [
  "anyhow",
  "bytes",

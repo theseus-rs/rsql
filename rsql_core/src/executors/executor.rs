@@ -77,19 +77,24 @@ impl<'a> Executor<'a> {
             ..Default::default()
         };
         let helper = Highlighter::new(&options, "sql");
+        let locale = self.configuration.locale.as_str();
+        let echo = t!("echo_command", locale = locale);
+        let off = t!("off", locale = locale);
+        let echo_off = format!("{}{} {}", self.configuration.command_identifier, echo, off);
 
-        if self.configuration.echo == EchoMode::On {
-            let input = helper.highlight(input)?;
-            writeln!(&mut self.output, "{}", input)?;
-        } else if self.configuration.echo == EchoMode::Prompt {
-            let locale = self.configuration.locale.as_str();
-            let prompt = t!(
-                "prompt",
-                locale = locale,
-                program_name = self.configuration.program_name,
-            );
-            let input = helper.highlight(input)?;
-            writeln!(&mut self.output, "{}{}", prompt, input)?;
+        if input != echo_off {
+            if self.configuration.echo == EchoMode::On {
+                let input = helper.highlight(input)?;
+                writeln!(&mut self.output, "{}", input)?;
+            } else if self.configuration.echo == EchoMode::Prompt {
+                let prompt = t!(
+                    "prompt",
+                    locale = locale,
+                    program_name = self.configuration.program_name,
+                );
+                let input = helper.highlight(input)?;
+                writeln!(&mut self.output, "{}{}", prompt, input)?;
+            }
         }
 
         let command_identifier = &self.configuration.command_identifier;

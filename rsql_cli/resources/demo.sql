@@ -1,17 +1,27 @@
-CREATE TABLE contacts
+.echo prompt
+CREATE TABLE users
 (
-    contact_id INTEGER PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
     first_name TEXT NOT NULL,
     last_name  TEXT NOT NULL,
-    email      TEXT NOT NULL UNIQUE,
-    phone      TEXT NOT NULL UNIQUE
+    email      TEXT NOT NULL UNIQUE
 );
 
-INSERT INTO contacts (first_name, last_name, email, phone)
-VALUES ('Alice', 'Johnson', 'alice@example.com', '555-1234'),
-       ('Bob', 'Smith', 'bob@example.com', '555-5678'),
-       ('Charlie', 'Brown', 'charlie@example.com', '555-9876'),
-       ('David', 'Lee', 'david@example.com', '555-4321');
+.echo off
+.sleep 1
+.echo prompt
+INSERT INTO users (id, first_name, last_name, email)
+VALUES (1, 'Alice', 'Johnson', 'alice@example.com'),
+       (2, 'Bob', 'Smith', 'bob@example.com'),
+       (3, 'Charlie', 'Brown', 'charlie@example.com'),
+       (4, 'David', 'Lee', 'david@example.com');
 
-SELECT *
-FROM contacts;
+.echo off
+.sleep 1
+.echo prompt
+SELECT
+    id AS "Id",
+    first_name AS "First Name",
+    last_name AS "Last Name",
+    email AS "Email"
+FROM users;
