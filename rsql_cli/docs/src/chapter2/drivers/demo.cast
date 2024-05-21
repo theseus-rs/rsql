@@ -1,6 +1,6 @@
-{"version": 2, "width": 120, "height": 30, "timestamp": 1716230308, "env": {"SHELL": "/bin/zsh", "TERM": "xterm-256color"}}
-[0.022758, "o", "\u001b]11;?\u001b\\"]
-[0.031565, "o", "⠁ connect                                                                                                               "]
-[0.031693, "o", "\r\u001b[2K"]
-[0.039507, "o", "rsql> \u001b[38;2;131;148;150m.drivers\u001b[0m\r\n"]
-[0.039687, "o", "Drivers: duckdb, mariadb, mysql, postgres, postgresql, rusqlite, sqlite, sqlserver\r\n"]
+{"version": 2, "width": 120, "height": 30, "timestamp": 1716299477, "env": {"SHELL": "/bin/zsh", "TERM": "xterm-256color"}}
+[0.022185, "o", "\u001b]11;?\u001b\\"]
+[0.030276, "o", "⠁ connect                                                                                                               "]
+[0.030364, "o", "\r\u001b[2K"]
+[0.037932, "o", "rsql> \u001b[38;2;131;148;150m.drivers\u001b[0m\r\n"]
+[0.038111, "o", "Drivers: duckdb, mariadb, mysql, postgres, postgresql, rusqlite, sqlite, sqlserver\r\n"]
