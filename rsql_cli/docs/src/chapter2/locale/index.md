@@ -25,3 +25,7 @@ Set the locale to `en-GB`:
 ```text
 .locale en-GB
 ```
+
+### Demonstration
+
+![](./demo.gif)

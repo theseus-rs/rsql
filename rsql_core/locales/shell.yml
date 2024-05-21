@@ -109,7 +109,7 @@ error_format:
 
 invalid_command:
   en: "Invalid command '%{invalid_command}', for help type '%{help_command}'"
-  ar: "الأمر غير صالح '{invalid_command}%'، للحصول على المساعدة اكتب '{help_command}%'"
+  ar: "الأمر غير صالح '%{invalid_command}', للمساعدة اكتب '%{help_command}'"
   be: "Няправільная каманда '%{invalid_command}', для дапамогі пішыце '%{help_command}'"
   bg: "Невалидна команда '%{invalid_command}', за помощ въведете '%{help_command}'"
   bn: "অবৈধ কমান্ড '%{invalid_command}', সাহায্যের জন্য '%{help_command}' টাইপ করুন"

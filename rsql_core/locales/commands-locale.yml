@@ -32,7 +32,7 @@ locale_command:
   mk: "локал"
   ms: "tempatan"
   mt: "lokal"
-  nl: "locale"
+  nl: "plaats"
   no: "lokalisering"
   pl: "lokalizacja"
   pt: "local"

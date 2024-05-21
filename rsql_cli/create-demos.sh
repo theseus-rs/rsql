@@ -17,5 +17,5 @@ for file in $(find $root_dir -name "*.sql"); do
 
   cd "$script_directory"
   asciinema rec --overwrite --command="$rsql --file $sql_file" "$cast_file"
-  agg "$cast_file" "$gif_file"
+  agg --rows=30 --cols=100 --renderer=resvg "$cast_file" "$gif_file"
 done
