@@ -342,6 +342,7 @@ mod tests {
     async fn test_execute_command(command_identifier: &str, echo: EchoMode) -> anyhow::Result<()> {
         let mut configuration = Configuration {
             bail_on_error: false,
+            color: false,
             command_identifier: command_identifier.to_string(),
             echo: echo.clone(),
             ..Default::default()
@@ -402,6 +403,7 @@ mod tests {
 
     async fn test_execute_command_sql(echo: EchoMode) -> anyhow::Result<()> {
         let mut configuration = Configuration {
+            color: false,
             echo: echo.clone(),
             ..Default::default()
         };
