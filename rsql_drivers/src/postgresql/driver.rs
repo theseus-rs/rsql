@@ -633,8 +633,8 @@ mod test {
         let postgres_image = testcontainers::RunnableImage::from(
             testcontainers_modules::postgres::Postgres::default(),
         );
-        let container = postgres_image.start().await;
-        let port = container.get_host_port_ipv4(5432).await;
+        let container = postgres_image.start().await?;
+        let port = container.get_host_port_ipv4(5432).await?;
 
         let database_url = format!("postgresql://postgres:postgres@localhost:{}/postgres", port);
         let driver_manager = DriverManager::default();

@@ -21,7 +21,7 @@ impl crate::Driver for Driver {
     }
 }
 
-#[cfg(target_os = "linux")]
+// #[cfg(target_os = "linux")]
 #[cfg(test)]
 mod test {
     use crate::{Connection, DriverManager};
@@ -32,8 +32,8 @@ mod test {
         let mysql_image = testcontainers::RunnableImage::from(
             testcontainers_modules::mariadb::Mariadb::default(),
         );
-        let container = mysql_image.start().await;
-        let port = container.get_host_port_ipv4(3306).await;
+        let container = mysql_image.start().await?;
+        let port = container.get_host_port_ipv4(3306).await?;
 
         let database_url = &format!("mariadb://root@127.0.0.1:{port}/test");
         let driver_manager = DriverManager::default();

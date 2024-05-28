@@ -194,8 +194,8 @@ mod test {
     async fn test_container() -> anyhow::Result<()> {
         let mysql_image =
             testcontainers::RunnableImage::from(testcontainers_modules::mysql::Mysql::default());
-        let container = mysql_image.start().await;
-        let port = container.get_host_port_ipv4(3306).await;
+        let container = mysql_image.start().await?;
+        let port = container.get_host_port_ipv4(3306).await?;
 
         let database_url = &format!("mysql://root@127.0.0.1:{port}/mysql");
         let driver_manager = DriverManager::default();
