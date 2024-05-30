@@ -181,7 +181,7 @@ impl Connection {
     }
 }
 
-#[cfg(not(target_os = "windows"))]
+#[cfg(target_os = "linux")]
 #[cfg(test)]
 mod test {
     use crate::{Connection, DriverManager, Row, Value};

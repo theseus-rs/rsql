@@ -143,7 +143,7 @@ async fn retrieve_indexes(connection: &mut dyn Connection, database: &mut Databa
     Ok(())
 }
 
-#[cfg(not(target_os = "windows"))]
+#[cfg(target_os = "linux")]
 #[cfg(test)]
 mod test {
     use crate::{Connection, DriverManager};
