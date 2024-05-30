@@ -223,7 +223,7 @@ fn convert_to_value(row: &Row, column: &Column, index: usize) -> Result<Value> {
     }
 }
 
-#[cfg(target_os = "linux")]
+#[cfg(not(target_os = "windows"))]
 #[cfg(test)]
 mod test {
     use super::*;

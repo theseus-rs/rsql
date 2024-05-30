@@ -21,7 +21,7 @@ impl crate::Driver for Driver {
     }
 }
 
-// #[cfg(target_os = "linux")]
+#[cfg(not(target_os = "windows"))]
 #[cfg(test)]
 mod test {
     use crate::{Connection, DriverManager};
