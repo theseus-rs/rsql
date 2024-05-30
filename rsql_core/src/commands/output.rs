@@ -78,7 +78,7 @@ mod tests {
         let description = Command.description("en");
         assert_eq!(
             description,
-            "Output the contents to a [file] or the console"
+            "Output contents to the system clipboard, <file> or the console"
         );
     }
 
@@ -120,7 +120,8 @@ mod tests {
 
         let result = Command.execute(options).await?;
         assert_eq!(result, LoopCondition::Continue);
-        assert!(output.to_string().contains("Clipboard"));
+        let output_debug = format!("{:?}", output);
+        assert!(output_debug.contains("ClipboardWriter"));
         Ok(())
     }
 

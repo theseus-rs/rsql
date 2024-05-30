@@ -35,7 +35,11 @@ impl Default for ClipboardWriter {
 
 impl Debug for ClipboardWriter {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.as_utf8().expect("Invalid UTF-8"))
+        write!(
+            f,
+            "ClipboardWriter: {}",
+            self.as_utf8().expect("Invalid UTF-8")
+        )
     }
 }
 
