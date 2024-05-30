@@ -157,8 +157,8 @@ mod test {
     async fn test_container() -> anyhow::Result<()> {
         let sqlserver_image =
             RunnableImage::from(MssqlServer::default().with_sa_password(PASSWORD));
-        let container = sqlserver_image.start().await;
-        let port = container.get_host_port_ipv4(1433).await;
+        let container = sqlserver_image.start().await?;
+        let port = container.get_host_port_ipv4(1433).await?;
         let database_url =
             &format!("sqlserver://sa:{PASSWORD}@127.0.0.1:{port}?TrustServerCertificate=true");
         let driver_manager = DriverManager::default();
