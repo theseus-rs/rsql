@@ -4,6 +4,7 @@ use crate::Results::{Execute, Query};
 use crate::{FormatterOptions, Results};
 use colored::Colorize;
 use num_format::{Locale, ToFormattedString};
+use std::io::Write;
 use std::str::FromStr;
 
 /// Display the footer of the result set.
@@ -65,6 +66,7 @@ pub async fn write_footer(
         writeln!(output, "{}", footer)?
     }
 
+    output.flush()?;
     Ok(())
 }
 
