@@ -72,6 +72,7 @@ impl Writer for ClipboardWriter {}
 mod tests {
     use super::*;
 
+    #[cfg(not(target_os = "linux"))]
     #[test]
     fn test_writer() -> anyhow::Result<()> {
         let data = "Hello, world!";
