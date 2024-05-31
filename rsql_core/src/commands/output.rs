@@ -104,6 +104,7 @@ mod tests {
         Ok(())
     }
 
+    #[cfg(not(target_os = "linux"))]
     #[tokio::test]
     async fn test_execute_set_clipboard() -> anyhow::Result<()> {
         let mut output = Output::default();
@@ -119,19 +120,10 @@ mod tests {
             output: &mut output,
         };
 
-        let result = Command.execute(options).await;
-        match result {
-            Ok(result) => {
-                assert_eq!(result, LoopCondition::Continue);
-                let output_debug = format!("{:?}", output);
-                assert!(output_debug.contains("ClipboardWriter"));
-            }
-            Err(_error) => {
-                if env::var("CI")? != "true" {
-                    panic!("Expected LoopCondition::Continue")
-                }
-            }
-        }
+        let result = Command.execute(options).await?;
+        assert_eq!(result, LoopCondition::Continue);
+        let output_debug = format!("{:?}", output);
+        assert!(output_debug.contains("ClipboardWriter"));
         Ok(())
     }
 
