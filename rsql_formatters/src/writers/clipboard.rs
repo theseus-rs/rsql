@@ -68,11 +68,11 @@ impl Write for ClipboardWriter {
 
 impl Writer for ClipboardWriter {}
 
+#[cfg(not(target_os = "linux"))]
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    #[cfg(not(target_os = "linux"))]
     #[test]
     fn test_writer() -> anyhow::Result<()> {
         let data = "Hello, world!";
