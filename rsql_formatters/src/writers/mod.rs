@@ -1,3 +1,4 @@
+mod clipboard;
 mod fanout;
 mod file;
 mod memory;
@@ -5,6 +6,7 @@ mod stderr;
 mod stdout;
 mod writer;
 
+pub use clipboard::ClipboardWriter;
 pub use fanout::FanoutWriter;
 pub use file::FileWriter;
 pub use memory::MemoryWriter;

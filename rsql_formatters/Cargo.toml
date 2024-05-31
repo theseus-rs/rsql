@@ -14,6 +14,7 @@ version.workspace = true
 [dependencies]
 ansi_colours = { workspace = true }
 anyhow = { workspace = true }
+arboard = { workspace = true }
 async-trait = { workspace = true }
 colored = { workspace = true }
 csv = { workspace = true, optional = true }

@@ -1,6 +1,6 @@
 use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use async_trait::async_trait;
-use rsql_formatters::writers::{FileWriter, StdoutWriter};
+use rsql_formatters::writers::{ClipboardWriter, FileWriter, StdoutWriter};
 use rust_i18n::t;
 use std::fs::File;
 
@@ -15,7 +15,15 @@ impl ShellCommand for Command {
     }
 
     fn args(&self, locale: &str) -> String {
-        t!("output_argument", locale = locale).to_string()
+        let clipboard = t!("output_clipboard", locale = locale);
+        let file = t!("output_file", locale = locale);
+        t!(
+            "output_argument",
+            locale = locale,
+            clipboard = clipboard,
+            file = file
+        )
+        .to_string()
     }
 
     fn description(&self, locale: &str) -> String {
@@ -23,12 +31,16 @@ impl ShellCommand for Command {
     }
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
-        let file = options.input.get(1).unwrap_or(&"".to_string()).to_string();
+        let locale = options.configuration.locale.as_str();
+        let clipboard = t!("output_clipboard", locale = locale).to_string();
+        let option = options.input.get(1).unwrap_or(&"".to_string()).to_string();
 
-        if file.is_empty() {
+        if option.is_empty() {
             options.output.set(Box::new(StdoutWriter));
+        } else if option == clipboard {
+            options.output.set(Box::<ClipboardWriter>::default());
         } else {
-            let file = File::create(file)?;
+            let file = File::create(option)?;
             let writer = FileWriter::new(file);
             options.output.set(Box::new(writer));
         }
@@ -58,7 +70,7 @@ mod tests {
     #[test]
     fn test_args() {
         let args = Command.args("en");
-        assert_eq!(args, "[file]");
+        assert_eq!(args, "clipboard|<file>");
     }
 
     #[test]
@@ -66,7 +78,7 @@ mod tests {
         let description = Command.description("en");
         assert_eq!(
             description,
-            "Output the contents to a [file] or the console"
+            "Output contents to the system clipboard, <file> or the console"
         );
     }
 
@@ -88,6 +100,29 @@ mod tests {
         let result = Command.execute(options).await?;
         assert_eq!(result, LoopCondition::Continue);
         assert_eq!(output.to_string(), "stdout");
+        Ok(())
+    }
+
+    #[cfg(not(target_os = "linux"))]
+    #[tokio::test]
+    async fn test_execute_set_clipboard() -> anyhow::Result<()> {
+        let mut output = Output::default();
+        assert!(output.to_string().is_empty());
+        let options = CommandOptions {
+            configuration: &mut Configuration::default(),
+            command_manager: &CommandManager::default(),
+            driver_manager: &DriverManager::default(),
+            formatter_manager: &FormatterManager::default(),
+            connection: &mut MockConnection::new(),
+            history: &DefaultHistory::new(),
+            input: vec![".output".to_string(), "clipboard".to_string()],
+            output: &mut output,
+        };
+
+        let result = Command.execute(options).await?;
+        assert_eq!(result, LoopCondition::Continue);
+        let output_debug = format!("{:?}", output);
+        assert!(output_debug.contains("ClipboardWriter"));
         Ok(())
     }
 
