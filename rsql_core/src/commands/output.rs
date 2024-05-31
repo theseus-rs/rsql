@@ -59,7 +59,6 @@ mod tests {
     use rsql_drivers::{DriverManager, MockConnection};
     use rsql_formatters::FormatterManager;
     use rustyline::history::DefaultHistory;
-    use std::env;
     use tempfile::NamedTempFile;
 
     #[test]
