@@ -16,7 +16,7 @@ describe_command:
   et: "kirjeldama"
   fi: "kuvaus"
   fr: "décrire"
-  ga: "cur síos"
+  ga: "cur-síos"
   he: "לתאר"
   hi: "वर्णन"
   hr: "opisati"
@@ -46,7 +46,7 @@ describe_command:
   th: "ลักษณะ"
   tr: "tanımla"
   uk: "описати"
-  vi: "mô tả"
+  vi: "mô-tả"
   yi: "באַשרייַבן"
   zh: "描述"
 
