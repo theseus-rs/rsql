@@ -10,7 +10,7 @@ output_command:
   bn: "আউটপুট"
   cs: "výstup"
   da: "output"
-  de: "Ausgabe"
+  de: "ausgabe"
   el: "έξοδος"
   es: "salida"
   et: "väljund"
@@ -46,7 +46,7 @@ output_command:
   th: "เอาท์พุท"
   tr: "çıktı"
   uk: "вивід"
-  vi: "đầu ra"
+  vi: "đầu-ra"
   yi: "אויספוט"
   zh: "输出"
 
