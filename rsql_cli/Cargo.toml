@@ -32,7 +32,7 @@ colored = { workspace = true }
 dotenvy = { workspace = true }
 octocrab = { workspace = true }
 os_info = { workspace = true }
-rsql_core = { path = "../rsql_core", version = "0.13.1", features = ["all"] }
+rsql_core = { path = "../rsql_core", version = "0.13.2", features = ["all"] }
 rust-i18n = { workspace = true }
 semver = { workspace = true }
 serde = { workspace = true }
