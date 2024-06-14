@@ -4,7 +4,6 @@ use crate::formatter::FormatterOptions;
 use crate::writers::Output;
 use crate::Results;
 use crate::Results::Query;
-use colored::Colorize;
 use num_format::Locale;
 use prettytable::format::{Alignment, TableFormat};
 use prettytable::{Cell, Table};
@@ -65,7 +64,7 @@ async fn process_data(
 
         for data in row.into_iter() {
             let mut alignment = Alignment::LEFT;
-            let mut data = match data {
+            let data = match data {
                 Value::Null => "NULL".to_string(),
                 _ => {
                     if data.is_numeric() {
@@ -74,10 +73,6 @@ async fn process_data(
                     data.to_formatted_string(&locale)
                 }
             };
-
-            if options.color && rows % 2 == 0 {
-                data = data.dimmed().to_string();
-            }
 
             let cell = Cell::new_align(&data, alignment);
             row_data.add_cell(cell);
