@@ -85,9 +85,9 @@ mod tests {
     #[cfg(any(feature = "html", feature = "xml"))]
     #[test]
     fn test_quick_xml_error() {
-        let error = quick_xml::Error::UnexpectedToken("test".to_string());
+        let error = quick_xml::Error::UnknownPrefix("test".as_bytes().to_vec());
         let io_error = Error::from(error);
-        assert_eq!(io_error.to_string(), "Unexpected token 'test'");
+        assert_eq!(io_error.to_string(), "Unknown namespace prefix '\"test\"'");
     }
 
     #[cfg(any(feature = "json", feature = "jsonl"))]
