@@ -29,7 +29,7 @@ mod test {
 
     #[tokio::test]
     async fn test_container() -> anyhow::Result<()> {
-        let mysql_image = testcontainers::RunnableImage::from(
+        let mysql_image = testcontainers::ContainerRequest::from(
             testcontainers_modules::mariadb::Mariadb::default(),
         );
         let container = mysql_image.start().await?;

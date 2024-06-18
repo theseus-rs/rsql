@@ -630,7 +630,7 @@ mod test {
     #[cfg(not(any(target_os = "linux", target_os = "macos")))]
     #[tokio::test]
     async fn test_container() -> anyhow::Result<()> {
-        let postgres_image = testcontainers::RunnableImage::from(
+        let postgres_image = testcontainers::ContainerRequest::from(
             testcontainers_modules::postgres::Postgres::default(),
         );
         let container = postgres_image.start().await?;

@@ -154,7 +154,7 @@ mod test {
     #[tokio::test]
     async fn test_container() -> anyhow::Result<()> {
         let mysql_image =
-            testcontainers::RunnableImage::from(testcontainers_modules::mysql::Mysql::default());
+            testcontainers::ContainerRequest::from(testcontainers_modules::mysql::Mysql::default());
         let container = mysql_image.start().await?;
         let port = container.get_host_port_ipv4(3306).await?;
 

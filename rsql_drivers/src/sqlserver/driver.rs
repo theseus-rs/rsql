@@ -231,7 +231,7 @@ mod test {
     use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
     use indoc::indoc;
     use testcontainers::runners::AsyncRunner;
-    use testcontainers::RunnableImage;
+    use testcontainers::ContainerRequest;
     use testcontainers_modules::mssql_server::MssqlServer;
 
     const PASSWORD: &str = "Password42!";
@@ -239,7 +239,7 @@ mod test {
     #[tokio::test]
     async fn test_container() -> anyhow::Result<()> {
         let sqlserver_image =
-            RunnableImage::from(MssqlServer::default().with_sa_password(PASSWORD));
+            ContainerRequest::from(MssqlServer::default().with_sa_password(PASSWORD));
         let container = sqlserver_image.start().await?;
         let port = container.get_host_port_ipv4(1433).await?;
         let database_url =
