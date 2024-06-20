@@ -1,12 +1,11 @@
 use crate::error::Result;
 use crate::value::Value;
 use crate::Error::UnsupportedColumnType;
-use crate::{postgresql, MemoryQueryResult, Metadata, QueryResult};
+use crate::{postgresql, Error, MemoryQueryResult, Metadata, QueryResult};
 use async_trait::async_trait;
 use bit_vec::BitVec;
 use chrono::{DateTime, NaiveDate, NaiveDateTime, NaiveTime, Utc};
-use postgresql_archive::Version;
-use postgresql_embedded::{PostgreSQL, Settings, Status};
+use postgresql_embedded::{PostgreSQL, Settings, Status, Version};
 use std::collections::HashMap;
 use std::path::PathBuf;
 use std::str::FromStr;
@@ -58,7 +57,8 @@ impl Connection {
         let postgresql = if embedded {
             let default_version = POSTGRESQL_EMBEDDED_VERSION.to_string();
             let specified_version = query_parameters.get("version").unwrap_or(&default_version);
-            let version = Version::from_str(specified_version)?;
+            let version = Version::from_str(specified_version)
+                .map_err(|error| Error::IoError(error.into()))?;
             let mut settings = Settings::from_url(url)?;
 
             if let Some(config_dir) = query_parameters.get("installation_dir") {
