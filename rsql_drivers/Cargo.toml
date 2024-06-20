@@ -23,7 +23,6 @@ indoc = { workspace = true }
 libsql = { workspace = true, optional = true }
 mockall = { workspace = true }
 num-format = { workspace = true }
-postgresql_archive = { workspace = true, optional = true }
 postgresql_embedded = { workspace = true, optional = true }
 regex = { workspace = true }
 rusqlite = { workspace = true, features = ["bundled-full"], optional = true }
@@ -77,13 +76,11 @@ mysql = [
     "sqlx/mysql",
 ]
 postgres = [
-    "dep:postgresql_archive",
     "dep:postgresql_embedded",
     "dep:tokio-postgres",
 ]
 postgresql = [
     "dep:bit-vec",
-    "dep:postgresql_archive",
     "dep:postgresql_embedded",
     "dep:sqlx",
     "sqlx/postgres",
