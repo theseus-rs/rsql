@@ -55,12 +55,13 @@ impl Connection {
         let mut database_url = url.to_string().replace("postgres://", "postgresql://");
 
         let postgresql = if embedded {
-            let default_version = POSTGRESQL_EMBEDDED_VERSION.to_string();
-            let specified_version = query_parameters.get("version").unwrap_or(&default_version);
-            let version = Version::from_str(specified_version)
-                .map_err(|error| Error::IoError(error.into()))?;
             let mut settings = Settings::from_url(url)?;
 
+            if query_parameters.get("version").is_none() {
+                let version = Version::from_str(POSTGRESQL_EMBEDDED_VERSION)
+                    .map_err(|error| Error::IoError(error.into()))?;
+                settings.version = version;
+            }
             if let Some(config_dir) = query_parameters.get("installation_dir") {
                 settings.installation_dir = PathBuf::from(config_dir);
             }
@@ -68,9 +69,10 @@ impl Connection {
                 settings.password = password;
             }
 
-            debug!("Starting embedded PostgreSQL {version} server");
-            let mut postgresql = PostgreSQL::new(version, settings);
+            let mut postgresql = PostgreSQL::new(settings);
             postgresql.setup().await?;
+            let version = postgresql.settings().version;
+            debug!("Starting embedded PostgreSQL {version} server");
             postgresql.start().await?;
 
             let database_name = "embedded";
