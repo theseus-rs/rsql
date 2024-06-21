@@ -57,7 +57,7 @@ impl Connection {
         let postgresql = if embedded {
             let mut settings = Settings::from_url(url)?;
 
-            if query_parameters.get("version").is_none() {
+            if !query_parameters.contains_key("version") {
                 let version = Version::from_str(POSTGRESQL_EMBEDDED_VERSION)
                     .map_err(|error| Error::IoError(error.into()))?;
                 settings.version = version;
