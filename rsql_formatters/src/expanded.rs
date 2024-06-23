@@ -38,7 +38,7 @@ impl crate::Formatter for Formatter {
             rows = process_data(options, query_result, &mut data).await?;
             let table = ExtendedTable::from(data);
 
-            writeln!(output, "{}", table)?;
+            writeln!(output, "{table}")?;
         }
 
         write_footer(options, results, rows, output).await?;
@@ -107,7 +107,7 @@ mod tests {
         formatter.format(&options, &mut results, output).await?;
 
         let unicode_output = output.to_string().replace("\r\n", "\n");
-        let expected = indoc! {r#"
+        let expected = indoc! {r"
             -[ RECORD 0 ]-
             id    | 1,234
             value | foo
@@ -115,7 +115,7 @@ mod tests {
             id    | 5,678
             value | NULL
             2 rows (9ns)
-        "#};
+        "};
         assert_eq!(unicode_output, expected);
         Ok(())
     }

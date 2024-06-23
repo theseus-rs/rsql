@@ -5,6 +5,9 @@ pub enum Error {
     /// IO error
     #[error(transparent)]
     IoError(anyhow::Error),
+    /// Error when parsing an integer
+    #[error(transparent)]
+    TryFromIntError(#[from] std::num::TryFromIntError),
     /// Error an unknown format is specified
     #[error("unknown format [{format}]")]
     UnknownFormat { format: String },
@@ -17,7 +20,7 @@ pub enum Error {
     feature = "psql",
     feature = "unicode"
 ))]
-/// Converts a [csv::Error] into an [IoError](Error::IoError)
+/// Converts a [`csv::Error`] into an [`IoError`](Error::IoError)
 impl From<csv::Error> for Error {
     fn from(error: csv::Error) -> Self {
         Error::IoError(error.into())
@@ -25,7 +28,7 @@ impl From<csv::Error> for Error {
 }
 
 #[cfg(any(feature = "html", feature = "xml"))]
-/// Converts a [quick_xml::Error] into an [IoError](Error::IoError)
+/// Converts a [`quick_xml::Error`] into an [`IoError`](Error::IoError)
 impl From<quick_xml::Error> for Error {
     fn from(error: quick_xml::Error) -> Self {
         Error::IoError(error.into())
@@ -33,7 +36,7 @@ impl From<quick_xml::Error> for Error {
 }
 
 #[cfg(any(feature = "json", feature = "jsonl"))]
-/// Converts a [serde_json::Error] into an [IoError](Error::IoError)
+/// Converts a [`serde_json::Error`] into an [`IoError`](Error::IoError)
 impl From<serde_json::Error> for Error {
     fn from(error: serde_json::Error) -> Self {
         Error::IoError(error.into())
@@ -41,21 +44,21 @@ impl From<serde_json::Error> for Error {
 }
 
 #[cfg(feature = "yaml")]
-/// Converts a [serde_yaml::Error] into an [IoError](Error::IoError)
+/// Converts a [`serde_yaml::Error`] into an [`IoError`](Error::IoError)
 impl From<serde_yaml::Error> for Error {
     fn from(error: serde_yaml::Error) -> Self {
         Error::IoError(error.into())
     }
 }
 
-/// Converts a [std::io::Error] into an [IoError](Error::IoError)
+/// Converts a [`std::io::Error`] into an [`IoError`](Error::IoError)
 impl From<std::io::Error> for Error {
     fn from(error: std::io::Error) -> Self {
         Error::IoError(error.into())
     }
 }
 
-/// Convert [utf8 errors](std::string::FromUtf8Error) to [IoError](Error::IoError)
+/// Convert [`utf8 errors`](std::string::FromUtf8Error) to [`IoError`](Error::IoError)
 impl From<std::string::FromUtf8Error> for Error {
     fn from(error: std::string::FromUtf8Error) -> Self {
         Error::IoError(error.into())

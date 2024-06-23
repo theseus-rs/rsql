@@ -31,7 +31,7 @@ pub async fn write_footer(
     let num_locale = Locale::from_str(locale).unwrap_or(Locale::en);
     let rows = rows_affected.to_formatted_string(&num_locale);
     let rows_label = if !display_rows {
-        "".to_string()
+        String::new()
     } else if rows_affected == 1 {
         t!("row", locale = locale, rows = rows).to_string()
     } else {
@@ -41,7 +41,7 @@ pub async fn write_footer(
         let elapsed = format!("{:?}", options.elapsed);
         t!("elapsed_format", locale = locale, elapsed = elapsed).to_string()
     } else {
-        "".to_string()
+        String::new()
     };
 
     if options.color {
@@ -53,7 +53,7 @@ pub async fn write_footer(
         )
         .trim()
         .to_string();
-        writeln!(output, "{}", footer)?
+        writeln!(output, "{footer}")?;
     } else {
         let footer = t!(
             "footer_format",
@@ -63,7 +63,7 @@ pub async fn write_footer(
         )
         .trim()
         .to_string();
-        writeln!(output, "{}", footer)?
+        writeln!(output, "{footer}")?;
     }
 
     output.flush()?;

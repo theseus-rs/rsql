@@ -9,14 +9,21 @@ pub struct MemoryWriter {
 }
 
 impl MemoryWriter {
+    #[must_use]
     pub fn new(buffer: Vec<u8>) -> Self {
         Self { buffer }
     }
 
+    #[must_use]
     pub fn as_slice(&self) -> &[u8] {
         self.buffer.as_slice()
     }
 
+    /// Convert the buffer to a UTF-8 string
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the buffer is not valid UTF-8
     pub fn as_utf8(&self) -> std::result::Result<String, FromUtf8Error> {
         String::from_utf8(self.buffer.clone())
     }

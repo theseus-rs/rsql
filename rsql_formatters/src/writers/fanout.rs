@@ -8,6 +8,7 @@ pub struct FanoutWriter {
 }
 
 impl FanoutWriter {
+    #[must_use]
     pub fn new(writers: Vec<Box<dyn Writer + Send + Sync>>) -> Self {
         Self { writers }
     }
@@ -34,10 +35,10 @@ impl Display for FanoutWriter {
         let writers = self
             .writers
             .iter()
-            .map(|writer| writer.to_string())
+            .map(ToString::to_string)
             .collect::<Vec<_>>()
             .join(",");
-        write!(f, "{}", writers)
+        write!(f, "{writers}")
     }
 }
 
