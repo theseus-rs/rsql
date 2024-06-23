@@ -9,9 +9,7 @@ use tracing::debug;
 const UPDATE_CHECK_FILE: &str = "last_update_check";
 
 pub fn should_run_update_check(configuration: &Configuration) -> Result<bool> {
-    let config_dir = if let Some(path) = &configuration.config_dir {
-        path
-    } else {
+    let Some(config_dir) = &configuration.config_dir else {
         return Ok(false);
     };
 
@@ -69,7 +67,7 @@ pub async fn check_for_newer_version(
             version = latest.to_string()
         );
 
-        writeln!(output, "{}", newer_version)?;
+        writeln!(output, "{newer_version}")?;
     }
 
     Ok(())

@@ -86,7 +86,7 @@ mod tests {
             vec!["id".to_string(), "value".to_string()],
             vec![
                 Row::new(vec![Value::I64(1234), Value::String("foo".to_string())]),
-                Row::new(vec![Value::I64(5678), Value::String("bar".to_string())]),
+                Row::new(vec![Value::I64(5678), Value::Null]),
             ],
         );
 
@@ -113,7 +113,7 @@ mod tests {
             value | foo
             -[ RECORD 1 ]-
             id    | 5,678
-            value | bar
+            value | NULL
             2 rows (9ns)
         "#};
         assert_eq!(unicode_output, expected);

@@ -1,4 +1,5 @@
 #![forbid(unsafe_code)]
+#![deny(clippy::pedantic)]
 #[macro_use]
 extern crate rust_i18n;
 
@@ -18,7 +19,6 @@ use serde::Serialize;
 use std::{env, io};
 use supports_color::Stream;
 use tracing::info;
-use version::full_version;
 
 i18n!("locales", fallback = "en");
 
@@ -32,6 +32,7 @@ enum Color {
 }
 
 #[derive(Debug, Default, Parser)]
+#[allow(clippy::struct_field_names)]
 pub(crate) struct Args {
     /// The shell arguments
     #[clap(flatten)]
@@ -77,7 +78,7 @@ pub(crate) async fn execute(
     configuration: Configuration,
     mut output: Output,
 ) -> Result<i32> {
-    let version = full_version(&configuration);
+    let version = version::full(&configuration);
 
     info!("{version} initialized");
 
@@ -111,7 +112,7 @@ async fn welcome_message(
     let banner_version = t!(
         "banner_version",
         locale = locale,
-        version = full_version(configuration)
+        version = version::full(configuration)
     );
 
     let mut help_command = format!(
@@ -136,11 +137,11 @@ async fn welcome_message(
         quit_command = quit_command
     );
 
-    writeln!(output, "{}", banner_version)?;
+    writeln!(output, "{banner_version}")?;
     if !args.disable_update_check {
         check_for_newer_version(configuration, output).await?;
     }
-    writeln!(output, "{}", banner_message)?;
+    writeln!(output, "{banner_message}")?;
     Ok(())
 }
 
