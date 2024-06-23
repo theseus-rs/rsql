@@ -44,6 +44,16 @@ SELECT * FROM users;
 .echo off
 .sleep 1
 .echo prompt
+.format expanded
+
+.echo off
+.sleep 1
+.echo prompt
+SELECT * FROM users;
+
+.echo off
+.sleep 1
+.echo prompt
 .format html
 
 .echo off

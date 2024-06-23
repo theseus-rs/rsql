@@ -22,7 +22,6 @@ indexmap = { workspace = true, features = ["serde"] }
 indoc = { workspace = true }
 lazy_static = { workspace = true }
 num-format = { workspace = true }
-prettytable = { workspace = true, optional = true }
 quick-xml = { workspace = true, features = ["serialize"], optional = true }
 rsql_drivers = { path = "../rsql_drivers", version = "0.13.2" }
 rust-i18n = { workspace = true }
@@ -30,6 +29,7 @@ serde_json = { workspace = true, features = ["preserve_order"], optional = true 
 serde_yaml = { workspace = true, optional = true }
 supports-color = { workspace = true }
 syntect = { workspace = true }
+tabled = { workspace = true, features = ["ansi"], optional = true }
 tempfile = { workspace = true }
 thiserror = { workspace = true }
 
@@ -38,18 +38,34 @@ test-log = { workspace = true }
 tokio = { workspace = true }
 
 [features]
-all = ["ascii", "csv", "html", "json", "jsonl", "markdown", "plain", "psql", "sqlite", "tsv", "unicode", "xml", "yaml"]
+all = [
+    "ascii",
+    "csv",
+    "expanded",
+    "html",
+    "json",
+    "jsonl",
+    "markdown",
+    "plain",
+    "psql",
+    "sqlite",
+    "tsv",
+    "unicode",
+    "xml",
+    "yaml"
+]
 default = []
-ascii = ["dep:prettytable"]
+ascii = ["dep:tabled"]
 csv = ["dep:csv"]
+expanded = ["dep:tabled"]
 html = ["dep:quick-xml"]
 json = ["dep:serde_json"]
 jsonl = ["dep:serde_json"]
-markdown = ["dep:prettytable"]
-plain = ["dep:prettytable"]
-psql = ["dep:prettytable"]
+markdown = ["dep:tabled"]
+plain = ["dep:tabled"]
+psql = ["dep:tabled"]
 sqlite = ["dep:csv"]
 tsv = ["dep:csv"]
-unicode = ["dep:prettytable"]
+unicode = ["dep:tabled"]
 xml = ["dep:quick-xml"]
 yaml = ["dep:serde_yaml"]

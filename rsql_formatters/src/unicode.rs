@@ -3,29 +3,7 @@ use crate::formatter::FormatterOptions;
 use crate::writers::Output;
 use crate::{table, Results};
 use async_trait::async_trait;
-use lazy_static::lazy_static;
-use prettytable::format::{FormatBuilder, LinePosition, LineSeparator, TableFormat};
-
-lazy_static! {
-    pub static ref FORMAT_UNICODE: TableFormat = FormatBuilder::new()
-        .column_separator('│')
-        .borders('│')
-        .separators(&[LinePosition::Top], LineSeparator::new('─', '┬', '┌', '┐'))
-        .separators(
-            &[LinePosition::Title],
-            LineSeparator::new('═', '╪', '╞', '╡')
-        )
-        .separators(
-            &[LinePosition::Intern],
-            LineSeparator::new('─', '┼', '├', '┤')
-        )
-        .separators(
-            &[LinePosition::Bottom],
-            LineSeparator::new('─', '┴', '└', '┘')
-        )
-        .padding(1, 1)
-        .build();
-}
+use tabled::settings::{Style, Theme};
 
 /// A formatter for Unicode tables
 #[derive(Debug, Default)]
@@ -43,7 +21,8 @@ impl crate::Formatter for Formatter {
         results: &mut Results,
         output: &mut Output,
     ) -> Result<()> {
-        table::format(*FORMAT_UNICODE, options, results, output).await
+        let theme = Theme::from_style(Style::modern_rounded());
+        table::format(theme, options, results, output).await
     }
 }
 
@@ -80,11 +59,11 @@ mod tests {
 
         let unicode_output = output.to_string().replace("\r\n", "\n");
         let expected = indoc! {r#"
-            ┌────────┐
+            ╭────────╮
             │   id   │
-            ╞════════╡
+            ├────────┤
             │ 12,345 │
-            └────────┘
+            ╰────────╯
             1 row (5.678µs)
         "#};
         assert_eq!(unicode_output, expected);

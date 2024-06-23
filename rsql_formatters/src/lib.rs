@@ -9,6 +9,8 @@ mod csv;
 #[cfg(any(feature = "csv", feature = "sqlite", feature = "tsv"))]
 mod delimited;
 mod error;
+#[cfg(feature = "expanded")]
+mod expanded;
 mod footer;
 mod formatter;
 mod highlighter;

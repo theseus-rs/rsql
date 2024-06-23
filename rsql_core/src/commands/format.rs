@@ -116,6 +116,8 @@ mod tests {
             "ascii",
             #[cfg(feature = "format-csv")]
             "csv",
+            #[cfg(feature = "format-expanded")]
+            "expanded",
             #[cfg(feature = "format-html")]
             "html",
             #[cfg(feature = "format-json")]
