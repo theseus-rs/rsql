@@ -45,7 +45,7 @@ impl Connection {
         let database_url = if memory {
             "sqlite::memory:".to_string()
         } else {
-            let file = params.remove("file").unwrap_or("".to_string());
+            let file = params.remove("file").unwrap_or_default();
             let query: String = form_urlencoded::Serializer::new(String::new())
                 .extend_pairs(params.iter())
                 .finish();
@@ -89,7 +89,7 @@ impl crate::Connection for Connection {
         for row in query_rows {
             let mut row_data = Vec::new();
             for column in row.columns() {
-                let value = self.convert_to_value(&row, column)?;
+                let value = Self::convert_to_value(&row, column)?;
                 row_data.push(value);
             }
             rows.push(crate::Row::new(row_data));
@@ -106,7 +106,7 @@ impl crate::Connection for Connection {
 }
 
 impl Connection {
-    fn convert_to_value(&self, row: &SqliteRow, column: &SqliteColumn) -> Result<Value> {
+    fn convert_to_value(row: &SqliteRow, column: &SqliteColumn) -> Result<Value> {
         let column_name = column.name();
         let column_type = column.type_info();
         let column_type_name = column_type.name();
@@ -178,7 +178,7 @@ impl Connection {
             }
         } else {
             let column_type = column.type_info();
-            let type_name = format!("{:?}", column_type);
+            let type_name = format!("{column_type:?}");
 
             Err(UnsupportedColumnType {
                 column_name: column_name.to_string(),

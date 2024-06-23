@@ -8,38 +8,51 @@ pub struct Row {
 
 impl Row {
     /// Create a new instance of [Row]
+    #[must_use]
     pub fn new(values: Vec<Value>) -> Self {
         Self { values }
     }
 
     /// Get the first value of the row
+    #[must_use]
     pub fn first(&self) -> Option<&Value> {
         self.values.first()
     }
 
     /// Get the value at the given index
+    #[must_use]
     pub fn get(&self, index: usize) -> Option<&Value> {
         self.values.get(index)
     }
 
     /// Check if the row is empty
+    #[must_use]
     pub fn is_empty(&self) -> bool {
         self.values.is_empty()
     }
 
     /// Get the last value of the row
+    #[must_use]
     pub fn last(&self) -> Option<&Value> {
         self.values.last()
     }
 
     /// Get the number of values in the row
+    #[must_use]
     pub fn len(&self) -> usize {
         self.values.len()
     }
 
     /// Get the values of the row
+    #[must_use]
     pub fn values(&self) -> &Vec<Value> {
         &self.values
+    }
+
+    /// Get an iterator over the values of the row
+    #[allow(dead_code)]
+    fn iter(&self) -> std::slice::Iter<Value> {
+        <&Self as IntoIterator>::into_iter(self)
     }
 }
 
@@ -105,5 +118,14 @@ mod test {
         let values = vec![Value::String("foo".to_string())];
         let row = Row::new(values.clone());
         assert_eq!(row.len(), 1);
+    }
+
+    #[test]
+    fn test_row_iter() {
+        let values = vec![Value::String("foo".to_string())];
+        let row = Row::new(values.clone());
+        let mut iterator = row.iter();
+        assert_eq!(iterator.next(), Some(&Value::String("foo".to_string())));
+        assert_eq!(iterator.next(), None);
     }
 }

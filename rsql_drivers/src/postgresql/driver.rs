@@ -11,7 +11,6 @@ use sqlx::postgres::types::Oid;
 use sqlx::postgres::{PgColumn, PgConnectOptions, PgRow};
 use sqlx::{Column, ColumnIndex, Decode, PgPool, Row, Type};
 use std::collections::HashMap;
-use std::ops::Deref;
 use std::path::PathBuf;
 use std::str::FromStr;
 use std::string::ToString;
@@ -52,8 +51,7 @@ impl Connection {
             parsed_url.query_pairs().into_owned().collect();
         let embedded = query_parameters
             .get("embedded")
-            .map(|v| v == "true")
-            .unwrap_or(false);
+            .map_or(false, |v| v == "true");
         let mut database_url = url.to_string();
 
         let postgresql = if embedded {
@@ -121,7 +119,7 @@ impl crate::Connection for Connection {
         for row in query_rows {
             let mut row_data = Vec::new();
             for column in row.columns() {
-                let value = self.convert_to_value(&row, column)?;
+                let value = Self::convert_to_value(&row, column)?;
                 row_data.push(value);
             }
             rows.push(crate::Row::new(row_data));
@@ -147,50 +145,59 @@ impl crate::Connection for Connection {
 }
 
 impl Connection {
-    fn convert_to_value(&self, row: &PgRow, column: &PgColumn) -> Result<Value> {
+    #[allow(clippy::too_many_lines)]
+    fn convert_to_value(row: &PgRow, column: &PgColumn) -> Result<Value> {
         let column_type = column.type_info();
-        let postgresql_type = column_type.deref();
-        let column_type = format!("{:?}", postgresql_type);
+        let postgresql_type = &**column_type;
+        let column_type = format!("{postgresql_type:?}");
         let column_type_parts: Vec<&str> = column_type.split('(').collect();
         let column_name = column.name();
 
-        let value = match column_type_parts[0] {
-            "Bool" => self.get_value(row, column_name, |v: bool| Value::Bool(v))?,
-            "BoolArray" => self.get_value(row, column_name, |v: Vec<bool>| {
+        let Some(column_type_first_part) = column_type_parts.first() else {
+            return Err(UnsupportedColumnType {
+                column_name: column.name().to_string(),
+                column_type: column_type.to_string(),
+            });
+        };
+
+        let value = match *column_type_first_part {
+            "Bool" => Self::get_value(row, column_name, |v: bool| Value::Bool(v))?,
+            "BoolArray" => Self::get_value(row, column_name, |v: Vec<bool>| {
                 Value::Array(v.into_iter().map(Value::Bool).collect())
             })?,
             "Bpchar" | "Char" | "Name" | "Text" | "Varchar" => {
-                self.get_value(row, column_name, |v: String| Value::String(v))?
+                Self::get_value(row, column_name, |v: String| Value::String(v))?
             }
-            "BpcharArray" | "CharArray" | "NameArray" | "TextArray" | "VarcharArray" => self
-                .get_value(row, column_name, |v: Vec<String>| {
+            "BpcharArray" | "CharArray" | "NameArray" | "TextArray" | "VarcharArray" => {
+                Self::get_value(row, column_name, |v: Vec<String>| {
                     Value::Array(v.into_iter().map(Value::String).collect())
-                })?,
-            "Bytea" => self.get_value(row, column_name, |v: Vec<u8>| Value::Bytes(v.to_vec()))?,
-            "ByteaArray" => self.get_value(row, column_name, |v: Vec<Vec<u8>>| {
-                Value::Array(v.into_iter().map(|v| Value::Bytes(v.to_vec())).collect())
+                })?
+            }
+            "Bytea" => Self::get_value(row, column_name, |v: Vec<u8>| Value::Bytes(v.clone()))?,
+            "ByteaArray" => Self::get_value(row, column_name, |v: Vec<Vec<u8>>| {
+                Value::Array(v.into_iter().map(|v| Value::Bytes(v.clone())).collect())
             })?,
-            "Int2" => self.get_value(row, column_name, |v: i16| Value::I16(v))?,
-            "Int2Array" => self.get_value(row, column_name, |v: Vec<i16>| {
+            "Int2" => Self::get_value(row, column_name, |v: i16| Value::I16(v))?,
+            "Int2Array" => Self::get_value(row, column_name, |v: Vec<i16>| {
                 Value::Array(v.into_iter().map(Value::I16).collect())
             })?,
-            "Int4" => self.get_value(row, column_name, |v: i32| Value::I32(v))?,
-            "Int4Array" => self.get_value(row, column_name, |v: Vec<i32>| {
+            "Int4" => Self::get_value(row, column_name, |v: i32| Value::I32(v))?,
+            "Int4Array" => Self::get_value(row, column_name, |v: Vec<i32>| {
                 Value::Array(v.into_iter().map(Value::I32).collect())
             })?,
-            "Int8" => self.get_value(row, column_name, |v: i64| Value::I64(v))?,
-            "Int8Array" => self.get_value(row, column_name, |v: Vec<i64>| {
+            "Int8" => Self::get_value(row, column_name, |v: i64| Value::I64(v))?,
+            "Int8Array" => Self::get_value(row, column_name, |v: Vec<i64>| {
                 Value::Array(v.into_iter().map(Value::I64).collect())
             })?,
-            "Oid" => self.get_value(row, column_name, |v: Oid| Value::U32(v.0))?,
-            "OidArray" => self.get_value(row, column_name, |v: Vec<Oid>| {
+            "Oid" => Self::get_value(row, column_name, |v: Oid| Value::U32(v.0))?,
+            "OidArray" => Self::get_value(row, column_name, |v: Vec<Oid>| {
                 Value::Array(v.into_iter().map(|v| Value::U32(v.0)).collect())
             })?,
             "Json" | "Jsonb" => {
-                self.get_value(row, column_name, |v: serde_json::Value| Value::Json(v))?
+                Self::get_value(row, column_name, |v: serde_json::Value| Value::Json(v))?
             }
             "JsonArray" | "JsonbArray" => {
-                self.get_value(row, column_name, |v: Vec<serde_json::Value>| {
+                Self::get_value(row, column_name, |v: Vec<serde_json::Value>| {
                     Value::Array(v.into_iter().map(Value::Json).collect())
                 })?
             }
@@ -208,12 +215,12 @@ impl Connection {
             // "LineArray" => Value::Null,
             // "Cidr" => Value::Null,
             // "CidrArray" => Value::Null,
-            "Float4" => self.get_value(row, column_name, |v: f32| Value::F32(v))?,
-            "Float4Array" => self.get_value(row, column_name, |v: Vec<f32>| {
+            "Float4" => Self::get_value(row, column_name, |v: f32| Value::F32(v))?,
+            "Float4Array" => Self::get_value(row, column_name, |v: Vec<f32>| {
                 Value::Array(v.into_iter().map(Value::F32).collect())
             })?,
-            "Float8" => self.get_value(row, column_name, |v: f64| Value::F64(v))?,
-            "Float8Array" => self.get_value(row, column_name, |v: Vec<f64>| {
+            "Float8" => Self::get_value(row, column_name, |v: f64| Value::F64(v))?,
+            "Float8Array" => Self::get_value(row, column_name, |v: Vec<f64>| {
                 Value::Array(v.into_iter().map(Value::F64).collect())
             })?,
             // "Unknown" => Value::Null,
@@ -225,27 +232,27 @@ impl Connection {
             // "Macaddr8Array" => Value::Null,
             // "Inet" => Value::Null,
             // "InetArray" => Value::Null,
-            "Date" => self.get_value(row, column_name, |v: NaiveDate| Value::Date(v))?,
-            "DateArray" => self.get_value(row, column_name, |v: Vec<NaiveDate>| {
+            "Date" => Self::get_value(row, column_name, |v: NaiveDate| Value::Date(v))?,
+            "DateArray" => Self::get_value(row, column_name, |v: Vec<NaiveDate>| {
                 Value::Array(v.into_iter().map(Value::Date).collect())
             })?,
-            "Time" | "Timetz" => self.get_value(row, column_name, |v: NaiveTime| Value::Time(v))?,
+            "Time" | "Timetz" => Self::get_value(row, column_name, |v: NaiveTime| Value::Time(v))?,
             "TimeArray" | "TimetzArray" => {
-                self.get_value(row, column_name, |v: Vec<NaiveTime>| {
+                Self::get_value(row, column_name, |v: Vec<NaiveTime>| {
                     Value::Array(v.into_iter().map(Value::Time).collect())
                 })?
             }
             "Timestamp" => {
-                self.get_value(row, column_name, |v: NaiveDateTime| Value::DateTime(v))?
+                Self::get_value(row, column_name, |v: NaiveDateTime| Value::DateTime(v))?
             }
-            "TimestampArray" => self.get_value(row, column_name, |v: Vec<NaiveDateTime>| {
+            "TimestampArray" => Self::get_value(row, column_name, |v: Vec<NaiveDateTime>| {
                 Value::Array(v.into_iter().map(Value::DateTime).collect())
             })?,
-            "Timestamptz" => self.get_value(row, column_name, |v: chrono::DateTime<Utc>| {
+            "Timestamptz" => Self::get_value(row, column_name, |v: chrono::DateTime<Utc>| {
                 Value::DateTime(v.naive_utc())
             })?,
             "TimestamptzArray" => {
-                self.get_value(row, column_name, |v: Vec<chrono::DateTime<Utc>>| {
+                Self::get_value(row, column_name, |v: Vec<chrono::DateTime<Utc>>| {
                     Value::Array(
                         v.into_iter()
                             .map(|v| Value::DateTime(v.naive_utc()))
@@ -255,21 +262,21 @@ impl Connection {
             }
             // "Interval" => Value::Null,
             // "IntervalArray" => Value::Null,
-            "Bit" | "Varbit" => self.get_value(row, column_name, |v: BitVec| {
-                Value::String(self.bit_string(v))
+            "Bit" | "Varbit" => Self::get_value(row, column_name, |v: BitVec| {
+                Value::String(Self::bit_string(&v))
             })?,
-            "BitArray" | "VarbitArray" => self.get_value(row, column_name, |v: Vec<BitVec>| {
+            "BitArray" | "VarbitArray" => Self::get_value(row, column_name, |v: Vec<BitVec>| {
                 Value::Array(
                     v.into_iter()
-                        .map(|v| Value::String(self.bit_string(v)))
+                        .map(|v| Value::String(Self::bit_string(&v)))
                         .collect(),
                 )
             })?,
-            "Numeric" => self.get_value(row, column_name, |v: rust_decimal::Decimal| {
+            "Numeric" => Self::get_value(row, column_name, |v: rust_decimal::Decimal| {
                 Value::String(v.to_string())
             })?,
             "NumericArray" => {
-                self.get_value(row, column_name, |v: Vec<rust_decimal::Decimal>| {
+                Self::get_value(row, column_name, |v: Vec<rust_decimal::Decimal>| {
                     Value::Array(
                         v.into_iter()
                             .map(|v| Value::String(v.to_string()))
@@ -277,10 +284,10 @@ impl Connection {
                     )
                 })?
             }
-            // "Record" => Value::Null,
-            // "RecordArray" => Value::Null,
-            "Uuid" => self.get_value(row, column_name, |v: uuid::Uuid| Value::Uuid(v))?,
-            "UuidArray" => self.get_value(row, column_name, |v: Vec<uuid::Uuid>| {
+            // Some(&"Record"Some(& => Value::Null,
+            // Some(&"RecordArray") => Value::Null,
+            "Uuid" => Self::get_value(row, column_name, |v: uuid::Uuid| Value::Uuid(v))?,
+            "UuidArray" => Self::get_value(row, column_name, |v: Vec<uuid::Uuid>| {
                 Value::Array(v.into_iter().map(Value::Uuid).collect())
             })?,
             // "Int4Range" => Value::Null,
@@ -314,12 +321,7 @@ impl Connection {
         Ok(value)
     }
 
-    fn get_value<'r, T, I>(
-        &self,
-        row: &'r PgRow,
-        index: I,
-        to_value: impl Fn(T) -> Value,
-    ) -> Result<Value>
+    fn get_value<'r, T, I>(row: &'r PgRow, index: I, to_value: impl Fn(T) -> Value) -> Result<Value>
     where
         T: Decode<'r, <PgRow as Row>::Database> + Type<<PgRow as Row>::Database>,
         I: ColumnIndex<PgRow>,
@@ -330,7 +332,7 @@ impl Connection {
         }
     }
 
-    fn bit_string(&self, value: BitVec) -> String {
+    fn bit_string(value: &BitVec) -> String {
         let bit_string: String = value
             .iter()
             .map(|bit| if bit { '1' } else { '0' })

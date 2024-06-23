@@ -52,7 +52,7 @@ impl Connection {
         } else {
             let host = parsed_url.host().expect("Host is required").to_string();
             let auth_token = params.get("auth_token").map_or("", |value| value.as_str());
-            let database_url = format!("libsql://{}", host);
+            let database_url = format!("libsql://{host}");
             Builder::new_remote(database_url, auth_token.to_string())
                 .build()
                 .await?
@@ -88,7 +88,8 @@ impl crate::Connection for Connection {
         while let Some(query_row) = query_rows.next().await? {
             let mut row = Vec::new();
             for (index, _column_name) in columns.iter().enumerate() {
-                let value = self.convert_to_value(&query_row, index as i32)?;
+                let index = i32::try_from(index)?;
+                let value = Self::convert_to_value(&query_row, index)?;
                 row.push(value);
             }
             rows.push(Row::new(row));
@@ -104,13 +105,13 @@ impl crate::Connection for Connection {
 }
 
 impl Connection {
-    fn convert_to_value(&self, row: &libsql::Row, column_index: i32) -> Result<Value> {
+    fn convert_to_value(row: &libsql::Row, column_index: i32) -> Result<Value> {
         let value = match row.get_value(column_index)? {
             libsql::Value::Null => Value::Null,
             libsql::Value::Integer(value) => Value::I64(value),
             libsql::Value::Real(value) => Value::F64(value),
             libsql::Value::Text(value) => Value::String(value),
-            libsql::Value::Blob(value) => Value::Bytes(value.to_vec()),
+            libsql::Value::Blob(value) => Value::Bytes(value.clone()),
         };
 
         Ok(value)
@@ -121,7 +122,7 @@ impl Debug for Connection {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Connection")
             .field("url", &self.url)
-            .finish()
+            .finish_non_exhaustive()
     }
 }
 
@@ -136,8 +137,8 @@ mod test {
         let driver_manager = DriverManager::default();
         let connection = driver_manager.connect(DATABASE_URL).await?;
 
-        assert!(format!("{:?}", connection).contains("Connection"));
-        assert!(format!("{:?}", connection).contains(DATABASE_URL));
+        assert!(format!("{connection:?}").contains("Connection"));
+        assert!(format!("{connection:?}").contains(DATABASE_URL));
         Ok(())
     }
 

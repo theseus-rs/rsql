@@ -26,7 +26,7 @@ async fn retrieve_databases(
 }
 
 async fn retrieve_tables(connection: &mut dyn Connection, database: &mut Database) -> Result<()> {
-    let sql = indoc! { r#"
+    let sql = indoc! { r"
             SELECT
                 table_name,
                 column_name,
@@ -38,7 +38,7 @@ async fn retrieve_tables(connection: &mut dyn Connection, database: &mut Databas
             ORDER BY
                 table_name,
                 ordinal_position
-        "#};
+        "};
     let mut query_result = connection.query(sql).await?;
 
     while let Some(row) = query_result.next().await {
@@ -83,7 +83,7 @@ async fn retrieve_tables(connection: &mut dyn Connection, database: &mut Databas
 }
 
 async fn retrieve_indexes(connection: &mut dyn Connection, database: &mut Database) -> Result<()> {
-    let sql = indoc! {r#"
+    let sql = indoc! {r"
             SELECT
                 table_name,
                 index_name,
@@ -94,7 +94,7 @@ async fn retrieve_indexes(connection: &mut dyn Connection, database: &mut Databa
             ORDER BY
                 table_name,
                 index_name
-        "#};
+        "};
     let mut query_result = connection.query(sql).await?;
 
     while let Some(row) = query_result.next().await {

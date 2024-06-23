@@ -2,8 +2,8 @@ use crate::error::Result;
 use crate::row::Row;
 use crate::Metadata;
 use async_trait::async_trait;
-use mockall::predicate::*;
-use mockall::*;
+use mockall::automock;
+use mockall::predicate::str;
 use std::fmt::Debug;
 
 /// Results from a query
@@ -22,6 +22,7 @@ pub struct LimitQueryResult {
 }
 
 impl LimitQueryResult {
+    #[must_use]
     pub fn new(inner: Box<dyn QueryResult>, limit: usize) -> Self {
         Self {
             inner,
@@ -57,6 +58,7 @@ pub struct MemoryQueryResult {
 }
 
 impl MemoryQueryResult {
+    #[must_use]
     pub fn new(columns: Vec<String>, rows: Vec<Row>) -> Self {
         Self {
             columns,

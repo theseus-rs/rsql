@@ -2,8 +2,8 @@ use crate::error::Result;
 use crate::Connection;
 use crate::Error::DriverNotFound;
 use async_trait::async_trait;
-use mockall::predicate::*;
-use mockall::*;
+use mockall::automock;
+use mockall::predicate::str;
 use std::collections::BTreeMap;
 use std::fmt::Debug;
 use tracing::instrument;
@@ -18,12 +18,14 @@ pub trait Driver: Debug + Send + Sync {
 
 /// Manages available drivers
 #[derive(Debug)]
+#[allow(clippy::module_name_repetitions)]
 pub struct DriverManager {
     drivers: BTreeMap<&'static str, Box<dyn Driver>>,
 }
 
 impl DriverManager {
     /// Create a new instance of the `DriverManager`
+    #[must_use]
     pub fn new() -> Self {
         DriverManager {
             drivers: BTreeMap::new(),
@@ -37,13 +39,14 @@ impl DriverManager {
     }
 
     /// Get a drivers by name
+    #[must_use]
     pub fn get(&self, identifier: &str) -> Option<&dyn Driver> {
-        self.drivers.get(identifier).map(|driver| driver.as_ref())
+        self.drivers.get(identifier).map(AsRef::as_ref)
     }
 
     /// Get an iterator over the available drivers
     pub fn iter(&self) -> impl Iterator<Item = &dyn Driver> {
-        self.drivers.values().map(|driver| driver.as_ref())
+        self.drivers.values().map(AsRef::as_ref)
     }
 
     /// Connect to a database
@@ -51,7 +54,7 @@ impl DriverManager {
     pub async fn connect(&self, url: &str) -> Result<Box<dyn Connection>> {
         let parsed_url = Url::parse(url)?;
         let scheme = parsed_url.scheme();
-        let password = parsed_url.password().map(|password| password.to_string());
+        let password = parsed_url.password().map(ToString::to_string);
         let url = url.to_string();
 
         match &self.get(scheme) {

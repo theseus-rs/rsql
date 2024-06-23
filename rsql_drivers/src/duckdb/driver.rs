@@ -39,6 +39,7 @@ pub(crate) struct Connection {
 }
 
 impl Connection {
+    #[allow(clippy::unused_async)]
     pub(crate) async fn new(url: String) -> Result<Connection> {
         let parsed_url = Url::parse(url.as_str())?;
         let mut params: HashMap<String, String> = parsed_url.query_pairs().into_owned().collect();
@@ -88,7 +89,7 @@ impl crate::Connection for Connection {
             let mut row = Vec::new();
             for (index, _column_name) in columns.iter().enumerate() {
                 let column_name = columns.get(index).expect("no column");
-                let value = self.convert_to_value(query_row, column_name, index)?;
+                let value = Self::convert_to_value(query_row, column_name, index)?;
                 row.push(value);
             }
             rows.push(crate::Row::new(row));
@@ -104,12 +105,7 @@ impl crate::Connection for Connection {
 }
 
 impl Connection {
-    fn convert_to_value(
-        &self,
-        row: &Row,
-        column_name: &String,
-        column_index: usize,
-    ) -> Result<Value> {
+    fn convert_to_value(row: &Row, column_name: &String, column_index: usize) -> Result<Value> {
         let value_ref = row.get_ref(column_index)?;
         let value = match value_ref {
             ValueRef::Null => Value::Null,
@@ -133,17 +129,17 @@ impl Connection {
             ValueRef::Blob(value) => Value::Bytes(value.to_vec()),
             ValueRef::Date32(value) => {
                 let start_date = NaiveDate::from_ymd_opt(1970, 1, 1).expect("invalid date");
-                let delta = TimeDelta::days(value as i64);
+                let delta = TimeDelta::days(i64::from(value));
                 let date = start_date.add(delta);
                 Value::Date(date)
             }
             ValueRef::Time64(unit, value) => {
                 let start_time = NaiveTime::from_hms_opt(0, 0, 0).expect("invalid time");
                 let duration = match unit {
-                    TimeUnit::Second => Duration::from_secs(value as u64),
-                    TimeUnit::Millisecond => Duration::from_millis(value as u64),
-                    TimeUnit::Microsecond => Duration::from_micros(value as u64),
-                    TimeUnit::Nanosecond => Duration::from_nanos(value as u64),
+                    TimeUnit::Second => Duration::from_secs(u64::try_from(value)?),
+                    TimeUnit::Millisecond => Duration::from_millis(u64::try_from(value)?),
+                    TimeUnit::Microsecond => Duration::from_micros(u64::try_from(value)?),
+                    TimeUnit::Nanosecond => Duration::from_nanos(u64::try_from(value)?),
                 };
                 let time = start_time.add(duration);
                 Value::Time(time)
@@ -153,10 +149,10 @@ impl Connection {
                 let start_time = NaiveTime::from_hms_opt(0, 0, 0).expect("invalid time");
                 let start_date_time = NaiveDateTime::new(start_date, start_time);
                 let duration = match unit {
-                    TimeUnit::Second => Duration::from_secs(value as u64),
-                    TimeUnit::Millisecond => Duration::from_millis(value as u64),
-                    TimeUnit::Microsecond => Duration::from_micros(value as u64),
-                    TimeUnit::Nanosecond => Duration::from_nanos(value as u64),
+                    TimeUnit::Second => Duration::from_secs(u64::try_from(value)?),
+                    TimeUnit::Millisecond => Duration::from_millis(u64::try_from(value)?),
+                    TimeUnit::Microsecond => Duration::from_micros(u64::try_from(value)?),
+                    TimeUnit::Nanosecond => Duration::from_nanos(u64::try_from(value)?),
                 };
                 let date_time = start_date_time.add(duration);
                 Value::DateTime(date_time)
@@ -224,7 +220,7 @@ mod test {
     async fn test_table_data_types() -> anyhow::Result<()> {
         let driver_manager = DriverManager::default();
         let mut connection = driver_manager.connect(DATABASE_URL).await?;
-        let sql = indoc! {r#"
+        let sql = indoc! {r"
             CREATE TABLE data_types (
                 varchar_type VARCHAR,
                 blob_type BLOB,
@@ -245,10 +241,10 @@ mod test {
                 time_type TIME,
                 timestamp_type TIMESTAMP
             )
-        "#};
+        "};
         let _ = connection.execute(sql).await?;
 
-        let sql = indoc! {r#"
+        let sql = indoc! {r"
             INSERT INTO data_types (
                 varchar_type, blob_type, bool_type, bit_type,
                 tinyint_type, smallint_type, integer_type, bigint_type,
@@ -262,17 +258,17 @@ mod test {
                  123.45, 123.0, 123.0,
                  '2022-01-01', '14:30:00', '2022-01-01 14:30:00'
             )
-        "#};
+        "};
         let _ = connection.execute(sql).await?;
 
-        let sql = indoc! {r#"
+        let sql = indoc! {r"
             SELECT varchar_type, blob_type, bool_type, bit_type,
                    tinyint_type, smallint_type, integer_type, bigint_type,
                    utinyint_type, usmallint_type, uinteger_type, ubigint_type,
                    real_type, double_type, decimal_type,
                    date_type, time_type, timestamp_type
               FROM data_types
-        "#};
+        "};
         let mut query_result = connection.query(sql).await?;
 
         if let Some(row) = query_result.next().await {

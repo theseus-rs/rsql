@@ -132,6 +132,7 @@ impl crate::Connection for Connection {
     }
 }
 
+#[allow(clippy::same_functions_in_if_condition)]
 fn convert_to_value(row: &Row, column: &Column, index: usize) -> Result<Value> {
     let column_name = column.name();
 
@@ -215,7 +216,7 @@ fn convert_to_value(row: &Row, column: &Column, index: usize) -> Result<Value> {
         }
     } else {
         let column_type = format!("{:?}", column.column_type());
-        let type_name = format!("{:?}", column_type);
+        let type_name = format!("{column_type:?}");
         return Err(UnsupportedColumnType {
             column_name: column_name.to_string(),
             column_type: type_name,

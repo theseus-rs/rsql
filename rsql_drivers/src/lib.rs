@@ -1,4 +1,5 @@
 #![forbid(unsafe_code)]
+#![deny(clippy::pedantic)]
 #[macro_use]
 extern crate rust_i18n;
 
