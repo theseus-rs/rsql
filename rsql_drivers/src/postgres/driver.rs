@@ -50,8 +50,7 @@ impl Connection {
             parsed_url.query_pairs().into_owned().collect();
         let embedded = query_parameters
             .get("embedded")
-            .map(|v| v == "true")
-            .unwrap_or(false);
+            .map_or(false, |v| v == "true");
         let mut database_url = url.to_string().replace("postgres://", "postgresql://");
 
         let postgresql = if embedded {
@@ -87,7 +86,7 @@ impl Connection {
         let (client, connection) = tokio_postgres::connect(database_url.as_str(), NoTls).await?;
         tokio::spawn(async move {
             if let Err(e) = connection.await {
-                eprintln!("connection error: {}", e);
+                eprintln!("connection error: {e}");
             }
         });
         let connection = Connection { postgresql, client };
@@ -120,7 +119,7 @@ impl crate::Connection for Connection {
         for query_row in query_rows {
             let mut row = Vec::new();
             for (index, column) in query_columns.iter().enumerate() {
-                let value = self.convert_to_value(&query_row, column, index)?;
+                let value = Self::convert_to_value(&query_row, column, index)?;
                 row.push(value);
             }
             rows.push(crate::Row::new(row));
@@ -145,7 +144,6 @@ impl crate::Connection for Connection {
 
 impl Connection {
     pub(crate) fn convert_to_value(
-        &self,
         row: &Row,
         column: &Column,
         column_index: usize,
@@ -153,37 +151,37 @@ impl Connection {
         // https://www.postgresql.org/docs/current/datatype.html
         let column_type = column.type_();
         let value = match *column_type {
-            Type::BIT | Type::VARBIT => self.get_single(row, column_index, |v: BitVec| {
-                Value::String(self.bit_string(v))
+            Type::BIT | Type::VARBIT => Self::get_single(row, column_index, |v: BitVec| {
+                Value::String(Self::bit_string(&v))
             })?,
             Type::BIT_ARRAY | Type::VARBIT_ARRAY => {
-                self.get_array(row, column_index, |v: BitVec| {
-                    Value::String(self.bit_string(v))
+                Self::get_array(row, column_index, |v: BitVec| {
+                    Value::String(Self::bit_string(&v))
                 })?
             }
-            Type::BOOL => self.get_single(row, column_index, |v: bool| Value::Bool(v))?,
-            Type::BOOL_ARRAY => self.get_array(row, column_index, |v: bool| Value::Bool(v))?,
-            Type::INT2 => self.get_single(row, column_index, |v: i16| Value::I16(v))?,
-            Type::INT2_ARRAY => self.get_array(row, column_index, |v: i16| Value::I16(v))?,
-            Type::INT4 => self.get_single(row, column_index, |v: i32| Value::I32(v))?,
-            Type::INT4_ARRAY => self.get_array(row, column_index, |v: i32| Value::I32(v))?,
-            Type::INT8 => self.get_single(row, column_index, |v: i64| Value::I64(v))?,
-            Type::INT8_ARRAY => self.get_array(row, column_index, |v: i64| Value::I64(v))?,
-            Type::FLOAT4 => self.get_single(row, column_index, |v: f32| Value::F32(v))?,
-            Type::FLOAT4_ARRAY => self.get_array(row, column_index, |v: f32| Value::F32(v))?,
-            Type::FLOAT8 => self.get_single(row, column_index, |v: f64| Value::F64(v))?,
-            Type::FLOAT8_ARRAY => self.get_array(row, column_index, |v: f64| Value::F64(v))?,
+            Type::BOOL => Self::get_single(row, column_index, |v: bool| Value::Bool(v))?,
+            Type::BOOL_ARRAY => Self::get_array(row, column_index, |v: bool| Value::Bool(v))?,
+            Type::INT2 => Self::get_single(row, column_index, |v: i16| Value::I16(v))?,
+            Type::INT2_ARRAY => Self::get_array(row, column_index, |v: i16| Value::I16(v))?,
+            Type::INT4 => Self::get_single(row, column_index, |v: i32| Value::I32(v))?,
+            Type::INT4_ARRAY => Self::get_array(row, column_index, |v: i32| Value::I32(v))?,
+            Type::INT8 => Self::get_single(row, column_index, |v: i64| Value::I64(v))?,
+            Type::INT8_ARRAY => Self::get_array(row, column_index, |v: i64| Value::I64(v))?,
+            Type::FLOAT4 => Self::get_single(row, column_index, |v: f32| Value::F32(v))?,
+            Type::FLOAT4_ARRAY => Self::get_array(row, column_index, |v: f32| Value::F32(v))?,
+            Type::FLOAT8 => Self::get_single(row, column_index, |v: f64| Value::F64(v))?,
+            Type::FLOAT8_ARRAY => Self::get_array(row, column_index, |v: f64| Value::F64(v))?,
             Type::TEXT | Type::VARCHAR | Type::CHAR | Type::BPCHAR | Type::NAME => {
-                self.get_single(row, column_index, |v: String| Value::String(v))?
+                Self::get_single(row, column_index, |v: String| Value::String(v))?
             }
             Type::TEXT_ARRAY | Type::VARCHAR_ARRAY | Type::CHAR_ARRAY | Type::BPCHAR_ARRAY => {
-                self.get_array(row, column_index, |v: String| Value::String(v))?
+                Self::get_array(row, column_index, |v: String| Value::String(v))?
             }
             Type::JSON | Type::JSONB => {
-                self.get_single(row, column_index, |v: serde_json::Value| Value::Json(v))?
+                Self::get_single(row, column_index, |v: serde_json::Value| Value::Json(v))?
             }
             Type::JSON_ARRAY | Type::JSONB_ARRAY => {
-                self.get_array(row, column_index, |v: serde_json::Value| Value::Json(v))?
+                Self::get_array(row, column_index, |v: serde_json::Value| Value::Json(v))?
             }
             Type::BYTEA => {
                 let byte_value: Option<&[u8]> = row.try_get(column_index)?;
@@ -192,12 +190,12 @@ impl Connection {
                     None => Value::Null,
                 }
             }
-            Type::DATE => self.get_single(row, column_index, |v: NaiveDate| Value::Date(v))?,
+            Type::DATE => Self::get_single(row, column_index, |v: NaiveDate| Value::Date(v))?,
             Type::TIME | Type::TIMETZ => {
-                self.get_single(row, column_index, |v: NaiveTime| Value::Time(v))?
+                Self::get_single(row, column_index, |v: NaiveTime| Value::Time(v))?
             }
             Type::TIMESTAMP => {
-                self.get_single(row, column_index, |v: NaiveDateTime| Value::DateTime(v))?
+                Self::get_single(row, column_index, |v: NaiveDateTime| Value::DateTime(v))?
             }
             Type::TIMESTAMPTZ => {
                 let system_time: Option<SystemTime> = row.try_get(column_index)?;
@@ -209,8 +207,8 @@ impl Connection {
                     None => Value::Null,
                 }
             }
-            Type::OID => self.get_single(row, column_index, |v: u32| Value::U32(v))?,
-            Type::OID_ARRAY => self.get_array(row, column_index, |v: u32| Value::U32(v))?,
+            Type::OID => Self::get_single(row, column_index, |v: u32| Value::U32(v))?,
+            Type::OID_ARRAY => Self::get_array(row, column_index, |v: u32| Value::U32(v))?,
             Type::VOID => Value::Null, // pg_sleep() returns void
             _ => {
                 return Err(UnsupportedColumnType {
@@ -224,7 +222,6 @@ impl Connection {
     }
 
     fn get_single<'r, T: FromSql<'r>>(
-        &self,
         row: &'r Row,
         column_index: usize,
         to_value: impl Fn(T) -> Value,
@@ -236,7 +233,6 @@ impl Connection {
     }
 
     fn get_array<'r, T: FromSql<'r>>(
-        &self,
         row: &'r Row,
         column_index: usize,
         to_value: impl Fn(T) -> Value,
@@ -255,7 +251,7 @@ impl Connection {
         Ok(result)
     }
 
-    fn bit_string(&self, value: BitVec) -> String {
+    fn bit_string(value: &BitVec) -> String {
         let bit_string: String = value
             .iter()
             .map(|bit| if bit { '1' } else { '0' })

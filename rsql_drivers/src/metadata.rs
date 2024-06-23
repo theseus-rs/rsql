@@ -7,6 +7,7 @@ pub struct Metadata {
 }
 
 impl Metadata {
+    #[must_use]
     pub fn new() -> Self {
         Self {
             databases: IndexMap::new(),
@@ -27,6 +28,7 @@ impl Metadata {
         self.databases.get_mut(&name)
     }
 
+    #[must_use]
     pub fn current_database(&self) -> Option<&Database> {
         if let Some((_name, database)) = self.databases.first() {
             Some(database)
@@ -35,6 +37,7 @@ impl Metadata {
         }
     }
 
+    #[must_use]
     pub fn databases(&self) -> Vec<&Database> {
         let values: Vec<&Database> = self.databases.values().collect();
         values
@@ -55,6 +58,7 @@ impl Database {
         }
     }
 
+    #[must_use]
     pub fn name(&self) -> &str {
         &self.name
     }
@@ -73,6 +77,7 @@ impl Database {
         self.tables.get_mut(&name)
     }
 
+    #[must_use]
     pub fn tables(&self) -> Vec<&Table> {
         let values: Vec<&Table> = self.tables.values().collect();
         values
@@ -95,6 +100,7 @@ impl Table {
         }
     }
 
+    #[must_use]
     pub fn name(&self) -> &str {
         &self.name
     }
@@ -103,6 +109,7 @@ impl Table {
         self.columns.insert(column.name.clone(), column);
     }
 
+    #[must_use]
     pub fn columns(&self) -> Vec<&Column> {
         let values: Vec<&Column> = self.columns.values().collect();
         values
@@ -132,6 +139,7 @@ impl Table {
         self.indexes.get_mut(&name)
     }
 
+    #[must_use]
     pub fn indexes(&self) -> Vec<&Index> {
         let values: Vec<&Index> = self.indexes.values().collect();
         values
@@ -152,22 +160,26 @@ impl Column {
             name: name.into(),
             data_type: data_type.into(),
             not_null,
-            default: default.map(|value| value.into()),
+            default: default.map(Into::into),
         }
     }
 
+    #[must_use]
     pub fn name(&self) -> &str {
         &self.name
     }
 
+    #[must_use]
     pub fn data_type(&self) -> &str {
         &self.data_type
     }
 
+    #[must_use]
     pub fn not_null(&self) -> bool {
         self.not_null
     }
 
+    #[must_use]
     pub fn default(&self) -> Option<&str> {
         self.default.as_deref()
     }
@@ -184,11 +196,12 @@ impl Index {
     pub fn new<S: Into<String>>(name: S, columns: Vec<S>, unique: bool) -> Self {
         Self {
             name: name.into(),
-            columns: columns.into_iter().map(|column| column.into()).collect(),
+            columns: columns.into_iter().map(Into::into).collect(),
             unique,
         }
     }
 
+    #[must_use]
     pub fn name(&self) -> &str {
         &self.name
     }
@@ -197,10 +210,12 @@ impl Index {
         self.columns.push(column.into());
     }
 
+    #[must_use]
     pub fn columns(&self) -> &[String] {
         &self.columns
     }
 
+    #[must_use]
     pub fn unique(&self) -> bool {
         self.unique
     }

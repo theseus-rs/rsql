@@ -25,7 +25,7 @@ async fn retrieve_databases(
 }
 
 async fn retrieve_tables(connection: &mut dyn Connection, database: &mut Database) -> Result<()> {
-    let sql = indoc! { r#"
+    let sql = indoc! { r"
             SELECT
                 table_name,
                 column_name,
@@ -38,7 +38,7 @@ async fn retrieve_tables(connection: &mut dyn Connection, database: &mut Databas
             ORDER BY
                 table_name,
                 ordinal_position
-        "#};
+        "};
     let mut query_result = connection.query(sql).await?;
 
     while let Some(row) = query_result.next().await {
@@ -57,7 +57,7 @@ async fn retrieve_tables(connection: &mut dyn Connection, database: &mut Databas
                 if character_maximum_length.is_null() {
                     value.to_string()
                 } else {
-                    format!("{}({})", value, character_maximum_length)
+                    format!("{value}({character_maximum_length})")
                 }
             }
             None => continue,
@@ -91,7 +91,7 @@ async fn retrieve_tables(connection: &mut dyn Connection, database: &mut Databas
 }
 
 async fn retrieve_indexes(connection: &mut dyn Connection, database: &mut Database) -> Result<()> {
-    let sql = indoc! {r#"
+    let sql = indoc! {r"
             SELECT
                 t.name AS table_name,
                 i.name AS index_name,
@@ -106,7 +106,7 @@ async fn retrieve_indexes(connection: &mut dyn Connection, database: &mut Databa
                 t.name,
                 i.name,
                 ic.key_ordinal
-        "#};
+        "};
     let mut query_result = connection.query(sql).await?;
 
     while let Some(row) = query_result.next().await {
@@ -126,10 +126,8 @@ async fn retrieve_indexes(connection: &mut dyn Connection, database: &mut Databa
             Some(Value::Bool(value)) => *value,
             _ => continue,
         };
-
-        let table = match database.get_mut(table_name) {
-            Some(table) => table,
-            None => continue,
+        let Some(table) = database.get_mut(table_name) else {
+            continue;
         };
 
         if let Some(index) = table.get_index_mut(&index_name) {

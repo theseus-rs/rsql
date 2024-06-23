@@ -36,6 +36,7 @@ pub enum Value {
 }
 
 impl Value {
+    #[must_use]
     pub fn to_formatted_string(&self, locale: &Locale) -> String {
         match self {
             Value::Null => "null".to_string(),
@@ -70,10 +71,12 @@ impl Value {
         }
     }
 
+    #[must_use]
     pub fn is_null(&self) -> bool {
         matches!(self, Value::Null)
     }
 
+    #[must_use]
     pub fn is_numeric(&self) -> bool {
         #[allow(clippy::match_like_matches_macro)]
         match self {
@@ -111,11 +114,11 @@ impl fmt::Display for Value {
             Value::Json(value) => value.to_string(),
             Value::Array(value) => value
                 .iter()
-                .map(|value| value.to_string())
+                .map(ToString::to_string)
                 .collect::<Vec<String>>()
                 .join(", "),
         };
-        write!(f, "{}", string_value)
+        write!(f, "{string_value}")
     }
 }
 
@@ -456,7 +459,7 @@ mod tests {
     }
 
     #[test]
-    fn test_json() -> Result<()> {
+    fn test_json() {
         let original_json = json!({"foo": "bar", "baz": 123});
         assert!(!Value::Json(original_json.clone()).is_null());
         assert!(!Value::Json(original_json.clone()).is_numeric());
@@ -472,7 +475,6 @@ mod tests {
             json!(Value::Json(original_json.clone())),
             json!({"foo":"bar","baz":123})
         );
-        Ok(())
     }
 
     #[test]

@@ -132,6 +132,7 @@ impl crate::Connection for Connection {
     }
 }
 
+#[allow(clippy::same_functions_in_if_condition)]
 fn convert_to_value(row: &Row, column: &Column, index: usize) -> Result<Value> {
     let column_name = column.name();
 
@@ -215,7 +216,7 @@ fn convert_to_value(row: &Row, column: &Column, index: usize) -> Result<Value> {
         }
     } else {
         let column_type = format!("{:?}", column.column_type());
-        let type_name = format!("{:?}", column_type);
+        let type_name = format!("{column_type:?}");
         return Err(UnsupportedColumnType {
             column_name: column_name.to_string(),
             column_type: type_name,
@@ -277,7 +278,7 @@ mod test {
     }
 
     async fn test_data_types(connection: &mut dyn Connection) -> anyhow::Result<()> {
-        let sql = indoc! {r#"
+        let sql = indoc! {r"
             CREATE TABLE data_types (
                 nchar_type NCHAR(1),
                 char_type CHAR(1),
@@ -299,10 +300,10 @@ mod test {
                 time_type TIME,
                 datetime_type DATETIME
             )
-        "#};
+        "};
         let _ = connection.execute(sql).await?;
 
-        let sql = indoc! {r#"
+        let sql = indoc! {r"
             INSERT INTO data_types (
                 nchar_type, char_type, nvarchar_type, varchar_type, ntext_type, text_type,
                 binary_type, varbinary_type,
@@ -316,17 +317,17 @@ mod test {
                  123.45, 123.0, 1, 123.0,
                  '2022-01-01', '14:30:00', '2022-01-01 14:30:00'
              )
-        "#};
+        "};
         let _ = connection.execute(sql).await?;
 
-        let sql = indoc! {r#"
+        let sql = indoc! {r"
             SELECT nchar_type, char_type, nvarchar_type, varchar_type, ntext_type, text_type,
                    binary_type, varbinary_type,
                    tinyint_type, smallint_type, int_type, bigint_type,
                    float24_type, float53_type, bit_type, decimal_type,
                    date_type, time_type, datetime_type
               FROM data_types
-        "#};
+        "};
         let mut query_result = connection.query(sql).await?;
         assert_eq!(
             query_result.next().await,

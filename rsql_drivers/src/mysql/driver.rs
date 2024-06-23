@@ -72,7 +72,7 @@ impl crate::Connection for Connection {
         for row in query_rows {
             let mut row_data = Vec::new();
             for column in row.columns() {
-                let value = self.convert_to_value(&row, column)?;
+                let value = Self::convert_to_value(&row, column)?;
                 row_data.push(value);
             }
             rows.push(crate::Row::new(row_data));
@@ -89,7 +89,7 @@ impl crate::Connection for Connection {
 }
 
 impl Connection {
-    fn convert_to_value(&self, row: &MySqlRow, column: &MySqlColumn) -> Result<Value> {
+    fn convert_to_value(row: &MySqlRow, column: &MySqlColumn) -> Result<Value> {
         let column_name = column.name();
 
         if let Ok(value) = row.try_get::<Option<String>, &str>(column_name) {
@@ -157,7 +157,7 @@ impl Connection {
                 Some(v) => {
                     let date = v.date();
                     let time = v.time();
-                    let date_time_string = format!("{} {}", date, time);
+                    let date_time_string = format!("{date} {time}");
                     let date_time =
                         NaiveDateTime::parse_from_str(&date_time_string, "%Y-%m-%d %H:%M:%S%.f")
                             .expect("invalid date");
@@ -172,7 +172,7 @@ impl Connection {
             }
         } else {
             let column_type = column.type_info();
-            let type_name = format!("{:?}", column_type);
+            let type_name = format!("{column_type:?}");
             return Err(UnsupportedColumnType {
                 column_name: column_name.to_string(),
                 column_type: type_name,
@@ -231,7 +231,7 @@ mod test {
     }
 
     async fn test_data_types(connection: &mut dyn Connection) -> anyhow::Result<()> {
-        let sql = indoc! {r#"
+        let sql = indoc! {r"
             CREATE TABLE data_types (
                 char_type CHAR,
                 varchar_type VARCHAR(50),
@@ -253,7 +253,7 @@ mod test {
                 timestamp_type TIMESTAMP,
                 json_type JSON
             )
-        "#};
+        "};
         let _ = connection.execute(sql).await?;
 
         let sql = indoc! {r#"
@@ -271,13 +271,13 @@ mod test {
         "#};
         let _ = connection.execute(sql).await?;
 
-        let sql = indoc! {r#"
+        let sql = indoc! {r"
             SELECT char_type, varchar_type, text_type, binary_type, varbinary_type, blob_type,
                    tinyint_type, smallint_type, mediumint_type, int_type, bigint_type,
                    decimal_type, float_type, double_type, date_type, time_type, datetime_type,
                    timestamp_type, json_type
               FROM data_types
-        "#};
+        "};
         let mut query_result = connection.query(sql).await?;
         assert_eq!(
             query_result.next().await,

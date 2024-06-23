@@ -34,6 +34,7 @@ pub(crate) struct Connection {
 }
 
 impl Connection {
+    #[allow(clippy::unused_async)]
     pub(crate) async fn new(url: String) -> Result<Connection> {
         let parsed_url = Url::parse(url.as_str())?;
         let mut params: HashMap<String, String> = parsed_url.query_pairs().into_owned().collect();
@@ -88,7 +89,7 @@ impl crate::Connection for Connection {
         while let Some(query_row) = query_rows.next()? {
             let mut row = Vec::new();
             for (index, _column_name) in columns.iter().enumerate() {
-                let value = self.convert_to_value(query_row, index)?;
+                let value = Self::convert_to_value(query_row, index)?;
                 row.push(value);
             }
             rows.push(crate::Row::new(row));
@@ -104,7 +105,7 @@ impl crate::Connection for Connection {
 }
 
 impl Connection {
-    fn convert_to_value(&self, row: &Row, column_index: usize) -> Result<Value> {
+    fn convert_to_value(row: &Row, column_index: usize) -> Result<Value> {
         let value = match row.get_ref(column_index)? {
             ValueRef::Null => Value::Null,
             ValueRef::Integer(value) => Value::I64(value),
