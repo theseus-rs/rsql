@@ -104,6 +104,8 @@ impl Default for FormatterManager {
         formatter_manager.add(Box::new(crate::ascii::Formatter));
         #[cfg(feature = "csv")]
         formatter_manager.add(Box::new(crate::csv::Formatter));
+        #[cfg(feature = "expanded")]
+        formatter_manager.add(Box::new(crate::expanded::Formatter));
         #[cfg(feature = "html")]
         formatter_manager.add(Box::new(crate::html::Formatter));
         #[cfg(feature = "json")]
@@ -175,6 +177,8 @@ mod tests {
         #[cfg(feature = "ascii")]
         let formatter_count = formatter_count + 1;
         #[cfg(feature = "csv")]
+        let formatter_count = formatter_count + 1;
+        #[cfg(feature = "expanded")]
         let formatter_count = formatter_count + 1;
         #[cfg(feature = "html")]
         let formatter_count = formatter_count + 1;

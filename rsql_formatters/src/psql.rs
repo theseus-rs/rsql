@@ -3,19 +3,7 @@ use crate::formatter::FormatterOptions;
 use crate::writers::Output;
 use crate::{table, Results};
 use async_trait::async_trait;
-use lazy_static::lazy_static;
-use prettytable::format::{FormatBuilder, LinePosition, LineSeparator, TableFormat};
-
-lazy_static! {
-    pub static ref FORMAT_UNICODE: TableFormat = FormatBuilder::new()
-        .column_separator('|')
-        .separators(
-            &[LinePosition::Title],
-            LineSeparator::new('-', '+', '-', '-')
-        )
-        .padding(1, 1)
-        .build();
-}
+use tabled::settings::{Style, Theme};
 
 /// A formatter for psql tables
 #[derive(Debug, Default)]
@@ -33,7 +21,8 @@ impl crate::Formatter for Formatter {
         results: &mut Results,
         output: &mut Output,
     ) -> Result<()> {
-        table::format(*FORMAT_UNICODE, options, results, output).await
+        let theme = Theme::from_style(Style::psql());
+        table::format(theme, options, results, output).await
     }
 }
 
@@ -75,8 +64,8 @@ mod tests {
         let expected = indoc! {r#"
                id   | value 
              -------+-------
-              1,234 | foo 
-              5,678 | bar 
+              1,234 | foo   
+              5,678 | bar   
              2 rows (9ns)
         "#};
         assert_eq!(unicode_output, expected);

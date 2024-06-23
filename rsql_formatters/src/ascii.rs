@@ -3,7 +3,7 @@ use crate::formatter::FormatterOptions;
 use crate::writers::Output;
 use crate::{table, Results};
 use async_trait::async_trait;
-use prettytable::format::consts::FORMAT_DEFAULT;
+use tabled::settings::{Style, Theme};
 
 /// A formatter for ASCII tables
 #[derive(Debug, Default)]
@@ -21,7 +21,8 @@ impl crate::Formatter for Formatter {
         results: &mut Results,
         output: &mut Output,
     ) -> Result<()> {
-        table::format(*FORMAT_DEFAULT, options, results, output).await
+        let theme = Theme::from_style(Style::ascii());
+        table::format(theme, options, results, output).await
     }
 }
 
@@ -60,7 +61,7 @@ mod tests {
         let expected = indoc! {r#"
             +--------+
             |   id   |
-            +========+
+            +--------+
             | 12,345 |
             +--------+
             1 row (5.678µs)

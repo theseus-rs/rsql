@@ -5,14 +5,15 @@ use crate::writers::Output;
 use crate::Results;
 use crate::Results::Query;
 use num_format::Locale;
-use prettytable::format::{Alignment, TableFormat};
-use prettytable::{Cell, Table};
 use rsql_drivers::{QueryResult, Value};
 use std::str::FromStr;
+use tabled::builder::Builder;
+use tabled::settings::object::{Cell, Rows};
+use tabled::settings::{Alignment, Theme};
 
 /// Format the results of a query into a table and write to the output.
 pub async fn format(
-    table_format: TableFormat,
+    theme: Theme,
     options: &FormatterOptions,
     results: &mut Results,
     output: &mut Output,
@@ -25,64 +26,65 @@ pub async fn format(
             return Ok(());
         }
 
-        let mut table = Table::new();
-        table.set_format(table_format);
+        let mut builder = Builder::default();
 
         if options.header {
-            process_headers(query_result, &mut table).await;
+            builder.push_record(query_result.columns().await);
         }
 
-        rows = process_data(options, query_result, &mut table).await?;
+        let cells;
+        (rows, cells) = process_data(options, query_result, &mut builder).await?;
 
-        table.print(output)?;
+        let mut table = builder.build();
+        table.with(theme);
+
+        if options.header {
+            table.modify(Rows::first(), Alignment::center());
+        }
+
+        // Align numeric columns to the right
+        for cell in cells {
+            table.modify(cell, Alignment::right());
+        }
+
+        writeln!(output, "{}", table)?;
     }
 
     write_footer(options, results, rows, output).await?;
     Ok(())
 }
 
-async fn process_headers(query_result: &mut Box<dyn QueryResult>, table: &mut Table) {
-    let mut row_data = prettytable::Row::default();
-
-    for column in &query_result.columns().await {
-        let cell = Cell::new_align(&column.to_string(), Alignment::CENTER);
-        row_data.add_cell(cell);
-    }
-
-    table.set_titles(row_data);
-}
-
 async fn process_data(
     options: &FormatterOptions,
     query_result: &mut Box<dyn QueryResult>,
-    table: &mut Table,
-) -> Result<u64> {
+    builder: &mut Builder,
+) -> Result<(u64, Vec<Cell>)> {
     let locale = Locale::from_str(options.locale.as_str()).unwrap_or(Locale::en);
     let mut rows: u64 = 0;
+    let mut cells = Vec::new();
     while let Some(row) = query_result.next().await {
-        let mut row_data = prettytable::Row::default();
+        let mut row_data = Vec::new();
 
-        for data in row.into_iter() {
-            let mut alignment = Alignment::LEFT;
+        for (column, data) in row.into_iter().enumerate() {
             let data = match data {
                 Value::Null => "NULL".to_string(),
                 _ => {
                     if data.is_numeric() {
-                        alignment = Alignment::RIGHT;
+                        let row = if options.header { rows + 1 } else { rows };
+                        cells.push(Cell::new(row as usize, column));
                     }
                     data.to_formatted_string(&locale)
                 }
             };
 
-            let cell = Cell::new_align(&data, alignment);
-            row_data.add_cell(cell);
+            row_data.push(data);
         }
 
         rows += 1;
-        table.add_row(row_data);
+        builder.push_record(row_data);
     }
 
-    Ok(rows)
+    Ok((rows, cells))
 }
 
 #[cfg(test)]
@@ -91,9 +93,9 @@ mod tests {
     use crate::writers::Output;
     use crate::Results::Execute;
     use indoc::indoc;
-    use prettytable::format::consts::FORMAT_DEFAULT;
     use rsql_drivers::{MemoryQueryResult, Row, Value};
     use std::time::Duration;
+    use tabled::settings::Style;
 
     const COLUMN_HEADER: &str = "id";
 
@@ -146,10 +148,11 @@ mod tests {
         options: &mut FormatterOptions,
         results: &mut Results,
     ) -> anyhow::Result<String> {
+        let theme = Theme::from_style(Style::ascii());
         let output = &mut Output::default();
         options.elapsed = Duration::from_nanos(9);
 
-        format(*FORMAT_DEFAULT, options, results, output).await?;
+        format(theme, options, results, output).await?;
 
         Ok(output.to_string().replace("\r\n", "\n"))
     }
@@ -182,7 +185,6 @@ mod tests {
         let expected = indoc! {r#"
             +----+
             | id |
-            +====+
             +----+
             0 rows (9ns)
         "#};
@@ -205,7 +207,6 @@ mod tests {
         let expected = indoc! {r#"
             +----+
             | id |
-            +====+
             +----+
             0 rows
         "#};
@@ -226,7 +227,7 @@ mod tests {
         let expected = indoc! {r#"
             +--------+
             |   id   |
-            +========+
+            +--------+
             | NULL   |
             +--------+
             | 12,345 |
@@ -306,7 +307,7 @@ mod tests {
         let expected = indoc! {r#"
             +--------+--------+----------------------------+
             | number | string |            text            |
-            +========+========+============================+
+            +--------+--------+----------------------------+
             |     42 | foo    | Lorem ipsum dolor sit amet |
             +--------+--------+----------------------------+
             1 row (9ns)

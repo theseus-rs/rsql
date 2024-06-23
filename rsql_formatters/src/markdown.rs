@@ -3,20 +3,7 @@ use crate::formatter::FormatterOptions;
 use crate::writers::Output;
 use crate::{table, Results};
 use async_trait::async_trait;
-use lazy_static::lazy_static;
-use prettytable::format::{FormatBuilder, LinePosition, LineSeparator, TableFormat};
-
-lazy_static! {
-    pub static ref FORMAT_MARKDOWN: TableFormat = FormatBuilder::new()
-        .column_separator('|')
-        .borders('|')
-        .separators(
-            &[LinePosition::Title],
-            LineSeparator::new('-', '|', '|', '|')
-        )
-        .padding(1, 1)
-        .build();
-}
+use tabled::settings::{Style, Theme};
 
 /// A formatter for markdown tables
 #[derive(Debug, Default)]
@@ -34,7 +21,8 @@ impl crate::Formatter for Formatter {
         results: &mut Results,
         output: &mut Output,
     ) -> Result<()> {
-        table::format(*FORMAT_MARKDOWN, options, results, output).await
+        let theme = Theme::from_style(Style::markdown());
+        table::format(theme, options, results, output).await
     }
 }
 
