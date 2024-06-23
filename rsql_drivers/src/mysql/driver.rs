@@ -231,7 +231,7 @@ mod test {
     }
 
     async fn test_data_types(connection: &mut dyn Connection) -> anyhow::Result<()> {
-        let sql = indoc! {r#"
+        let sql = indoc! {r"
             CREATE TABLE data_types (
                 char_type CHAR,
                 varchar_type VARCHAR(50),
@@ -253,7 +253,7 @@ mod test {
                 timestamp_type TIMESTAMP,
                 json_type JSON
             )
-        "#};
+        "};
         let _ = connection.execute(sql).await?;
 
         let sql = indoc! {r#"
@@ -271,13 +271,13 @@ mod test {
         "#};
         let _ = connection.execute(sql).await?;
 
-        let sql = indoc! {r#"
+        let sql = indoc! {r"
             SELECT char_type, varchar_type, text_type, binary_type, varbinary_type, blob_type,
                    tinyint_type, smallint_type, mediumint_type, int_type, bigint_type,
                    decimal_type, float_type, double_type, date_type, time_type, datetime_type,
                    timestamp_type, json_type
               FROM data_types
-        "#};
+        "};
         let mut query_result = connection.query(sql).await?;
         assert_eq!(
             query_result.next().await,
