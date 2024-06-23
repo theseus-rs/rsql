@@ -61,13 +61,13 @@ mod tests {
         formatter.format(&options, &mut results, output).await?;
 
         let unicode_output = output.to_string().replace("\r\n", "\n");
-        let expected = indoc! {r#"
+        let expected = indoc! {r"
                id   | value 
              -------+-------
               1,234 | foo   
               5,678 | bar   
              2 rows (9ns)
-        "#};
+        "};
         assert_eq!(unicode_output, expected);
         Ok(())
     }

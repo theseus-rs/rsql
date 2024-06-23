@@ -4,7 +4,7 @@ use crate::formatter::FormatterOptions;
 use crate::highlighter::Highlighter;
 use crate::writers::Output;
 use crate::Results;
-use crate::Results::Query;
+use crate::Results::{Execute, Query};
 use async_trait::async_trait;
 use indexmap::IndexMap;
 use rsql_drivers::Value;
@@ -36,7 +36,7 @@ pub(crate) async fn format_yaml(
 ) -> Result<()> {
     let query_result = match results {
         Query(query_result) => query_result,
-        _ => return write_footer(options, results, 0, output).await,
+        Execute(_) => return write_footer(options, results, 0, output).await,
     };
 
     let mut yaml_rows: Vec<IndexMap<&String, Value>> = Vec::new();
@@ -120,7 +120,7 @@ mod test {
             .await?;
 
         let output = output.to_string().replace("\r\n", "\n");
-        let expected = indoc! {r#"
+        let expected = indoc! {r"
             - id: 1
               data: Ynl0ZXM=
             - id: 2
@@ -128,7 +128,7 @@ mod test {
             - id: 3
               data: null
             3 rows (9ns)
-        "#};
+        "};
         assert_eq!(output, expected);
         Ok(())
     }

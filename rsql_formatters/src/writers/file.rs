@@ -12,14 +12,21 @@ pub struct FileWriter {
 }
 
 impl FileWriter {
+    #[must_use]
     pub fn new(file: File) -> Self {
         Self { file }
     }
 
+    #[must_use]
     pub fn file(&self) -> &File {
         &self.file
     }
 
+    /// Create a new `FileWriter` from a path
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the file cannot be created
     pub fn from_path<P: AsRef<Path>>(path: P) -> Result<Self> {
         Ok(Self {
             file: File::create(path)?,

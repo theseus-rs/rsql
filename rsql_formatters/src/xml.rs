@@ -2,7 +2,7 @@ use crate::error::Result;
 use crate::footer::write_footer;
 use crate::formatter::FormatterOptions;
 use crate::writers::Output;
-use crate::Results::Query;
+use crate::Results::{Execute, Query};
 use crate::{Highlighter, Results};
 use async_trait::async_trait;
 use quick_xml::events::{BytesEnd, BytesStart, BytesText, Event};
@@ -35,7 +35,7 @@ pub(crate) async fn format_xml(
 ) -> Result<()> {
     let query_result = match results {
         Query(query_result) => query_result,
-        _ => return write_footer(options, results, 0, output).await,
+        Execute(_) => return write_footer(options, results, 0, output).await,
     };
 
     let mut raw_output = Output::default();
@@ -122,7 +122,7 @@ mod test {
             .await?;
 
         let output = output.to_string().replace("\r\n", "\n");
-        let expected = indoc! {r#"
+        let expected = indoc! {r"
             <results>
               <row>
                 <id>1</id>
@@ -138,7 +138,7 @@ mod test {
               </row>
             </results>
             3 rows (9ns)
-        "#};
+        "};
         assert_eq!(output, expected);
         Ok(())
     }

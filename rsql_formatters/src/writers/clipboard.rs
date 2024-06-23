@@ -11,14 +11,21 @@ pub struct ClipboardWriter {
 }
 
 impl ClipboardWriter {
+    #[must_use]
     pub fn new(clipboard: Clipboard, buffer: Vec<u8>) -> Self {
         Self { clipboard, buffer }
     }
 
+    #[must_use]
     pub fn as_slice(&self) -> &[u8] {
         self.buffer.as_slice()
     }
 
+    /// Convert the buffer to a UTF-8 string
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the buffer is not valid UTF-8
     pub fn as_utf8(&self) -> std::result::Result<String, FromUtf8Error> {
         String::from_utf8(self.buffer.clone())
     }
@@ -56,7 +63,7 @@ impl Write for ClipboardWriter {
 
     fn flush(&mut self) -> Result<()> {
         self.buffer.flush()?;
-        let data = String::from_utf8(self.buffer.to_vec()).map_err(|_| {
+        let data = String::from_utf8(self.buffer.clone()).map_err(|_| {
             io::Error::new(io::ErrorKind::InvalidData, "Failed to convert to UTF-8")
         })?;
         self.clipboard

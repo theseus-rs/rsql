@@ -19,6 +19,12 @@ pub struct Highlighter {
 }
 
 impl Highlighter {
+    /// Create a new highlighter
+    ///
+    /// # Panics
+    ///
+    /// Panics if the syntax or theme cannot be found
+    #[must_use]
     pub fn new(options: &FormatterOptions, syntax_name: &str) -> Self {
         let color = options.color;
         let syntax_set = SyntaxSet::load_defaults_newlines();
@@ -42,14 +48,22 @@ impl Highlighter {
         }
     }
 
+    /// Highlight the content
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the content cannot be highlighted
+    ///
+    /// # Panics
+    ///
+    /// Panics if the content cannot be highlighted
     pub fn highlight<'l>(&self, content: &'l str) -> Result<Cow<'l, str>> {
         if !self.color {
             return Ok(content.into());
         }
 
-        let color_level = match supports_color::on(Stream::Stdout) {
-            Some(color_level) => color_level,
-            None => return Ok(content.into()),
+        let Some(color_level) = supports_color::on(Stream::Stdout) else {
+            return Ok(content.into());
         };
 
         let mut highlighter = HighlightLines::new(&self.syntax, &self.theme);
@@ -64,22 +78,22 @@ impl Highlighter {
             // iTerm2 - reports as 256 color support; works with 24-bit color
             // Ubuntu Terminal - reports as has_basic; works with 24-bit color
             // Windows Terminal - reports as has_basic; works with 24-bit color
-            return Ok(self.as_256_color_terminal_escaped(&ranges));
+            return Ok(Self::as_256_color_terminal_escaped(&ranges));
         }
 
         // No color support
         Ok(content.into())
     }
 
-    fn as_256_color_terminal_escaped<'l>(&self, ranges: &[(Style, &'l str)]) -> Cow<'l, str> {
+    fn as_256_color_terminal_escaped<'l>(ranges: &[(Style, &'l str)]) -> Cow<'l, str> {
         let mut color_line: String = String::new();
-        for &(ref style, text) in ranges.iter() {
+        for &(ref style, text) in ranges {
             let foreground =
                 ansi256_from_rgb([style.foreground.r, style.foreground.g, style.foreground.b]);
-            write!(color_line, "\x1b[38;5;{}m{}", foreground, text).expect("write color");
+            write!(color_line, "\x1b[38;5;{foreground}m{text}").expect("write color");
         }
 
-        write!(color_line, "{}", RESET).expect("write reset");
+        write!(color_line, "{RESET}").expect("write reset");
         color_line.into()
     }
 }

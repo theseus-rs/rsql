@@ -40,7 +40,7 @@ async fn format_delimited(
         while let Some(row) = query_result.next().await {
             let mut csv_row: Vec<Vec<u8>> = Vec::new();
 
-            for data in row.into_iter() {
+            for data in &row {
                 let bytes = match data {
                     Value::Null => Vec::new(),
                     _ => Vec::from(data.to_string().as_bytes()),

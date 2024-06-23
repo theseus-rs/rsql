@@ -2,7 +2,7 @@ use crate::error::Result;
 use crate::footer::write_footer;
 use crate::formatter::FormatterOptions;
 use crate::writers::Output;
-use crate::Results::Query;
+use crate::Results::{Execute, Query};
 use crate::{Highlighter, Results};
 use async_trait::async_trait;
 use indexmap::IndexMap;
@@ -37,7 +37,7 @@ pub(crate) async fn format_json(
 ) -> Result<()> {
     let query_result = match results {
         Query(query_result) => query_result,
-        _ => return write_footer(options, results, 0, output).await,
+        Execute(_) => return write_footer(options, results, 0, output).await,
     };
 
     let highlighter = Highlighter::new(options, "json");
@@ -60,11 +60,11 @@ pub(crate) async fn format_json(
                 json_row.insert(column, data.clone());
             }
         }
-        if !jsonl {
-            json_rows.push(json_row);
-        } else {
+        if jsonl {
             let json = json!(json_row).to_string();
             write!(output, "{}", highlighter.highlight(json.as_str())?)?;
+        } else {
+            json_rows.push(json_row);
         }
 
         rows += 1;

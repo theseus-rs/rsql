@@ -47,7 +47,7 @@ pub async fn format(
             table.modify(cell, Alignment::right());
         }
 
-        writeln!(output, "{}", table)?;
+        writeln!(output, "{table}")?;
     }
 
     write_footer(options, results, rows, output).await?;
@@ -66,15 +66,15 @@ async fn process_data(
         let mut row_data = Vec::new();
 
         for (column, data) in row.into_iter().enumerate() {
-            let data = match data {
-                Value::Null => "NULL".to_string(),
-                _ => {
-                    if data.is_numeric() {
-                        let row = if options.header { rows + 1 } else { rows };
-                        cells.push(Cell::new(row as usize, column));
-                    }
-                    data.to_formatted_string(&locale)
+            let data = if data == &Value::Null {
+                "NULL".to_string()
+            } else {
+                if data.is_numeric() {
+                    let row = if options.header { rows + 1 } else { rows };
+                    let cell = Cell::new(usize::try_from(row)?, column);
+                    cells.push(cell);
                 }
+                data.to_formatted_string(&locale)
             };
 
             row_data.push(data);
@@ -182,12 +182,12 @@ mod tests {
         let mut results = query_result_no_rows();
 
         let output = test_format(&mut options, &mut results).await?;
-        let expected = indoc! {r#"
+        let expected = indoc! {r"
             +----+
             | id |
             +----+
             0 rows (9ns)
-        "#};
+        "};
         assert_eq!(output, expected);
         Ok(())
     }
@@ -204,12 +204,12 @@ mod tests {
         let mut results = query_result_no_rows();
 
         let output = test_format(&mut options, &mut results).await?;
-        let expected = indoc! {r#"
+        let expected = indoc! {r"
             +----+
             | id |
             +----+
             0 rows
-        "#};
+        "};
         assert_eq!(output, expected);
         Ok(())
     }
@@ -224,7 +224,7 @@ mod tests {
         let mut results = query_result_two_rows();
 
         let output = test_format(&mut options, &mut results).await?;
-        let expected = indoc! {r#"
+        let expected = indoc! {r"
             +--------+
             |   id   |
             +--------+
@@ -233,7 +233,7 @@ mod tests {
             | 12,345 |
             +--------+
             2 rows (9ns)
-        "#};
+        "};
         assert_eq!(output, expected);
         Ok(())
     }
@@ -268,11 +268,11 @@ mod tests {
         let mut results = query_result_one_row();
 
         let output = test_format(&mut options, &mut results).await?;
-        let expected = indoc! {r#"
+        let expected = indoc! {r"
             +--------+
             | 12,345 |
             +--------+
-        "#};
+        "};
         assert_eq!(output, expected);
         Ok(())
     }
@@ -287,9 +287,9 @@ mod tests {
         let mut results = query_result_no_columns();
 
         let output = test_format(&mut options, &mut results).await?;
-        let expected = indoc! {r#"
+        let expected = indoc! {r"
             0 rows (9ns)
-        "#};
+        "};
         assert_eq!(output, expected);
         Ok(())
     }
@@ -304,14 +304,14 @@ mod tests {
         let mut results = query_result_number_and_string();
 
         let output = test_format(&mut options, &mut results).await?;
-        let expected = indoc! {r#"
+        let expected = indoc! {r"
             +--------+--------+----------------------------+
             | number | string |            text            |
             +--------+--------+----------------------------+
             |     42 | foo    | Lorem ipsum dolor sit amet |
             +--------+--------+----------------------------+
             1 row (9ns)
-        "#};
+        "};
         assert_eq!(output, expected);
         Ok(())
     }

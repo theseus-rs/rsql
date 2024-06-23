@@ -9,6 +9,7 @@ pub struct Output {
 }
 
 impl Output {
+    #[must_use]
     pub fn new(writer: Box<dyn Writer + Send + Sync>) -> Self {
         Self { writer }
     }
@@ -17,6 +18,11 @@ impl Output {
         self.writer = writer;
     }
 
+    /// Write a formatted string to the output
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the write operation fails
     pub fn write_fmt(&mut self, fmt: std::fmt::Arguments) -> io::Result<()> {
         self.writer.write_fmt(fmt)
     }

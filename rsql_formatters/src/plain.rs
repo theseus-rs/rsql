@@ -58,11 +58,11 @@ mod tests {
         formatter.format(&options, &mut results, output).await?;
 
         let plain_output = output.to_string().replace("\r\n", "\n");
-        let expected = indoc! {r#"
+        let expected = indoc! {r"
                id   
              12,345 
             1 row (5.678µs)
-        "#};
+        "};
         assert_eq!(plain_output, expected);
         Ok(())
     }

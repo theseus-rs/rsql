@@ -8,6 +8,7 @@ use std::time::Duration;
 
 /// Options for formatters
 #[derive(Debug)]
+#[allow(clippy::struct_excessive_bools)]
 pub struct FormatterOptions {
     pub changes: bool,
     pub color: bool,
@@ -44,10 +45,12 @@ pub enum Results {
 }
 
 impl Results {
+    #[must_use]
     pub fn is_query(&self) -> bool {
         matches!(self, Results::Query(_))
     }
 
+    #[must_use]
     pub fn is_execute(&self) -> bool {
         matches!(self, Results::Execute(_))
     }
@@ -72,6 +75,7 @@ pub struct FormatterManager {
 
 impl FormatterManager {
     /// Create a new instance of the `FormatterManager`
+    #[must_use]
     pub fn new() -> Self {
         FormatterManager {
             formats: BTreeMap::new(),
@@ -85,13 +89,14 @@ impl FormatterManager {
     }
 
     /// Get a formatters by name
+    #[must_use]
     pub fn get(&self, identifier: &str) -> Option<&dyn Formatter> {
-        self.formats.get(identifier).map(|format| format.as_ref())
+        self.formats.get(identifier).map(AsRef::as_ref)
     }
 
     /// Get an iterator over the available formatters
     pub fn iter(&self) -> impl Iterator<Item = &dyn Formatter> {
-        self.formats.values().map(|format| format.as_ref())
+        self.formats.values().map(AsRef::as_ref)
     }
 }
 
