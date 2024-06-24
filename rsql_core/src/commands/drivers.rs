@@ -23,11 +23,11 @@ impl ShellCommand for Command {
         let list_delimiter = t!("list_delimiter", locale = locale).to_string();
         let drivers: String = driver_manager
             .iter()
-            .map(|driver| driver.identifier())
+            .map(rsql_drivers::Driver::identifier)
             .collect::<Vec<_>>()
             .join(list_delimiter.as_str());
         let drivers_options = t!("drivers_options", locale = locale, drivers = drivers).to_string();
-        writeln!(options.output, "{}", drivers_options)?;
+        writeln!(options.output, "{drivers_options}")?;
 
         Ok(LoopCondition::Continue)
     }

@@ -4,7 +4,6 @@ use async_trait::async_trait;
 use rsql_drivers::{MemoryQueryResult, Row, Table, Value};
 use rsql_formatters::Results;
 use rust_i18n::t;
-use std::ops::Deref;
 
 /// Describe the specified database object
 #[derive(Debug, Default)]
@@ -47,9 +46,9 @@ impl ShellCommand for Command {
         let mut table_column_rows = Vec::new();
 
         let index_label = t!("index", locale = locale).to_string();
-        let columns_label = t!("describe_columns", locale = locale).to_string();
-        let unique_label = t!("describe_unique", locale = locale).to_string();
-        let indexes_column_labels = vec![index_label, columns_label, unique_label];
+        let index_columns_label = t!("describe_columns", locale = locale).to_string();
+        let index_unique_label = t!("describe_unique", locale = locale).to_string();
+        let indexes_column_labels = vec![index_label, index_columns_label, index_unique_label];
         let mut indexes_column_rows = Vec::new();
         let mut table: Option<&Table> = None;
 
@@ -82,7 +81,7 @@ impl ShellCommand for Command {
                 };
                 let row = Row::new(vec![
                     Value::String(index.name().to_string()),
-                    Value::String(index.columns().join(list_delimiter.deref())),
+                    Value::String(index.columns().join(&*list_delimiter)),
                     Value::String(unique),
                 ]);
                 indexes_column_rows.push(row);
@@ -119,7 +118,7 @@ impl ShellCommand for Command {
             .await?;
 
         let indexes_label = t!("describe_indexes", locale = locale).to_string();
-        writeln!(output, "{}", indexes_label)?;
+        writeln!(output, "{indexes_label}")?;
         formatter
             .format(formatter_options, &mut indexes_results, output)
             .await?;
@@ -244,7 +243,7 @@ mod tests {
 
         assert_eq!(result, LoopCondition::Continue);
         let contents = output.to_string().replace("\r\n", "\n");
-        let expected = indoc! {r#"
+        let expected = indoc! {r"
             ╭────────┬─────────┬──────────┬─────────╮
             │ Column │  Type   │ Not null │ Default │
             ├────────┼─────────┼──────────┼─────────┤
@@ -260,7 +259,7 @@ mod tests {
             ├────────────────┼─────────┼────────┤
             │ users_name_idx │ name    │ No     │
             ╰────────────────┴─────────┴────────╯
-        "#};
+        "};
         assert_eq!(contents, expected);
 
         Ok(())

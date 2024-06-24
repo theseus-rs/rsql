@@ -18,7 +18,6 @@ pub trait Driver: Debug + Send + Sync {
 
 /// Manages available drivers
 #[derive(Debug)]
-#[allow(clippy::module_name_repetitions)]
 pub struct DriverManager {
     drivers: BTreeMap<&'static str, Box<dyn Driver>>,
 }

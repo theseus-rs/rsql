@@ -45,7 +45,7 @@ impl ShellCommand for Command {
                 EchoMode::Off => off,
             };
             let echo_setting = t!("echo_setting", locale = locale, echo = echo).to_string();
-            writeln!(options.output, "{}", echo_setting)?;
+            writeln!(options.output, "{echo_setting}")?;
             return Ok(LoopCondition::Continue);
         }
 

@@ -21,7 +21,7 @@ impl ShellCommand for Command {
     }
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
-        let default = "".to_string();
+        let default = String::new();
         let command_name = options.input.get(1).unwrap_or(&default);
         let mut command = tokio::process::Command::new(command_name);
         let args = options.input.iter().skip(2);
@@ -32,12 +32,12 @@ impl ShellCommand for Command {
         let stdout = String::from_utf8_lossy(&output.stdout).into_owned();
 
         if !stdout.is_empty() {
-            write!(options.output, "{}", stdout)?;
+            write!(options.output, "{stdout}")?;
         }
 
         let stderr = String::from_utf8_lossy(&output.stderr).into_owned();
         if !stderr.is_empty() {
-            write!(options.output, "{}", stderr)?;
+            write!(options.output, "{stderr}")?;
         }
 
         Ok(LoopCondition::Continue)

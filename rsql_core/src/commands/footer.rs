@@ -35,7 +35,7 @@ impl ShellCommand for Command {
                 off
             };
             let footer_setting = t!("footer_setting", locale = locale, footer = footer).to_string();
-            writeln!(options.output, "{}", footer_setting)?;
+            writeln!(options.output, "{footer_setting}")?;
             return Ok(LoopCondition::Continue);
         }
 

@@ -26,7 +26,7 @@ impl ShellCommand for Command {
 
         if options.input.len() <= 1 {
             let format_setting = t!("locale_setting", locale = locale, locale = locale).to_string();
-            writeln!(options.output, "{}", format_setting)?;
+            writeln!(options.output, "{format_setting}")?;
             return Ok(LoopCondition::Continue);
         }
 

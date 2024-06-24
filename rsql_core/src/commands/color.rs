@@ -31,7 +31,7 @@ impl ShellCommand for Command {
         if options.input.len() <= 1 {
             let color = if options.configuration.color { on } else { off };
             let color_setting = t!("color_setting", locale = locale, color = color).to_string();
-            writeln!(options.output, "{}", color_setting)?;
+            writeln!(options.output, "{color_setting}")?;
             return Ok(LoopCondition::Continue);
         }
 

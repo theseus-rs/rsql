@@ -25,7 +25,7 @@ impl ShellCommand for Command {
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
         let locale = options.configuration.locale.as_str();
-        let file = options.input.get(1).unwrap_or(&"".to_string()).to_string();
+        let file = options.input.get(1).unwrap_or(&String::new()).to_string();
         let contents = fs::read_to_string(file);
 
         if let Err(error) = contents {

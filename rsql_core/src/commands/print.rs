@@ -25,7 +25,7 @@ impl ShellCommand for Command {
             writeln!(options.output)?;
         } else {
             for option in options.input.iter().skip(1) {
-                writeln!(options.output, "{}", option)?;
+                writeln!(options.output, "{option}")?;
             }
         }
 

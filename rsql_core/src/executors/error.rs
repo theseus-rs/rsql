@@ -19,21 +19,21 @@ pub enum Error {
     IoError(anyhow::Error),
 }
 
-/// Converts a [indicatif::style::TemplateError] into an [IoError](Error::IoError)
+/// Converts a [`indicatif::style::TemplateError`] into an [`IoError`](Error::IoError)
 impl From<indicatif::style::TemplateError> for Error {
     fn from(error: indicatif::style::TemplateError) -> Self {
         Error::IoError(error.into())
     }
 }
 
-/// Converts a [regex::Error] into an [IoError](Error::IoError)
+/// Converts a [`regex::Error`] into an [`IoError`](Error::IoError)
 impl From<regex::Error> for Error {
     fn from(error: regex::Error) -> Self {
         Error::IoError(error.into())
     }
 }
 
-/// Converts a [std::io::Error] into an [IoError](Error::IoError)
+/// Converts a [`std::io::Error`] into an [`IoError`](Error::IoError)
 impl From<std::io::Error> for Error {
     fn from(error: std::io::Error) -> Self {
         Error::IoError(error.into())

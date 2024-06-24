@@ -36,7 +36,7 @@ impl ShellCommand for Command {
                 off
             };
             let bail_setting = t!("bail_setting", locale = locale, bail = bail).to_string();
-            writeln!(options.output, "{}", bail_setting)?;
+            writeln!(options.output, "{bail_setting}")?;
             return Ok(LoopCondition::Continue);
         }
 

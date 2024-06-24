@@ -25,36 +25,42 @@ pub struct ShellBuilder {
 /// A shell for interacting with a database.
 impl ShellBuilder {
     /// Set the configuration for the shell.
+    #[must_use]
     pub fn with_configuration(mut self, configuration: Configuration) -> Self {
         self.shell.configuration = configuration;
         self
     }
 
     /// Set the driver manager for the shell.
+    #[must_use]
     pub fn with_driver_manager(mut self, driver_manager: DriverManager) -> Self {
         self.shell.driver_manager = driver_manager;
         self
     }
 
     /// Set the command manager for the shell.
+    #[must_use]
     pub fn with_command_manager(mut self, command_manager: CommandManager) -> Self {
         self.shell.command_manager = command_manager;
         self
     }
 
     /// Set the formatter manager for the shell.
+    #[must_use]
     pub fn with_formatter_manager(mut self, formatter_manager: FormatterManager) -> Self {
         self.shell.formatter_manager = formatter_manager;
         self
     }
 
     /// Set the output for the shell.
+    #[must_use]
     pub fn with_output(mut self, output: Output) -> Self {
         self.shell.output = output;
         self
     }
 
     /// Build the shell.
+    #[must_use]
     pub fn build(self) -> Shell {
         self.shell
     }
@@ -73,6 +79,10 @@ pub struct Shell {
 /// Shell implementation.
 impl Shell {
     /// Execute the shell with the provided arguments.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the shell fails to execute.
     pub async fn execute(&mut self, args: &ShellArgs) -> Result<i32> {
         let mut binding = self.driver_manager.connect(args.url.as_str()).await?;
         let connection = binding.as_mut();
@@ -165,14 +175,14 @@ impl Shell {
                     if self.configuration.color {
                         program_interrupted = program_interrupted.red().to_string();
                     }
-                    eprintln!("{}", program_interrupted);
+                    eprintln!("{program_interrupted}");
                     error!("Program interrupted");
                     connection.close().await?;
                     LoopCondition::Exit(1)
                 }
                 Err(error) => {
                     let mut error_string = t!("error", locale = locale).to_string();
-                    let error_message = format!("{:?}", error);
+                    let error_message = format!("{error:?}");
                     if self.configuration.color {
                         error_string = error_string.red().to_string();
                     }
@@ -225,7 +235,7 @@ impl Shell {
             Err(error) => {
                 let locale = self.configuration.locale.as_str();
                 let mut error_string = t!("error", locale = locale).to_string();
-                let error_message = format!("{:?}", error);
+                let error_message = format!("{error:?}");
                 if self.configuration.color {
                     error_string = error_string.red().to_string();
                 }
@@ -328,7 +338,7 @@ mod test {
     #[test]
     fn test_shell_debug() {
         let shell = ShellBuilder::default().build();
-        let debug = format!("{:?}", shell);
+        let debug = format!("{shell:?}");
         assert!(debug.contains("Shell"));
         assert!(debug.contains("configuration"));
         assert!(debug.contains("driver_manager"));
@@ -370,7 +380,7 @@ mod test {
         Ok(())
     }
 
-    async fn test_editor(color: bool) -> anyhow::Result<()> {
+    fn test_editor(color: bool) -> anyhow::Result<()> {
         let configuration = Configuration {
             bail_on_error: false,
             color,
@@ -386,12 +396,12 @@ mod test {
 
     #[tokio::test]
     async fn test_editor_color_true() -> anyhow::Result<()> {
-        test_editor(true).await
+        test_editor(true)
     }
 
     #[tokio::test]
     async fn test_editor_color_false() -> anyhow::Result<()> {
-        test_editor(false).await
+        test_editor(false)
     }
 
     #[tokio::test]

@@ -3,7 +3,7 @@ extern crate unicode_width;
 
 use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use async_trait::async_trait;
-use colored::*;
+use colored::Colorize;
 use rust_i18n::t;
 use unicode_width::UnicodeWidthStr;
 
@@ -137,10 +137,10 @@ mod tests {
     #[tokio::test]
     async fn test_execute_unicode_format_en() -> anyhow::Result<()> {
         let contents = test_execute(false, ".", "en", "help").await?;
-        let expected = indoc! {r#"
+        let expected = indoc! {r"
             .footer on|off  Enable or disable result footer
             .help           Show this help message
-        "#};
+        "};
         assert_eq!(contents, expected);
         Ok(())
     }
@@ -148,10 +148,10 @@ mod tests {
     #[tokio::test]
     async fn test_execute_unicode_format_de() -> anyhow::Result<()> {
         let contents = test_execute(false, ".", "de", "hilfe").await?;
-        let expected = indoc! {r#"
+        let expected = indoc! {r"
             .fußzeile ein|aus  Ergebnisfuß aktivieren oder deaktivieren
             .hilfe             Diese Hilfemeldung anzeigen
-        "#};
+        "};
         assert_eq!(contents, expected);
         Ok(())
     }

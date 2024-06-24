@@ -1,6 +1,7 @@
 use crate::commands::Error::InvalidOption;
 use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use async_trait::async_trait;
+use rsql_formatters::Formatter;
 use rust_i18n::t;
 
 /// Command to set the results format
@@ -32,17 +33,17 @@ impl ShellCommand for Command {
                 format = options.configuration.results_format
             )
             .to_string();
-            writeln!(options.output, "{}", format_setting)?;
+            writeln!(options.output, "{format_setting}")?;
 
             let list_delimiter = t!("list_delimiter", locale = locale).to_string();
             let formats: String = formatter_manager
                 .iter()
-                .map(|driver| driver.identifier())
+                .map(Formatter::identifier)
                 .collect::<Vec<_>>()
                 .join(list_delimiter.as_str());
             let format_options =
                 t!("format_options", locale = locale, formats = formats).to_string();
-            writeln!(options.output, "{}", format_options)?;
+            writeln!(options.output, "{format_options}")?;
 
             return Ok(LoopCondition::Continue);
         }

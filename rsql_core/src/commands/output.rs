@@ -33,7 +33,7 @@ impl ShellCommand for Command {
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
         let locale = options.configuration.locale.as_str();
         let clipboard = t!("output_clipboard", locale = locale).to_string();
-        let option = options.input.get(1).unwrap_or(&"".to_string()).to_string();
+        let option = options.input.get(1).unwrap_or(&String::new()).to_string();
 
         if option.is_empty() {
             options.output.set(Box::new(StdoutWriter));
@@ -121,7 +121,7 @@ mod tests {
 
         let result = Command.execute(options).await?;
         assert_eq!(result, LoopCondition::Continue);
-        let output_debug = format!("{:?}", output);
+        let output_debug = format!("{output:?}");
         assert!(output_debug.contains("ClipboardWriter"));
         Ok(())
     }
