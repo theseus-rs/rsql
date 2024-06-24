@@ -1,5 +1,7 @@
 #![forbid(unsafe_code)]
 #![deny(clippy::pedantic)]
+#![allow(clippy::module_name_repetitions)]
+
 #[macro_use]
 extern crate rust_i18n;
 

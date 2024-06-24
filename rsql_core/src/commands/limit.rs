@@ -32,7 +32,7 @@ impl ShellCommand for Command {
                 .results_limit
                 .to_formatted_string(&num_locale);
             let limit_setting = t!("limit_setting", locale = locale, limit = limit).to_string();
-            writeln!(options.output, "{}", limit_setting)?;
+            writeln!(options.output, "{limit_setting}")?;
             return Ok(LoopCondition::Continue);
         }
 

@@ -35,7 +35,7 @@ impl ShellCommand for Command {
                 off
             };
             let header_setting = t!("header_setting", locale = locale, header = header).to_string();
-            writeln!(options.output, "{}", header_setting)?;
+            writeln!(options.output, "{header_setting}")?;
             return Ok(LoopCondition::Continue);
         }
 

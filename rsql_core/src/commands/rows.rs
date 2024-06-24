@@ -35,7 +35,7 @@ impl ShellCommand for Command {
                 off
             };
             let rows_setting = t!("rows_setting", locale = locale, rows = rows).to_string();
-            writeln!(options.output, "{}", rows_setting)?;
+            writeln!(options.output, "{rows_setting}")?;
             return Ok(LoopCondition::Continue);
         }
 

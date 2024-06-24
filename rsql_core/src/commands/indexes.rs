@@ -26,7 +26,7 @@ impl ShellCommand for Command {
         let start = std::time::Instant::now();
         let output = options.output;
         let metadata = options.connection.metadata().await?;
-        let table_filter = options.input.get(1).map(|s| s.as_str());
+        let table_filter = options.input.get(1).map(String::as_str);
         let configuration = options.configuration;
         let locale = &configuration.locale;
         let table_label = t!("table", locale = locale).to_string();

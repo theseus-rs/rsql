@@ -50,7 +50,7 @@ pub trait ShellCommand: Debug + Sync {
     fn name(&self, locale: &str) -> String;
     /// Get the arguments for the command
     fn args(&self, _locale: &str) -> String {
-        "".to_string()
+        String::new()
     }
     /// Get the description of the command
     fn description(&self, locale: &str) -> String;
@@ -66,6 +66,7 @@ pub struct CommandManager {
 
 impl CommandManager {
     /// Create a new instance of the `CommandManager` struct
+    #[must_use]
     pub fn new() -> Self {
         CommandManager {
             commands: Vec::new(),
@@ -74,10 +75,11 @@ impl CommandManager {
 
     /// Add a new command to the list of available commands
     pub fn add(&mut self, command: Box<dyn ShellCommand>) {
-        let _ = &self.commands.push(command);
+        let () = &self.commands.push(command);
     }
 
     /// Get a command by name
+    #[must_use]
     pub fn get(&self, locale: &str, name: &str) -> Option<&dyn ShellCommand> {
         for command in &self.commands {
             if command.name(locale) == name {
@@ -88,6 +90,7 @@ impl CommandManager {
     }
 
     /// Gets a command by starts with prefix if it is unique
+    #[must_use]
     pub fn get_starts_with(&self, locale: &str, prefix: &str) -> Option<&dyn ShellCommand> {
         let mut result: Option<&dyn ShellCommand> = None;
         for command in &self.commands {
@@ -104,7 +107,7 @@ impl CommandManager {
 
     /// Get an iterator over the available commands
     pub(crate) fn iter(&self) -> impl Iterator<Item = &dyn ShellCommand> {
-        self.commands.iter().map(|command| command.as_ref())
+        self.commands.iter().map(AsRef::as_ref)
     }
 }
 
@@ -148,6 +151,7 @@ impl Default for CommandManager {
 mod tests {
     use super::*;
     use rsql_drivers::MockConnection;
+    use rustyline::history::FileHistory;
 
     #[test]
     fn test_debug() {
@@ -157,12 +161,12 @@ mod tests {
             driver_manager: &DriverManager::default(),
             formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
-            history: &Default::default(),
+            history: &FileHistory::default(),
             input: vec!["42".to_string()],
             output: &mut Output::default(),
         };
 
-        let debug = format!("{:?}", options);
+        let debug = format!("{options:?}");
         assert!(debug.contains("CommandOptions"));
         assert!(debug.contains("configuration"));
         assert!(debug.contains("command_manager"));

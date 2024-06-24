@@ -35,7 +35,7 @@ impl ShellCommand for Command {
                 off
             };
             let timer_setting = t!("timer_setting", locale = locale, timer = timer).to_string();
-            writeln!(options.output, "{}", timer_setting)?;
+            writeln!(options.output, "{timer_setting}")?;
             return Ok(LoopCondition::Continue);
         }
 

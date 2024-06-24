@@ -27,21 +27,21 @@ pub enum Error {
     },
 }
 
-/// Converts a [clearscreen::Error] into an [IoError](Error::IoError)
+/// Converts a [`clearscreen::Error`] into an [`IoError`](Error::IoError)
 impl From<clearscreen::Error> for Error {
     fn from(error: clearscreen::Error) -> Self {
         Error::IoError(error.into())
     }
 }
 
-/// Converts a [std::num::ParseIntError] into an [IoError](Error::IoError)
+/// Converts a [`std::num::ParseIntError`] into an [`IoError`](Error::IoError)
 impl From<std::num::ParseIntError> for Error {
     fn from(error: std::num::ParseIntError) -> Self {
         Error::IoError(error.into())
     }
 }
 
-/// Converts a [std::io::Error] into an [IoError](Error::IoError)
+/// Converts a [`std::io::Error`] into an [`IoError`](Error::IoError)
 impl From<std::io::Error> for Error {
     fn from(error: std::io::Error) -> Self {
         Error::IoError(error.into())

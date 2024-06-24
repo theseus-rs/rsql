@@ -19,7 +19,7 @@ pub(crate) struct SqlExecutor<'a> {
     output: &'a mut Output,
 }
 
-/// Implementation for [SqlExecutor].
+/// Implementation for [`SqlExecutor`].
 impl<'a> SqlExecutor<'a> {
     pub(crate) fn new(
         configuration: &'a Configuration,
@@ -39,15 +39,13 @@ impl<'a> SqlExecutor<'a> {
     pub(crate) async fn execute(&mut self, sql: &str) -> Result<LoopCondition> {
         let start = std::time::Instant::now();
         let result_format = &self.configuration.results_format;
-        let formatter = match self.formatter_manager.get(result_format) {
-            Some(formatter) => formatter,
-            None => {
-                return Err(rsql_formatters::Error::UnknownFormat {
-                    format: result_format.to_string(),
-                }
-                .into())
+        let Some(formatter) = self.formatter_manager.get(result_format) else {
+            return Err(rsql_formatters::Error::UnknownFormat {
+                format: result_format.to_string(),
             }
+            .into());
         };
+
         let mut options = self.configuration.get_formatter_options();
 
         let limit = self.configuration.results_limit;
@@ -114,7 +112,7 @@ mod tests {
 
         let executor =
             SqlExecutor::new(&configuration, &formatter_manager, &mut connection, output);
-        let debug = format!("{:?}", executor);
+        let debug = format!("{executor:?}");
         assert!(debug.contains("SqlExecutor"));
         assert!(debug.contains("configuration"));
         assert!(debug.contains("formatter_manager"));

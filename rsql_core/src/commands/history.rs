@@ -48,7 +48,7 @@ impl ShellCommand for Command {
                         entry = entry
                     );
 
-                    writeln!(options.output, "{}", history_list_entry)?;
+                    writeln!(options.output, "{history_list_entry}")?;
                 }
 
                 on
@@ -57,7 +57,7 @@ impl ShellCommand for Command {
             };
             let history_setting =
                 t!("history_setting", locale = locale, history = history).to_string();
-            writeln!(options.output, "{}", history_setting)?;
+            writeln!(options.output, "{history_setting}")?;
 
             return Ok(LoopCondition::Continue);
         }

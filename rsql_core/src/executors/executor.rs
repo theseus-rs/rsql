@@ -42,20 +42,25 @@ impl<'a> Executor<'a> {
         }
     }
 
-    async fn parse_commands(&self, contents: String) -> Result<Vec<String>> {
+    fn parse_commands(&self, contents: &str) -> Result<Vec<String>> {
         let command_identifier = regex::escape(&self.configuration.command_identifier);
-        let pattern = format!(r"(?ms)^\s*({}.*?|.*?;|.*)\s*$", command_identifier);
+        let pattern = format!(r"(?ms)^\s*({command_identifier}.*?|.*?;|.*)\s*$");
         let regex = Regex::new(pattern.as_str())?;
         let commands: Vec<String> = regex
-            .find_iter(contents.as_str())
+            .find_iter(contents)
             .map(|mat| mat.as_str().trim().to_string())
             .collect();
         Ok(commands)
     }
 
+    /// Execute the command and return the loop condition.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the command cannot be executed.
     pub async fn execute(&mut self, input: &str) -> Result<LoopCondition> {
         let input = input.trim();
-        let commands = self.parse_commands(input.to_string()).await?;
+        let commands = self.parse_commands(input)?;
         for command in commands {
             if let LoopCondition::Exit(exit_code) = &self.execute_command(command.as_str()).await? {
                 return Ok(LoopCondition::Exit(*exit_code));
@@ -85,7 +90,7 @@ impl<'a> Executor<'a> {
         if input != echo_off {
             if self.configuration.echo == EchoMode::On {
                 let input = helper.highlight(input)?;
-                writeln!(&mut self.output, "{}", input)?;
+                writeln!(&mut self.output, "{input}")?;
             } else if self.configuration.echo == EchoMode::Prompt {
                 let prompt = t!(
                     "prompt",
@@ -93,7 +98,7 @@ impl<'a> Executor<'a> {
                     program_name = self.configuration.program_name,
                 );
                 let input = helper.highlight(input)?;
-                writeln!(&mut self.output, "{}{}", prompt, input)?;
+                writeln!(&mut self.output, "{prompt}{input}")?;
             }
         }
 
@@ -143,7 +148,6 @@ mod tests {
     use indoc::indoc;
     use mockall::predicate::eq;
     use rsql_drivers::MockConnection;
-    use std::ops::Deref;
 
     #[tokio::test]
     async fn test_debug() {
@@ -164,7 +168,7 @@ mod tests {
             &mut connection,
             output,
         );
-        let debug = format!("{:?}", executor);
+        let debug = format!("{executor:?}");
         assert!(debug.contains("Executor"));
         assert!(debug.contains("configuration"));
         assert!(debug.contains("command_manager"));
@@ -192,15 +196,15 @@ mod tests {
             &mut connection,
             &mut output,
         );
-        let contents = indoc! {r#"
+        let contents = indoc! {r"
             .bail on
             SELECT *
             FROM table;
             .timer on
             INSERT INTO table ...;
             .exit 1
-            SELECT 1"#};
-        let commands = executor.parse_commands(contents.to_string()).await?;
+            SELECT 1"};
+        let commands = executor.parse_commands(contents)?;
 
         assert_eq!(commands.len(), 6);
         assert_eq!(commands[0], ".bail on");
@@ -235,15 +239,15 @@ mod tests {
             &mut output,
         );
 
-        let contents = indoc! {r#"
+        let contents = indoc! {r"
             \bail on
             SELECT *
             FROM table;
             \timer on
             INSERT INTO table ...;
             \exit 1
-        "#};
-        let commands = executor.parse_commands(contents.to_string()).await?;
+        "};
+        let commands = executor.parse_commands(contents)?;
 
         assert_eq!(commands.len(), 5);
         assert_eq!(commands[0], "\\bail on");
@@ -278,10 +282,10 @@ mod tests {
             &mut output,
         );
 
-        let input = indoc! {r#"
+        let input = indoc! {r"
             .bail on
             .timer on
-        "#};
+        "};
         let _ = executor.execute(input).await?;
         assert!(configuration.bail_on_error);
         assert!(configuration.results_timer);
@@ -377,7 +381,7 @@ mod tests {
                     locale = locale,
                     program_name = configuration.program_name,
                 );
-                assert!(execute_output.contains(prompt.deref()));
+                assert!(execute_output.contains(&*prompt));
                 assert!(execute_output.contains(input.as_str()));
             }
             EchoMode::Off => assert!(!execute_output.contains(input.as_str())),
@@ -441,7 +445,7 @@ mod tests {
                     locale = locale,
                     program_name = configuration.program_name,
                 );
-                assert!(execute_output.contains(prompt.deref()));
+                assert!(execute_output.contains(&*prompt));
                 assert!(execute_output.contains(input));
             }
             EchoMode::Off => assert!(!execute_output.contains(input)),

@@ -20,7 +20,7 @@ pub(crate) struct CommandExecutor<'a> {
     output: &'a mut Output,
 }
 
-/// Implementation for [CommandExecutor].
+/// Implementation for [`CommandExecutor`].
 impl<'a> CommandExecutor<'a> {
     pub(crate) fn new(
         configuration: &'a mut Configuration,
@@ -131,7 +131,7 @@ mod tests {
             &mut connection,
             output,
         );
-        let debug = format!("{:?}", executor);
+        let debug = format!("{executor:?}");
         assert!(debug.contains("CommandExecutor"));
         assert!(debug.contains("configuration"));
         assert!(debug.contains("command_manager"));
@@ -209,27 +209,24 @@ mod tests {
         test_execute("!!").await
     }
 
-    fn assert_split(input: &str, expected: Vec<&str>) {
+    fn assert_split(input: &str, expected: &[&str]) {
         assert_eq!(split_string(input), expected);
     }
 
     #[test]
     fn test_split_strings() {
-        assert_split(r#"foo "bar baz""#, vec!["foo", "bar baz"]);
-        assert_split(r#"foo "bar'baz""#, vec!["foo", "bar'baz"]);
+        assert_split(r#"foo "bar baz""#, &["foo", "bar baz"]);
+        assert_split(r#"foo "bar'baz""#, &["foo", "bar'baz"]);
 
-        assert_split(r#"foo 'bar baz'"#, vec!["foo", "bar baz"]);
-        assert_split(r#"foo 'bar"baz'"#, vec!["foo", "bar\"baz"]);
+        assert_split(r"foo 'bar baz'", &["foo", "bar baz"]);
+        assert_split(r#"foo 'bar"baz'"#, &["foo", "bar\"baz"]);
 
         assert_split(
             r#"foo 'bar baz' "qux quux""#,
-            vec!["foo", "bar baz", "qux quux"],
+            &["foo", "bar baz", "qux quux"],
         );
 
-        assert_split(r#".print "hello, world!""#, vec![".print", "hello, world!"]);
-        assert_split(
-            r#"\print "hello, world!""#,
-            vec!["\\print", "hello, world!"],
-        );
+        assert_split(r#".print "hello, world!""#, &[".print", "hello, world!"]);
+        assert_split(r#"\print "hello, world!""#, &["\\print", "hello, world!"]);
     }
 }

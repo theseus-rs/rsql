@@ -36,7 +36,7 @@ impl ShellCommand for Command {
             };
             let changes_setting =
                 t!("changes_setting", locale = locale, changes = changes).to_string();
-            writeln!(options.output, "{}", changes_setting)?;
+            writeln!(options.output, "{changes_setting}")?;
             return Ok(LoopCondition::Continue);
         }
 
