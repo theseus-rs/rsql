@@ -20,7 +20,7 @@ The format command sets the format mode for the CLI. The default format mode is 
 | `jsonl`    | [JSON Lines (JSONL)](https://jsonlines.org/)                                        |
 | `markdown` | [Markdown](https://www.markdownguide.org/extended-syntax/#tables)                   |
 | `plain`    | Column based layout                                                                 |
-| `psql`     | PostgreSQL formatted table                                                          |
+| `psql`     | [PostgreSQL Standard Format](https://www.postgresql.org/docs/current/app-psql.html) |
 | `sqlite`   | SQLite formatted table                                                              |
 | `tsv`      | [Tab Separated Values (TSV)](https://en.wikipedia.org/wiki/Tab-separated_values)    |
 | `unicode`  | Unicode characters to draw a table                                                  |
