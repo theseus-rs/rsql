@@ -134,7 +134,7 @@ footer = true
 #   "unicode" - Unicode characters to draw a table
 #   "xml" - Extensible Markup Language (XML)
 #   "yaml" - YAML Ain’t Markup Language (YAML)
-format = "unicode"
+format = "psql"
 
 # Indicate if header should be displayed when displaying results.
 #

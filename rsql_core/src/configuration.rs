@@ -359,7 +359,7 @@ impl Default for Configuration {
             theme: "Solarized (dark)".to_string(),
             results_changes: true,
             results_footer: true,
-            results_format: "unicode".to_string(),
+            results_format: "psql".to_string(),
             results_header: true,
             results_limit: 100,
             results_rows: true,
@@ -574,7 +574,7 @@ mod test {
         let theme = "Solarized (light)";
         let results_changes = false;
         let results_footer = false;
-        let results_format = "unicode".to_string();
+        let results_format = "psql".to_string();
         let results_header = false;
         let results_limit = 42;
         let results_rows = false;
@@ -659,7 +659,7 @@ mod test {
         assert_eq!(configuration.theme, "Solarized (dark)");
         assert!(configuration.results_changes);
         assert!(configuration.results_footer);
-        assert_eq!(configuration.results_format, "unicode".to_string());
+        assert_eq!(configuration.results_format, "psql".to_string());
         assert!(configuration.results_header);
         assert_eq!(configuration.results_limit, 100);
         assert!(configuration.results_rows);

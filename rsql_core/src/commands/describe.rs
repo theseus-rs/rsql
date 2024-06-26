@@ -118,6 +118,7 @@ impl ShellCommand for Command {
             .await?;
 
         let indexes_label = t!("describe_indexes", locale = locale).to_string();
+        writeln!(output)?;
         writeln!(output, "{indexes_label}")?;
         formatter
             .format(formatter_options, &mut indexes_results, output)
@@ -210,6 +211,7 @@ mod tests {
     async fn test_execute() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
             color: false,
+            results_format: "psql".to_string(),
             ..default::Default::default()
         };
         let mut metadata = Metadata::default();
@@ -244,21 +246,16 @@ mod tests {
         assert_eq!(result, LoopCondition::Continue);
         let contents = output.to_string().replace("\r\n", "\n");
         let expected = indoc! {r"
-            ╭────────┬─────────┬──────────┬─────────╮
-            │ Column │  Type   │ Not null │ Default │
-            ├────────┼─────────┼──────────┼─────────┤
-            │ id     │ INTEGER │ No       │         │
-            ├────────┼─────────┼──────────┼─────────┤
-            │ name   │ TEXT    │ Yes      │         │
-            ╰────────┴─────────┴──────────┴─────────╯
-            Indexes
-            ╭────────────────┬─────────┬────────╮
-            │     Index      │ Columns │ Unique │
-            ├────────────────┼─────────┼────────┤
-            │ users_id_idx   │ id      │ Yes    │
-            ├────────────────┼─────────┼────────┤
-            │ users_name_idx │ name    │ No     │
-            ╰────────────────┴─────────┴────────╯
+              Column |  Type   | Not null | Default 
+             --------+---------+----------+---------
+              id     | INTEGER | No       |         
+              name   | TEXT    | Yes      |         
+             
+             Indexes
+                  Index      | Columns | Unique 
+             ----------------+---------+--------
+              users_id_idx   | id      | Yes    
+              users_name_idx | name    | No     
         "};
         assert_eq!(contents, expected);
 
