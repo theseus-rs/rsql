@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="utf-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>rsql Changelog</title><link>http://127.0.0.1:7979/rsql/rsql_cli/changelog</link><description>Changelog information for rsql</description><category domain="https://github.com/theseus-rs/rsql">rsql Changelog</category><atom:link href="http://127.0.0.1:7979/rsql/rsql_cli/changelog.rss" rel="self"/><item><title>v0.13.3</title><link>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.13.3</link><category domain="https://github.com/theseus-rs/rsql">rsql Changelog</category><guid>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.13.3</guid><content:encoded><![CDATA[<h2>✨ Enhancements</h2>
+<ul>
+<li>add expanded format (#154)</li>
+</ul>
+<h2>📦 Build system</h2>
+<ul>
+<li>enable pedantic lints for formatters (#155)</li>
+<li>update to use latest postgresql_embedded API (#153)</li>
+<li>remove references to postgresql_archive (#152)</li>
+<li>update postgresql_embedded (#151)</li>
+</ul>
+]]></content:encoded></item><item><title>v0.13.2</title><link>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.13.2</link><category domain="https://github.com/theseus-rs/rsql">rsql Changelog</category><guid>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.13.2</guid><content:encoded><![CDATA[<h2>✨ Enhancements</h2>
+<ul>
+<li>add clipboard output option (#148)</li>
+</ul>
+<h2>📖 Documentation</h2>
+<ul>
+<li>update command localizations (#149)</li>
+</ul>
+<h2>📦 Build system</h2>
+<ul>
+<li>update dependencies (#150)</li>
+<li>update testcontainers dependency (#147)</li>
+</ul>
+]]></content:encoded></item><item><title>v0.13.1</title><link>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.13.1</link><category domain="https://github.com/theseus-rs/rsql">rsql Changelog</category><guid>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.13.1</guid><content:encoded><![CDATA[<h2>✨ Enhancements</h2>
+<ul>
+<li>add echo highlighter (#143)</li>
+<li>add echo prompt option (#141)</li>
+</ul>
+<h2>📖 Documentation</h2>
+<ul>
+<li>add locale command demo (#145)</li>
+<li>add command demos (#144)</li>
+</ul>
+<h2>📦 Build system</h2>
+<ul>
+<li>update dependencies (#146)</li>
+<li>correct linting errors (#142)</li>
+</ul>
+]]></content:encoded></item><item><title>v0.13.0</title><link>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.13.0</link><category domain="https://github.com/theseus-rs/rsql">rsql Changelog</category><guid>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.13.0</guid><content:encoded><![CDATA[<h2>💥 Breaking changes</h2>
+<ul>
+<li>add Value::Null and remove Option&lt;Value&gt; from Row interfaces (#133)</li>
+</ul>
+<h2>✨ Enhancements</h2>
+<ul>
+<li>check for updates once every 24 hours (#139)</li>
+<li>center table titles (#138)</li>
+<li>add support for abbreviated commands (#136)</li>
+<li>add describe command (#135)</li>
+<li>implement column metadata (#134)</li>
+</ul>
+<h2>🛠️ Other improvements</h2>
+<ul>
+<li>change update interval from 24 hours to once a week (#140)</li>
+<li>add file size benchmark (#137)</li>
+<li>add Value::Null and remove Option&lt;Value&gt; from Row interfaces (#133)</li>
+</ul>
+]]></content:encoded></item><item><title>v0.12.0</title><link>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.12.0</link><category domain="https://github.com/theseus-rs/rsql">rsql Changelog</category><guid>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.12.0</guid><content:encoded><![CDATA[<h2>💥 Breaking changes</h2>
+<ul>
+<li>create database metadata (#121)</li>
+</ul>
+<h2>✨ Enhancements</h2>
+<ul>
+<li>add tee command (#131)</li>
+<li>add system command (#130)</li>
+<li>add mariadb driver (#124)</li>
+<li>display tables and indexes using formatter (#122)</li>
+</ul>
+<h2>🛠️ Other improvements</h2>
+<ul>
+<li>add mariadb integration test (#132)</li>
+<li>re-use database metadata between drivers for the same database (#123)</li>
+<li>create database metadata (#121)</li>
+</ul>
+]]></content:encoded></item><item><title>v0.11.2</title><link>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.11.2</link><category domain="https://github.com/theseus-rs/rsql">rsql Changelog</category><guid>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.11.2</guid><content:encoded><![CDATA[<h2>✨ Enhancements</h2>
+<ul>
+<li>right align numeric data in tables (#120)</li>
+<li>convert localizations from language-country to langauge (#119)</li>
+<li>add color cli argument (#118)</li>
+</ul>
+]]></content:encoded></item><item><title>v0.11.1</title><link>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.11.1</link><category domain="https://github.com/theseus-rs/rsql">rsql Changelog</category><guid>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.11.1</guid><content:encoded><![CDATA[<h2>📖 Documentation</h2>
+<ul>
+<li>fix limit docs (#117)</li>
+<li>update readme to include SQL Server (#114)</li>
+</ul>
+<h2>📦 Build system</h2>
+<ul>
+<li>use vendored openssl with sqlserver / tiberius (#116)</li>
+</ul>
+]]></content:encoded></item><item><title>v0.11.0</title><link>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.11.0</link><category domain="https://github.com/theseus-rs/rsql">rsql Changelog</category><guid>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.11.0</guid><content:encoded><![CDATA[<h2>💥 Breaking changes</h2>
+<ul>
+<li>update Connection execute/query to use &amp;mut self (#112)</li>
+</ul>
+<h2>✨ Enhancements</h2>
+<ul>
+<li>add sqlserver driver (#113)</li>
+</ul>
+<h2>🐞 Bug fixes</h2>
+<ul>
+<li>build with rust 1.77.2 to address <a href="https://www.cve.org/CVERecord?id=CVE-2024-24576" rel="noopener noreferrer">CVE-2024-24576</a></li>
+</ul>
+<h2>📖 Documentation</h2>
+<ul>
+<li>remove doc features (#111)</li>
+</ul>
+<h2>🛠️ Other improvements</h2>
+<ul>
+<li>update Connection execute/query to use &amp;mut self (#112)</li>
+</ul>
+]]></content:encoded></item><item><title>v0.10.0</title><link>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.10.0</link><category domain="https://github.com/theseus-rs/rsql">rsql Changelog</category><guid>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.10.0</guid><content:encoded><![CDATA[<h2>💥 Breaking changes</h2>
+<ul>
+<li>remove QueryResult rows() function (#109)</li>
+<li>added QueryResult next() (#108)</li>
+<li>introduce Row struct to QueryResult to replace Vec (#107)</li>
+</ul>
+<h2>✨ Enhancements</h2>
+<ul>
+<li>add duckdb driver (#110)</li>
+<li>add check for newer version on startup (#105)</li>
+</ul>
+<h2>🛠️ Other improvements</h2>
+<ul>
+<li>remove QueryResult rows() function (#109)</li>
+<li>added QueryResult next() (#108)</li>
+<li>introduce Row struct to QueryResult to replace Vec (#107)</li>
+<li>rename disable_auto_update to disable_update_check (#106)</li>
+</ul>
+]]></content:encoded></item><item><title>v0.9.0</title><link>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.9.0</link><category domain="https://github.com/theseus-rs/rsql">rsql Changelog</category><guid>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.9.0</guid><content:encoded><![CDATA[<h2>💥 Breaking changes</h2>
+<ul>
+<li>remove limit from connection trait (#103)</li>
+<li>rename Connection.stop() to Connection.close() (#102)</li>
+<li>remove Results from Connection interface (#101)</li>
+<li>move formatters into rsql_formatters crate (#100)</li>
+<li>move drivers into rsql_drivers crate (#99)</li>
+</ul>
+<h2>✨ Enhancements</h2>
+<ul>
+<li>add libsql driver (#98)</li>
+</ul>
+<h2>🐞 Bug fixes</h2>
+<ul>
+<li>update dependencies to address <a href="https://rustsec.org/advisories/RUSTSEC-2024-0332.html" rel="noopener noreferrer">RUSTSEC-2024-0332</a></li>
+</ul>
+<h2>📦 Build system</h2>
+<ul>
+<li>update driver and formatter crates for release (#104)</li>
+</ul>
+<h2>🛠️ Other improvements</h2>
+<ul>
+<li>remove limit from connection trait (#103)</li>
+<li>rename Connection.stop() to Connection.close() (#102)</li>
+<li>remove Results from Connection interface (#101)</li>
+<li>move formatters into rsql_formatters crate (#100)</li>
+<li>move drivers into rsql_drivers crate (#99)</li>
+<li>update l10n (#97)</li>
+</ul>
+]]></content:encoded></item><item><title>v0.8.0</title><link>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.8.0</link><category domain="https://github.com/theseus-rs/rsql">rsql Changelog</category><guid>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.8.0</guid><content:encoded><![CDATA[<h2>💥 Breaking changes</h2>
+<ul>
+<li>return exit code from evaluate (#89)</li>
+<li>move Results from FormatterOptions to Formatter.execute() (#88)</li>
+</ul>
+<h2>✨ Enhancements</h2>
+<ul>
+<li>add mysql driver (#96)</li>
+<li>add limit command (#94)</li>
+<li>add postgres driver (#93)</li>
+<li>add rows command (#92)</li>
+<li>add changes command (#91)</li>
+<li>add output command (#90)</li>
+<li>add sqlite format (#87)</li>
+</ul>
+<h2>🛠️ Other improvements</h2>
+<ul>
+<li>add functional and benchmark tests (#95)</li>
+<li>return exit code from evaluate (#89)</li>
+<li>move Results from FormatterOptions to Formatter.execute() (#88)</li>
+</ul>
+]]></content:encoded></item><item><title>v0.7.4</title><link>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.7.4</link><category domain="https://github.com/theseus-rs/rsql">rsql Changelog</category><guid>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.7.4</guid><content:encoded><![CDATA[<h2>✨ Enhancements</h2>
+<ul>
+<li>add psql format (#84)</li>
+<li>add markdown format (#83)</li>
+<li>add sleep command (#81)</li>
+<li>add indexes command (#80)</li>
+<li>add print command (#79)</li>
+<li>add read command (#78)</li>
+</ul>
+<h2>🐞 Bug fixes</h2>
+<ul>
+<li>correct editor history not being tracked when enabled (#86)</li>
+<li>correct ascii, plain and unicode format when there are no columns (#82)</li>
+</ul>
+<h2>📖 Documentation</h2>
+<ul>
+<li>update web docs (#85)</li>
+</ul>
+]]></content:encoded></item><item><title>v0.7.3</title><link>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.7.3</link><category domain="https://github.com/theseus-rs/rsql">rsql Changelog</category><guid>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.7.3</guid><content:encoded><![CDATA[<h2>✨ Enhancements</h2>
+<ul>
+<li>add plain format (#77)</li>
+<li>add rusqlite driver (#76)</li>
+<li>provide help text on invalid command if available (#75)</li>
+<li>additional localization (#74)</li>
+</ul>
+<h2>🐞 Bug fixes</h2>
+<ul>
+<li>suppress startup banner when commands or file are specified (#72)</li>
+<li>correct unicode character width calculation (#71)</li>
+</ul>
+<h2>📖 Documentation</h2>
+<ul>
+<li>correct supported locales link (#70)</li>
+</ul>
+<h2>🛠️ Other improvements</h2>
+<ul>
+<li>improve test coverage (#73)</li>
+</ul>
+]]></content:encoded></item><item><title>v0.7.2</title><link>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.7.2</link><category domain="https://github.com/theseus-rs/rsql">rsql Changelog</category><guid>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.7.2</guid><content:encoded><![CDATA[<h2>✨ Enhancements</h2>
+<ul>
+<li>add i18n support (#69)</li>
+<li>update history command to allow configuration (#68)</li>
+<li>add color command (#67)</li>
+<li>add postgresql support for timestampz (#66)</li>
+<li>add configurable command identifier (#65)</li>
+</ul>
+]]></content:encoded></item><item><title>v0.7.1</title><link>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.7.1</link><category domain="https://github.com/theseus-rs/rsql">rsql Changelog</category><guid>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.7.1</guid><content:encoded><![CDATA[<h2>✨ Enhancements</h2>
+<ul>
+<li>add result highlighter for html, json, jsonl, xml, and yaml (#63)</li>
+<li>add drivers command (#62)</li>
+<li>add support for PostgreSQL bit and bit varying (#60)</li>
+</ul>
+<h2>🐞 Bug fixes</h2>
+<ul>
+<li>no-op empty commands (#64)</li>
+</ul>
+<h2>🛠️ Other improvements</h2>
+<ul>
+<li>improve test coverage (#61)</li>
+<li>add postgresql and sqlite benchmarks (#59)</li>
+</ul>
+]]></content:encoded></item><item><title>v0.7.0</title><link>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.7.0</link><category domain="https://github.com/theseus-rs/rsql">rsql Changelog</category><guid>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.7.0</guid><content:encoded><![CDATA[<h2>💥 Breaking changes</h2>
+<ul>
+<li>add executors (#56)</li>
+</ul>
+<h2>✨ Enhancements</h2>
+<ul>
+<li>allow shell output writer to be configured (#57)</li>
+<li>add echo command (#55)</li>
+</ul>
+<h2>📖 Documentation</h2>
+<ul>
+<li>add security policy (#58)</li>
+</ul>
+<h2>🛠️ Other improvements</h2>
+<ul>
+<li>set branch for changelog (#54)</li>
+<li>add executors (#56)</li>
+</ul>
+]]></content:encoded></item><item><title>v0.6.0</title><link>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.6.0</link><category domain="https://github.com/theseus-rs/rsql">rsql Changelog</category><guid>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.6.0</guid><content:encoded><![CDATA[<h2>💥 Breaking changes</h2>
+<ul>
+<li>run commands from file, stdin, or command line (#53)</li>
+<li>refactor QueryResult to be an async trait (#49)</li>
+</ul>
+<h2>✨ Enhancements</h2>
+<ul>
+<li>run commands from file, stdin, or command line (#53)</li>
+</ul>
+<h2>📦 Build system</h2>
+<ul>
+<li>add changelog generation job (#52)</li>
+</ul>
+<h2>🛠️ Other improvements</h2>
+<ul>
+<li>add pull request template (#51)</li>
+<li>add github issue templates (#50)</li>
+<li>refactor QueryResult to be an async trait (#49)</li>
+</ul>
+]]></content:encoded></item><item><title>v0.5.2</title><link>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.5.2</link><category domain="https://github.com/theseus-rs/rsql">rsql Changelog</category><guid>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.5.2</guid><content:encoded><![CDATA[<h2>🛠️ Other improvements</h2>
+<ul>
+<li>add web analytics (#47)</li>
+<li>improve test coverage (#46)</li>
+<li>improve test coverage (#48)</li>
+</ul>
+]]></content:encoded></item><item><title>v0.5.1</title><link>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.5.1</link><category domain="https://github.com/theseus-rs/rsql">rsql Changelog</category><guid>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.5.1</guid><content:encoded><![CDATA[<h2>✨ Enhancements</h2>
+<ul>
+<li>add html format (#45)</li>
+<li>add xml format (#44)</li>
+<li>add yaml format (#42)</li>
+<li>add json and jsonl formats (#41)</li>
+<li>add tsv formatter (#40)</li>
+</ul>
+<h2>🛠️ Other improvements</h2>
+<ul>
+<li>improve test coverage (#43)</li>
+</ul>
+]]></content:encoded></item><item><title>v0.5.0</title><link>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.5.0</link><category domain="https://github.com/theseus-rs/rsql">rsql Changelog</category><guid>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.5.0</guid><content:encoded><![CDATA[<h2>💥 Breaking changes</h2>
+<ul>
+<li>add custom Result and Error types (#39)</li>
+<li>add csv formatter (#38)</li>
+</ul>
+<h2>✨ Enhancements</h2>
+<ul>
+<li>add csv formatter (#38)</li>
+</ul>
+<h2>🛠️ Other improvements</h2>
+<ul>
+<li>add custom Result and Error types (#39)</li>
+<li>remove table header highlight (#37)</li>
+</ul>
+]]></content:encoded></item><item><title>v0.4.4</title><link>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.4.4</link><category domain="https://github.com/theseus-rs/rsql">rsql Changelog</category><guid>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.4.4</guid><content:encoded><![CDATA[<h2>📦 Build system</h2>
+<ul>
+<li>remove armv5te support (#36)</li>
+</ul>
+]]></content:encoded></item><item><title>v0.4.3</title><link>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.4.3</link><category domain="https://github.com/theseus-rs/rsql">rsql Changelog</category><guid>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.4.3</guid><content:encoded><![CDATA[<h2>✨ Enhancements</h2>
+<ul>
+<li>add progress indicator to long running operations (#34)</li>
+</ul>
+<h2>🐞 Bug fixes</h2>
+<ul>
+<li>correct sqlx dependency (#35)</li>
+</ul>
+<h2>📖 Documentation</h2>
+<ul>
+<li>add downloads badge to readme (#31)</li>
+</ul>
+<h2>📦 Build system</h2>
+<ul>
+<li>make sqlx and optional dependency (#33)</li>
+</ul>
+<h2>🛠️ Other improvements</h2>
+<ul>
+<li>update driver manager test to work without sqlite feature (#32)</li>
+</ul>
+]]></content:encoded></item><item><title>v0.4.2</title><link>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.4.2</link><category domain="https://github.com/theseus-rs/rsql">rsql Changelog</category><guid>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.4.2</guid><content:encoded><![CDATA[<h2>✨ Enhancements</h2>
+<ul>
+<li>install postgresql embedded to rsql configuration directory (#30)</li>
+</ul>
+<h2>🛠️ Other improvements</h2>
+<ul>
+<li>upgrade postgresql-embedded (#29)</li>
+</ul>
+]]></content:encoded></item><item><title>v0.4.1</title><link>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.4.1</link><category domain="https://github.com/theseus-rs/rsql">rsql Changelog</category><guid>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.4.1</guid><content:encoded><![CDATA[<h2>🐞 Bug fixes</h2>
+<ul>
+<li>corrected sqlite conversion logic error where strings were treated as bytes (#28)</li>
+</ul>
+<h2>🛠️ Other improvements</h2>
+<ul>
+<li>remove invalid crate category (#27)</li>
+<li>add driver interface tests (#26)</li>
+</ul>
+]]></content:encoded></item><item><title>v0.4.0</title><link>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.4.0</link><category domain="https://github.com/theseus-rs/rsql">rsql Changelog</category><guid>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.4.0</guid><content:encoded><![CDATA[<h2>💥 Breaking changes</h2>
+<ul>
+<li>add shell and shellbuilder to facilitate configuring drivers, commands and formatters (#24)</li>
+<li>add Formatters and FormatterManager. change .display command to .format (#21)</li>
+</ul>
+<h2>✨ Enhancements</h2>
+<ul>
+<li>add shell and shellbuilder to facilitate configuring drivers, commands and formatters (#24)</li>
+</ul>
+<h2>📖 Documentation</h2>
+<ul>
+<li>correct history document formatting (#20)</li>
+</ul>
+<h2>🛠️ Other improvements</h2>
+<ul>
+<li>add command tests to increase coverage (#25)</li>
+<li>add table tests to improve coverage (#23)</li>
+<li>improve table formatter test coverage (#22)</li>
+<li>add Formatters and FormatterManager. change .display command to .format (#21)</li>
+</ul>
+]]></content:encoded></item><item><title>v0.3.0</title><link>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.3.0</link><category domain="https://github.com/theseus-rs/rsql">rsql Changelog</category><guid>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.3.0</guid><content:encoded><![CDATA[<h2>💥 Breaking changes</h2>
+<ul>
+<li>refactor results to support configurable output formatting (#19)</li>
+<li>refactor modules to better align with usage (#18)</li>
+</ul>
+<h2>✨ Enhancements</h2>
+<ul>
+<li>add support for postgresql void type (#17)</li>
+</ul>
+<h2>📖 Documentation</h2>
+<ul>
+<li>add initial command documentation (#16)</li>
+</ul>
+<h2>🛠️ Other improvements</h2>
+<ul>
+<li>refactor results to support configurable output formatting (#19)</li>
+<li>refactor modules to better align with usage (#18)</li>
+</ul>
+]]></content:encoded></item><item><title>v0.2.1</title><link>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.2.1</link><category domain="https://github.com/theseus-rs/rsql">rsql Changelog</category><guid>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.2.1</guid><content:encoded><![CDATA[<h2>📖 Documentation</h2>
+<ul>
+<li>add scaffolding for web documentation (#15)</li>
+</ul>
+]]></content:encoded></item><item><title>v0.2.0</title><link>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.2.0</link><category domain="https://github.com/theseus-rs/rsql">rsql Changelog</category><guid>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.2.0</guid><content:encoded><![CDATA[<h2>💥 Breaking changes</h2>
+<ul>
+<li>add configurable driver support (#12)</li>
+<li>refactor Engine to Connection (#14)</li>
+<li>rename Commands to CommandManager (#13)</li>
+</ul>
+<h2>✨ Enhancements</h2>
+<ul>
+<li>add configurable driver support (#12)</li>
+<li>add option/command to bail on the first error (#11)</li>
+<li>convert byte results to base64 when printing results (#10)</li>
+</ul>
+<h2>📖 Documentation</h2>
+<ul>
+<li>update website changelog configuration (#9)</li>
+</ul>
+<h2>🛠️ Other improvements</h2>
+<ul>
+<li>refactor Engine to Connection (#14)</li>
+<li>rename Commands to CommandManager (#13)</li>
+</ul>
+]]></content:encoded></item><item><title>v0.1.4</title><link>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.1.4</link><category domain="https://github.com/theseus-rs/rsql">rsql Changelog</category><guid>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.1.4</guid><content:encoded><![CDATA[<h2>✨ Enhancements</h2>
+<ul>
+<li>add ability to detect/set locale and display numeric data with locale format (#8)</li>
+</ul>
+<img width="322" alt="image" src="https://github.com/theseus-rs/rsql/assets/3210678/d500c204-620c-42be-bb22-be73152be65b">
+<ul>
+<li>allow commands in rsql_core to be configured by caller (#6)</li>
+</ul>
+<h2>🛠️ Other improvements</h2>
+<ul>
+<li>internal: disable sqlite as default database url when the sqlite feature is not enabled (#7)</li>
+</ul>
+]]></content:encoded></item><item><title>v0.1.3</title><link>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.1.3</link><category domain="https://github.com/theseus-rs/rsql">rsql Changelog</category><guid>http://127.0.0.1:7979/rsql/rsql_cli/changelog/v0.1.3</guid><content:encoded><![CDATA[<h2>📖 Documentation</h2>
+<ul>
+<li>update documentation links (#5)</li>
+</ul>
+]]></content:encoded></item></channel></rss>
