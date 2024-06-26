@@ -1,5 +1,5 @@
-{"version": 2, "width": 120, "height": 30, "timestamp": 1719160581, "env": {"SHELL": "/bin/zsh", "TERM": "xterm-256color"}}
-[0.02281, "o", "\u001b]11;?\u001b\\"]
-[0.04827, "o", "⠁ connect                                                                                                               "]
-[0.048366, "o", "\r\u001b[2K"]
-[0.056026, "o", "rsql> \u001b[38;2;131;148;150m.exit \u001b[38;2;108;113;196m1\u001b[0m\r\n"]
+{"version": 2, "width": 120, "height": 30, "timestamp": 1719422743, "env": {"SHELL": "/bin/zsh", "TERM": "xterm-256color"}}
+[0.022922, "o", "\u001b]11;?\u001b\\"]
+[0.036486, "o", "⠁ connect                                                                                                               "]
+[0.03659, "o", "\r\u001b[2K"]
+[0.044804, "o", "rsql> \u001b[38;2;131;148;150m.exit \u001b[38;2;108;113;196m1\u001b[0m\r\n"]
