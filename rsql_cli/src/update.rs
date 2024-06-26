@@ -18,7 +18,7 @@ pub fn should_run_update_check(configuration: &Configuration) -> Result<bool> {
     if let Ok(mut file) = File::open(&file_path) {
         let mut contents = String::new();
         if file.read_to_string(&mut contents)? > 0 {
-            let last_check_time = DateTime::parse_from_rfc3339(&contents.trim())?;
+            let last_check_time = DateTime::parse_from_rfc3339(contents.trim())?;
             let now = Utc::now();
             let last_check_time_utc = last_check_time.with_timezone(&Utc);
             if (now - last_check_time_utc) < Duration::weeks(1) {
