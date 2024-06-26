@@ -19,7 +19,7 @@ use rust_i18n::t;
 use serde::Serialize;
 use std::{env, io};
 use supports_color::Stream;
-use tracing::info;
+use tracing::{info, warn};
 
 i18n!("locales", fallback = "en");
 
@@ -140,7 +140,12 @@ async fn welcome_message(
 
     writeln!(output, "{banner_version}")?;
     if !args.disable_update_check {
-        check_for_newer_version(configuration, output).await?;
+        match check_for_newer_version(configuration, output).await {
+            Ok(()) => {}
+            Err(error) => {
+                warn!("Failed to check for newer version: {error}");
+            }
+        }
     }
     writeln!(output, "{banner_message}")?;
     Ok(())
