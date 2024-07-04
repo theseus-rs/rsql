@@ -5,7 +5,7 @@ use crate::{postgresql, Error, MemoryQueryResult, Metadata, QueryResult};
 use async_trait::async_trait;
 use bit_vec::BitVec;
 use chrono::{DateTime, NaiveDate, NaiveDateTime, NaiveTime, Utc};
-use postgresql_embedded::{PostgreSQL, Settings, Status, Version};
+use postgresql_embedded::{PostgreSQL, Settings, Status, VersionReq};
 use std::collections::HashMap;
 use std::path::PathBuf;
 use std::str::FromStr;
@@ -16,7 +16,7 @@ use tokio_postgres::{Client, Column, NoTls, Row};
 use tracing::debug;
 use url::Url;
 
-const POSTGRESQL_EMBEDDED_VERSION: &str = "16.3.0";
+const POSTGRESQL_EMBEDDED_VERSION: &str = "=16.3.0";
 
 #[derive(Debug)]
 pub struct Driver;
@@ -57,7 +57,7 @@ impl Connection {
             let mut settings = Settings::from_url(url)?;
 
             if !query_parameters.contains_key("version") {
-                let version = Version::from_str(POSTGRESQL_EMBEDDED_VERSION)
+                let version = VersionReq::from_str(POSTGRESQL_EMBEDDED_VERSION)
                     .map_err(|error| Error::IoError(error.into()))?;
                 settings.version = version;
             }
@@ -70,7 +70,7 @@ impl Connection {
 
             let mut postgresql = PostgreSQL::new(settings);
             postgresql.setup().await?;
-            let version = postgresql.settings().version;
+            let version = postgresql.settings().version.clone();
             debug!("Starting embedded PostgreSQL {version} server");
             postgresql.start().await?;
 
