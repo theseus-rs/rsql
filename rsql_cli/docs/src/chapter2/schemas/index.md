@@ -3,19 +3,19 @@
 ### Usage
 
 ```text
-.tables
+.schemas
 ```
 
 ### Description
 
-The tables command lists the tables in the schema.
+The schemas command lists the schemas in the database.
 
 ### Examples
 
-List the tables in the schema:
+List the schemas in the database:
 
 ```text
-.tables
+.schemas
 ```
 
 ### Demonstration

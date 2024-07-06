@@ -53,8 +53,8 @@ mod test {
             .await?;
 
         let metadata = connection.metadata().await?;
-        let database = metadata.current_database().expect("database");
-        let tables = database
+        let schema = metadata.current_schema().expect("schema");
+        let tables = schema
             .tables()
             .iter()
             .map(|table| table.name())
@@ -62,7 +62,7 @@ mod test {
         assert!(tables.contains(&"contacts"));
         assert!(tables.contains(&"users"));
 
-        let contacts_table = database.get("contacts").expect("contacts table");
+        let contacts_table = schema.get("contacts").expect("contacts table");
         let contacts_indexes = contacts_table
             .indexes()
             .iter()
@@ -70,7 +70,7 @@ mod test {
             .collect::<Vec<_>>();
         assert_eq!(contacts_indexes, vec!["PRIMARY"]);
 
-        let user_table = database.get("users").expect("users table");
+        let user_table = schema.get("users").expect("users table");
         let user_indexes = user_table
             .indexes()
             .iter()

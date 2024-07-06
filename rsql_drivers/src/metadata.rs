@@ -3,57 +3,55 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct Metadata {
-    databases: IndexMap<String, Database>,
+    schemas: IndexMap<String, Schema>,
 }
 
 impl Metadata {
     #[must_use]
     pub fn new() -> Self {
         Self {
-            databases: IndexMap::new(),
+            schemas: IndexMap::new(),
         }
     }
 
-    pub fn add(&mut self, database: Database) {
-        self.databases.insert(database.name.clone(), database);
+    pub fn add(&mut self, schema: Schema) {
+        self.schemas.insert(schema.name.clone(), schema);
     }
 
-    pub fn get<S: Into<String>>(&self, name: S) -> Option<&Database> {
+    pub fn get<S: Into<String>>(&self, name: S) -> Option<&Schema> {
         let name = name.into();
-        self.databases.get(&name)
+        self.schemas.get(&name)
     }
 
-    pub fn get_mut<S: Into<String>>(&mut self, name: S) -> Option<&mut Database> {
+    pub fn get_mut<S: Into<String>>(&mut self, name: S) -> Option<&mut Schema> {
         let name = name.into();
-        self.databases.get_mut(&name)
+        self.schemas.get_mut(&name)
     }
 
     #[must_use]
-    pub fn current_database(&self) -> Option<&Database> {
-        if let Some((_name, database)) = self.databases.first() {
-            Some(database)
-        } else {
-            None
-        }
+    pub fn current_schema(&self) -> Option<&Schema> {
+        self.schemas.values().find(|schema| schema.current)
     }
 
     #[must_use]
-    pub fn databases(&self) -> Vec<&Database> {
-        let values: Vec<&Database> = self.databases.values().collect();
+    pub fn schemas(&self) -> Vec<&Schema> {
+        let values: Vec<&Schema> = self.schemas.values().collect();
         values
     }
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
-pub struct Database {
+pub struct Schema {
     name: String,
+    current: bool,
     tables: IndexMap<String, Table>,
 }
 
-impl Database {
-    pub fn new<S: Into<String>>(name: S) -> Self {
+impl Schema {
+    pub fn new<S: Into<String>>(name: S, current: bool) -> Self {
         Self {
             name: name.into(),
+            current,
             tables: IndexMap::new(),
         }
     }
@@ -61,6 +59,11 @@ impl Database {
     #[must_use]
     pub fn name(&self) -> &str {
         &self.name
+    }
+
+    #[must_use]
+    pub fn current(&self) -> bool {
+        self.current
     }
 
     pub fn add(&mut self, table: Table) {
@@ -228,18 +231,30 @@ mod test {
     #[test]
     fn test_metadata() {
         let mut metadata = Metadata::new();
-        assert_eq!(metadata.databases().len(), 0);
+        assert_eq!(metadata.schemas().len(), 0);
 
-        let database = Database::new("default");
-        metadata.add(database.clone());
-        assert_eq!(metadata.databases().len(), 1);
+        let default_schema = Schema::new("default", true);
+        let test_schema = Schema::new("test", false);
+
+        assert!(metadata.current_schema().is_none());
+        metadata.add(default_schema.clone());
+        metadata.add(test_schema.clone());
+        assert_eq!(metadata.schemas().len(), 2);
+
+        let current_schema = metadata.current_schema();
+        assert!(current_schema.is_some());
+        if let Some(schema) = current_schema {
+            assert_eq!(schema.name(), "default");
+            assert!(schema.current());
+        }
+        assert!(metadata.get("default").is_some());
         assert!(metadata.get("default").is_some());
         assert!(metadata.get_mut("default").is_some());
     }
 
     #[test]
-    fn test_database() {
-        let mut db = Database::new("default");
+    fn test_schema() {
+        let mut db = Schema::new("default", true);
         assert_eq!(db.name(), "default");
         assert_eq!(db.tables().len(), 0);
 
