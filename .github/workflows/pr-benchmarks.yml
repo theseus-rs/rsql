@@ -23,9 +23,6 @@ jobs:
           components: 'llvm-tools-preview'
           toolchain: stable
 
-      - name: Enable caching
-        uses: Swatinem/rust-cache@v2
-
       - name: Install benchmarking tools
         uses: bencherdev/bencher@main
 

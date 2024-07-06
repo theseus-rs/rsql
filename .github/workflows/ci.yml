@@ -54,9 +54,6 @@ jobs:
         with:
           tool: grcov
 
-      - name: Enable caching
-        uses: Swatinem/rust-cache@v2
-
       - name: Tests
         env:
           CARGO_TERM_COLOR: always
