@@ -27,7 +27,7 @@ async fn retrieve_schemas(connection: &mut dyn Connection, metadata: &mut Metada
             Some(value) => value.to_string(),
             None => continue,
         };
-        let current = matches!(row.get(1), Some(Value::Bool(true)));
+        let current = matches!(row.get(1), Some(Value::I16(1)));
         let schema = Schema::new(schema_name, current);
         schemas.push(schema);
     }
