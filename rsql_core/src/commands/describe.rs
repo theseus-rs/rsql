@@ -52,7 +52,7 @@ impl ShellCommand for Command {
         let mut indexes_column_rows = Vec::new();
         let mut table: Option<&Table> = None;
 
-        if let Some(database) = metadata.current_database() {
+        if let Some(database) = metadata.current_schema() {
             table = database.get(table_name);
         }
 
@@ -138,7 +138,7 @@ mod tests {
     use crate::configuration::Configuration;
     use crate::writers::Output;
     use indoc::indoc;
-    use rsql_drivers::{Column, Database, DriverManager, Index, Metadata, MockConnection, Table};
+    use rsql_drivers::{Column, DriverManager, Index, Metadata, MockConnection, Schema, Table};
     use rsql_formatters::FormatterManager;
     use rustyline::history::DefaultHistory;
     use std::default;
@@ -158,7 +158,7 @@ mod tests {
     #[test]
     fn test_description() {
         let description = Command.description("en");
-        assert_eq!(description, "Describe a table in the database");
+        assert_eq!(description, "Describe a table in the schema");
     }
 
     #[tokio::test]
@@ -183,7 +183,7 @@ mod tests {
     #[tokio::test]
     async fn test_execute_invalid_table() -> anyhow::Result<()> {
         let mut metadata = Metadata::default();
-        let database = Database::default();
+        let database = Schema::default();
         metadata.add(database);
         let mock_connection = &mut MockConnection::new();
         mock_connection
@@ -215,7 +215,7 @@ mod tests {
             ..default::Default::default()
         };
         let mut metadata = Metadata::default();
-        let mut database = Database::default();
+        let mut database = Schema::new("default", true);
         let table_name = "users";
         let mut table = Table::new(table_name);
         table.add_column(Column::new("id", "INTEGER", true, None));

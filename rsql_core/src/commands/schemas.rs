@@ -4,18 +4,18 @@ use rsql_drivers::{MemoryQueryResult, Row, Value};
 use rsql_formatters::Results;
 use rust_i18n::t;
 
-/// List the tables in the schema
+/// List the schemas in the database
 #[derive(Debug, Default)]
 pub struct Command;
 
 #[async_trait]
 impl ShellCommand for Command {
     fn name(&self, locale: &str) -> String {
-        t!("tables_command", locale = locale).to_string()
+        t!("schemas_command", locale = locale).to_string()
     }
 
     fn description(&self, locale: &str) -> String {
-        t!("tables_description", locale = locale).to_string()
+        t!("schemas_description", locale = locale).to_string()
     }
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
@@ -24,17 +24,21 @@ impl ShellCommand for Command {
         let metadata = options.connection.metadata().await?;
         let configuration = options.configuration;
         let locale = &configuration.locale;
-        let table_label = t!("table", locale = locale).to_string();
-        let columns = vec![table_label];
+        let schema_label = t!("schema", locale = locale).to_string();
+        let current_label = t!("schemas_current", locale = locale).to_string();
+        let columns = vec![schema_label, current_label];
         let mut rows = Vec::new();
 
-        if let Some(database) = metadata.current_schema() {
-            let tables = database.tables();
-            for table in tables {
-                let value = Value::String(table.name().to_string());
-                let row = Row::new(vec![value]);
-                rows.push(row);
-            }
+        let schemas = metadata.schemas();
+        for schema in schemas {
+            let name = Value::String(schema.name().to_string());
+            let current = if schema.current() {
+                Value::String(t!("yes", locale = locale).to_string())
+            } else {
+                Value::String(t!("no", locale = locale).to_string())
+            };
+            let row = Row::new(vec![name, current]);
+            rows.push(row);
         }
 
         let query_result = MemoryQueryResult::new(columns, rows);
@@ -63,30 +67,28 @@ mod tests {
     use crate::commands::{CommandManager, CommandOptions};
     use crate::configuration::Configuration;
     use crate::writers::Output;
-    use rsql_drivers::{DriverManager, Metadata, MockConnection, Schema, Table};
+    use rsql_drivers::{DriverManager, Metadata, MockConnection, Schema};
     use rsql_formatters::FormatterManager;
     use rustyline::history::DefaultHistory;
 
     #[test]
     fn test_name() {
         let name = Command.name("en");
-        assert_eq!(name, "tables");
+        assert_eq!(name, "schemas");
     }
 
     #[test]
     fn test_description() {
         let description = Command.description("en");
-        assert_eq!(description, "List the tables in the schema");
+        assert_eq!(description, "List the schemas in the database");
     }
 
     #[tokio::test]
     async fn test_execute() -> anyhow::Result<()> {
         let mut metadata = Metadata::new();
-        let mut database = Schema::new("default", true);
-        let table_name = "table1";
-        let table = Table::new(table_name);
-        database.add(table);
-        metadata.add(database);
+        let schema_name = "default";
+        let schema = Schema::new(schema_name, true);
+        metadata.add(schema);
 
         let mock_connection = &mut MockConnection::new();
         mock_connection
@@ -100,15 +102,15 @@ mod tests {
             formatter_manager: &FormatterManager::default(),
             connection: mock_connection,
             history: &DefaultHistory::new(),
-            input: vec![".tables".to_string()],
+            input: vec![".schemas".to_string()],
             output: &mut output,
         };
 
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        let tables = output.to_string();
-        assert!(tables.contains(table_name));
+        let schemas = output.to_string();
+        assert!(schemas.contains(schema_name));
         Ok(())
     }
 }

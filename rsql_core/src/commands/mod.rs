@@ -21,6 +21,7 @@ pub mod print;
 pub mod quit;
 pub mod read;
 pub mod rows;
+pub mod schemas;
 pub mod sleep;
 pub mod system;
 pub mod tables;

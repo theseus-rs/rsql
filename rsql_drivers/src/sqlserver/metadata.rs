@@ -1,30 +1,48 @@
-use crate::{Column, Connection, Database, Index, Metadata, Result, Table, Value};
+use crate::{Column, Connection, Index, Metadata, Result, Schema, Table, Value};
 use indoc::indoc;
 
 pub(crate) async fn get_metadata(connection: &mut dyn Connection) -> Result<Metadata> {
     let mut metadata = Metadata::default();
 
-    retrieve_databases(connection, &mut metadata).await?;
+    retrieve_schemas(connection, &mut metadata).await?;
 
     Ok(metadata)
 }
 
-async fn retrieve_databases(
-    connection: &mut dyn Connection,
-    metadata: &mut Metadata,
-) -> Result<()> {
-    let databases = vec![Database::new("default")];
+async fn retrieve_schemas(connection: &mut dyn Connection, metadata: &mut Metadata) -> Result<()> {
+    let mut schemas = vec![];
+    let sql = indoc! { r"
+        SELECT
+            s.name,
+            CASE
+                WHEN s.name = SCHEMA_NAME() THEN CAST(1 AS BIT)
+                ELSE CAST(0 AS BIT)
+            END AS current_schema
+        FROM
+            sys.schemas s;
+    "};
+    let mut query_result = connection.query(sql).await?;
 
-    for mut database in databases {
-        retrieve_tables(connection, &mut database).await?;
-        retrieve_indexes(connection, &mut database).await?;
-        metadata.add(database);
+    while let Some(row) = query_result.next().await {
+        let schema_name = match row.get(0) {
+            Some(value) => value.to_string(),
+            None => continue,
+        };
+        let current = matches!(row.get(1), Some(Value::Bool(true)));
+        let schema = Schema::new(schema_name, current);
+        schemas.push(schema);
+    }
+
+    for mut schema in schemas {
+        retrieve_tables(connection, &mut schema).await?;
+        retrieve_indexes(connection, &mut schema).await?;
+        metadata.add(schema);
     }
 
     Ok(())
 }
 
-async fn retrieve_tables(connection: &mut dyn Connection, database: &mut Database) -> Result<()> {
+async fn retrieve_tables(connection: &mut dyn Connection, schema: &mut Schema) -> Result<()> {
     let sql = indoc! { r"
             SELECT
                 table_name,
@@ -78,19 +96,19 @@ async fn retrieve_tables(connection: &mut dyn Connection, database: &mut Databas
         };
 
         let column = Column::new(column_name, column_type, not_null, default_value);
-        if let Some(table) = database.get_mut(&table_name) {
+        if let Some(table) = schema.get_mut(&table_name) {
             table.add_column(column);
         } else {
             let mut table = Table::new(table_name);
             table.add_column(column);
-            database.add(table);
+            schema.add(table);
         }
     }
 
     Ok(())
 }
 
-async fn retrieve_indexes(connection: &mut dyn Connection, database: &mut Database) -> Result<()> {
+async fn retrieve_indexes(connection: &mut dyn Connection, schema: &mut Schema) -> Result<()> {
     let sql = indoc! {r"
             SELECT
                 t.name AS table_name,
@@ -126,7 +144,7 @@ async fn retrieve_indexes(connection: &mut dyn Connection, database: &mut Databa
             Some(Value::Bool(value)) => *value,
             _ => continue,
         };
-        let Some(table) = database.get_mut(table_name) else {
+        let Some(table) = schema.get_mut(table_name) else {
             continue;
         };
 
@@ -176,9 +194,9 @@ mod test {
             .await?;
 
         let metadata = connection.metadata().await?;
-        let database = metadata.current_database().expect("database");
+        let schema = metadata.current_schema().expect("schema");
 
-        let contacts_table = database.get("contacts").expect("contacts table");
+        let contacts_table = schema.get("contacts").expect("contacts table");
         assert_eq!(contacts_table.name(), "contacts");
         assert_eq!(contacts_table.columns().len(), 2);
         let id_column = contacts_table.get_column("id").expect("id column");
@@ -199,7 +217,7 @@ mod test {
             .collect::<Vec<_>>();
         assert!(contacts_indexes[0].contains(&"PK__contacts__".to_string()));
 
-        let users_table = database.get("users").expect("users table");
+        let users_table = schema.get("users").expect("users table");
         assert_eq!(users_table.name(), "users");
         assert_eq!(users_table.columns().len(), 2);
         let id_column = users_table.get_column("id").expect("id column");

@@ -1,6 +1,6 @@
-{"version": 2, "width": 120, "height": 30, "timestamp": 1720281591, "env": {"SHELL": "/bin/zsh", "TERM": "xterm-256color"}}
-[0.022731, "o", "\u001b]11;?\u001b\\"]
-[0.048321, "o", "⠁ connect                                                                                                               "]
-[0.048373, "o", "\r\u001b[2K"]
-[0.056047, "o", "rsql> \u001b[38;2;131;148;150m.system echo \u001b[38;2;131;148;150m\"\u001b[38;2;42;161;152mhello, world!\u001b[38;2;131;148;150m\"\u001b[0m\r\n"]
-[0.057974, "o", "hello, world!\r\n"]
+{"version": 2, "width": 120, "height": 30, "timestamp": 1720303331, "env": {"SHELL": "/bin/zsh", "TERM": "xterm-256color"}}
+[0.022626, "o", "\u001b]11;?\u001b\\"]
+[0.037428, "o", "⠁ connect                                                                                                               "]
+[0.037509, "o", "\r\u001b[2K"]
+[0.045504, "o", "rsql> \u001b[38;2;131;148;150m.system echo \u001b[38;2;131;148;150m\"\u001b[38;2;42;161;152mhello, world!\u001b[38;2;131;148;150m\"\u001b[0m\r\n"]
+[0.047326, "o", "hello, world!\r\n"]

@@ -34,7 +34,7 @@ impl ShellCommand for Command {
         let columns = vec![table_label, index_label];
         let mut rows = Vec::new();
 
-        if let Some(database) = metadata.current_database() {
+        if let Some(database) = metadata.current_schema() {
             let tables = match table_filter {
                 Some(table_name) => match database.get(table_name) {
                     Some(table) => vec![table],
@@ -79,7 +79,7 @@ mod tests {
     use crate::commands::{CommandManager, CommandOptions};
     use crate::configuration::Configuration;
     use crate::writers::Output;
-    use rsql_drivers::{Database, DriverManager, Index, Metadata, MockConnection, Table};
+    use rsql_drivers::{DriverManager, Index, Metadata, MockConnection, Schema, Table};
     use rsql_formatters::FormatterManager;
     use rustyline::history::DefaultHistory;
 
@@ -104,7 +104,7 @@ mod tests {
     #[tokio::test]
     async fn test_execute() -> anyhow::Result<()> {
         let mut metadata = Metadata::new();
-        let mut database = Database::new("default");
+        let mut database = Schema::new("default", true);
         let mut table = Table::new("table1");
         let index_name = "index1";
         let index = Index::new(index_name, Vec::new(), false);
@@ -139,7 +139,7 @@ mod tests {
     #[tokio::test]
     async fn test_execute_with_table() -> anyhow::Result<()> {
         let mut metadata = Metadata::new();
-        let mut database = Database::new("default");
+        let mut database = Schema::new("default", true);
         let table_name = "table1";
         let mut table = Table::new(table_name);
         let index_name = "index1";

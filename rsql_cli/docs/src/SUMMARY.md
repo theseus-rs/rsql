@@ -28,6 +28,7 @@
     - [quit](chapter2/quit/index.md)
     - [read](chapter2/read/index.md)
     - [rows](chapter2/rows/index.md)
+    - [schemas](chapter2/schemas/index.md)
     - [sleep](chapter2/sleep/index.md)
     - [system](chapter2/system/index.md)
     - [tables](chapter2/tables/index.md)
