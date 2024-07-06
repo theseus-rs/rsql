@@ -5,7 +5,7 @@ use crate::writers::Output;
 use crate::Results;
 use crate::Results::Query;
 use async_trait::async_trait;
-use num_format::Locale;
+use num_format::{Locale, ToFormattedString};
 use rsql_drivers::{QueryResult, Value};
 use std::str::FromStr;
 use tabled::tables::ExtendedTable;
@@ -36,7 +36,12 @@ impl crate::Formatter for Formatter {
             let mut data: Vec<Vec<String>> = Vec::new();
             data.push(query_result.columns().await);
             rows = process_data(options, query_result, &mut data).await?;
-            let table = ExtendedTable::from(data);
+            let locale = options.locale.clone();
+            let table = ExtendedTable::from(data).template(move |index| {
+                let format_locale = Locale::from_str(&locale).unwrap_or(Locale::en);
+                let record = (index + 1).to_formatted_string(&format_locale);
+                t!("expanded_record", locale = &locale, record = record).to_string()
+            });
 
             writeln!(output, "{table}")?;
         }
