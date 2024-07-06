@@ -111,17 +111,17 @@ mod tests {
 
         formatter.format(&options, &mut results, output).await?;
 
-        let unicode_output = output.to_string().replace("\r\n", "\n");
+        let expanded_output = output.to_string().replace("\r\n", "\n");
         let expected = indoc! {r"
-            -[ RECORD 0 ]-
+            -[ RECORD 1 ]-
             id    | 1,234
             value | foo
-            -[ RECORD 1 ]-
+            -[ RECORD 2 ]-
             id    | 5,678
             value | NULL
             2 rows (9ns)
         "};
-        assert_eq!(unicode_output, expected);
+        assert_eq!(expanded_output, expected);
         Ok(())
     }
 }
