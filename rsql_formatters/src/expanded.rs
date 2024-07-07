@@ -5,7 +5,7 @@ use crate::writers::Output;
 use crate::Results;
 use crate::Results::Query;
 use async_trait::async_trait;
-use num_format::{Locale, ToFormattedString};
+use num_format::Locale;
 use rsql_drivers::{QueryResult, Value};
 use std::str::FromStr;
 use tabled::tables::ExtendedTable;
