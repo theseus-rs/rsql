@@ -29,6 +29,10 @@ async fn retrieve_schemas(connection: &mut dyn Connection, metadata: &mut Metada
     schemas.sort_by_key(|schema| schema.name().to_string());
 
     for mut schema in schemas {
+        if !schema.current() {
+            continue;
+        }
+
         retrieve_tables(connection, &mut schema).await?;
         retrieve_indexes(connection, &mut schema).await?;
         metadata.add(schema);

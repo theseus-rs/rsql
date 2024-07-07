@@ -8,7 +8,7 @@ The following locales have translations available for use. Most of the translati
 often be less than perfect. If you would like to contribute a better translation, or add a new locale, please submit
 your contribution to [rsql](https://github.com/theseus-rs/rsql).
 
-| locale | Description              |
+| Locale | Description              |
 |--------|--------------------------|
 | ar     | Arabic                   |
 | be     | Belarusian               |
