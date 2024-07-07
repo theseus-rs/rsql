@@ -5071,7 +5071,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_cli"
-version = "0.13.3"
+version = "0.13.4"
 dependencies = [
  "anyhow",
  "chrono",
@@ -5095,7 +5095,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_core"
-version = "0.13.3"
+version = "0.13.4"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -5134,7 +5134,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_drivers"
-version = "0.13.3"
+version = "0.13.4"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -5172,7 +5172,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_formatters"
-version = "0.13.3"
+version = "0.13.4"
 dependencies = [
  "ansi_colours",
  "anyhow",
@@ -6290,7 +6290,8 @@ dependencies = [
 [[package]]
 name = "tabled"
 version = "0.15.0"
-source = "git+https://github.com/zhiburt/tabled.git?rev=624c294#624c294092cd0a4b2f0988ce34ca37c3f46c975d"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4c998b0c8b921495196a48aabaf1901ff28be0760136e31604f7967b0792050e"
 dependencies = [
  "ansi-str",
  "ansitok",
@@ -6302,7 +6303,8 @@ dependencies = [
 [[package]]
 name = "tabled_derive"
 version = "0.7.0"
-source = "git+https://github.com/zhiburt/tabled.git?rev=624c294#624c294092cd0a4b2f0988ce34ca37c3f46c975d"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4c138f99377e5d653a371cdad263615634cfc8467685dfe8e73e2b8e98f44b17"
 dependencies = [
  "heck 0.4.1",
  "proc-macro-error",
