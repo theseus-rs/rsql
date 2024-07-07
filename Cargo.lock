@@ -5035,7 +5035,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_cli"
-version = "0.13.4"
+version = "0.13.5"
 dependencies = [
  "anyhow",
  "chrono",
@@ -5059,7 +5059,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_core"
-version = "0.13.4"
+version = "0.13.5"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -5098,7 +5098,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_drivers"
-version = "0.13.4"
+version = "0.13.5"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -5136,7 +5136,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_formatters"
-version = "0.13.4"
+version = "0.13.5"
 dependencies = [
  "ansi_colours",
  "anyhow",
