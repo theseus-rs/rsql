@@ -96,7 +96,7 @@ tag-name = "v{{version}}"
 # Config for 'cargo dist'
 [workspace.metadata.dist]
 # The preferred cargo-dist version to use in CI (Cargo.toml SemVer syntax)
-cargo-dist-version = "0.18.0"
+cargo-dist-version = "0.19.1"
 # CI backends to support
 ci = "github"
 # Whether cargo-dist should create a Github Release or use an existing draft
@@ -115,6 +115,8 @@ publish-jobs = ["homebrew"]
 pr-run-mode = "skip"
 # Whether to install an updater program
 install-updater = false
+# Path that installers should place binaries in
+install-path = "CARGO_HOME"
 
 [workspace.metadata.dist.github-custom-runners]
 aarch64-apple-darwin = "macos-14"
