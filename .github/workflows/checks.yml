@@ -60,7 +60,7 @@ jobs:
         with:
           toolchain: stable
       - name: Install cargo deny
-        run: cargo install cargo-deny@0.14.16
+        run: cargo install cargo-deny@0.14.24
       - name: Check licenses
         run: cargo deny check --allow duplicate
 
