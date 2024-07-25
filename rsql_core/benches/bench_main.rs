@@ -2,7 +2,7 @@ use criterion::criterion_main;
 
 mod benchmarks;
 
-#[cfg(feature = "libsql")]
+#[cfg(feature = "driver-libsql")]
 criterion_main! {
     benchmarks::duckdb::all,
     benchmarks::libsql::all,
@@ -12,7 +12,7 @@ criterion_main! {
     benchmarks::sqlite::all,
 }
 
-#[cfg(not(feature = "libsql"))]
+#[cfg(not(feature = "driver-libsql"))]
 criterion_main! {
     benchmarks::duckdb::all,
     benchmarks::postgres::all,

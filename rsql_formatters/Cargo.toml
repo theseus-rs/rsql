@@ -20,7 +20,6 @@ colored = { workspace = true }
 csv = { workspace = true, optional = true }
 indexmap = { workspace = true, features = ["serde"] }
 indoc = { workspace = true }
-lazy_static = { workspace = true }
 num-format = { workspace = true }
 quick-xml = { workspace = true, features = ["serialize"], optional = true }
 rsql_drivers = { path = "../rsql_drivers", version = "0.13.5" }
