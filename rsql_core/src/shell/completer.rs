@@ -1,10 +1,13 @@
 use crate::shell::helper::ReplHelper;
-use lazy_static::lazy_static;
 use rustyline::completion::{Candidate, Completer, Pair};
 use rustyline::Context;
+use std::sync::LazyLock;
 
-lazy_static! {
-    static ref CANDIDATES: Vec<Pair> = vec![
+static CANDIDATES: LazyLock<Vec<Pair>> = LazyLock::new(init_candidates);
+
+#[allow(clippy::too_many_lines)]
+fn init_candidates() -> Vec<Pair> {
+    vec![
         Pair {
             display: "SELECT - Retrieve data from a table".to_string(),
             replacement: "SELECT".to_string(),
@@ -157,7 +160,7 @@ lazy_static! {
             display: "ROLLBACK - Rollback the changes".to_string(),
             replacement: "ROLLBACK".to_string(),
         },
-    ];
+    ]
 }
 
 impl Completer for ReplHelper {

@@ -1,5 +1,5 @@
 pub mod duckdb;
-#[cfg(feature = "libsql")]
+#[cfg(feature = "driver-libsql")]
 pub mod libsql;
 pub mod postgres;
 pub mod postgresql;

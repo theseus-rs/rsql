@@ -21,7 +21,6 @@ dark-light = { workspace = true }
 dirs = { workspace = true }
 indicatif = { workspace = true }
 indoc = { workspace = true }
-lazy_static = { workspace = true }
 num-format = { workspace = true }
 regex = { workspace = true }
 rsql_drivers = { path = "../rsql_drivers", version = "0.13.5" }
