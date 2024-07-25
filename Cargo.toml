@@ -64,7 +64,7 @@ test-log = "0.2.16"
 testcontainers = "0.20.1"
 testcontainers-modules = "0.8.0"
 thiserror = "1.0.63"
-tiberius = { version = "0.12.2", default-features = false }
+tiberius = { version = "0.12.3", default-features = false }
 tokio = "1.38.0"
 tokio-postgres = "0.7.10"
 tokio-util = "0.7.11"
