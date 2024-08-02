@@ -24,7 +24,6 @@ allow = [
     "MPL-2.0",
     "OpenSSL",
     "PostgreSQL",
-    "Unicode-3.0",
     "Unicode-DFS-2016",
     "WTFPL",
 ]
@@ -32,7 +31,7 @@ allow = [
 [advisories]
 ignore = [
     "RUSTSEC-2023-0071",
-    "RUSTSEC-2024-0336"
+    "RUSTSEC-2024-0320",
 ]
 
 # https://embarkstudios.github.io/cargo-deny/checks/bans/cfg.html

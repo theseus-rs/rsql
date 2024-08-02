@@ -23,7 +23,7 @@ indoc = { workspace = true }
 libsql = { workspace = true, optional = true }
 mockall = { workspace = true }
 num-format = { workspace = true }
-postgresql_embedded = { workspace = true, optional = true, features = ["rustls-tls", "theseus"] }
+postgresql_embedded = { workspace = true, optional = true }
 regex = { workspace = true }
 rusqlite = { workspace = true, features = ["bundled-full"], optional = true }
 rust_decimal = { workspace = true }
@@ -41,7 +41,7 @@ uuid = { workspace = true, features = ["serde", "v4"] }
 
 [target.'cfg(target_os = "macos")'.dependencies.tiberius]
 default-features = false
-features = ["bigdecimal", "chrono", "rust_decimal", "rustls", "tds73", "time"]
+features = ["bigdecimal", "chrono", "rust_decimal", "tds73", "time"]
 optional = true
 workspace = true
 
