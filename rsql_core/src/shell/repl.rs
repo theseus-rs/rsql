@@ -169,17 +169,7 @@ impl Shell {
 
                     loop_condition
                 }
-                Err(ReadlineError::Interrupted) => {
-                    let mut program_interrupted =
-                        t!("program_interrupted", locale = locale).to_string();
-                    if self.configuration.color {
-                        program_interrupted = program_interrupted.red().to_string();
-                    }
-                    eprintln!("{program_interrupted}");
-                    error!("Program interrupted");
-                    connection.close().await?;
-                    LoopCondition::Exit(1)
-                }
+                Err(ReadlineError::Interrupted) => LoopCondition::Continue,
                 Err(error) => {
                     let mut error_string = t!("error", locale = locale).to_string();
                     let error_message = format!("{error:?}");
