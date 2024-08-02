@@ -4280,7 +4280,6 @@ checksum = "14776d152cebebb5b09e219bf1ff399dd3e001b9e3eb362b612f0f44f87cd642"
 dependencies = [
  "anyhow",
  "async-trait",
- "flate2",
  "hex",
  "http 1.1.0",
  "human_bytes",
@@ -4292,10 +4291,6 @@ dependencies = [
  "reqwest-tracing",
  "semver",
  "serde",
- "serde_json",
- "sha2",
- "tar",
- "target-triple",
  "tempfile",
  "thiserror",
  "tracing",

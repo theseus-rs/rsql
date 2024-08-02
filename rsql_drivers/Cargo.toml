@@ -23,7 +23,7 @@ indoc = { workspace = true }
 libsql = { workspace = true, optional = true }
 mockall = { workspace = true }
 num-format = { workspace = true }
-postgresql_embedded = { workspace = true, optional = true, features = ["theseus"] }
+postgresql_embedded = { workspace = true, optional = true }
 regex = { workspace = true }
 rusqlite = { workspace = true, features = ["bundled-full"], optional = true }
 rust_decimal = { workspace = true }
