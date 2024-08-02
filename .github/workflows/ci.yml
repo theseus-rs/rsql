@@ -49,6 +49,10 @@ jobs:
           components: 'llvm-tools-preview'
           toolchain: stable
 
+      - name: Install NASM
+        if: ${{ startsWith(matrix.os, 'windows-') }}
+        uses: ilammy/setup-nasm@v1
+
       - name: Install grcov
         uses: taiki-e/install-action@main
         with:
