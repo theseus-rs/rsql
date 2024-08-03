@@ -41,6 +41,8 @@ mod test {
 
         test_schema(&mut *connection).await?;
 
+        container.stop().await?;
+        container.rm().await?;
         Ok(())
     }
 

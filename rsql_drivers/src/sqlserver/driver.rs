@@ -251,6 +251,8 @@ mod test {
         test_connection_interface(&mut *connection).await?;
         test_data_types(&mut *connection).await?;
 
+        container.stop().await?;
+        container.rm().await?;
         Ok(())
     }
 

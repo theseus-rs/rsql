@@ -650,6 +650,8 @@ mod test {
 
         assert_eq!(*value, Value::String("foo".to_string()));
 
+        container.stop().await?;
+        container.rm().await?;
         Ok(())
     }
 }
