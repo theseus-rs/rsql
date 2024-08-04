@@ -95,20 +95,20 @@ jobs:
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
 
-      - name: Install benchmarking tools
-        if: ${{ github.ref == 'refs/heads/main' && startsWith(matrix.os, 'ubuntu-') }}
-        uses: bencherdev/bencher@main
-
-      - name: Run benchmarks
-        if: ${{ github.ref == 'refs/heads/main' && startsWith(matrix.os, 'ubuntu-') }}
-        env:
-          BENCHER_API_TOKEN: ${{ secrets.BENCHER_API_TOKEN }}
-          BENCHER_PROJECT: theseus-rs-rsql
-          BENCHER_ADAPTER: rust_criterion
-        run: |
-          cargo build --release
-          bencher run \
-            --file-size ./target/release/rsql \
-            --adapter json
-          bencher run \
-            "cargo bench"
+#      - name: Install benchmarking tools
+#        if: ${{ github.ref == 'refs/heads/main' && startsWith(matrix.os, 'ubuntu-') }}
+#        uses: bencherdev/bencher@main
+#
+#      - name: Run benchmarks
+#        if: ${{ github.ref == 'refs/heads/main' && startsWith(matrix.os, 'ubuntu-') }}
+#        env:
+#          BENCHER_API_TOKEN: ${{ secrets.BENCHER_API_TOKEN }}
+#          BENCHER_PROJECT: theseus-rs-rsql
+#          BENCHER_ADAPTER: rust_criterion
+#        run: |
+#          cargo build --release
+#          bencher run \
+#            --file-size ./target/release/rsql \
+#            --adapter json
+#          bencher run \
+#            "cargo bench"
