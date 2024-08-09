@@ -24,7 +24,7 @@ jobs:
           - { target: aarch64-unknown-linux-musl, os: ubuntu-latest }
           # - { target: arm-linux-androideabi, os: ubuntu-latest }
           - { target: arm-unknown-linux-gnueabi, os: ubuntu-latest }
-          - { target: arm-unknown-linux-gnueabihf, os: ubuntu-latest }
+          # - { target: arm-unknown-linux-gnueabihf, os: ubuntu-latest }
           # - { target: arm-unknown-linux-musleabi, os: ubuntu-latest }
           # - { target: arm-unknown-linux-musleabihf, os: ubuntu-latest }
           # - { target: armv5te-unknown-linux-gnueabi, os: ubuntu-latest }
