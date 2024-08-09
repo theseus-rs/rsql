@@ -10,7 +10,7 @@ edition = "2021"
 keywords = ["database", "mysql", "postgresql", "sql", "sqlite"]
 license = "Apache-2.0 OR MIT"
 repository = "https://github.com/theseus-rs/rsql"
-version = "0.13.6"
+version = "0.13.7"
 
 [workspace.dependencies]
 ansi_colours = "1.2.3"
