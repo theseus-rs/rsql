@@ -255,8 +255,9 @@ impl ConfigurationBuilder {
         let log_level = configuration.log_level;
         let registry = tracing_subscriber::registry();
         let progress_style =
-            ProgressStyle::with_template("{span_child_prefix}{spinner} {span_name}")
-                .expect("progress style");
+            ProgressStyle::with_template("{span_child_prefix}{spinner} {span_name} [{elapsed_precise}] [{wide_bar}] {bytes}/{total_bytes} ({bytes_per_sec}, {eta})")
+                .expect("progress style")
+                .progress_chars("=> ");
 
         if log_level == LevelFilter::OFF {
             #[cfg(not(test))]
