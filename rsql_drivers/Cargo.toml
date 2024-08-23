@@ -20,16 +20,19 @@ form_urlencoded = { workspace = true, optional = true }
 futures-util = { workspace = true, optional = true }
 indexmap = { workspace = true, features = ["serde"] }
 indoc = { workspace = true }
+jwt-simple = { workspace = true, optional = true }
 libsql = { workspace = true, optional = true }
 mockall = { workspace = true }
 num-format = { workspace = true }
 postgresql_embedded = { workspace = true, optional = true }
 regex = { workspace = true }
+reqwest = { workspace = true, optional = true, features = ["json", "gzip"] }
 rusqlite = { workspace = true, features = ["bundled-full"], optional = true }
 rust_decimal = { workspace = true }
 rust-i18n = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true, features = ["preserve_order"] }
+sha2 = { workspace = true, optional = true }
 sqlx = { workspace = true, features = ["bit-vec", "chrono", "json", "macros", "runtime-tokio", "rust_decimal", "time", "uuid"], optional = true }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["rt", "rt-multi-thread", "macros"] }
@@ -58,7 +61,7 @@ testcontainers-modules = { workspace = true, features = ["mariadb", "mssql_serve
 tokio = { workspace = true }
 
 [features]
-all = ["duckdb", "mariadb", "mysql", "postgres", "postgresql", "rusqlite", "sqlite", "sqlserver"]
+all = ["duckdb", "mariadb", "mysql", "postgres", "postgresql", "rusqlite","snowflake", "sqlite", "sqlserver"]
 default = []
 duckdb = [
     "dep:duckdb"
@@ -87,6 +90,11 @@ postgresql = [
 ]
 rusqlite = [
     "dep:rusqlite",
+]
+snowflake = [
+    "dep:jwt-simple",
+    "dep:reqwest",
+    "dep:sha2",
 ]
 sqlite = [
     "dep:form_urlencoded",

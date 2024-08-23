@@ -92,6 +92,8 @@ impl Default for DriverManager {
         drivers.add(Box::new(crate::sqlite::Driver));
         #[cfg(feature = "sqlserver")]
         drivers.add(Box::new(crate::sqlserver::Driver));
+        #[cfg(feature = "snowflake")]
+        drivers.add(Box::new(crate::snowflake::Driver));
 
         drivers
     }

@@ -24,6 +24,8 @@ pub mod postgresql;
 mod row;
 #[cfg(feature = "rusqlite")]
 pub mod rusqlite;
+#[cfg(feature = "snowflake")]
+mod snowflake;
 #[cfg(feature = "sqlite")]
 pub mod sqlite;
 #[cfg(feature = "sqlserver")]

@@ -62,7 +62,7 @@ impl<'a> SqlExecutor<'a> {
     ///
     /// This function is split out so that it can be instrumented and a visual progress indicator
     /// can be shown without leaving artifacts in the output when the results are formatted.
-    #[instrument(skip(sql, limit))]
+    #[instrument(skip(self, sql, limit))]
     async fn execute_sql(&mut self, sql: &str, limit: usize) -> Result<Results> {
         Span::current().pb_set_style(&ProgressStyle::with_template(
             "{span_child_prefix}{spinner}",
