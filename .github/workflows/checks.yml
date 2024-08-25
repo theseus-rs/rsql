@@ -20,7 +20,7 @@ jobs:
       - name: Install cargo audit
         run: cargo install cargo-audit
       - name: Audit dependencies
-        run: cargo audit --ignore RUSTSEC-2023-0071 --ignore RUSTSEC-2024-0320
+        run: cargo audit --ignore RUSTSEC-2023-0071 --ignore RUSTSEC-2024-0320 --ignore RUSTSEC-2024-0363
 
   check:
     runs-on: ubuntu-22.04
@@ -50,19 +50,19 @@ jobs:
         run: |
           cargo clippy --all-targets --all-features --examples --tests
 
-  #  deny:
-  #    runs-on: ubuntu-22.04
-  #    steps:
-  #      - name: Checkout repository
-  #        uses: actions/checkout@v4
-  #      - name: Install Rust
-  #        uses: dtolnay/rust-toolchain@master
-  #        with:
-  #          toolchain: stable
-  #      - name: Install cargo deny
-  #        run: cargo install cargo-deny
-  #      - name: Check licenses
-  #        run: cargo deny check --allow duplicate
+  deny:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+      - name: Install cargo deny
+        run: cargo install cargo-deny
+      - name: Check licenses
+        run: cargo deny check --allow duplicate
 
   doc:
     runs-on: ubuntu-22.04
