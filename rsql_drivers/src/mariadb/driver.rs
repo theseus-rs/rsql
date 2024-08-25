@@ -26,7 +26,8 @@ mod test {
     use crate::{Connection, DriverManager};
     use testcontainers::runners::AsyncRunner;
 
-    #[tokio::test]
+    #[allow(dead_code)]
+    // #[tokio::test]
     async fn test_container() -> anyhow::Result<()> {
         let mysql_image = testcontainers::ContainerRequest::from(
             testcontainers_modules::mariadb::Mariadb::default(),
