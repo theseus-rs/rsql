@@ -5,7 +5,7 @@ use crate::writers::Output;
 use crate::Results;
 use crate::Results::Query;
 use async_trait::async_trait;
-use num_format::Locale;
+use num_format::{Locale, ToFormattedString};
 use rsql_drivers::{QueryResult, Value};
 use std::str::FromStr;
 use tabled::tables::ExtendedTable;
@@ -36,14 +36,12 @@ impl crate::Formatter for Formatter {
             let mut data: Vec<Vec<String>> = Vec::new();
             data.push(query_result.columns().await);
             rows = process_data(options, query_result, &mut data).await?;
-            // let locale = options.locale.clone();
-            let table = ExtendedTable::from(data);
-            // Update to defined version once https://github.com/zhiburt/tabled/pull/412 is released
-            // let table = ExtendedTable::from(data).template(move |index| {
-            //     let format_locale = Locale::from_str(&locale).unwrap_or(Locale::en);
-            //     let record = (index + 1).to_formatted_string(&format_locale);
-            //     t!("expanded_record", locale = &locale, record = record).to_string()
-            // });
+            let locale = options.locale.clone();
+            let table = ExtendedTable::from(data).template(move |index| {
+                let format_locale = Locale::from_str(&locale).unwrap_or(Locale::en);
+                let record = (index + 1).to_formatted_string(&format_locale);
+                t!("expanded_record", locale = &locale, record = record).to_string()
+            });
 
             writeln!(output, "{table}")?;
         }
@@ -115,10 +113,10 @@ mod tests {
 
         let expanded_output = output.to_string().replace("\r\n", "\n");
         let expected = indoc! {r"
-            -[ RECORD 0 ]-
+            -[ RECORD 1 ]-
             id    | 1,234
             value | foo
-            -[ RECORD 1 ]-
+            -[ RECORD 2 ]-
             id    | 5,678
             value | NULL
             2 rows (9ns)

@@ -20,7 +20,7 @@ async-trait = "0.1.81"
 base64 = "0.22.1"
 bit-vec = "0.6.3"
 chrono = "0.4.38"
-clap = "4.5.15"
+clap = "4.5.16"
 clap-stdin = "0.5.1"
 clearscreen = "3.0.0"
 colored = "2.1.0"
@@ -37,29 +37,29 @@ indexmap = "2.3.0"
 indoc = "2.0.5"
 indicatif = "0.17.8"
 jwt-simple = "0.12.9"
-libsql = "0.4.0"
+libsql = "0.5.0"
 mockall = "0.13.0"
 num-format = "0.4.4"
 octocrab = "0.39.0"
 os_info = "3.8.2"
-postgresql_embedded = "0.16.1"
+postgresql_embedded = "0.16.2"
 quick-xml = "0.36.1"
 regex = "1.10.6"
 reqwest = "0.12.5"
-rusqlite = "0.30.0"
+rusqlite = "0.32.1"
 rust_decimal = "1.35.0"
-rust-i18n = "3.0.1"
+rust-i18n = "3.1.2"
 rustyline = "14.0.0"
 semver = "1.0.23"
-serde = "1.0.203"
-serde_json = "1.0.118"
+serde = "1.0.209"
+serde_json = "1.0.127"
 serde_yaml = "0.9.34"
 sha2 = "0.10.8"
-sqlx = "0.7.4"
+sqlx = "0.8.1"
 supports-color = "3.0.0"
 sys-locale = "0.3.1"
 syntect = "5.2.0"
-tabled = "0.15.0"
+tabled = "0.16.0"
 tempfile = "3.11.0"
 termbg = "0.5.0"
 test-log = "0.2.16"
@@ -74,7 +74,7 @@ tracing = "0.1.40"
 tracing-appender = "0.2.3"
 tracing-indicatif = "0.3.6"
 tracing-subscriber = "0.3.18"
-unicode-width = "0.1.13"
+unicode-width = "0.1.11"
 url = "2.5.2"
 uuid = "1.10.0"
 
@@ -98,7 +98,7 @@ tag-name = "v{{version}}"
 # Config for 'cargo dist'
 [workspace.metadata.dist]
 # The preferred cargo-dist version to use in CI (Cargo.toml SemVer syntax)
-cargo-dist-version = "0.20.0"
+cargo-dist-version = "0.21.1"
 # CI backends to support
 ci = "github"
 # Whether cargo-dist should create a Github Release or use an existing draft
@@ -113,7 +113,7 @@ targets = ["aarch64-apple-darwin", "x86_64-apple-darwin", "x86_64-unknown-linux-
 post-announce-jobs = ["./release-post-announce"]
 # Publish jobs to run in CI
 publish-jobs = ["homebrew"]
-# Publish jobs to run in CI
+# Which actions to run on pull requests
 pr-run-mode = "skip"
 # Whether to install an updater program
 install-updater = false
