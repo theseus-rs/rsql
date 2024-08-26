@@ -18,8 +18,6 @@ pub enum SnowflakeError {
     MissingPublicKey,
     #[error("Missing account in connection string")]
     MissingAccount,
-    #[error("Missing user in connection string")]
-    MissingUser,
     #[error("Unable to create request headers")]
     MalformedHeaders,
     #[error("Unknown Snowflake Error")]

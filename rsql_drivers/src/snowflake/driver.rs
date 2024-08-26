@@ -81,10 +81,7 @@ impl SnowflakeConnection {
             .next()
             .ok_or(SnowflakeError::MissingAccount)?
             .to_string();
-        let user = query_params
-            .get("user")
-            .ok_or(SnowflakeError::MissingUser)?
-            .to_string();
+        let user = parsed_url.username();
         let base_url = format!("https://{base_url}/api/v2/statements");
 
         if let Some(password) = password {
