@@ -200,9 +200,7 @@ impl SnowflakeConnection {
             .query(&[("partition", partition.to_string())])
             .send()
             .await
-            .map_err(|e| {
-                SnowflakeError::Request(e).into()
-            })
+            .map_err(|e| SnowflakeError::Request(e).into())
     }
 
     /// If this connection is configured to use a key pair, check if the JWT has expired and refresh it if necessary
@@ -223,7 +221,6 @@ impl SnowflakeConnection {
         }
         Ok(())
     }
-
 
     /// Execute a SQL query against the Snowflake API.
     ///
@@ -252,11 +249,8 @@ impl SnowflakeConnection {
             )
             .send()
             .await
-            .map_err(|e| {
-                SnowflakeError::Request(e).into()
-            })
+            .map_err(|e| SnowflakeError::Request(e).into())
     }
-
 
     /// Parse row data from snowflake response
     ///
@@ -268,7 +262,9 @@ impl SnowflakeConnection {
     ) -> Result<Vec<Row>> {
         result_data["data"]
             .as_array()
-            .ok_or(SnowflakeError::ResponseContent("Snowflake Response missing row data".into()))?
+            .ok_or(SnowflakeError::ResponseContent(
+                "Snowflake Response missing row data".into(),
+            ))?
             .iter()
             .map(|row| {
                 row.as_array()
@@ -298,14 +294,21 @@ impl crate::Connection for SnowflakeConnection {
             .await?
             .error_for_status()
             .map_err(|e| SnowflakeError::Response(e))?;
-        let response_json: serde_json::Value = response.json().await.map_err(|e| {
-            SnowflakeError::Response(e)
-        })?;
+        let response_json: serde_json::Value = response
+            .json()
+            .await
+            .map_err(|e| SnowflakeError::Response(e))?;
         let row_count = response_json["data"][0][0]
             .as_str()
-            .ok_or(SnowflakeError::ResponseContent("Query executed: row count not found".into()))?
+            .ok_or(SnowflakeError::ResponseContent(
+                "Query executed: row count not found".into(),
+            ))?
             .parse::<u64>()
-            .map_err(|e| SnowflakeError::ResponseContent(format!("Query executed: row count not a number: {e}")))?;
+            .map_err(|e| {
+                SnowflakeError::ResponseContent(format!(
+                    "Query executed: row count not a number: {e}"
+                ))
+            })?;
         Ok(row_count)
     }
 
@@ -314,20 +317,32 @@ impl crate::Connection for SnowflakeConnection {
     }
 
     async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {
-        let response = self.request(sql).await?.error_for_status().map_err(|e| SnowflakeError::Response(e))?;
-        let response_json: serde_json::Value = response.json().await.map_err(|e| {
-            SnowflakeError::ResponseContent(format!("Error parsing Response: {e}"))
-        })?;
+        let response = self
+            .request(sql)
+            .await?
+            .error_for_status()
+            .map_err(|e| SnowflakeError::Response(e))?;
+        let response_json: serde_json::Value = response
+            .json()
+            .await
+            .map_err(|e| SnowflakeError::ResponseContent(format!("Error parsing Response: {e}")))?;
 
-        let handle = response_json["statementHandle"]
-            .as_str()
-            .ok_or(SnowflakeError::ResponseContent("No handle in Response".into()))?;
+        let handle =
+            response_json["statementHandle"]
+                .as_str()
+                .ok_or(SnowflakeError::ResponseContent(
+                    "No handle in Response".into(),
+                ))?;
         let partitions = response_json["resultSetMetaData"]["partitionInfo"]
             .as_array()
-            .ok_or(SnowflakeError::ResponseContent("No partition data in response".into()))?;
+            .ok_or(SnowflakeError::ResponseContent(
+                "No partition data in response".into(),
+            ))?;
         let column_definitions: Vec<_> = response_json["resultSetMetaData"]["rowType"]
             .as_array()
-            .ok_or(SnowflakeError::ResponseContent("No ResultSet row type info in response".into()))?
+            .ok_or(SnowflakeError::ResponseContent(
+                "No ResultSet row type info in response".into(),
+            ))?
             .iter()
             .map(ColumnDefinition::try_from_value)
             .collect::<Result<Vec<_>>>()?;
@@ -340,9 +355,15 @@ impl crate::Connection for SnowflakeConnection {
         let mut rows = Self::parse_result_data(&response_json, &column_definitions)?;
         if partitions.len() > 1 {
             for i in 1..partitions.len() {
-                let response = self.request_handle_partition(handle, i).await?.error_for_status().map_err(|e| SnowflakeError::Response(e))?;
+                let response = self
+                    .request_handle_partition(handle, i)
+                    .await?
+                    .error_for_status()
+                    .map_err(|e| SnowflakeError::Response(e))?;
                 let response_json: serde_json::Value = response.json().await.map_err(|e| {
-                    SnowflakeError::ResponseContent(format!("Error parsing partition response: {e}"))
+                    SnowflakeError::ResponseContent(format!(
+                        "Error parsing partition response: {e}"
+                    ))
                 })?;
                 rows.extend(Self::parse_result_data(
                     &response_json,
@@ -422,11 +443,15 @@ impl ColumnDefinition {
     fn try_from_value(value: &serde_json::Value) -> Result<Self> {
         let name = value["name"]
             .as_str()
-            .ok_or(SnowflakeError::ResponseContent("missing column name in response".into()))?
+            .ok_or(SnowflakeError::ResponseContent(
+                "missing column name in response".into(),
+            ))?
             .to_string();
         let snowflake_type = value["type"]
             .as_str()
-            .ok_or(SnowflakeError::ResponseContent("missing column type in response".into()))?
+            .ok_or(SnowflakeError::ResponseContent(
+                "missing column type in response".into(),
+            ))?
             .to_string();
         let scale = value["scale"].as_u64();
 

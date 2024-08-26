@@ -1,4 +1,3 @@
-
 #[derive(Debug, thiserror::Error)]
 pub enum SnowflakeError {
     #[error("Unable to create snowflake client")]
