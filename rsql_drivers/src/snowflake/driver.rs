@@ -137,7 +137,7 @@ impl SnowflakeConnection {
     /// Errors if there is an issue building the underlying client
     fn new_client(auth_token: &str, token_type: &str) -> Result<reqwest::Client> {
         let mut headers = HashMap::new();
-        headers.insert("Authorization".to_owned(), format!("Bearer {}", auth_token));
+        headers.insert("Authorization".to_owned(), format!("Bearer {auth_token}"));
         headers.insert("Content-Type".to_owned(), "application/json".to_owned());
         headers.insert(
             "X-Snowflake-Authorization-Token-Type".to_owned(),
@@ -255,10 +255,10 @@ impl SnowflakeConnection {
     /// Parse row data from snowflake response
     ///
     /// # Errors
-    /// Errors if the result_data["data"] is not an array or if the row data is not an array
+    /// Errors if the `result_data["data"]` is not an array or if the row data is not an array
     fn parse_result_data(
         result_data: &serde_json::Value,
-        column_definitions: &Vec<ColumnDefinition>,
+        column_definitions: &[ColumnDefinition],
     ) -> Result<Vec<Row>> {
         result_data["data"]
             .as_array()
@@ -293,11 +293,9 @@ impl crate::Connection for SnowflakeConnection {
             .request(sql)
             .await?
             .error_for_status()
-            .map_err(|e| SnowflakeError::Response(e))?;
-        let response_json: serde_json::Value = response
-            .json()
-            .await
-            .map_err(|e| SnowflakeError::Response(e))?;
+            .map_err(SnowflakeError::Response)?;
+        let response_json: serde_json::Value =
+            response.json().await.map_err(SnowflakeError::Response)?;
         let row_count = response_json["data"][0][0]
             .as_str()
             .ok_or(SnowflakeError::ResponseContent(
@@ -321,7 +319,7 @@ impl crate::Connection for SnowflakeConnection {
             .request(sql)
             .await?
             .error_for_status()
-            .map_err(|e| SnowflakeError::Response(e))?;
+            .map_err(SnowflakeError::Response)?;
         let response_json: serde_json::Value = response
             .json()
             .await
@@ -359,7 +357,7 @@ impl crate::Connection for SnowflakeConnection {
                     .request_handle_partition(handle, i)
                     .await?
                     .error_for_status()
-                    .map_err(|e| SnowflakeError::Response(e))?;
+                    .map_err(SnowflakeError::Response)?;
                 let response_json: serde_json::Value = response.json().await.map_err(|e| {
                     SnowflakeError::ResponseContent(format!(
                         "Error parsing partition response: {e}"
@@ -468,6 +466,7 @@ mod test {
     use wiremock::matchers::{method, path};
     use wiremock::{Mock, MockServer, ResponseTemplate};
 
+    #[allow(clippy::too_many_lines)]
     fn initial_response_json() -> serde_json::Value {
         json!({
             "resultSetMetaData": {
@@ -594,7 +593,7 @@ mod test {
             "sqlState": "00000",
             "statementHandle": "01b69c52-0002-cff6-007b-7807000435b2",
             "message": "Statement executed successfully.",
-            "createdOn": 123456
+            "createdOn": 123_456
         })
     }
 
@@ -615,7 +614,7 @@ mod test {
     }
 
     #[tokio::test]
-    async fn test_query_against_mock() {
+    async fn test_query_against_mock() -> anyhow::Result<()> {
         let mock = MockServer::start().await;
         let response_json = initial_response_json();
         let handle = "01b69c52-0002-cff6-007b-7807000435b2";
@@ -634,30 +633,29 @@ mod test {
             .await;
 
         let conn_str = "snowflake://abc123.snowflakecomputing.com/?user=test";
-        let mut conn = SnowflakeConnection::new(conn_str, Some("auth_token".to_string())).unwrap();
+        let mut conn = SnowflakeConnection::new(conn_str, Some("auth_token".to_string()))?;
         conn.set_base_url(&mock.uri());
 
         let mut result = conn
             .query(
                 "SELECT Int, Float, Boolean, Time, Date, DateTimeNTZ, DateTimeTZ, FROM table LIMIT 2",
             )
-            .await
-            .unwrap();
+            .await?;
         assert_eq!(
             result.next().await,
             Some(Row::new(vec![
                 Value::I64(1),
                 Value::F64(2.1),
                 Value::Bool(false),
-                Value::Time(NaiveTime::from_hms_nano_opt(19, 57, 48, 0).unwrap()),
-                Value::Date(NaiveDate::from_ymd_opt(2024, 8, 14).unwrap()),
+                Value::Time(NaiveTime::from_hms_nano_opt(19, 57, 48, 0).expect("invalid time")),
+                Value::Date(NaiveDate::from_ymd_opt(2024, 8, 14).expect("invalid date")),
                 Value::DateTime(NaiveDateTime::new(
-                    NaiveDate::from_ymd_opt(2024, 8, 14).unwrap(),
-                    NaiveTime::from_hms_opt(19, 57, 48).unwrap()
+                    NaiveDate::from_ymd_opt(2024, 8, 14).expect("invalid date"),
+                    NaiveTime::from_hms_opt(19, 57, 48).expect("invalid time")
                 )),
                 Value::DateTime(
                     DateTime::parse_from_rfc3339("2024-08-14T19:57:48.000000000+00:00")
-                        .unwrap()
+                        .expect("invalid datetime")
                         .naive_utc()
                 )
             ]))
@@ -668,149 +666,59 @@ mod test {
                 Value::I64(2),
                 Value::F64(3.1),
                 Value::Bool(true),
-                Value::Time(NaiveTime::from_hms_nano_opt(23, 59, 59, 123456789).unwrap()),
-                Value::Date(NaiveDate::from_ymd_opt(2000, 1, 1).unwrap()),
+                Value::Time(
+                    NaiveTime::from_hms_nano_opt(23, 59, 59, 123_456_789).expect("invalid time")
+                ),
+                Value::Date(NaiveDate::from_ymd_opt(2000, 1, 1).expect("invalid date")),
                 Value::DateTime(NaiveDateTime::new(
-                    NaiveDate::from_ymd_opt(2000, 1, 1).unwrap(),
-                    NaiveTime::from_hms_nano_opt(23, 59, 59, 123456789).unwrap()
+                    NaiveDate::from_ymd_opt(2000, 1, 1).expect("invalid date"),
+                    NaiveTime::from_hms_nano_opt(23, 59, 59, 123_456_789).expect("invalid time")
                 )),
                 Value::DateTime(
                     DateTime::parse_from_rfc3339("2000-01-01T23:59:59.123456789-00:00")
-                        .unwrap()
+                        .expect("invalid datetime")
                         .naive_utc()
                 )
             ]))
         );
-    }
-
-    #[tokio::test]
-    async fn test_parse_result_data() {
-        let response_json = serde_json::json!({
-            "data": [
-                ["1.0", "3", "true", "2024-08-24", "12:00:00.000000000", "2025-01-01T23:59:59.000000000", "2025-01-01T23:59:59.000000000", "2025-01-01T23:59:59.000000000-0700"],
-                ["4.0", "6", "false", "1993-05-07", "00:00:00.123456789", "2001-01-01T23:59:59.123456789", "2001-01-01T23:59:59.123456789", "2001-01-01T23:59:59.123456789+0100"],
-            ]
-        });
-
-        let column_definitions = vec![
-            ColumnDefinition::new("float".to_string(), "fixed".to_string(), Some(2)),
-            ColumnDefinition::new("int".to_string(), "fixed".to_string(), None),
-            ColumnDefinition::new("bool".to_string(), "boolean".to_string(), None),
-            ColumnDefinition::new("date".to_string(), "date".to_string(), None),
-            ColumnDefinition::new("time".to_string(), "time".to_string(), None),
-            ColumnDefinition::new(
-                "datetime_ntz".to_string(),
-                "timestamp_ntz".to_string(),
-                None,
-            ),
-            ColumnDefinition::new(
-                "datetime_ltz".to_string(),
-                "timestamp_ntz".to_string(),
-                None,
-            ),
-            ColumnDefinition::new("datetime_tz".to_string(), "timestamp_tz".to_string(), None),
-        ];
-
-        let rows =
-            SnowflakeConnection::parse_result_data(&response_json, &column_definitions).unwrap();
-        assert_eq!(rows.len(), 2);
-        assert_eq!(rows[0].len(), 8);
-        assert_eq!(rows[0].get(0).unwrap(), &Value::F64(1.0));
-        assert_eq!(rows[0].get(1).unwrap(), &Value::I64(3));
-        assert_eq!(rows[0].get(2).unwrap(), &Value::Bool(true));
-        assert_eq!(
-            rows[0].get(3).unwrap(),
-            &Value::Date(NaiveDate::from_ymd_opt(2024, 8, 24).unwrap())
-        );
-        assert_eq!(
-            rows[0].get(4).unwrap(),
-            &Value::Time(NaiveTime::from_hms_nano_opt(12, 0, 0, 0).unwrap())
-        );
-        assert_eq!(
-            rows[0].get(5).unwrap(),
-            &Value::DateTime(
-                DateTime::from_timestamp(1_735_775_999, 0)
-                    .unwrap()
-                    .naive_utc()
-            )
-        );
-        assert_eq!(
-            rows[0].get(6).unwrap(),
-            &Value::DateTime(
-                DateTime::from_timestamp(1_735_775_999, 0)
-                    .unwrap()
-                    .naive_utc()
-            )
-        );
-        assert_eq!(
-            rows[0].get(7).unwrap(),
-            &Value::DateTime(
-                DateTime::from_timestamp(1_735_775_999, 0)
-                    .unwrap()
-                    .naive_utc()
-            )
-        );
-        assert_eq!(rows[1].get(0).unwrap(), &Value::F64(4.0));
-        assert_eq!(rows[1].get(1).unwrap(), &Value::I64(6));
-        assert_eq!(rows[1].get(2).unwrap(), &Value::Bool(false));
-        assert_eq!(
-            rows[1].get(3).unwrap(),
-            &Value::Date(NaiveDate::from_ymd_opt(1993, 5, 7).unwrap())
-        );
-        assert_eq!(
-            rows[1].get(4).unwrap(),
-            &Value::Time(NaiveTime::from_hms_nano_opt(0, 0, 0, 123_456_789).unwrap())
-        );
-        assert_eq!(
-            rows[1].get(5).unwrap(),
-            &Value::DateTime(
-                DateTime::from_timestamp(978_393_599, 123_456_789)
-                    .unwrap()
-                    .naive_utc()
-            )
-        );
-        assert_eq!(
-            rows[1].get(6).unwrap(),
-            &Value::DateTime(
-                DateTime::from_timestamp(978_393_599, 123_456_789)
-                    .unwrap()
-                    .naive_utc()
-            )
-        );
-        assert_eq!(
-            rows[1].get(7).unwrap(),
-            &Value::DateTime(
-                DateTime::from_timestamp(978_393_599, 123_456_789)
-                    .unwrap()
-                    .naive_utc()
-            )
-        );
+        Ok(())
     }
 
     #[test]
     fn test_column_maps_null() {
         let column = ColumnDefinition::new("column".to_string(), "fixed".to_string(), None);
-        assert_eq!(column.convert_to_value(&json!(null)).unwrap(), Value::Null);
+        assert_eq!(
+            column.convert_to_value(&json!(null)).ok(),
+            Some(Value::Null)
+        );
     }
 
     #[test]
     fn test_float_column() {
         let column = ColumnDefinition::new("float".to_string(), "fixed".to_string(), Some(5));
         assert_eq!(
-            column.convert_to_value(&json!("1.23456")).unwrap(),
+            column
+                .convert_to_value(&json!("1.23456"))
+                .expect("failed to convert to value"),
             Value::F64(1.23456)
         );
         assert_eq!(
-            column.convert_to_value(&json!("0.00001")).unwrap(),
+            column
+                .convert_to_value(&json!("0.00001"))
+                .expect("failed to convert to value"),
             Value::F64(0.00001)
         );
         assert_eq!(
-            column.convert_to_value(&json!("-123.45678")).unwrap(),
+            column
+                .convert_to_value(&json!("-123.45678"))
+                .expect("failed to convert to value"),
             Value::F64(-123.45678)
         );
         assert_eq!(
-            column.convert_to_value(&json!("9999999.99999")).unwrap(),
-            Value::F64(9999999.99999)
+            column
+                .convert_to_value(&json!("9999999.99999"))
+                .expect("failed to convert to value"),
+            Value::F64(9_999_999.999_99)
         );
         assert!(column.convert_to_value(&json!("not_a_number")).is_err());
         assert!(column.convert_to_value(&json!("1,23456")).is_err());
@@ -821,31 +729,39 @@ mod test {
         let int_column = ColumnDefinition::new("int".to_string(), "fixed".to_string(), None);
 
         assert_eq!(
-            int_column.convert_to_value(&json!("1")).unwrap(),
+            int_column
+                .convert_to_value(&json!("1"))
+                .expect("failed to convert to _value"),
             Value::I64(1)
         );
         assert_eq!(
-            int_column.convert_to_value(&json!("0")).unwrap(),
+            int_column
+                .convert_to_value(&json!("0"))
+                .expect("failed to convert to _value"),
             Value::I64(0)
         );
         assert_eq!(
-            int_column.convert_to_value(&json!("156516516514")).unwrap(),
+            int_column
+                .convert_to_value(&json!("156516516514"))
+                .expect("invalid value"),
             Value::I64(156_516_516_514)
         );
         assert_eq!(
-            int_column.convert_to_value(&json!("-9999999")).unwrap(),
+            int_column
+                .convert_to_value(&json!("-9999999"))
+                .expect("failed to convert to value"),
             Value::I64(-9_999_999)
         );
         assert_eq!(
             int_column
                 .convert_to_value(&json!(i64::MIN.to_string()))
-                .unwrap(),
+                .expect("failed to convert to value"),
             Value::I64(i64::MIN)
         );
         assert_eq!(
             int_column
                 .convert_to_value(&json!(i64::MAX.to_string()))
-                .unwrap(),
+                .expect("failed to convert to value"),
             Value::I64(i64::MAX)
         );
         assert!(int_column.convert_to_value(&json!("1.3434")).is_err());
@@ -855,11 +771,15 @@ mod test {
     fn test_boolean_column() {
         let column = ColumnDefinition::new("bool".to_string(), "boolean".to_string(), None);
         assert_eq!(
-            column.convert_to_value(&json!("true")).unwrap(),
+            column
+                .convert_to_value(&json!("true"))
+                .expect("failed to convert to value"),
             Value::Bool(true)
         );
         assert_eq!(
-            column.convert_to_value(&json!("false")).unwrap(),
+            column
+                .convert_to_value(&json!("false"))
+                .expect("failed to convert to value"),
             Value::Bool(false)
         );
         assert!(column.convert_to_value(&json!("not_a_boolean")).is_err());
@@ -869,12 +789,16 @@ mod test {
     fn test_date_column() {
         let column = ColumnDefinition::new("date".to_string(), "date".to_string(), None);
         assert_eq!(
-            column.convert_to_value(&json!("2024-08-24")).unwrap(),
-            Value::Date(NaiveDate::from_ymd_opt(2024, 8, 24).unwrap())
+            column
+                .convert_to_value(&json!("2024-08-24"))
+                .expect("failed to convert to value"),
+            Value::Date(NaiveDate::from_ymd_opt(2024, 8, 24).expect("invalid date"))
         );
         assert_eq!(
-            column.convert_to_value(&json!("1993-05-07")).unwrap(),
-            Value::Date(NaiveDate::from_ymd_opt(1993, 5, 7).unwrap())
+            column
+                .convert_to_value(&json!("1993-05-07"))
+                .expect("failed to convert to value"),
+            Value::Date(NaiveDate::from_ymd_opt(1993, 5, 7).expect("invalid date"))
         );
         assert!(column.convert_to_value(&json!("not_a_date")).is_err());
     }
@@ -885,14 +809,14 @@ mod test {
         assert_eq!(
             column
                 .convert_to_value(&json!("12:00:00.000000000"))
-                .unwrap(),
-            Value::Time(NaiveTime::from_hms_opt(12, 0, 0).unwrap())
+                .expect("failed to convert to value"),
+            Value::Time(NaiveTime::from_hms_opt(12, 0, 0).expect("invalid time"))
         );
         assert_eq!(
             column
                 .convert_to_value(&json!("00:00:00.123456789"))
-                .unwrap(),
-            Value::Time(NaiveTime::from_hms_nano_opt(0, 0, 0, 123_456_789).unwrap())
+                .expect("failed to convert to value"),
+            Value::Time(NaiveTime::from_hms_nano_opt(0, 0, 0, 123_456_789).expect("invalid time"))
         );
         assert!(column.convert_to_value(&json!("not_a_time")).is_err());
     }
@@ -907,19 +831,19 @@ mod test {
         assert_eq!(
             column
                 .convert_to_value(&json!("2025-01-01T23:59:59.000000000"))
-                .unwrap(),
+                .expect("failed to convert to value"),
             Value::DateTime(NaiveDateTime::new(
-                NaiveDate::from_ymd_opt(2025, 1, 1).unwrap(),
-                NaiveTime::from_hms_nano_opt(23, 59, 59, 0).unwrap()
+                NaiveDate::from_ymd_opt(2025, 1, 1).expect("invalid date"),
+                NaiveTime::from_hms_nano_opt(23, 59, 59, 0).expect("invalid time")
             ))
         );
         assert_eq!(
             column
                 .convert_to_value(&json!("2001-01-01T23:59:59.123456789"))
-                .unwrap(),
+                .expect("failed to convert to value"),
             Value::DateTime(NaiveDateTime::new(
-                NaiveDate::from_ymd_opt(2001, 1, 1).unwrap(),
-                NaiveTime::from_hms_nano_opt(23, 59, 59, 123456789).unwrap()
+                NaiveDate::from_ymd_opt(2001, 1, 1).expect("invalid date"),
+                NaiveTime::from_hms_nano_opt(23, 59, 59, 123_456_789).expect("invalid time")
             ))
         );
         assert!(column.convert_to_value(&json!("not_a_datetime")).is_err());
@@ -935,19 +859,19 @@ mod test {
         assert_eq!(
             column
                 .convert_to_value(&json!("2025-01-01T23:59:59.000000000"))
-                .unwrap(),
+                .expect("failed to convert to value"),
             Value::DateTime(NaiveDateTime::new(
-                NaiveDate::from_ymd_opt(2025, 1, 1).unwrap(),
-                NaiveTime::from_hms_nano_opt(23, 59, 59, 0).unwrap()
+                NaiveDate::from_ymd_opt(2025, 1, 1).expect("invalid date"),
+                NaiveTime::from_hms_nano_opt(23, 59, 59, 0).expect("invalid time")
             ))
         );
         assert_eq!(
             column
                 .convert_to_value(&json!("2001-01-01T23:59:59.123456789"))
-                .unwrap(),
+                .expect("failed to convert to value"),
             Value::DateTime(NaiveDateTime::new(
-                NaiveDate::from_ymd_opt(2001, 1, 1).unwrap(),
-                NaiveTime::from_hms_nano_opt(23, 59, 59, 123456789).unwrap()
+                NaiveDate::from_ymd_opt(2001, 1, 1).expect("invalid date"),
+                NaiveTime::from_hms_nano_opt(23, 59, 59, 123_456_789).expect("invalid value")
             ))
         );
         assert!(column.convert_to_value(&json!("not_a_datetime")).is_err());
@@ -960,19 +884,19 @@ mod test {
         assert_eq!(
             column
                 .convert_to_value(&json!("2025-01-01T23:59:59.000000000-0700"))
-                .unwrap(),
+                .expect("failed to convert to value"),
             Value::DateTime(NaiveDateTime::new(
-                NaiveDate::from_ymd_opt(2025, 1, 1).unwrap(),
-                NaiveTime::from_hms_nano_opt(23, 59, 59, 0).unwrap()
+                NaiveDate::from_ymd_opt(2025, 1, 1).expect("invalid date"),
+                NaiveTime::from_hms_nano_opt(23, 59, 59, 0).expect("invalid time")
             ))
         );
         assert_eq!(
             column
                 .convert_to_value(&json!("2001-01-01T23:59:59.123456789+0000"))
-                .unwrap(),
+                .expect("failed to convert to value"),
             Value::DateTime(NaiveDateTime::new(
-                NaiveDate::from_ymd_opt(2001, 1, 1).unwrap(),
-                NaiveTime::from_hms_nano_opt(23, 59, 59, 123456789).unwrap()
+                NaiveDate::from_ymd_opt(2001, 1, 1).expect("invalid date"),
+                NaiveTime::from_hms_nano_opt(23, 59, 59, 123_456_789).expect("invalid time")
             ))
         );
         assert!(column.convert_to_value(&json!("not_a_datetime")).is_err());
