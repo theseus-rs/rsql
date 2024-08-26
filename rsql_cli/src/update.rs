@@ -1,10 +1,11 @@
 use anyhow::Result;
+use axoupdater::AxoUpdater;
 use chrono::{DateTime, Duration, Utc};
+use inquire::ui::RenderConfig;
+use inquire::Confirm;
 use rsql_core::configuration::Configuration;
-use semver::Version;
 use std::fs::{create_dir_all, File};
 use std::io::{Read, Write};
-use tracing::debug;
 
 const UPDATE_CHECK_FILE: &str = "last_update_check";
 
@@ -44,30 +45,62 @@ pub async fn check_for_newer_version(
         return Ok(());
     }
 
-    let current = Version::parse(&configuration.version)?;
-    let release = match octocrab::instance()
-        .repos("theseus-rs", "rsql")
-        .releases()
-        .get_latest()
-        .await
-    {
-        Ok(release) => release,
-        Err(error) => {
-            debug!("Failed to get latest release: {error:?}");
-            return Ok(());
-        }
-    };
-    let latest = Version::parse(release.tag_name.trim_start_matches('v'))?;
-
-    if latest > current {
+    let mut updater = AxoUpdater::new_for("rsql_cli");
+    updater.disable_installer_output();
+    let receipt = updater.load_receipt()?;
+    if receipt.is_update_needed().await? {
         let locale = configuration.locale.as_str();
-        let newer_version = t!(
-            "newer_version",
+        let no = t!("no", locale = locale).to_lowercase();
+        let yes = t!("yes", locale = locale).to_string();
+        let update_version_prompt = t!("update_version_prompt", locale = locale);
+        let update_version_prompt_placeholder = t!(
+            "update_version_prompt_placeholder",
             locale = locale,
-            version = latest.to_string()
+            yes = yes,
+            no = no,
+        );
+        let update_version_prompt_error = t!(
+            "update_version_prompt_error",
+            locale = locale,
+            yes = yes,
+            no = no,
         );
 
-        writeln!(output, "{newer_version}")?;
+        let confirm = Confirm {
+            message: &update_version_prompt,
+            starting_input: None,
+            default: Some(true),
+            placeholder: Some(&*update_version_prompt_placeholder),
+            help_message: None,
+            formatter: &|answer| {
+                if answer {
+                    yes.to_string()
+                } else {
+                    no.to_string()
+                }
+            },
+            parser: &|answer| Ok(answer == yes),
+            error_message: update_version_prompt_error.to_string(),
+            default_value_formatter: &|default| {
+                if default {
+                    yes.to_string()
+                } else {
+                    no.to_string()
+                }
+            },
+            render_config: RenderConfig::default(),
+        };
+
+        if !confirm.prompt()? {
+            return Ok(());
+        }
+
+        let update_result = receipt.run().await?;
+        if let Some(result) = update_result {
+            let version = result.new_version;
+            let updated_version = t!("updated_version", locale = locale, version = version,);
+            writeln!(output, "{updated_version}")?;
+        }
     }
 
     Ok(())

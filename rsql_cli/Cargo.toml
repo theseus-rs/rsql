@@ -27,13 +27,14 @@ winres = { version = "0.1" }
 
 [dependencies]
 anyhow = { workspace = true }
+axoupdater = { workspace = true }
 chrono = { workspace = true }
 clap = { workspace = true, features = ["derive", "env"] }
 colored = { workspace = true }
 dotenvy = { workspace = true }
-octocrab = { workspace = true }
+inquire = { workspace = true }
 os_info = { workspace = true }
-rsql_core = { path = "../rsql_core", version = "0.13.9", features = ["all"] }
+rsql_core = { path = "../rsql_core", version = "0.13.10", features = ["all"] }
 rust-i18n = { workspace = true }
 semver = { workspace = true }
 serde = { workspace = true }
