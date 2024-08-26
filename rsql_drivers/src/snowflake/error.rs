@@ -1,40 +1,30 @@
-use std::error::Error;
-use std::fmt::Display;
 
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum SnowflakeError {
+    #[error("Unable to create snowflake client")]
     ClientCreation,
+    #[error("JWT signature error")]
     JwtSignature,
-    Request,
-    Response,
-    MissingPrivateKey,
-    MissingAccount,
-    MissingUser,
-    MissingPublicKey,
-    MalformedHeaders,
+    #[error("Unable to send Snowflake request: {0}")]
+    Request(reqwest::Error),
+    #[error("Snowflake response error: {0}")]
+    Response(reqwest::Error),
+    #[error("Malformed KEYPAIR_JWT private key")]
     MalformedPrivateKey,
+    #[error("Malformed KEYPAIR_JWT public key")]
     MalformedPublicKey,
+    #[error("Missing KEYPAIR_JWT private key")]
+    MissingPrivateKey,
+    #[error("Missing KEYPAIR_JWT public key")]
+    MissingPublicKey,
+    #[error("Missing account in connection string")]
+    MissingAccount,
+    #[error("Missing user in connection string")]
+    MissingUser,
+    #[error("Unable to create request headers")]
+    MalformedHeaders,
+    #[error("Unknown Snowflake Error")]
     Unspecified,
+    #[error("Snowflake response content error: {0}")]
     ResponseContent(String),
-}
-
-impl Error for SnowflakeError {}
-impl Display for SnowflakeError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            SnowflakeError::ClientCreation => write!(f, "Unable to create snowflake client"),
-            SnowflakeError::JwtSignature => write!(f, "JWT signature error"),
-            SnowflakeError::Request => write!(f, "Request error"),
-            SnowflakeError::Response => write!(f, "Response error"),
-            SnowflakeError::MissingPrivateKey => write!(f, "Missing private key"),
-            SnowflakeError::MissingAccount => write!(f, "Missing account"),
-            SnowflakeError::MissingUser => write!(f, "Missing user"),
-            SnowflakeError::MissingPublicKey => write!(f, "Missing public key"),
-            SnowflakeError::MalformedHeaders => write!(f, "Unable to create request headers"),
-            SnowflakeError::MalformedPrivateKey => write!(f, "Malformed private key"),
-            SnowflakeError::MalformedPublicKey => write!(f, "Malformed public key"),
-            SnowflakeError::Unspecified => write!(f, "Unspecified error"),
-            SnowflakeError::ResponseContent(s) => write!(f, "Response content error: {s}"),
-        }
-    }
 }

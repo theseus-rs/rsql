@@ -59,6 +59,7 @@ test-log = { workspace = true }
 testcontainers = { workspace = true }
 testcontainers-modules = { workspace = true, features = ["mariadb", "mssql_server", "mysql", "postgres"] }
 tokio = { workspace = true }
+wiremock = { workspace = true }
 
 [features]
 all = ["duckdb", "mariadb", "mysql", "postgres", "postgresql", "rusqlite","snowflake", "sqlite", "sqlserver"]
