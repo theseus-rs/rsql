@@ -93,6 +93,8 @@ mod tests {
             "postgresql",
             #[cfg(feature = "driver-rusqlite")]
             "rusqlite",
+            #[cfg(feature = "driver-snowflake")]
+            "snowflake",
             #[cfg(feature = "driver-sqlite")]
             "sqlite",
             #[cfg(feature = "driver-sqlserver")]

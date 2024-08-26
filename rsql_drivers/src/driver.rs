@@ -152,6 +152,9 @@ mod tests {
         #[cfg(feature = "rusqlite")]
         let driver_count = driver_count + 1;
 
+        #[cfg(feature = "snowflake")]
+        let driver_count = driver_count + 1;
+
         #[cfg(feature = "sqlite")]
         let driver_count = driver_count + 1;
 

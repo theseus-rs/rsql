@@ -127,6 +127,7 @@ impl SnowflakeConnection {
         let token = key_pair
             .sign(claims)
             .map_err(|_| SnowflakeError::JwtSignature)?;
+        info!("Generated JWT: {}", token);
 
         let mut headers = HashMap::new();
         headers.insert(
@@ -208,19 +209,16 @@ impl SnowflakeConnection {
     ) -> Result<Vec<Row>> {
         result_data["data"]
             .as_array()
-            .ok_or(SnowflakeError::Response)?
+            .ok_or(SnowflakeError::ResponseContent("missing row data".into()))?
             .iter()
             .map(|row| {
                 row.as_array()
-                    .ok_or(SnowflakeError::Response)?
+                    .ok_or(SnowflakeError::ResponseContent(
+                        "row data is not an array".into(),
+                    ))?
                     .iter()
                     .zip(column_definitions.iter())
-                    .map(|(value, column)| {
-                        column.map_value(value).map_err(|e| {
-                            error!("error: {:?}", e);
-                            SnowflakeError::Response.into()
-                        })
-                    })
+                    .map(|(value, column)| column.map_value(value))
                     .collect::<Result<Vec<_>>>()
                     .map(Row::new)
             })
@@ -351,15 +349,17 @@ impl ColumnDefinition {
             ),
             "time" => Value::Time(
                 NaiveTime::parse_from_str(value, TIME_FORMATS.1)
-                    .map_err(|_| SnowflakeError::ResponseContent("bad time".into()))?,
+                    .map_err(|_| SnowflakeError::ResponseContent(format!("bad time: {value}")))?,
             ),
             "timestamp_ntz" | "timestamp_ltz" => Value::DateTime(
-                NaiveDateTime::parse_from_str(value, DATETIME_NO_TZ_FORMATS.1)
-                    .map_err(|_| SnowflakeError::ResponseContent("bad datetime ntz".into()))?,
+                NaiveDateTime::parse_from_str(value, DATETIME_NO_TZ_FORMATS.1).map_err(|_| {
+                    SnowflakeError::ResponseContent(format!("invalid datetime ntz|ltz: {value}"))
+                })?,
             ),
             "timestamp_tz" => Value::DateTime(
-                NaiveDateTime::parse_from_str(value, DATETIME_TZ_FORMATS.1)
-                    .map_err(|_| SnowflakeError::ResponseContent("bad datetime tz".into()))?,
+                NaiveDateTime::parse_from_str(value, DATETIME_TZ_FORMATS.1).map_err(|_| {
+                    SnowflakeError::ResponseContent(format!("invalid datetime tz: {value}"))
+                })?,
             ),
             // includes "text" field for VARCHARs
             _ => Value::String(value.to_string()),
@@ -378,5 +378,114 @@ impl ColumnDefinition {
         let scale = value["scale"].as_u64();
 
         Ok(Self::new(name, snowflake_type, scale))
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_parse_result_data() {
+        let response_json = serde_json::json!({
+            "data": [
+                ["1.0", "3", "true", "2024-08-24", "12:00:00.000000000", "2025-01-01T23:59:59.000000000", "2025-01-01T23:59:59.000000000", "2025-01-01T23:59:59.000000000-0700"],
+                ["4.0", "6", "false", "1993-05-07", "00:00:00.123456789", "2001-01-01T23:59:59.123456789", "2001-01-01T23:59:59.123456789", "2001-01-01T23:59:59.123456789+0100"],
+            ]
+        });
+
+        let column_definitions = vec![
+            ColumnDefinition::new("float".to_string(), "fixed".to_string(), Some(2)),
+            ColumnDefinition::new("int".to_string(), "fixed".to_string(), None),
+            ColumnDefinition::new("bool".to_string(), "boolean".to_string(), None),
+            ColumnDefinition::new("date".to_string(), "date".to_string(), None),
+            ColumnDefinition::new("time".to_string(), "time".to_string(), None),
+            ColumnDefinition::new(
+                "datetime_ntz".to_string(),
+                "timestamp_ntz".to_string(),
+                None,
+            ),
+            ColumnDefinition::new(
+                "datetime_ltz".to_string(),
+                "timestamp_ntz".to_string(),
+                None,
+            ),
+            ColumnDefinition::new("datetime_tz".to_string(), "timestamp_tz".to_string(), None),
+        ];
+
+        let rows =
+            SnowflakeConnection::parse_result_data(&response_json, &column_definitions).unwrap();
+        assert_eq!(rows.len(), 2);
+        assert_eq!(rows[0].len(), 8);
+        assert_eq!(rows[0].get(0).unwrap(), &Value::F64(1.0));
+        assert_eq!(rows[0].get(1).unwrap(), &Value::I64(3));
+        assert_eq!(rows[0].get(2).unwrap(), &Value::Bool(true));
+        assert_eq!(
+            rows[0].get(3).unwrap(),
+            &Value::Date(NaiveDate::from_ymd_opt(2024, 8, 24).unwrap())
+        );
+        assert_eq!(
+            rows[0].get(4).unwrap(),
+            &Value::Time(NaiveTime::from_hms_nano_opt(12, 0, 0, 0).unwrap())
+        );
+        assert_eq!(
+            rows[0].get(5).unwrap(),
+            &Value::DateTime(
+                DateTime::from_timestamp(1_735_775_999, 0)
+                    .unwrap()
+                    .naive_utc()
+            )
+        );
+        assert_eq!(
+            rows[0].get(6).unwrap(),
+            &Value::DateTime(
+                DateTime::from_timestamp(1_735_775_999, 0)
+                    .unwrap()
+                    .naive_utc()
+            )
+        );
+        assert_eq!(
+            rows[0].get(7).unwrap(),
+            &Value::DateTime(
+                DateTime::from_timestamp(1_735_775_999, 0)
+                    .unwrap()
+                    .naive_utc()
+            )
+        );
+        assert_eq!(rows[1].get(0).unwrap(), &Value::F64(4.0));
+        assert_eq!(rows[1].get(1).unwrap(), &Value::I64(6));
+        assert_eq!(rows[1].get(2).unwrap(), &Value::Bool(false));
+        assert_eq!(
+            rows[1].get(3).unwrap(),
+            &Value::Date(NaiveDate::from_ymd_opt(1993, 5, 7).unwrap())
+        );
+        assert_eq!(
+            rows[1].get(4).unwrap(),
+            &Value::Time(NaiveTime::from_hms_nano_opt(0, 0, 0, 123_456_789).unwrap())
+        );
+        assert_eq!(
+            rows[1].get(5).unwrap(),
+            &Value::DateTime(
+                DateTime::from_timestamp(978_393_599, 123_456_789)
+                    .unwrap()
+                    .naive_utc()
+            )
+        );
+        assert_eq!(
+            rows[1].get(6).unwrap(),
+            &Value::DateTime(
+                DateTime::from_timestamp(978_393_599, 123_456_789)
+                    .unwrap()
+                    .naive_utc()
+            )
+        );
+        assert_eq!(
+            rows[1].get(7).unwrap(),
+            &Value::DateTime(
+                DateTime::from_timestamp(978_393_599, 123_456_789)
+                    .unwrap()
+                    .naive_utc()
+            )
+        );
     }
 }
