@@ -693,11 +693,18 @@ mod test {
     #[test]
     fn test_get_issuer_and_subject() {
         let keypair = RS256KeyPair::generate(2048).expect("cannot generate key for tests");
-        let public_cert = keypair.public_key().to_pem().expect("cannot generate cert for tests");
-        let expected_thumbprint = public_key_fingerprint(&public_cert).expect("cannot generate thumbprint");
+        let public_cert = keypair
+            .public_key()
+            .to_pem()
+            .expect("cannot generate cert for tests");
+        let expected_thumbprint =
+            public_key_fingerprint(&public_cert).expect("cannot generate thumbprint");
         let (issuer, subject) = get_issuer_and_subject(&public_cert, "abc123", "test").unwrap();
         assert_eq!(subject, format!("abc123.test"));
-        assert_eq!(issuer, format!("abc123.test.SHA256:{}", expected_thumbprint));
+        assert_eq!(
+            issuer,
+            format!("abc123.test.SHA256:{}", expected_thumbprint)
+        );
     }
 
     #[test]
