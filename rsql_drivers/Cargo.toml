@@ -20,7 +20,7 @@ form_urlencoded = { workspace = true, optional = true }
 futures-util = { workspace = true, optional = true }
 indexmap = { workspace = true, features = ["serde"] }
 indoc = { workspace = true }
-jwt-simple = { workspace = true, optional = true }
+jwt-simple = { workspace = true, optional = true, default-features = false, features = ["pure-rust"]}
 libsql = { workspace = true, optional = true }
 mockall = { workspace = true }
 num-format = { workspace = true }

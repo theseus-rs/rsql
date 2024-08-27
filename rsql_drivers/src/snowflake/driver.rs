@@ -48,22 +48,6 @@ pub(crate) struct SnowflakeConnection {
 }
 
 impl SnowflakeConnection {
-    /// Generate a fingerprint for a public key
-    /// Doing this manually since `jwt_simple` uses url-safe base64 when standard is required
-    ///
-    /// # Errors
-    /// Errors if the public key is malformed
-    fn public_key_fingerprint(public_key: &str) -> Result<String> {
-        let public_key =
-            RS256PublicKey::from_pem(public_key).map_err(|_| SnowflakeError::MalformedPublicKey)?;
-        let pub_key_der = public_key
-            .to_der()
-            .map_err(|_| SnowflakeError::MalformedPublicKey)?;
-        let mut hasher = Sha256::new();
-        hasher.update(&pub_key_der);
-        Ok(STANDARD.encode(hasher.finalize()))
-    }
-
     /// Establish a new connection to Snowflake
     ///
     /// # Errors
@@ -79,8 +63,7 @@ impl SnowflakeConnection {
         let account = base_url
             .split('.')
             .next()
-            .ok_or(SnowflakeError::MissingAccount)?
-            .to_string();
+            .ok_or(SnowflakeError::MissingAccount)?;
         let user = parsed_url.username();
         let base_url = format!("https://{base_url}/api/v2/statements");
 
@@ -111,11 +94,9 @@ impl SnowflakeConnection {
             let key_pair = RS256KeyPair::from_pem(&private_key)
                 .map_err(|_| SnowflakeError::MissingPrivateKey)?;
 
-            let fingerprint = Self::public_key_fingerprint(&public_key)?;
-            let issuer = format!("{account}.{user}.SHA256:{fingerprint}");
-            let subject = format!("{account}.{user}");
-
+            let (issuer, subject) = get_issuer_and_subject(&public_key, &account, user)?;
             let jwt_expires_at = chrono::Utc::now() + chrono::Duration::hours(1);
+
             let client = Mutex::new(Self::new_client_keypair(&issuer, &subject, &key_pair)?);
             Ok(Self {
                 base_url,
@@ -204,7 +185,7 @@ impl SnowflakeConnection {
     ///
     /// # Errors
     /// Errors if creating a new client with the key pair fails
-    fn check_jwt_refresh(&mut self) -> Result<()> {
+    async fn check_jwt_refresh(&mut self) -> Result<()> {
         if let (Some(jwt_expires_at), Some(issuer), Some(subject), Some(key_pair)) = (
             &self.jwt_expires_at,
             &self.issuer,
@@ -212,8 +193,9 @@ impl SnowflakeConnection {
             &self.key_pair,
         ) {
             if *jwt_expires_at < chrono::Utc::now() {
-                let client = Self::new_client_keypair(issuer, subject, key_pair)?;
-                self.client = Mutex::new(client);
+                let new_client = Self::new_client_keypair(issuer, subject, key_pair)?;
+                let mut client = self.client.lock().await;
+                *client = new_client;
             }
         }
         Ok(())
@@ -224,7 +206,7 @@ impl SnowflakeConnection {
     /// # Errors
     /// Errors if the request fails to receive a response
     async fn request(&mut self, sql: &str) -> Result<reqwest::Response> {
-        self.check_jwt_refresh()?;
+        self.check_jwt_refresh().await?;
         self.client
             .lock()
             .await
@@ -281,6 +263,34 @@ impl SnowflakeConnection {
     fn set_base_url(&mut self, base_url: &str) {
         self.base_url = format!("{base_url}/api/v2/statements");
     }
+}
+
+/// Generate a fingerprint for a public key
+/// Doing this manually since `jwt_simple` uses url-safe base64 when standard is required
+///
+/// # Errors
+/// Errors if the public key is malformed
+fn public_key_fingerprint(public_key: &str) -> Result<String> {
+    let public_key =
+        RS256PublicKey::from_pem(public_key).map_err(|_| SnowflakeError::MalformedPublicKey)?;
+    let pub_key_der = public_key
+        .to_der()
+        .map_err(|_| SnowflakeError::MalformedPublicKey)?;
+    let mut hasher = Sha256::new();
+    hasher.update(&pub_key_der);
+    Ok(STANDARD.encode(hasher.finalize()))
+}
+
+/// Get issuer and subject for a public key
+/// Snowflake requires the issuer and subject to be constructed with the account, user, and fingerprint
+///
+/// # Errors
+/// Errors if the public key is malformed
+fn get_issuer_and_subject(public_key: &str, account: &str, user: &str) -> Result<(String, String)> {
+    let fingerprint = public_key_fingerprint(&public_key)?;
+    let issuer = format!("{account}.{user}.SHA256:{fingerprint}");
+    let subject = format!("{account}.{user}");
+    Ok((issuer, subject))
 }
 
 #[async_trait]
@@ -367,8 +377,7 @@ impl crate::Connection for SnowflakeConnection {
             }
         }
 
-        let qr = MemoryQueryResult::new(column_names, rows);
-        Ok(Box::new(qr))
+        Ok(Box::new(MemoryQueryResult::new(column_names, rows)))
     }
 
     async fn close(&mut self) -> Result<()> {
@@ -467,7 +476,7 @@ mod test {
     fn initial_response_json() -> serde_json::Value {
         json!({
             "resultSetMetaData": {
-                "numRows": 10,
+                "numRows": 2,
                 "format": "jsonv2",
                 "partitionInfo": [
                     {
@@ -521,9 +530,9 @@ mod test {
                     },
                     {
                         "name": "Time",
-                        "database": "DNS_DATA",
-                        "schema": "PUBLIC",
-                        "table": "DNS_QUERY",
+                        "database": "",
+                        "schema": "",
+                        "table": "",
                         "nullable": true,
                         "type": "time",
                         "byteLength": null,
@@ -679,6 +688,16 @@ mod test {
             ]))
         );
         Ok(())
+    }
+
+    #[test]
+    fn test_get_issuer_and_subject() {
+        let keypair = RS256KeyPair::generate(2048).expect("cannot generate key for tests");
+        let public_cert = keypair.public_key().to_pem().expect("cannot generate cert for tests");
+        let expected_thumbprint = public_key_fingerprint(&public_cert).expect("cannot generate thumbprint");
+        let (issuer, subject) = get_issuer_and_subject(&public_cert, "abc123", "test").unwrap();
+        assert_eq!(subject, format!("abc123.test"));
+        assert_eq!(issuer, format!("abc123.test.SHA256:{}", expected_thumbprint));
     }
 
     #[test]
