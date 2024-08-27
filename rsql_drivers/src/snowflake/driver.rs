@@ -94,7 +94,7 @@ impl SnowflakeConnection {
             let key_pair = RS256KeyPair::from_pem(&private_key)
                 .map_err(|_| SnowflakeError::MissingPrivateKey)?;
 
-            let (issuer, subject) = get_issuer_and_subject(&public_key, &account, user)?;
+            let (issuer, subject) = get_issuer_and_subject(&public_key, account, user)?;
             let jwt_expires_at = chrono::Utc::now() + chrono::Duration::hours(1);
 
             let client = Mutex::new(Self::new_client_keypair(&issuer, &subject, &key_pair)?);
@@ -287,7 +287,7 @@ fn public_key_fingerprint(public_key: &str) -> Result<String> {
 /// # Errors
 /// Errors if the public key is malformed
 fn get_issuer_and_subject(public_key: &str, account: &str, user: &str) -> Result<(String, String)> {
-    let fingerprint = public_key_fingerprint(&public_key)?;
+    let fingerprint = public_key_fingerprint(public_key)?;
     let issuer = format!("{account}.{user}.SHA256:{fingerprint}");
     let subject = format!("{account}.{user}");
     Ok((issuer, subject))
@@ -699,12 +699,10 @@ mod test {
             .expect("cannot generate cert for tests");
         let expected_thumbprint =
             public_key_fingerprint(&public_cert).expect("cannot generate thumbprint");
-        let (issuer, subject) = get_issuer_and_subject(&public_cert, "abc123", "test").unwrap();
+        let (issuer, subject) = get_issuer_and_subject(&public_cert, "abc123", "test")
+            .expect("Failed to get issuer and subject");
         assert_eq!(subject, format!("abc123.test"));
-        assert_eq!(
-            issuer,
-            format!("abc123.test.SHA256:{}", expected_thumbprint)
-        );
+        assert_eq!(issuer, format!("abc123.test.SHA256:{expected_thumbprint}"));
     }
 
     #[test]
