@@ -11,7 +11,9 @@
 [![License](https://img.shields.io/crates/l/rsql_cli)](https://github.com/theseus-rs/rsql_cli#license)
 [![Semantic Versioning](https://img.shields.io/badge/%E2%9A%99%EF%B8%8F_SemVer-2.0.0-blue)](https://semver.org/spec/v2.0.0.html)
 
-`rsql` is a command line interface for databases.
+`rsql` is a command line interface for databases.  `rsql` is a modern, feature-rich, and user-friendly database client,
+that has been designed to be easy to use, and to provide a consistent experience across all supported databases. The
+project aims to provide reusable components for building other database clients.
 
 ## Getting Started
 
@@ -42,18 +44,18 @@ visit the [rsql](https://theseus-rs.github.io/rsql/rsql_cli/) site.
 rsql --url '<url>'
 ```
 
-| Driver            | URL                                                                           |
-|-------------------|-------------------------------------------------------------------------------|
-| duckdb            | `duckdb://?<memory=true>[&file=<database_file>]`                              |
-| libsql¹           | `libsql://<host>?[<memory=true>][&file=<database_file>][&auth_token=<token>]` |
-| mariadb (sqlx)    | `mariadb://<user>[:<password>]@<host>[:<port>]/<database>`                    |
-| mysql (sqlx)      | `mysql://<user>[:<password>]@<host>[:<port>]/<database>`                      |
-| postgres          | `postgres://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`   |
-| postgresql (sqlx) | `postgresql://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>` |
-| rusqlite          | `rusqlite://?<memory=true>[&file=<database_file>]`                            |
-| snowflake         | `snowflake://<user>[:<token>]@<account>.snowflakecomputing.com/[?private_key_file=pkey_file&public_key_file=pubkey_file]`|
-| sqlite (sqlx)     | `sqlite://?<memory=true>[&file=<database_file>]`                              |
-| sqlserver         | `sqlserver://<user>[:<password>]@<host>[:<port>]/<database>`                  |
+| Driver            | URL                                                                                                                       |
+|-------------------|---------------------------------------------------------------------------------------------------------------------------|
+| duckdb            | `duckdb://?<memory=true>[&file=<database_file>]`                                                                          |
+| libsql¹           | `libsql://<host>?[<memory=true>][&file=<database_file>][&auth_token=<token>]`                                             |
+| mariadb (sqlx)    | `mariadb://<user>[:<password>]@<host>[:<port>]/<database>`                                                                |
+| mysql (sqlx)      | `mysql://<user>[:<password>]@<host>[:<port>]/<database>`                                                                  |
+| postgres          | `postgres://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`                                               |
+| postgresql (sqlx) | `postgresql://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`                                             |
+| rusqlite          | `rusqlite://?<memory=true>[&file=<database_file>]`                                                                        |
+| snowflake         | `snowflake://<user>[:<token>]@<account>.snowflakecomputing.com/[?private_key_file=pkey_file&public_key_file=pubkey_file]` |
+| sqlite (sqlx)     | `sqlite://?<memory=true>[&file=<database_file>]`                                                                          |
+| sqlserver         | `sqlserver://<user>[:<password>]@<host>[:<port>]/<database>`                                                              |
 
 ¹ `libsql` needs to be enabled with the `libsql` feature flag; it is disabled by default as it conflicts
 with `rusqlite`.
@@ -62,7 +64,7 @@ with `rusqlite`.
 
 | Feature             |                                                                                                 |
 |---------------------|-------------------------------------------------------------------------------------------------|
-| Databases           | DuckDB, LibSQL (Turso), MariaDB, MySQL, PostgreSQL, Snowflake, SQLite3, SQL Server               |
+| Databases           | DuckDB, LibSQL (Turso), MariaDB, MySQL, PostgreSQL, Snowflake, SQLite3, SQL Server              |
 | Embedded PostgreSQL | ✅                                                                                               |
 | Syntax Highlighting | ✅                                                                                               |
 | Result Highlighting | ✅                                                                                               |
