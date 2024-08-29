@@ -1,6 +1,6 @@
 ## First Query
 
-The first query is a simple one. It selects the database version and returns the result.
+The following examples show how to run a simple query using the `rsql` CLI tool for different database engines.
 
 ### DuckDB
 
@@ -42,6 +42,18 @@ rsql --url 'postgresql://?embedded=true' -- "SELECT version();"
 
 ```shell
 rsql --url 'rusqlite://?memory=true' -- "SELECT sqlite_version();"
+```
+
+### Snowflake
+
+```shell
+rsql --url 'snowflake://<user>@<account>.snowflakecomputing.com/[?private_key_file=pkey_file&public_key_file=pubkey_file]' -- "SELECT CURRENT_VERSION();"
+```
+
+or
+
+```shell
+rsql --url 'snowflake://<user>[:<token>]@<account>.snowflakecomputing.com/' -- "SELECT CURRENT_VERSION();"
 ```
 
 ### Sqlite
