@@ -51,6 +51,7 @@ rsql --url '<url>'
 | postgres          | `postgres://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`   |
 | postgresql (sqlx) | `postgresql://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>` |
 | rusqlite          | `rusqlite://?<memory=true>[&file=<database_file>]`                            |
+| snowflake         | `snowflake://<user>[:<token>]@<account>.snowflakecomputing.com/[?private_key_file=pkey_file&public_key_file=pubkey_file]`|
 | sqlite (sqlx)     | `sqlite://?<memory=true>[&file=<database_file>]`                              |
 | sqlserver         | `sqlserver://<user>[:<password>]@<host>[:<port>]/<database>`                  |
 
@@ -61,7 +62,7 @@ with `rusqlite`.
 
 | Feature             |                                                                                                 |
 |---------------------|-------------------------------------------------------------------------------------------------|
-| Databases           | DuckDB, LibSQL (Turso), MariaDB, MySQL, PostgreSQL, SQLite3, SQL Server                         |
+| Databases           | DuckDB, LibSQL (Turso), MariaDB, MySQL, PostgreSQL, Snowflake, SQLite3, SQL Server               |
 | Embedded PostgreSQL | ✅                                                                                               |
 | Syntax Highlighting | ✅                                                                                               |
 | Result Highlighting | ✅                                                                                               |

@@ -56,6 +56,7 @@ all-drivers = [
     "driver-postgres",
     "driver-postgresql",
     "driver-rusqlite",
+    "driver-snowflake",
     "driver-sqlite",
     "driver-sqlserver",
 ]
@@ -66,6 +67,7 @@ driver-mysql = ["rsql_drivers/mysql"]
 driver-postgres = ["rsql_drivers/postgres"]
 driver-postgresql = ["rsql_drivers/postgresql"]
 driver-rusqlite = ["rsql_drivers/rusqlite"]
+driver-snowflake = ["rsql_drivers/snowflake"]
 driver-sqlite = ["rsql_drivers/sqlite"]
 driver-sqlserver = ["rsql_drivers/sqlserver"]
 all-formats = [

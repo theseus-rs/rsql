@@ -92,6 +92,13 @@ impl From<tiberius::error::Error> for Error {
     }
 }
 
+#[cfg(feature = "snowflake")]
+impl From<crate::snowflake::SnowflakeError> for Error {
+    fn from(error: crate::snowflake::SnowflakeError) -> Self {
+        Error::IoError(error.into())
+    }
+}
+
 /// Convert [`utf8 errors`](std::string::FromUtf8Error) to [`IoError`](Error::IoError)
 impl From<std::string::FromUtf8Error> for Error {
     fn from(error: std::string::FromUtf8Error) -> Self {

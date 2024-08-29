@@ -59,16 +59,15 @@ async fn main() -> Result<()> {
 
     let program_name = "rsql";
     let version = env!("CARGO_PKG_VERSION");
-    let mut configuration = ConfigurationBuilder::new(program_name, version)
+    let configuration = ConfigurationBuilder::new(program_name, version)
         .with_config()
+        .with_color(match args.color {
+            Color::Auto => supports_color::on(Stream::Stdout).is_some(),
+            Color::Always => true,
+            Color::Never => false,
+        })
         .build();
     let output = Output::new(Box::<StdoutWriter>::default());
-
-    configuration.color = match args.color {
-        Color::Auto => supports_color::on(Stream::Stdout).is_some(),
-        Color::Always => true,
-        Color::Never => false,
-    };
 
     let exit_code = execute(args, configuration, output).await?;
     std::process::exit(exit_code);
