@@ -40,8 +40,16 @@ visit the [rsql](https://theseus-rs.github.io/rsql/rsql_cli/) site.
 
 ## Usage
 
+### Interactive Mode
+
 ```shell
-rsql --url '<url>'
+rsql --url "<url>"
+```
+
+### Running a single Query
+
+```shell
+rsql --url "<url>" -- "<query>"
 ```
 
 | Driver            | URL                                                                                                                       |
