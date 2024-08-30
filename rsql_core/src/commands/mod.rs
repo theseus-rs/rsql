@@ -3,6 +3,7 @@ pub mod changes;
 pub mod clear;
 pub mod color;
 pub mod command;
+pub mod completions;
 pub mod describe;
 pub mod drivers;
 pub mod echo;
@@ -28,5 +29,5 @@ pub mod tables;
 pub mod tee;
 pub mod timer;
 
-pub use command::{CommandManager, CommandOptions, LoopCondition, ShellCommand};
+pub use command::{CommandManager, CommandOptions, LoopCondition,ToggleShellCommand, ShellCommand};
 pub use error::{Error, Result};

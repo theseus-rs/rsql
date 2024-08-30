@@ -1,3 +1,4 @@
+use crate::commands::Error::InvalidOption;
 use crate::commands::error::Result;
 use crate::configuration::Configuration;
 use async_trait::async_trait;
@@ -56,6 +57,60 @@ pub trait ShellCommand: Debug + Sync {
     fn description(&self, locale: &str) -> String;
     /// Execute the command
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition>;
+}
+
+
+#[async_trait]
+pub trait ToggleShellCommand: Debug + Sync {
+    fn is_enabled(&self, options: &CommandOptions<'_>) -> bool;
+    fn set_value(&self, options: &mut CommandOptions<'_>, value: bool);
+
+    fn get_name(&self) -> &'static str;
+    fn get_description(&self) -> &'static str;
+    fn get_setting_str(&self) -> &'static str;
+
+    fn toggleable_name(&self, locale: &str) -> String {
+        t!(self.get_name(), locale = locale).to_string()
+    }
+
+    fn t_args(&self, locale: &str) -> String {
+        let on = t!("on", locale = locale).to_string();
+        let off = t!("off", locale = locale).to_string();
+        t!("on_off_argument", locale = locale, on = on, off = off).to_string()
+    }
+
+    fn t_description(&self, locale: &str) -> String {
+        t!(self.get_description(), locale = locale).to_string()
+    }
+
+    async fn t_execute(&self, mut options: CommandOptions<'_>) -> Result<LoopCondition> {
+        let locale = options.configuration.locale.as_str();
+        let on = t!("on", locale = locale).to_string();
+        let off = t!("off", locale = locale).to_string();
+
+        if options.input.len() <= 1 {
+            let setting_enabled_text = if self.is_enabled(&options) { on } else { off };
+            let setting = t!(self.get_setting_str(), locale = locale, setting = setting_enabled_text).to_string();
+            writeln!(options.output, "{setting}")?;
+            return Ok(LoopCondition::Continue);
+        }
+
+        let argument = options.input[1].to_lowercase().to_string();
+        let new_setting = if argument == on {
+            true
+        } else if argument == off {
+            false
+        } else {
+            return Err(InvalidOption {
+                command_name: self.toggleable_name(locale).to_string(),
+                option: argument,
+            });
+        };
+
+        self.set_value(&mut options, new_setting);
+
+        Ok(LoopCondition::Continue)
+    }
 }
 
 /// Manages the active commands
@@ -120,6 +175,7 @@ impl Default for CommandManager {
         commands.add(Box::new(crate::commands::changes::Command));
         commands.add(Box::new(crate::commands::clear::Command));
         commands.add(Box::new(crate::commands::color::Command));
+        commands.add(Box::new(crate::commands::completions::Command));
         commands.add(Box::new(crate::commands::describe::Command));
         commands.add(Box::new(crate::commands::drivers::Command));
         commands.add(Box::new(crate::commands::echo::Command));
@@ -220,6 +276,6 @@ mod tests {
     fn test_command_manager_default() {
         let command_manager = CommandManager::default();
 
-        assert_eq!(command_manager.commands.len(), 27);
+        assert_eq!(command_manager.commands.len(), 28);
     }
 }

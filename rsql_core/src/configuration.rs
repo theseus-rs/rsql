@@ -244,6 +244,13 @@ impl ConfigurationBuilder {
         self
     }
 
+    #[must_use]
+    #[allow(dead_code)]
+    pub fn with_smart_completions(mut self, smart_completions: bool) -> Self {
+        self.configuration.smart_completions = smart_completions;
+        self
+    }
+
     /// Build a [Configuration] instance.
     ///
     /// # Panics
@@ -336,6 +343,7 @@ pub struct Configuration {
     pub results_limit: usize,
     pub results_rows: bool,
     pub results_timer: bool,
+    pub smart_completions: bool,
 }
 
 impl Default for Configuration {
@@ -365,6 +373,7 @@ impl Default for Configuration {
             results_limit: 100,
             results_rows: true,
             results_timer: true,
+            smart_completions: true,
         }
     }
 }

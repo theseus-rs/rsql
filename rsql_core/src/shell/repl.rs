@@ -6,7 +6,7 @@ use crate::shell::helper::ReplHelper;
 use crate::shell::Result;
 use crate::shell::ShellArgs;
 use colored::Colorize;
-use rsql_drivers::{Connection, DriverManager};
+use rsql_drivers::{Connection, DriverManager, Metadata};
 use rsql_formatters::writers::Output;
 use rsql_formatters::FormatterManager;
 use rustyline::config::Configurer;
@@ -110,8 +110,12 @@ impl Shell {
         Ok(exit_code)
     }
 
-    fn editor(&self, history_file: &str) -> Result<Editor<ReplHelper, FileHistory>> {
-        let helper = ReplHelper::new(&self.configuration);
+    fn editor(
+        &self,
+        history_file: &str,
+        metadata: Metadata,
+    ) -> Result<Editor<ReplHelper, FileHistory>> {
+        let helper = ReplHelper::new_with_metadata(&self.configuration, metadata);
         let mut editor = Editor::<ReplHelper, FileHistory>::new()?;
         if self.configuration.color {
             editor.set_color_mode(ColorMode::Forced);
@@ -140,10 +144,11 @@ impl Shell {
             Some(ref file) => String::from(file.to_string_lossy()),
             None => String::new(),
         };
+        let metadata = connection.metadata().await?;
 
         loop {
             // Create a new editor for each iteration in order to read any changes to the configuration.
-            let mut editor = self.editor(history_file.as_str())?;
+            let mut editor = self.editor(history_file.as_str(), metadata.clone())?;
             let locale = self.configuration.locale.as_str();
             let prompt = t!(
                 "prompt",
@@ -380,7 +385,7 @@ mod test {
         let shell = ShellBuilder::default()
             .with_configuration(configuration)
             .build();
-        let _ = shell.editor("history.txt")?;
+        let _ = shell.editor("history.txt", Metadata::default())?;
         Ok(())
     }
 

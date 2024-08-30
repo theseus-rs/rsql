@@ -28,6 +28,7 @@ rsql_formatters = { path = "../rsql_formatters", version = "0.13.12" }
 rust-i18n = { workspace = true }
 rustyline = { workspace = true }
 serde_json = { workspace = true, features = ["preserve_order"] }
+sqlparser = { workspace = true }
 sys-locale = { workspace = true }
 tempfile = { workspace = true }
 termbg = { workspace = true }
