@@ -1,7 +1,7 @@
-{"version": 2, "width": 142, "height": 32, "timestamp": 1724955198, "env": {"SHELL": "/bin/zsh", "TERM": "xterm-256color"}}
-[0.023237, "o", "\u001b]11;?\u001b\\"]
-[0.037235, "o", "⠁ connect [00:00:00] [                                                                                                   ] 0 B/0 B (0 B/s, 0s)"]
-[0.037311, "o", "\r\u001b[2K"]
-[1.070459, "o", "rsql> \u001b[38;2;131;148;150m.schemas\u001b[0m\r\n"]
-[1.070993, "o", " Schema | Current \r\n--------+---------\r\n main   | Yes     \r\n"]
-[1.071127, "o", "1 row \u001b[2m(229.75µs)\u001b[0m\r\n"]
+{"version": 2, "width": 147, "height": 38, "timestamp": 1725380352, "env": {"SHELL": "/bin/zsh", "TERM": "xterm-256color"}}
+[0.023599, "o", "\u001b]11;?\u001b\\"]
+[0.03749, "o", "⠁ connect [00:00:00] [                                                                                                        ] 0 B/0 B (0 B/s, 0s)"]
+[0.037581, "o", "\r\u001b[2K"]
+[1.069641, "o", "rsql> \u001b[38;2;131;148;150m.schemas\u001b[0m\r\n"]
+[1.070516, "o", " Schema | Current \r\n--------+---------\r\n main   | Yes     \r\n"]
+[1.070556, "o", "1 row \u001b[2m(347.292µs)\u001b[0m\r\n"]
