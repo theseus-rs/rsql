@@ -48,7 +48,7 @@ exit_command:
   uk: "вихід"
   vi: "thoát"
   yi: "הערויסגיין"
-  zh: "退出"
+  zh: "离开"
 
 exit_argument:
   en: "[code]"
