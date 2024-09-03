@@ -17,7 +17,7 @@ ansi_colours = "1.2.3"
 axoupdater = "0.7.0"
 anyhow = "1.0.86"
 arboard = "3.4.0"
-async-trait = "0.1.81"
+async-trait = "0.1.82"
 base64 = "0.22.1"
 bit-vec = "0.6.3"
 chrono = "0.4.38"
@@ -34,11 +34,11 @@ dotenvy = "0.15.7"
 duckdb = "1.0.0"
 form_urlencoded = "1.2.1"
 futures-util = "0.3.30"
-indexmap = "2.3.0"
+indexmap = "2.5.0"
 indicatif = "0.17.8"
 indoc = "2.0.5"
 inquire = "0.7.5"
-jwt-simple = { version = "0.12.9", default-features = false }
+jwt-simple = { version = "0.12.10", default-features = false }
 libsql = "0.5.0"
 mockall = "0.13.0"
 num-format = "0.4.4"
@@ -68,7 +68,7 @@ testcontainers = "0.21.1"
 testcontainers-modules = "0.9.0"
 thiserror = "1.0.63"
 tiberius = { version = "0.12.3", default-features = false }
-tokio = "1.38.0"
+tokio = "1.40.0"
 tokio-postgres = "0.7.10"
 tokio-util = "0.7.11"
 tracing = "0.1.40"
@@ -100,7 +100,7 @@ tag-name = "v{{version}}"
 # Config for 'cargo dist'
 [workspace.metadata.dist]
 # The preferred cargo-dist version to use in CI (Cargo.toml SemVer syntax)
-cargo-dist-version = "0.21.1"
+cargo-dist-version = "0.22.0"
 # CI backends to support
 ci = "github"
 # Whether cargo-dist should create a Github Release or use an existing draft
