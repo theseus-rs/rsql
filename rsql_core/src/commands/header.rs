@@ -1,59 +1,30 @@
-use crate::commands::Error::InvalidOption;
-use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
+use crate::commands::{CommandOptions, ToggleShellCommand};
 use async_trait::async_trait;
-use rust_i18n::t;
 
 /// Command to enable or disable result header
 #[derive(Debug, Default)]
 pub struct Command;
 
 #[async_trait]
-impl ShellCommand for Command {
-    fn name(&self, locale: &str) -> String {
-        t!("header_command", locale = locale).to_string()
+impl ToggleShellCommand for Command {
+    fn get_value(&self, options: &CommandOptions<'_>) -> bool {
+        options.configuration.results_header
     }
 
-    fn args(&self, locale: &str) -> String {
-        let on = t!("on", locale = locale).to_string();
-        let off = t!("off", locale = locale).to_string();
-        t!("on_off_argument", locale = locale, on = on, off = off).to_string()
+    fn set_value(&self, options: &mut CommandOptions<'_>, value: bool) {
+        options.configuration.results_header = value;
     }
 
-    fn description(&self, locale: &str) -> String {
-        t!("header_description", locale = locale).to_string()
+    fn get_name(&self) -> &'static str {
+        "header_command"
     }
 
-    async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
-        let locale = options.configuration.locale.as_str();
-        let on = t!("on", locale = locale).to_string();
-        let off = t!("off", locale = locale).to_string();
+    fn get_description(&self) -> &'static str {
+        "header_description"
+    }
 
-        if options.input.len() <= 1 {
-            let header = if options.configuration.results_header {
-                on
-            } else {
-                off
-            };
-            let header_setting = t!("header_setting", locale = locale, header = header).to_string();
-            writeln!(options.output, "{header_setting}")?;
-            return Ok(LoopCondition::Continue);
-        }
-
-        let argument = options.input[1].to_lowercase().to_string();
-        let header = if argument == on {
-            true
-        } else if argument == off {
-            false
-        } else {
-            return Err(InvalidOption {
-                command_name: self.name(locale).to_string(),
-                option: argument,
-            });
-        };
-
-        options.configuration.results_header = header;
-
-        Ok(LoopCondition::Continue)
+    fn get_setting_str(&self) -> &'static str {
+        "header_setting"
     }
 }
 
@@ -61,7 +32,7 @@ impl ShellCommand for Command {
 mod tests {
     use super::*;
     use crate::commands::LoopCondition;
-    use crate::commands::{CommandManager, CommandOptions};
+    use crate::commands::{CommandManager, CommandOptions, ShellCommand};
     use crate::configuration::Configuration;
     use crate::writers::Output;
     use rsql_drivers::{DriverManager, MockConnection};

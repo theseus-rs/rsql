@@ -196,7 +196,6 @@ pub struct ReplCompleter {
 }
 
 impl ReplCompleter {
-
     pub fn with_config(configuration: &Configuration, metadata: Metadata) -> Self {
         let mut completer = Self::new(metadata);
         completer.smart_completions = configuration.smart_completions;
@@ -204,7 +203,10 @@ impl ReplCompleter {
     }
 
     pub fn new(metadata: Metadata) -> Self {
-        Self { metadata, smart_completions: true }
+        Self {
+            metadata,
+            smart_completions: true,
+        }
     }
 
     fn tables_in_query(&self, tokens: &[TokenWithLocation]) -> Vec<(&Table, Option<String>)> {
@@ -559,7 +561,7 @@ mod test {
         let completer = ReplCompleter::new(metadata);
         let (start, candidates) = completer
             .complete("SEL", 3, &Context::new(&DefaultHistory::new()))
-            .unwrap();
+            .expect("valid completion");
 
         assert_eq!(start, 0);
         assert!(candidates.iter().any(|c| c.replacement() == "SELECT"));
@@ -571,7 +573,7 @@ mod test {
         let completer = ReplCompleter::new(metadata);
         let (start, candidates) = completer
             .complete("SELECT * FROM u", 15, &Context::new(&DefaultHistory::new()))
-            .unwrap();
+            .expect("valid completion");
 
         assert_eq!(start, 14);
         assert!(candidates.iter().any(|c| c.replacement() == "users"));
@@ -599,7 +601,7 @@ mod test {
         let completer = ReplCompleter::new(metadata);
         let (start, candidates) = completer
             .complete("SELECT users.", 13, &Context::new(&DefaultHistory::new()))
-            .unwrap();
+            .expect("valid completion");
 
         assert_eq!(start, 13);
         assert!(candidates.iter().any(|c| c.replacement() == "id"));

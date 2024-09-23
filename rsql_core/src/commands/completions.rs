@@ -1,31 +1,12 @@
-use crate::commands::{CommandOptions, LoopCondition, Result, ToggleShellCommand,ShellCommand};
+use crate::commands::{CommandOptions, ToggleShellCommand};
 use async_trait::async_trait;
-/// Command to enable or disable color output
+/// Command to enable or disable smart completions
 #[derive(Debug, Default)]
 pub struct Command;
 
 #[async_trait]
-impl ShellCommand for Command {
-    fn name(&self, locale: &str) -> String {
-        <Self as ToggleShellCommand>::toggleable_name(self, locale)
-    }
-    /// Get the arguments for the command
-    fn args(&self, locale: &str) -> String {
-        <Self as ToggleShellCommand>::t_args(self, locale)
-    }
-    /// Get the description of the command
-    fn description(&self, locale: &str) -> String {
-        <Self as ToggleShellCommand>::t_description(self, locale)
-    }
-    /// Execute the command
-    async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
-        <Self as ToggleShellCommand>::t_execute(self, options).await
-    }
-}
-
-#[async_trait]
 impl ToggleShellCommand for Command {
-    fn is_enabled(&self, options: &CommandOptions<'_>) -> bool {
+    fn get_value(&self, options: &CommandOptions<'_>) -> bool {
         options.configuration.smart_completions
     }
 
@@ -44,14 +25,13 @@ impl ToggleShellCommand for Command {
     fn get_setting_str(&self) -> &'static str {
         "completions_setting"
     }
-
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::commands::LoopCondition;
-    use crate::commands::{CommandManager, CommandOptions};
+    use crate::commands::{CommandManager, CommandOptions, ShellCommand};
     use crate::configuration::Configuration;
     use crate::writers::Output;
     use rsql_drivers::{DriverManager, MockConnection};

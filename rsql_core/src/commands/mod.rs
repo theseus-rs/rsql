@@ -29,5 +29,7 @@ pub mod tables;
 pub mod tee;
 pub mod timer;
 
-pub use command::{CommandManager, CommandOptions, LoopCondition,ToggleShellCommand, ShellCommand};
+pub use command::{
+    CommandManager, CommandOptions, LoopCondition, ShellCommand, ToggleShellCommand,
+};
 pub use error::{Error, Result};
