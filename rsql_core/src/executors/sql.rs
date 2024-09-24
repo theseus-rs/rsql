@@ -49,13 +49,18 @@ impl<'a> SqlExecutor<'a> {
         let mut options = self.configuration.get_formatter_options();
 
         let limit = self.configuration.results_limit;
+        let loop_condition = if contains_ddl(sql) {
+            LoopCondition::ContinueRefreshMetadata
+        } else {
+            LoopCondition::Continue
+        };
         let mut results = self.execute_sql(sql, limit).await?;
         options.elapsed = start.elapsed();
 
         formatter
             .format(&options, &mut results, self.output)
             .await?;
-        Ok(LoopCondition::Continue)
+        Ok(loop_condition)
     }
 
     /// Execute the SQL and return the results.
@@ -94,6 +99,19 @@ impl Debug for SqlExecutor<'_> {
             .field("connection", &self.connection)
             .finish()
     }
+}
+
+fn contains_ddl(sql: &str) -> bool {
+    let ddl_keywords = [
+        "CREATE", "ALTER", "DROP", "TRUNCATE", "RENAME", "COMMENT", "GRANT", "REVOKE", "ANALYZE",
+        "VACUUM", "REINDEX", "CLUSTER",
+    ];
+
+    let sql_upper = sql.to_uppercase();
+
+    ddl_keywords
+        .iter()
+        .any(|&keyword| sql_upper.contains(keyword))
 }
 
 #[cfg(test)]

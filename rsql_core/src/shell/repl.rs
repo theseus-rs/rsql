@@ -99,7 +99,7 @@ impl Shell {
                 .evaluate(connection, &DefaultHistory::new(), input.to_string())
                 .await?
             {
-                LoopCondition::Continue => 0,
+                LoopCondition::Continue | LoopCondition::ContinueRefreshMetadata => 0,
                 LoopCondition::Exit(exit_code) => *exit_code,
             }
         } else {
@@ -144,10 +144,16 @@ impl Shell {
             Some(ref file) => String::from(file.to_string_lossy()),
             None => String::new(),
         };
-        let metadata = connection.metadata().await?;
+        let mut metadata = connection.metadata().await?;
+        let mut is_metadata_stale = false;
 
         loop {
             // Create a new editor for each iteration in order to read any changes to the configuration.
+            metadata = if is_metadata_stale {
+                connection.metadata().await?
+            } else {
+                metadata
+            };
             let mut editor = self.editor(history_file.as_str(), metadata.clone())?;
             let locale = self.configuration.locale.as_str();
             let prompt = t!(
@@ -163,6 +169,10 @@ impl Shell {
                         .await
                     {
                         Ok(LoopCondition::Continue) => LoopCondition::Continue,
+                        Ok(LoopCondition::ContinueRefreshMetadata) => {
+                            is_metadata_stale = true;
+                            LoopCondition::Continue
+                        }
                         Ok(LoopCondition::Exit(exit_code)) => LoopCondition::Exit(*exit_code),
                         Err(_error) => LoopCondition::Exit(1),
                     };

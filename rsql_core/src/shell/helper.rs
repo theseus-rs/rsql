@@ -40,7 +40,7 @@ impl Completer for ReplHelper {
         line: &str,
         pos: usize,
         ctx: &Context<'_>,
-    ) -> rustyline::Result<(usize, Vec<<ReplCompleter as Completer>::Candidate>)> {
+    ) -> rustyline::Result<(usize, Vec<Self::Candidate>)> {
         self.completer.complete(line, pos, ctx)
     }
 }
