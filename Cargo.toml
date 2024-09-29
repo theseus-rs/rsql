@@ -43,7 +43,7 @@ libsql = "0.5.0"
 mockall = "0.13.0"
 num-format = "0.4.4"
 os_info = "3.8.2"
-postgresql_embedded = "0.16.3"
+postgresql_embedded = "0.17.0"
 quick-xml = "0.36.1"
 regex = "1.10.6"
 reqwest = "0.12.5"
@@ -100,7 +100,7 @@ tag-name = "v{{version}}"
 # Config for 'cargo dist'
 [workspace.metadata.dist]
 # The preferred cargo-dist version to use in CI (Cargo.toml SemVer syntax)
-cargo-dist-version = "0.22.0"
+cargo-dist-version = "0.22.1"
 # CI backends to support
 ci = "github"
 # Whether cargo-dist should create a Github Release or use an existing draft

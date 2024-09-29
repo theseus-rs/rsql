@@ -4772,9 +4772,9 @@ dependencies = [
 
 [[package]]
 name = "postgresql_archive"
-version = "0.16.3"
+version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e3066a9cfae31aa2f82b77719524805fa918b44ae544a0b1e3a2e76980dc59c3"
+checksum = "6c3a7f6f2587f038e79223fc1c54be16c09a7b4bb795b5477ca9821406d92bb2"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -4806,9 +4806,9 @@ dependencies = [
 
 [[package]]
 name = "postgresql_commands"
-version = "0.16.3"
+version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9706e3b1bbf2922476b63cdfd1a0e45d62e8dac6b23b2098e181f44c374e8b13"
+checksum = "f6b3e22de4c3e85eadf669737876ad1aa573587cfa638f63e760cbde457e2a70"
 dependencies = [
  "anyhow",
  "thiserror",
@@ -4817,9 +4817,9 @@ dependencies = [
 
 [[package]]
 name = "postgresql_embedded"
-version = "0.16.3"
+version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "746ed81a92319c9c214b7d0d69f00c9a2bc164c7b075b2fc3ec8f8a81c414241"
+checksum = "86b735fa072fd545fc07e3411d562e65fe6aa3fc2db3557b7897747e1a4efee6"
 dependencies = [
  "anyhow",
  "home",
@@ -5938,9 +5938,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.127"
+version = "1.0.128"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8043c06d9f82bd7271361ed64f415fe5e12a77fdb52e573e7f06a516dea329ad"
+checksum = "6ff5456707a1de34e7e37f2a6fd3d3f808c318259cbd01ab6377795054b483d8"
 dependencies = [
  "indexmap 2.5.0",
  "itoa",
