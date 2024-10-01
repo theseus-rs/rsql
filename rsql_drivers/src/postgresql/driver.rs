@@ -17,7 +17,7 @@ use std::string::ToString;
 use tracing::debug;
 use url::Url;
 
-const POSTGRESQL_EMBEDDED_VERSION: &str = "=16.4.0";
+const POSTGRESQL_EMBEDDED_VERSION: &str = "=17.0.0";
 
 #[derive(Debug)]
 pub struct Driver;
