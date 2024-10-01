@@ -1,59 +1,30 @@
-use crate::commands::Error::InvalidOption;
-use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
+use crate::commands::{CommandOptions, ToggleShellCommand};
 use async_trait::async_trait;
-use rust_i18n::t;
 
 /// Command to enable or disable result footer
 #[derive(Debug, Default)]
 pub struct Command;
 
 #[async_trait]
-impl ShellCommand for Command {
-    fn name(&self, locale: &str) -> String {
-        t!("footer_command", locale = locale).to_string()
+impl ToggleShellCommand for Command {
+    fn get_name(&self) -> &'static str {
+        "footer_command"
     }
 
-    fn args(&self, locale: &str) -> String {
-        let on = t!("on", locale = locale).to_string();
-        let off = t!("off", locale = locale).to_string();
-        t!("on_off_argument", locale = locale, on = on, off = off).to_string()
+    fn get_description(&self) -> &'static str {
+        "footer_description"
     }
 
-    fn description(&self, locale: &str) -> String {
-        t!("footer_description", locale = locale).to_string()
+    fn get_setting_str(&self) -> &'static str {
+        "footer_setting"
     }
 
-    async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
-        let locale = options.configuration.locale.as_str();
-        let on = t!("on", locale = locale).to_string();
-        let off = t!("off", locale = locale).to_string();
+    fn get_value(&self, options: &CommandOptions<'_>) -> bool {
+        options.configuration.results_footer
+    }
 
-        if options.input.len() <= 1 {
-            let footer = if options.configuration.results_footer {
-                on
-            } else {
-                off
-            };
-            let footer_setting = t!("footer_setting", locale = locale, footer = footer).to_string();
-            writeln!(options.output, "{footer_setting}")?;
-            return Ok(LoopCondition::Continue);
-        }
-
-        let argument = options.input[1].to_lowercase().to_string();
-        let footer = if argument == on {
-            true
-        } else if argument == off {
-            false
-        } else {
-            return Err(InvalidOption {
-                command_name: self.name(locale).to_string(),
-                option: argument,
-            });
-        };
-
-        options.configuration.results_footer = footer;
-
-        Ok(LoopCondition::Continue)
+    fn set_value(&self, options: &mut CommandOptions<'_>, value: bool) {
+        options.configuration.results_footer = value;
     }
 }
 
@@ -61,7 +32,7 @@ impl ShellCommand for Command {
 mod tests {
     use super::*;
     use crate::commands::LoopCondition;
-    use crate::commands::{CommandManager, CommandOptions};
+    use crate::commands::{CommandManager, CommandOptions, ShellCommand};
     use crate::configuration::Configuration;
     use crate::writers::Output;
     use rsql_drivers::{DriverManager, MockConnection};

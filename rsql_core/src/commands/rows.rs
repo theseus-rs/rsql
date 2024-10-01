@@ -1,59 +1,30 @@
-use crate::commands::Error::InvalidOption;
-use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
+use crate::commands::{CommandOptions, ToggleShellCommand};
 use async_trait::async_trait;
-use rust_i18n::t;
 
 /// Command to enable or disable the result rows
 #[derive(Debug, Default)]
 pub struct Command;
 
 #[async_trait]
-impl ShellCommand for Command {
-    fn name(&self, locale: &str) -> String {
-        t!("rows_command", locale = locale).to_string()
+impl ToggleShellCommand for Command {
+    fn get_value(&self, options: &CommandOptions<'_>) -> bool {
+        options.configuration.results_rows
     }
 
-    fn args(&self, locale: &str) -> String {
-        let on = t!("on", locale = locale).to_string();
-        let off = t!("off", locale = locale).to_string();
-        t!("on_off_argument", locale = locale, on = on, off = off).to_string()
+    fn set_value(&self, options: &mut CommandOptions<'_>, value: bool) {
+        options.configuration.results_rows = value;
     }
 
-    fn description(&self, locale: &str) -> String {
-        t!("rows_description", locale = locale).to_string()
+    fn get_name(&self) -> &'static str {
+        "rows_command"
     }
 
-    async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
-        let locale = options.configuration.locale.as_str();
-        let on = t!("on", locale = locale).to_string();
-        let off = t!("off", locale = locale).to_string();
+    fn get_description(&self) -> &'static str {
+        "rows_description"
+    }
 
-        if options.input.len() <= 1 {
-            let rows = if options.configuration.results_rows {
-                on
-            } else {
-                off
-            };
-            let rows_setting = t!("rows_setting", locale = locale, rows = rows).to_string();
-            writeln!(options.output, "{rows_setting}")?;
-            return Ok(LoopCondition::Continue);
-        }
-
-        let argument = options.input[1].to_lowercase().to_string();
-        let rows = if argument == on {
-            true
-        } else if argument == off {
-            false
-        } else {
-            return Err(InvalidOption {
-                command_name: self.name(locale).to_string(),
-                option: argument,
-            });
-        };
-
-        options.configuration.results_rows = rows;
-
-        Ok(LoopCondition::Continue)
+    fn get_setting_str(&self) -> &'static str {
+        "rows_setting"
     }
 }
 
@@ -61,7 +32,7 @@ impl ShellCommand for Command {
 mod tests {
     use super::*;
     use crate::commands::LoopCondition;
-    use crate::commands::{CommandManager, CommandOptions};
+    use crate::commands::{CommandManager, CommandOptions, ShellCommand};
     use crate::configuration::Configuration;
     use crate::writers::Output;
     use rsql_drivers::{DriverManager, MockConnection};
