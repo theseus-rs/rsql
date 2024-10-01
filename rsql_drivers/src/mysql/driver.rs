@@ -5,6 +5,7 @@ use crate::Error::UnsupportedColumnType;
 use crate::{MemoryQueryResult, Metadata, QueryResult};
 use async_trait::async_trait;
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
+use sqlparser::dialect::{Dialect, MySqlDialect};
 use sqlx::mysql::{MySqlColumn, MySqlConnectOptions, MySqlRow};
 use sqlx::types::time::OffsetDateTime;
 use sqlx::{Column, MySqlPool, Row};
@@ -85,6 +86,10 @@ impl crate::Connection for Connection {
     async fn close(&mut self) -> Result<()> {
         self.pool.close().await;
         Ok(())
+    }
+
+    fn dialect(&self) -> Box<dyn Dialect> {
+        Box::new(MySqlDialect{})
     }
 }
 

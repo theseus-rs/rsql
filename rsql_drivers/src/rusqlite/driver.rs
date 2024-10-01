@@ -5,6 +5,7 @@ use anyhow::anyhow;
 use async_trait::async_trait;
 use rusqlite::types::ValueRef;
 use rusqlite::Row;
+use sqlparser::dialect::{Dialect, SQLiteDialect};
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use url::Url;
@@ -101,6 +102,10 @@ impl crate::Connection for Connection {
 
     async fn close(&mut self) -> Result<()> {
         Ok(())
+    }
+
+    fn dialect(&self) -> Box<dyn Dialect>{
+        Box::new(SQLiteDialect{})
     }
 }
 

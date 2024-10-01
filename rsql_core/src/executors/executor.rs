@@ -148,6 +148,7 @@ mod tests {
     use indoc::indoc;
     use mockall::predicate::eq;
     use rsql_drivers::MockConnection;
+    use sqlparser::dialect::GenericDialect;
 
     #[tokio::test]
     async fn test_debug() {
@@ -421,6 +422,10 @@ mod tests {
             .expect_execute()
             .with(eq(input))
             .returning(|_| Ok(42));
+        connection
+            .expect_dialect()
+            .with()
+            .returning(|| Box::new(GenericDialect));
         let mut output = Output::default();
 
         let mut executor = Executor::new(

@@ -8,6 +8,7 @@ use jwt_simple::prelude::{Claims, Duration, RS256KeyPair, RS256PublicKey, RSAKey
 use reqwest::header::HeaderMap;
 use serde_json::json;
 use sha2::{Digest, Sha256};
+use sqlparser::dialect::{Dialect, SnowflakeDialect};
 use std::collections::HashMap;
 use std::fmt::Display;
 use tokio::sync::Mutex;
@@ -382,6 +383,10 @@ impl crate::Connection for SnowflakeConnection {
 
     async fn close(&mut self) -> Result<()> {
         Ok(())
+    }
+
+    fn dialect(&self) -> Box<dyn Dialect> {
+        Box::new(SnowflakeDialect{})
     }
 }
 

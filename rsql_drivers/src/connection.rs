@@ -4,6 +4,9 @@ use crate::Metadata;
 use async_trait::async_trait;
 use mockall::automock;
 use mockall::predicate::str;
+use sqlparser::dialect::Dialect;
+use sqlparser::ast::Statement;
+
 use std::fmt::Debug;
 
 /// Results from a query
@@ -91,11 +94,23 @@ pub trait Connection: Debug + Send + Sync {
     }
     async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>>;
     async fn close(&mut self) -> Result<()>;
-    fn ddl_keywords(&self) -> Vec<&'static str> {
-        vec![
-            "CREATE", "ALTER", "DROP", "TRUNCATE", "RENAME", "COMMENT", "GRANT", "REVOKE",
-            "ANALYZE", "VACUUM", "REINDEX", "CLUSTER",
-        ]
+
+    fn dialect(&self) -> Box<dyn Dialect>;
+    fn default_ddl(&self, statement: &Statement) -> bool {
+        match statement {
+            Statement::CreateSchema { .. }
+            | Statement::CreateDatabase { .. }
+            | Statement::CreateView { .. }
+            | Statement::CreateIndex(_)
+            | Statement::CreateTable(_)
+            | Statement::AlterTable { .. }
+            | Statement::AlterIndex { .. }
+            | Statement::Drop { .. } => true,
+            _ => false,
+        }
+    }
+    fn is_ddl(&self, statement: &Statement) -> bool {
+        self.default_ddl(statement)
     }
 }
 

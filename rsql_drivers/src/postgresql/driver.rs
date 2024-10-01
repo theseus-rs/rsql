@@ -7,6 +7,7 @@ use async_trait::async_trait;
 use bit_vec::BitVec;
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime, Utc};
 use postgresql_embedded::{PostgreSQL, Settings, Status, VersionReq};
+use sqlparser::dialect::{Dialect, PostgreSqlDialect};
 use sqlx::postgres::types::Oid;
 use sqlx::postgres::{PgColumn, PgConnectOptions, PgRow};
 use sqlx::{Column, ColumnIndex, Decode, PgPool, Row, Type};
@@ -141,6 +142,10 @@ impl crate::Connection for Connection {
         }
 
         Ok(())
+    }
+
+    fn dialect(&self) -> Box<dyn Dialect> {
+        Box::new(PostgreSqlDialect{})
     }
 }
 

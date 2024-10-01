@@ -5,6 +5,7 @@ use crate::Error::UnsupportedColumnType;
 use crate::{MemoryQueryResult, Metadata, QueryResult};
 use async_trait::async_trait;
 use futures_util::stream::TryStreamExt;
+use sqlparser::dialect::{Dialect, MsSqlDialect};
 use std::collections::HashMap;
 use std::string::ToString;
 use tiberius::{AuthMethod, Client, Column, Config, EncryptionLevel, QueryItem, Row};
@@ -129,6 +130,10 @@ impl crate::Connection for Connection {
 
     async fn close(&mut self) -> Result<()> {
         Ok(())
+    }
+
+    fn dialect(&self) -> Box<dyn Dialect> {
+        Box::new(MsSqlDialect{})
     }
 }
 

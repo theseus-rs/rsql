@@ -6,6 +6,7 @@ use async_trait::async_trait;
 use bit_vec::BitVec;
 use chrono::{DateTime, NaiveDate, NaiveDateTime, NaiveTime, Utc};
 use postgresql_embedded::{PostgreSQL, Settings, Status, VersionReq};
+use sqlparser::dialect::{Dialect, PostgreSqlDialect};
 use std::collections::HashMap;
 use std::path::PathBuf;
 use std::str::FromStr;
@@ -140,6 +141,11 @@ impl crate::Connection for Connection {
 
         Ok(())
     }
+
+    fn dialect(&self) -> Box<dyn Dialect> {
+        Box::new(PostgreSqlDialect{})
+    }
+
 }
 
 impl Connection {

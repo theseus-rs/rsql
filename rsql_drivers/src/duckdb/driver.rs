@@ -8,6 +8,7 @@ use async_trait::async_trait;
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime, TimeDelta};
 use duckdb::types::{TimeUnit, ValueRef};
 use duckdb::Row;
+use sqlparser::dialect::{Dialect, DuckDbDialect};
 use std::collections::HashMap;
 use std::ops::Add;
 use std::sync::{Arc, Mutex};
@@ -103,8 +104,8 @@ impl crate::Connection for Connection {
         Ok(())
     }
 
-    fn ddl_keywords(&self) -> Vec<&'static str> {
-        vec!["CREATE", "ALTER", "DROP", "ANALYZE", "VACUUM", "IMPORT"]
+    fn dialect(&self) -> Box<dyn Dialect> {
+        Box::new(DuckDbDialect{})
     }
 }
 
