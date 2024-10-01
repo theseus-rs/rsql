@@ -239,8 +239,11 @@ mod test {
 
     #[tokio::test]
     async fn test_container() -> anyhow::Result<()> {
-        let sqlserver_image =
-            ContainerRequest::from(MssqlServer::default().with_sa_password(PASSWORD));
+        let sqlserver_image = ContainerRequest::from(
+            MssqlServer::default()
+                .with_accept_eula()
+                .with_sa_password(PASSWORD),
+        );
         let container = sqlserver_image.start().await?;
         let port = container.get_host_port_ipv4(1433).await?;
         let database_url =
