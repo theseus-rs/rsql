@@ -91,6 +91,12 @@ pub trait Connection: Debug + Send + Sync {
     }
     async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>>;
     async fn close(&mut self) -> Result<()>;
+    fn ddl_keywords(&self) -> Vec<&'static str> {
+        vec![
+            "CREATE", "ALTER", "DROP", "TRUNCATE", "RENAME", "COMMENT", "GRANT", "REVOKE",
+            "ANALYZE", "VACUUM", "REINDEX", "CLUSTER",
+        ]
+    }
 }
 
 #[cfg(test)]

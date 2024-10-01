@@ -102,6 +102,10 @@ impl crate::Connection for Connection {
     async fn close(&mut self) -> Result<()> {
         Ok(())
     }
+
+    fn ddl_keywords(&self) -> Vec<&'static str> {
+        vec!["CREATE", "ALTER", "DROP", "ANALYZE", "VACUUM", "IMPORT"]
+    }
 }
 
 impl Connection {
