@@ -1,4 +1,5 @@
 use crate::commands::error::Result;
+use crate::commands::Error::InvalidOption;
 use crate::configuration::Configuration;
 use async_trait::async_trait;
 use rsql_drivers::{Connection, DriverManager};
@@ -56,6 +57,64 @@ pub trait ShellCommand: Debug + Sync {
     fn description(&self, locale: &str) -> String;
     /// Execute the command
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition>;
+}
+
+#[async_trait]
+pub trait ToggleShellCommand: Debug + Sync {
+    fn get_value(&self, options: &CommandOptions<'_>) -> bool;
+    fn set_value(&self, options: &mut CommandOptions<'_>, value: bool);
+
+    fn get_name(&self) -> &'static str;
+    fn get_description(&self) -> &'static str;
+    fn get_setting_str(&self) -> &'static str;
+}
+
+#[async_trait]
+impl<T: ToggleShellCommand> ShellCommand for T {
+    fn name(&self, locale: &str) -> String {
+        t!(self.get_name(), locale = locale).to_string()
+    }
+    fn args(&self, locale: &str) -> String {
+        let on = t!("on", locale = locale).to_string();
+        let off = t!("off", locale = locale).to_string();
+        t!("on_off_argument", locale = locale, on = on, off = off).to_string()
+    }
+    fn description(&self, locale: &str) -> String {
+        t!(self.get_description(), locale = locale).to_string()
+    }
+    async fn execute<'a>(&self, mut options: CommandOptions<'a>) -> Result<LoopCondition> {
+        let locale = options.configuration.locale.as_str();
+        let on = t!("on", locale = locale).to_string();
+        let off = t!("off", locale = locale).to_string();
+
+        if options.input.len() <= 1 {
+            let setting_enabled_text = if self.get_value(&options) { on } else { off };
+            let setting = t!(
+                self.get_setting_str(),
+                locale = locale,
+                setting = setting_enabled_text
+            )
+            .to_string();
+            writeln!(options.output, "{setting}")?;
+            return Ok(LoopCondition::Continue);
+        }
+
+        let argument = options.input[1].to_lowercase().to_string();
+        let new_setting = if argument == on {
+            true
+        } else if argument == off {
+            false
+        } else {
+            return Err(InvalidOption {
+                command_name: self.name(locale).to_string(),
+                option: argument,
+            });
+        };
+
+        self.set_value(&mut options, new_setting);
+
+        Ok(LoopCondition::Continue)
+    }
 }
 
 /// Manages the active commands
