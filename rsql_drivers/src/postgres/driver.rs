@@ -260,15 +260,11 @@ impl Connection {
     }
 }
 
-// postgresql embedded is not functioning on Windows yet
-#[cfg(not(target_os = "windows"))]
 #[cfg(test)]
 mod test {
     use crate::{DriverManager, Row, Value};
     use chrono::{NaiveDate, NaiveDateTime, NaiveTime, Utc};
     use serde_json::json;
-    #[cfg(not(any(target_os = "linux", target_os = "macos")))]
-    use testcontainers::runners::AsyncRunner;
 
     const DATABASE_URL: &str = "postgres://?embedded=true";
 
@@ -540,30 +536,6 @@ mod test {
     async fn test_data_type_not_supported() -> anyhow::Result<()> {
         let result = test_data_type("SELECT CAST('<a>b</a> as xml)").await;
         assert!(result.is_err());
-        Ok(())
-    }
-
-    #[cfg(not(any(target_os = "linux", target_os = "macos")))]
-    #[tokio::test]
-    async fn test_container() -> anyhow::Result<()> {
-        let postgres_image = testcontainers::ContainerRequest::from(
-            testcontainers_modules::postgres::Postgres::default(),
-        );
-        let container = postgres_image.start().await?;
-        let port = container.get_host_port_ipv4(5432).await?;
-
-        let database_url = format!("postgres://postgres:postgres@localhost:{}/postgres", port);
-        let driver_manager = DriverManager::default();
-        let mut connection = driver_manager.connect(database_url.as_str()).await?;
-
-        let mut query_result = connection.query("SELECT 'foo'::TEXT").await?;
-        let row = query_result.next().await.expect("no row");
-        let value = row.first().expect("no value");
-
-        assert_eq!(*value, Value::String("foo".to_string()));
-
-        container.stop().await?;
-        container.rm().await?;
         Ok(())
     }
 }
