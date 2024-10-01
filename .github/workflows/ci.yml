@@ -78,7 +78,7 @@ jobs:
           RUST_LOG: "info"
           RUST_LOG_SPAN_EVENTS: full
         run: |
-          cargo llvm-cov --all-features --workspace --lcov --output-path lcov.info
+          cargo llvm-cov --workspace --lcov --output-path lcov.info
 
       - name: Upload to codecov.io
         if: ${{ startsWith(matrix.os, 'ubuntu-') }}
