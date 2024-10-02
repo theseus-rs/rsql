@@ -83,8 +83,6 @@ libsql = [
 ]
 mariadb = [
     "mysql",
-    "dep:sqlx",
-    "sqlx/mysql",
 ]
 mysql = [
     "dep:sqlx",
@@ -99,6 +97,9 @@ postgresql = [
     "dep:postgresql_embedded",
     "dep:sqlx",
     "sqlx/postgres",
+]
+redshift = [
+    "postgresql",
 ]
 rusqlite = [
     "dep:rusqlite",

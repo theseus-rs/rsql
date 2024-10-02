@@ -23,8 +23,8 @@ indicatif = { workspace = true }
 indoc = { workspace = true }
 num-format = { workspace = true }
 regex = { workspace = true }
-rsql_drivers = { path = "../rsql_drivers", version = "0.13.12" }
-rsql_formatters = { path = "../rsql_formatters", version = "0.13.12" }
+rsql_drivers = { path = "../rsql_drivers", version = "0.13.13" }
+rsql_formatters = { path = "../rsql_formatters", version = "0.13.13" }
 rust-i18n = { workspace = true }
 rustyline = { workspace = true }
 serde_json = { workspace = true, features = ["preserve_order"] }
@@ -64,6 +64,7 @@ all-drivers = [
     "driver-mysql",
     "driver-postgres",
     "driver-postgresql",
+    "driver-redshift",
     "driver-rusqlite",
     "driver-snowflake",
     "driver-sqlite",
@@ -75,6 +76,7 @@ driver-mariadb = ["rsql_drivers/mariadb"]
 driver-mysql = ["rsql_drivers/mysql"]
 driver-postgres = ["rsql_drivers/postgres"]
 driver-postgresql = ["rsql_drivers/postgresql"]
+driver-redshift = ["rsql_drivers/redshift"]
 driver-rusqlite = ["rsql_drivers/rusqlite"]
 driver-snowflake = ["rsql_drivers/snowflake"]
 driver-sqlite = ["rsql_drivers/sqlite"]

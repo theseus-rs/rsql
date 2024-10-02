@@ -168,8 +168,13 @@ mod test {
     use testcontainers::runners::AsyncRunner;
 
     #[allow(dead_code)]
-    // #[tokio::test]
+    #[tokio::test]
     async fn test_container() -> anyhow::Result<()> {
+        // Skip tests on GitHub Actions for non-Linux platforms; the test containers fail to run.
+        if std::env::var("GITHUB_ACTIONS").is_ok() && !cfg!(target_os = "linux") {
+            return Ok(());
+        }
+
         let mysql_image =
             testcontainers::ContainerRequest::from(testcontainers_modules::mysql::Mysql::default());
         let container = mysql_image.start().await?;
