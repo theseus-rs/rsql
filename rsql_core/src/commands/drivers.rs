@@ -91,6 +91,8 @@ mod tests {
             "postgres",
             #[cfg(feature = "driver-postgresql")]
             "postgresql",
+            #[cfg(feature = "driver-redshift")]
+            "redshift",
             #[cfg(feature = "driver-rusqlite")]
             "rusqlite",
             #[cfg(feature = "driver-snowflake")]

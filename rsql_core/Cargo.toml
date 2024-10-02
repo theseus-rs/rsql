@@ -55,6 +55,7 @@ all-drivers = [
     "driver-mysql",
     "driver-postgres",
     "driver-postgresql",
+    "driver-redshift",
     "driver-rusqlite",
     "driver-snowflake",
     "driver-sqlite",
@@ -66,6 +67,7 @@ driver-mariadb = ["rsql_drivers/mariadb"]
 driver-mysql = ["rsql_drivers/mysql"]
 driver-postgres = ["rsql_drivers/postgres"]
 driver-postgresql = ["rsql_drivers/postgresql"]
+driver-redshift = ["rsql_drivers/redshift"]
 driver-rusqlite = ["rsql_drivers/rusqlite"]
 driver-snowflake = ["rsql_drivers/snowflake"]
 driver-sqlite = ["rsql_drivers/sqlite"]

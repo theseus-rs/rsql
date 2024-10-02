@@ -21,6 +21,8 @@ pub mod mysql;
 pub mod postgres;
 #[cfg(feature = "postgresql")]
 pub mod postgresql;
+#[cfg(feature = "redshift")]
+mod redshift;
 mod row;
 #[cfg(feature = "rusqlite")]
 pub mod rusqlite;

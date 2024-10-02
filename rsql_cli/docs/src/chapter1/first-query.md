@@ -38,6 +38,12 @@ rsql --url "postgres://?embedded=true" -- "SELECT version();"
 rsql --url "postgresql://?embedded=true" -- "SELECT version();"
 ```
 
+### Redshift
+
+```shell
+rsql --url "redshift://<user[:password>]@<host>[:<port>]/<database>" -- "SELECT version();"
+```
+
 ### Rusqlite
 
 ```shell
