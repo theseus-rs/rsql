@@ -57,7 +57,7 @@ workspace = true
 [dev-dependencies]
 test-log = { workspace = true }
 testcontainers = { workspace = true }
-testcontainers-modules = { workspace = true, features = ["mariadb", "mssql_server", "mysql"] }
+testcontainers-modules = { workspace = true, features = ["mariadb", "mssql_server", "mysql", "postgres"] }
 tokio = { workspace = true }
 wiremock = { workspace = true }
 
@@ -82,8 +82,6 @@ libsql = [
 ]
 mariadb = [
     "mysql",
-    "dep:sqlx",
-    "sqlx/mysql",
 ]
 mysql = [
     "dep:sqlx",
@@ -98,6 +96,9 @@ postgresql = [
     "dep:postgresql_embedded",
     "dep:sqlx",
     "sqlx/postgres",
+]
+redshift = [
+    "postgresql",
 ]
 rusqlite = [
     "dep:rusqlite",

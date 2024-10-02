@@ -86,6 +86,8 @@ impl Default for DriverManager {
         drivers.add(Box::new(crate::postgres::Driver));
         #[cfg(feature = "postgresql")]
         drivers.add(Box::new(crate::postgresql::Driver));
+        #[cfg(feature = "redshift")]
+        drivers.add(Box::new(crate::redshift::Driver));
         #[cfg(feature = "rusqlite")]
         drivers.add(Box::new(crate::rusqlite::Driver));
         #[cfg(feature = "sqlite")]
@@ -147,6 +149,9 @@ mod tests {
         let driver_count = driver_count + 1;
 
         #[cfg(feature = "postgresql")]
+        let driver_count = driver_count + 1;
+
+        #[cfg(feature = "redshift")]
         let driver_count = driver_count + 1;
 
         #[cfg(feature = "rusqlite")]

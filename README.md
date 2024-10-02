@@ -60,6 +60,7 @@ rsql --url "<url>" -- "<query>"
 | mysql (sqlx)      | `mysql://<user>[:<password>]@<host>[:<port>]/<database>`                                                                  |
 | postgres          | `postgres://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`                                               |
 | postgresql (sqlx) | `postgresql://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`                                             |
+| redshift (sqlx)   | `redshift://<user[:password>]@<host>[:<port>]/<database>`                                                                 |
 | rusqlite          | `rusqlite://?<memory=true>[&file=<database_file>]`                                                                        |
 | snowflake         | `snowflake://<user>[:<token>]@<account>.snowflakecomputing.com/[?private_key_file=pkey_file&public_key_file=pubkey_file]` |
 | sqlite (sqlx)     | `sqlite://?<memory=true>[&file=<database_file>]`                                                                          |
