@@ -5,6 +5,7 @@ use crate::{MemoryQueryResult, Metadata, QueryResult, Row};
 use async_trait::async_trait;
 use libsql::replication::Frames;
 use libsql::Builder;
+use sqlparser::dialect::{Dialect, GenericDialect};
 use std::collections::HashMap;
 use std::fmt::Debug;
 use url::Url;
@@ -101,6 +102,10 @@ impl crate::Connection for Connection {
 
     async fn close(&mut self) -> Result<()> {
         Ok(())
+    }
+
+    fn dialect(&self) -> Box<dyn Dialect> {
+        Box::new(GenericDialect)
     }
 }
 

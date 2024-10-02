@@ -386,7 +386,7 @@ impl crate::Connection for SnowflakeConnection {
     }
 
     fn dialect(&self) -> Box<dyn Dialect> {
-        Box::new(SnowflakeDialect{})
+        Box::new(SnowflakeDialect {})
     }
 }
 

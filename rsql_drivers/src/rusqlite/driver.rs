@@ -1,10 +1,11 @@
 use crate::error::{Error, Result};
 use crate::value::Value;
-use crate::{sqlite, MemoryQueryResult, Metadata, QueryResult};
+use crate::{sqlite, MemoryQueryResult, Metadata, QueryMeta, QueryResult};
 use anyhow::anyhow;
 use async_trait::async_trait;
 use rusqlite::types::ValueRef;
 use rusqlite::Row;
+use sqlparser::ast::Statement;
 use sqlparser::dialect::{Dialect, SQLiteDialect};
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
@@ -104,8 +105,22 @@ impl crate::Connection for Connection {
         Ok(())
     }
 
-    fn dialect(&self) -> Box<dyn Dialect>{
-        Box::new(SQLiteDialect{})
+    fn dialect(&self) -> Box<dyn Dialect> {
+        Box::new(SQLiteDialect {})
+    }
+
+    fn match_statement(&self, statement: &Statement) -> QueryMeta {
+        let default = self.default_match_statement(statement);
+        match default {
+            QueryMeta::Unknown => match statement {
+                // missing: DETACH DATABASE
+                Statement::CreateVirtualTable { .. } | Statement::AttachDatabase { .. } => {
+                    QueryMeta::DDL
+                }
+                _ => QueryMeta::Unknown,
+            },
+            other => other,
+        }
     }
 }
 

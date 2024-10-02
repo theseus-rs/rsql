@@ -2,11 +2,10 @@ use crate::commands::LoopCondition;
 use crate::configuration::Configuration;
 use crate::executors::Result;
 use indicatif::ProgressStyle;
-use rsql_drivers::{Connection, LimitQueryResult};
+use rsql_drivers::{Connection, LimitQueryResult, QueryMeta};
 use rsql_formatters;
 use rsql_formatters::writers::Output;
 use rsql_formatters::{FormatterManager, Results};
-use sqlparser::ast::Statement;
 use std::fmt;
 use std::fmt::Debug;
 use tracing::{info, instrument, Span};
@@ -68,15 +67,15 @@ impl<'a> SqlExecutor<'a> {
         Span::current().pb_set_style(&ProgressStyle::with_template(
             "{span_child_prefix}{spinner}",
         )?);
-        if let Ok(statements) = sqlparser::parser::Parser::parse_sql(self.connection.dialect().as_ref(), sql) {
-            let parsed_statement = statements.get(0);
-            let is_ddl = parsed_statement.map_or(false, |statement| self.connection.is_ddl(statement));
-            let is_select = parsed_statement.map_or(false, |statement| matches!(statement, Statement::Query(_)));
-            info!("{:?}, is_ddl: {}, is_select: {}", parsed_statement, is_ddl, is_select);
-        }
-        let command = if sql.len() > 6 { &sql[..6] } else { "" };
+        let is_select = if let Some(query_meta) = self.connection.parse_sql(sql) {
+            info!("query: {sql}, parse meta: {query_meta:?}");
+            matches!(query_meta, QueryMeta::Query)
+        } else {
+            let command = if sql.len() > 6 { &sql[..6] } else { "" };
+            command.to_lowercase() == "select"
+        };
 
-        let results = if command.to_lowercase() == "select" {
+        let results = if is_select {
             let query_results = self.connection.query(sql).await?;
 
             if limit == 0 {
@@ -107,9 +106,8 @@ impl Debug for SqlExecutor<'_> {
 mod tests {
     use super::*;
     use crate::configuration::Configuration;
-    use mockall::predicate::{eq, always};
+    use mockall::predicate::{always, eq};
     use rsql_drivers::{MemoryQueryResult, MockConnection};
-    use sqlparser::dialect::GenericDialect;
 
     #[tokio::test]
     async fn test_debug() {
@@ -158,9 +156,9 @@ mod tests {
             .with(eq(sql))
             .returning(|_| Ok(42));
         connection
-            .expect_dialect()
-            .with()
-            .returning(|| Box::new(GenericDialect));
+            .expect_parse_sql()
+            .with(eq(sql))
+            .returning(|_| None);
         let connection = &mut connection as &mut dyn Connection;
         let mut output = Output::default();
 
@@ -183,13 +181,13 @@ mod tests {
         let sql = "SELECT * FROM foo";
         let limit = 42;
         connection
-            .expect_dialect()
-            .with()
-            .returning(|| Box::new(GenericDialect));
+            .expect_parse_sql()
+            .with(eq(sql))
+            .returning(|_| None);
         connection
-            .expect_is_ddl()
+            .expect_parse_sql()
             .with(always())
-            .returning(|_| false);
+            .returning(|_| None);
         connection
             .expect_query()
             .returning(|_| Ok(Box::<MemoryQueryResult>::default()));
@@ -211,9 +209,9 @@ mod tests {
         let mut connection = MockConnection::new();
         let sql = "INSERT INTO foo";
         connection
-            .expect_dialect()
-            .with()
-            .returning(|| Box::new(GenericDialect));
+            .expect_parse_sql()
+            .with(eq(sql))
+            .returning(|_| None);
         connection
             .expect_execute()
             .with(eq(sql))

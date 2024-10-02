@@ -89,7 +89,7 @@ impl crate::Connection for Connection {
     }
 
     fn dialect(&self) -> Box<dyn Dialect> {
-        Box::new(MySqlDialect{})
+        Box::new(MySqlDialect {})
     }
 }
 

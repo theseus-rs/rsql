@@ -133,7 +133,7 @@ impl crate::Connection for Connection {
     }
 
     fn dialect(&self) -> Box<dyn Dialect> {
-        Box::new(MsSqlDialect{})
+        Box::new(MsSqlDialect {})
     }
 }
 

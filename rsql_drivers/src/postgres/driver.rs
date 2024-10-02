@@ -1,11 +1,12 @@
 use crate::error::Result;
 use crate::value::Value;
 use crate::Error::UnsupportedColumnType;
-use crate::{postgresql, Error, MemoryQueryResult, Metadata, QueryResult};
+use crate::{postgresql, Error, MemoryQueryResult, Metadata, QueryMeta, QueryResult};
 use async_trait::async_trait;
 use bit_vec::BitVec;
 use chrono::{DateTime, NaiveDate, NaiveDateTime, NaiveTime, Utc};
 use postgresql_embedded::{PostgreSQL, Settings, Status, VersionReq};
+use sqlparser::ast::Statement;
 use sqlparser::dialect::{Dialect, PostgreSqlDialect};
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -143,9 +144,21 @@ impl crate::Connection for Connection {
     }
 
     fn dialect(&self) -> Box<dyn Dialect> {
-        Box::new(PostgreSqlDialect{})
+        Box::new(PostgreSqlDialect {})
     }
 
+    fn match_statement(&self, statement: &Statement) -> QueryMeta {
+        let default = self.default_match_statement(statement);
+        match default {
+            QueryMeta::Unknown => match statement {
+                Statement::CreateExtension { .. } | Statement::CreateFunction { .. } => {
+                    QueryMeta::DDL
+                }
+                _ => QueryMeta::Unknown,
+            },
+            other => other,
+        }
+    }
 }
 
 impl Connection {
