@@ -31,7 +31,7 @@ jobs:
 
         include:
           - platform: linux-x64
-            os: ubuntu-22.04
+            os: ubuntu-24.04
           - platform: macos-arm64
             os: macos-14
           - platform: macos-x64
@@ -46,7 +46,6 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@master
         with:
-          components: 'llvm-tools-preview'
           toolchain: stable
 
       # aws-lc-rs requires nasm: https://github.com/rustls/rustls/issues/1913
@@ -54,38 +53,32 @@ jobs:
         if: ${{ startsWith(matrix.os, 'windows-') }}
         uses: ilammy/setup-nasm@v1
 
-      - name: Install grcov
+      - name: Install cargo-llvm-cov
         uses: taiki-e/install-action@main
         with:
-          tool: grcov
+          tool: cargo-llvm-cov
 
       - name: Tests
+        if: ${{ !startsWith(matrix.os, 'ubuntu-') }}
         env:
           CARGO_TERM_COLOR: always
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-          LLVM_PROFILE_FILE: rsql-%p-%m.profraw
           RUST_BACKTRACE: 1
           RUST_LOG: "info"
           RUST_LOG_SPAN_EVENTS: full
-          RUSTFLAGS: -Cinstrument-coverage
-          RUSTDOCFLAGS: -Cinstrument-coverage
         run: |
           cargo test --workspace --features all
 
-      - name: Produce coverage info
+      - name: Tests
         if: ${{ startsWith(matrix.os, 'ubuntu-') }}
+        env:
+          CARGO_TERM_COLOR: always
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          RUST_BACKTRACE: 1
+          RUST_LOG: "info"
+          RUST_LOG_SPAN_EVENTS: full
         run: |
-          grcov $(find . -name "rsql-*.profraw" -print) \
-            -s . \
-            --branch \
-            --ignore-not-existing \
-            --ignore='target/*' \
-            --ignore='benches/*' \
-            --ignore='/*' \
-            --binary-path ./target/debug/ \
-            --excl-line='#\[derive' \
-            -t lcov \
-            -o lcov.info
+          cargo llvm-cov --workspace --lcov --output-path lcov.info
 
       - name: Upload to codecov.io
         if: ${{ startsWith(matrix.os, 'ubuntu-') }}

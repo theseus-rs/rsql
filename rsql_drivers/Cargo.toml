@@ -33,6 +33,7 @@ rust-i18n = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true, features = ["preserve_order"] }
 sha2 = { workspace = true, optional = true }
+sqlparser = { workspace = true }
 sqlx = { workspace = true, features = ["bit-vec", "chrono", "json", "macros", "runtime-tokio", "rust_decimal", "time", "uuid"], optional = true }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["rt", "rt-multi-thread", "macros"] }
@@ -82,8 +83,6 @@ libsql = [
 ]
 mariadb = [
     "mysql",
-    "dep:sqlx",
-    "sqlx/mysql",
 ]
 mysql = [
     "dep:sqlx",
@@ -98,6 +97,9 @@ postgresql = [
     "dep:postgresql_embedded",
     "dep:sqlx",
     "sqlx/postgres",
+]
+redshift = [
+    "postgresql",
 ]
 rusqlite = [
     "dep:rusqlite",

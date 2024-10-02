@@ -2,12 +2,14 @@ use crate::duckdb::metadata;
 use crate::error::{Error, Result};
 use crate::value::Value;
 use crate::Error::UnsupportedColumnType;
-use crate::{MemoryQueryResult, Metadata, QueryResult};
+use crate::{MemoryQueryResult, Metadata, QueryMeta, QueryResult};
 use anyhow::anyhow;
 use async_trait::async_trait;
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime, TimeDelta};
 use duckdb::types::{TimeUnit, ValueRef};
 use duckdb::Row;
+use sqlparser::ast::Statement;
+use sqlparser::dialect::{Dialect, DuckDbDialect};
 use std::collections::HashMap;
 use std::ops::Add;
 use std::sync::{Arc, Mutex};
@@ -102,6 +104,26 @@ impl crate::Connection for Connection {
     async fn close(&mut self) -> Result<()> {
         Ok(())
     }
+
+    fn dialect(&self) -> Box<dyn Dialect> {
+        Box::new(DuckDbDialect {})
+    }
+
+    fn match_statement(&self, statement: &Statement) -> QueryMeta {
+        let default = self.default_match_statement(statement);
+        match default {
+            QueryMeta::Unknown => match statement {
+                Statement::Install { .. }
+                | Statement::AttachDuckDBDatabase { .. }
+                | Statement::CreateMacro { .. }
+                | Statement::CreateSecret { .. }
+                | Statement::DetachDuckDBDatabase { .. }
+                | Statement::Load { .. } => QueryMeta::DDL,
+                _ => QueryMeta::Unknown,
+            },
+            other => other,
+        }
+    }
 }
 
 impl Connection {
@@ -172,7 +194,7 @@ impl Connection {
 
 #[cfg(test)]
 mod test {
-    use crate::{DriverManager, Row, Value};
+    use crate::{DriverManager, QueryMeta, Row, Value};
     use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
     use indoc::indoc;
 
@@ -311,6 +333,40 @@ mod test {
             assert_eq!(row.get(17).cloned(), Some(Value::DateTime(date_time)));
         }
 
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_dialect() -> anyhow::Result<()> {
+        let driver_manager = DriverManager::default();
+        let connection = driver_manager.connect(DATABASE_URL).await?;
+        let dialect = connection.dialect();
+
+        assert!(dialect.is_delimited_identifier_start('"'));
+        assert!(!dialect.is_delimited_identifier_start('\''));
+        assert!(dialect.is_identifier_start('a'));
+        assert!(dialect.is_identifier_part('_'));
+
+        Ok(())
+    }
+    #[tokio::test]
+    async fn test_parse_sql() -> anyhow::Result<()> {
+        let driver_manager = DriverManager::default();
+        let connection = driver_manager.connect(DATABASE_URL).await?;
+
+        let ddl_sql_statements = [
+            "INSTALL extention_name",
+            "ATTACH 'file.db'",
+            "CREATE MACRO add(a, b) AS a + b",
+            "CREATE SECRET secret_name ( TYPE secret_type )",
+            "DETACH file",
+            "LOAD extension_name",
+        ];
+
+        for sql in ddl_sql_statements {
+            let statement_meta = connection.parse_sql(sql);
+            assert!(matches!(statement_meta, Some(QueryMeta::DDL)));
+        }
         Ok(())
     }
 }

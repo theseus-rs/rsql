@@ -1,9 +1,8 @@
-{"version": 2, "width": 147, "height": 38, "timestamp": 1725380268, "env": {"SHELL": "/bin/zsh", "TERM": "xterm-256color"}}
-[0.023048, "o", "\u001b]11;?\u001b\\"]
-[0.049897, "o", "⠁ connect [00:00:00] [                                                                                                        ] 0 B/0 B (0 B/s, 0s)"]
-[0.049986, "o", "\r\u001b[2K"]
-[0.057619, "o", "rsql> \u001b[38;2;131;148;150m.bail\u001b[0m\r\n"]
-[0.057781, "o", "Bail on error: off\r\n"]
-[1.09106, "o", "rsql> \u001b[38;2;131;148;150m.bail off\u001b[0m\r\n"]
-[2.119691, "o", "rsql> \u001b[38;2;131;148;150m.invalid\u001b[38;2;133;153;0m-\u001b[38;2;131;148;150mcommand\u001b[0m\r\n"]
-[2.120247, "o", "\u001b[31m\u001b[31mError\u001b[0m\u001b[31m\u001b[0m: Invalid command '\u001b[1m.invalid-command\u001b[0m', for help type '\u001b[1m.help\u001b[0m'\r\n"]
+{"version": 2, "width": 147, "height": 38, "timestamp": 1727898108, "env": {"SHELL": "/bin/zsh", "TERM": "xterm-256color"}}
+[0.019588, "o", "\u001b]11;?\u001b\\"]
+[0.047302, "o", "⠁ connect [00:00:00] [                                                                                                        ] 0 B/0 B (0 B/s, 0s)\r\u001b[2K"]
+[0.056458, "o", "rsql> \u001b[38;2;131;148;150m.bail\u001b[0m\r\n"]
+[0.056615, "o", "Bail on error: off\r\n"]
+[1.09762, "o", "rsql> \u001b[38;2;131;148;150m.bail off\u001b[0m\r\n"]
+[2.14432, "o", "rsql> \u001b[38;2;131;148;150m.invalid\u001b[38;2;133;153;0m-\u001b[38;2;131;148;150mcommand\u001b[0m\r\n"]
+[2.144907, "o", "\u001b[31m\u001b[31mError\u001b[0m\u001b[31m\u001b[0m: Invalid command '\u001b[1m.invalid-command\u001b[0m', for help type '\u001b[1m.help\u001b[0m'\r\n"]

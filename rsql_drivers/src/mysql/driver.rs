@@ -5,6 +5,7 @@ use crate::Error::UnsupportedColumnType;
 use crate::{MemoryQueryResult, Metadata, QueryResult};
 use async_trait::async_trait;
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
+use sqlparser::dialect::{Dialect, MySqlDialect};
 use sqlx::mysql::{MySqlColumn, MySqlConnectOptions, MySqlRow};
 use sqlx::types::time::OffsetDateTime;
 use sqlx::{Column, MySqlPool, Row};
@@ -85,6 +86,10 @@ impl crate::Connection for Connection {
     async fn close(&mut self) -> Result<()> {
         self.pool.close().await;
         Ok(())
+    }
+
+    fn dialect(&self) -> Box<dyn Dialect> {
+        Box::new(MySqlDialect {})
     }
 }
 
@@ -190,8 +195,13 @@ mod test {
     use testcontainers::runners::AsyncRunner;
 
     #[allow(dead_code)]
-    // #[tokio::test]
+    #[tokio::test]
     async fn test_container() -> anyhow::Result<()> {
+        // Skip tests on GitHub Actions for non-Linux platforms; the test containers fail to run.
+        if std::env::var("GITHUB_ACTIONS").is_ok() && !cfg!(target_os = "linux") {
+            return Ok(());
+        }
+
         let mysql_image =
             testcontainers::ContainerRequest::from(testcontainers_modules::mysql::Mysql::default());
         let container = mysql_image.start().await?;

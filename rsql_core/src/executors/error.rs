@@ -40,6 +40,12 @@ impl From<std::io::Error> for Error {
     }
 }
 
+impl From<sqlparser::parser::ParserError> for Error {
+    fn from(error: sqlparser::parser::ParserError) -> Self {
+        Error::IoError(error.into())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

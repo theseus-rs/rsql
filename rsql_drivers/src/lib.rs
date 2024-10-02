@@ -21,6 +21,8 @@ pub mod mysql;
 pub mod postgres;
 #[cfg(feature = "postgresql")]
 pub mod postgresql;
+#[cfg(feature = "redshift")]
+mod redshift;
 mod row;
 #[cfg(feature = "rusqlite")]
 pub mod rusqlite;
@@ -33,7 +35,7 @@ mod sqlserver;
 mod value;
 
 pub use connection::{
-    Connection, LimitQueryResult, MemoryQueryResult, MockConnection, QueryResult,
+    Connection, LimitQueryResult, MemoryQueryResult, MockConnection, QueryMeta, QueryResult,
 };
 pub use driver::{Driver, DriverManager, MockDriver};
 pub use error::{Error, Result};

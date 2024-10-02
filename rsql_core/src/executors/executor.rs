@@ -426,6 +426,10 @@ mod tests {
             .expect_execute()
             .with(eq(input))
             .returning(|_| Ok(42));
+        connection
+            .expect_parse_sql()
+            .with(eq(input))
+            .returning(|_| Some(rsql_drivers::QueryMeta::DML));
         let mut output = Output::default();
 
         let mut executor = Executor::new(
