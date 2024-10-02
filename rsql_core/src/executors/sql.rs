@@ -8,7 +8,7 @@ use rsql_formatters::writers::Output;
 use rsql_formatters::{FormatterManager, Results};
 use std::fmt;
 use std::fmt::Debug;
-use tracing::{info, instrument, Span};
+use tracing::{instrument, Span};
 use tracing_indicatif::span_ext::IndicatifSpanExt;
 
 /// A SQL executor for interacting with a database.
@@ -68,7 +68,6 @@ impl<'a> SqlExecutor<'a> {
             "{span_child_prefix}{spinner}",
         )?);
         let is_select = if let Some(query_meta) = self.connection.parse_sql(sql) {
-            info!("query: {sql}, parse meta: {query_meta:?}");
             matches!(query_meta, QueryMeta::Query)
         } else {
             let command = if sql.len() > 6 { &sql[..6] } else { "" };
