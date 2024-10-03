@@ -40,7 +40,7 @@ visit the [rsql](https://theseus-rs.github.io/rsql/rsql_cli/) site.
 
 | Feature             |                                                                                                 |
 |---------------------|-------------------------------------------------------------------------------------------------|
-| Databases           | DuckDB, LibSQL (Turso), MariaDB, MySQL, PostgreSQL, Snowflake, SQLite3, SQL Server              |
+| Databases           | DuckDB, LibSQL (Turso), MariaDB, MySQL, PostgreSQL, Redshift, Snowflake, SQLite3, SQL Server    |
 | Embedded PostgreSQL | ✅                                                                                               |
 | Syntax Highlighting | ✅                                                                                               |
 | Result Highlighting | ✅                                                                                               |
