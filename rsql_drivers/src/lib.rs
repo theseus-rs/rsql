@@ -23,7 +23,6 @@ pub mod postgres;
 pub mod postgresql;
 #[cfg(feature = "redshift")]
 mod redshift;
-mod row;
 #[cfg(feature = "rusqlite")]
 pub mod rusqlite;
 #[cfg(feature = "snowflake")]
@@ -40,7 +39,6 @@ pub use connection::{
 pub use driver::{Driver, DriverManager, MockDriver};
 pub use error::{Error, Result};
 pub use metadata::{Column, Index, Metadata, Schema, Table};
-pub use row::Row;
 pub use value::Value;
 
 use rust_i18n::i18n;

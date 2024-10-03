@@ -74,12 +74,12 @@ pub async fn write_footer(
 mod tests {
     use super::*;
     use crate::writers::Output;
-    use rsql_drivers::{MemoryQueryResult, Row, Value};
+    use rsql_drivers::{MemoryQueryResult, Value};
     use std::time::Duration;
 
     fn query_result(rows: u8) -> Results {
-        let rows: Vec<Row> = (0..rows)
-            .map(|_| Row::new(vec![Value::Null, Value::I64(12345)]))
+        let rows: Vec<Vec<Value>> = (0..rows)
+            .map(|_| vec![Value::Null, Value::I64(12345)])
             .collect();
         let query_result =
             MemoryQueryResult::new(vec!["id".to_string(), "value".to_string()], rows);

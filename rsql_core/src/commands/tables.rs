@@ -1,6 +1,6 @@
 use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use async_trait::async_trait;
-use rsql_drivers::{MemoryQueryResult, Row, Value};
+use rsql_drivers::{MemoryQueryResult, Value};
 use rsql_formatters::Results;
 use rust_i18n::t;
 
@@ -32,7 +32,7 @@ impl ShellCommand for Command {
             let tables = database.tables();
             for table in tables {
                 let value = Value::String(table.name().to_string());
-                let row = Row::new(vec![value]);
+                let row = vec![value];
                 rows.push(row);
             }
         }

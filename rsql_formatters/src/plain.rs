@@ -32,14 +32,12 @@ mod tests {
     use crate::writers::Output;
     use crate::Formatter;
     use indoc::indoc;
-    use rsql_drivers::{MemoryQueryResult, Row, Value};
+    use rsql_drivers::{MemoryQueryResult, Value};
     use std::time::Duration;
 
     fn query_result() -> Results {
-        let query_result = MemoryQueryResult::new(
-            vec!["id".to_string()],
-            vec![Row::new(vec![Value::I64(12345)])],
-        );
+        let query_result =
+            MemoryQueryResult::new(vec!["id".to_string()], vec![vec![Value::I64(12345)]]);
 
         Results::Query(Box::new(query_result))
     }

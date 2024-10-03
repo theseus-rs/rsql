@@ -1,6 +1,5 @@
-use crate::{
-    snowflake::SnowflakeError, MemoryQueryResult, Metadata, QueryResult, Result, Row, Value,
-};
+use crate::connection::Row;
+use crate::{snowflake::SnowflakeError, MemoryQueryResult, Metadata, QueryResult, Result, Value};
 use async_trait::async_trait;
 use base64::{engine::general_purpose::STANDARD, Engine};
 use chrono::{DateTime, NaiveDate, NaiveDateTime, NaiveTime, Utc};
@@ -255,7 +254,6 @@ impl SnowflakeConnection {
                     .zip(column_definitions.iter())
                     .map(|(value, column)| column.convert_to_value(value))
                     .collect::<Result<Vec<_>>>()
-                    .map(Row::new)
             })
             .collect::<Result<Vec<_>>>()
     }
@@ -654,7 +652,7 @@ mod test {
             .await?;
         assert_eq!(
             result.next().await,
-            Some(Row::new(vec![
+            Some(vec![
                 Value::I64(1),
                 Value::F64(2.1),
                 Value::Bool(false),
@@ -669,11 +667,11 @@ mod test {
                         .expect("invalid datetime")
                         .naive_utc()
                 )
-            ]))
+            ])
         );
         assert_eq!(
             result.next().await,
-            Some(Row::new(vec![
+            Some(vec![
                 Value::I64(2),
                 Value::F64(3.1),
                 Value::Bool(true),
@@ -690,7 +688,7 @@ mod test {
                         .expect("invalid datetime")
                         .naive_utc()
                 )
-            ]))
+            ])
         );
         Ok(())
     }

@@ -1,6 +1,6 @@
 use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use async_trait::async_trait;
-use rsql_drivers::{MemoryQueryResult, Row, Value};
+use rsql_drivers::{MemoryQueryResult, Value};
 use rsql_formatters::Results;
 use rust_i18n::t;
 
@@ -47,7 +47,7 @@ impl ShellCommand for Command {
                 for index in table.indexes() {
                     let table_value = Value::String(table.name().to_string());
                     let index_value = Value::String(index.name().to_string());
-                    let row = Row::new(vec![table_value, index_value]);
+                    let row = vec![table_value, index_value];
                     rows.push(row);
                 }
             }

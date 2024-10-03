@@ -23,7 +23,7 @@ async fn retrieve_schemas(connection: &mut dyn Connection, metadata: &mut Metada
     let mut query_result = connection.query(sql).await?;
 
     while let Some(row) = query_result.next().await {
-        let schema_name = match row.get(0) {
+        let schema_name = match row.first() {
             Some(value) => value.to_string(),
             None => continue,
         };
@@ -63,7 +63,7 @@ async fn retrieve_tables(connection: &mut dyn Connection, schema: &mut Schema) -
     let mut query_result = connection.query(sql).await?;
 
     while let Some(row) = query_result.next().await {
-        let table_name = match row.get(0) {
+        let table_name = match row.first() {
             Some(value) => value.to_string(),
             None => continue,
         };
@@ -131,7 +131,7 @@ async fn retrieve_indexes(connection: &mut dyn Connection, schema: &mut Schema) 
     let mut query_result = connection.query(sql).await?;
 
     while let Some(row) = query_result.next().await {
-        let table_name = match row.get(0) {
+        let table_name = match row.first() {
             Some(value) => value.to_string(),
             None => continue,
         };
