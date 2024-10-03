@@ -794,14 +794,18 @@ mod test {
         ];
         assert_eq!(keywords_found.len(), expected.len());
 
-        keywords_found.iter().zip(expected.iter()).for_each(|(found, expectation)| {
-            match found.token {
+        keywords_found
+            .iter()
+            .zip(expected.iter())
+            .for_each(|(found, expectation)| match found.token {
                 Token::Word(Word {
                     keyword: found_keyword,
                     ..
-                })  => assert_eq!(found_keyword, *expectation),
-                _ => assert!(false, "response from find_previous_keyword was not a keyword"),
-            }
-        });
+                }) => assert_eq!(found_keyword, *expectation),
+                _ => assert!(
+                    false,
+                    "response from find_previous_keyword was not a keyword"
+                ),
+            });
     }
 }
