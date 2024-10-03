@@ -63,7 +63,7 @@ mod test {
     use crate::writers::Output;
     use crate::Results::Execute;
     use indoc::indoc;
-    use rsql_drivers::{MemoryQueryResult, Row, Value};
+    use rsql_drivers::{MemoryQueryResult, Value};
     use std::time::Duration;
 
     #[tokio::test]
@@ -102,10 +102,7 @@ mod test {
         };
         let mut query_result = Query(Box::new(MemoryQueryResult::new(
             vec!["id".to_string(), "data".to_string()],
-            vec![Row::new(vec![
-                Value::I64(1),
-                Value::String("foo".to_string()),
-            ])],
+            vec![vec![Value::I64(1), Value::String("foo".to_string())]],
         )));
         let output = &mut Output::default();
 
@@ -137,9 +134,9 @@ mod test {
         let mut query_result = Query(Box::new(MemoryQueryResult::new(
             vec!["id".to_string(), "data".to_string()],
             vec![
-                Row::new(vec![Value::I64(1), Value::Bytes(b"bytes".to_vec())]),
-                Row::new(vec![Value::I64(2), Value::String("foo".to_string())]),
-                Row::new(vec![Value::I64(3), Value::Null]),
+                vec![Value::I64(1), Value::Bytes(b"bytes".to_vec())],
+                vec![Value::I64(2), Value::String("foo".to_string())],
+                vec![Value::I64(3), Value::Null],
             ],
         )));
         let output = &mut Output::default();

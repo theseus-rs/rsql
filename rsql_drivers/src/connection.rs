@@ -1,6 +1,5 @@
 use crate::error::Result;
-use crate::row::Row;
-use crate::Metadata;
+use crate::{Metadata, Value};
 use async_trait::async_trait;
 use mockall::automock;
 use mockall::predicate::str;
@@ -14,7 +13,7 @@ use std::fmt::Debug;
 #[async_trait]
 pub trait QueryResult: Debug + Send + Sync {
     async fn columns(&self) -> Vec<String>;
-    async fn next(&mut self) -> Option<Row>;
+    async fn next(&mut self) -> Option<Vec<Value>>;
 }
 
 /// Query result with a limit
@@ -42,7 +41,7 @@ impl QueryResult for LimitQueryResult {
         self.inner.columns().await
     }
 
-    async fn next(&mut self) -> Option<Row> {
+    async fn next(&mut self) -> Option<Vec<Value>> {
         if self.row_index >= self.limit {
             return None;
         }
@@ -58,12 +57,12 @@ impl QueryResult for LimitQueryResult {
 pub struct MemoryQueryResult {
     columns: Vec<String>,
     row_index: usize,
-    rows: Vec<Row>,
+    rows: Vec<Vec<Value>>,
 }
 
 impl MemoryQueryResult {
     #[must_use]
-    pub fn new(columns: Vec<String>, rows: Vec<Row>) -> Self {
+    pub fn new(columns: Vec<String>, rows: Vec<Vec<Value>>) -> Self {
         Self {
             columns,
             row_index: 0,
@@ -78,7 +77,7 @@ impl QueryResult for MemoryQueryResult {
         self.columns.clone()
     }
 
-    async fn next(&mut self) -> Option<Row> {
+    async fn next(&mut self) -> Option<Vec<Value>> {
         let result = self.rows.get(self.row_index).cloned();
         self.row_index += 1;
         result
@@ -107,6 +106,7 @@ pub trait Connection: Debug + Send + Sync {
     fn dialect(&self) -> Box<dyn Dialect> {
         Box::new(GenericDialect)
     }
+
     fn parse_sql(&self, sql: &str) -> StatementMetadata {
         let statements = Parser::parse_sql(self.dialect().as_ref(), sql).unwrap_or_default();
 
@@ -121,6 +121,7 @@ pub trait Connection: Debug + Send + Sync {
             }
         }
     }
+
     fn default_match_statement(&self, statement: &Statement) -> StatementMetadata {
         match statement {
             Statement::CreateSchema { .. }
@@ -139,6 +140,7 @@ pub trait Connection: Debug + Send + Sync {
             _ => StatementMetadata::Unknown,
         }
     }
+
     fn match_statement(&self, statement: &Statement) -> StatementMetadata {
         self.default_match_statement(statement)
     }
@@ -152,7 +154,7 @@ mod test {
     #[tokio::test]
     async fn test_memory_query_result_new() {
         let columns = vec!["a".to_string()];
-        let rows = vec![Row::new(vec![Value::String("foo".to_string())])];
+        let rows = vec![vec![Value::String("foo".to_string())]];
 
         let mut result = MemoryQueryResult::new(columns, rows);
 
@@ -169,11 +171,11 @@ mod test {
     async fn test_limit_query_result() {
         let columns = vec!["id".to_string()];
         let rows = vec![
-            Row::new(vec![Value::I64(1)]),
-            Row::new(vec![Value::I64(2)]),
-            Row::new(vec![Value::I64(3)]),
-            Row::new(vec![Value::I64(4)]),
-            Row::new(vec![Value::I64(5)]),
+            vec![Value::I64(1)],
+            vec![Value::I64(2)],
+            vec![Value::I64(3)],
+            vec![Value::I64(4)],
+            vec![Value::I64(5)],
         ];
         let memory_result = MemoryQueryResult::new(columns, rows);
         let mut result = LimitQueryResult::new(Box::new(memory_result), 2);
@@ -194,7 +196,7 @@ mod test {
     #[tokio::test]
     async fn test_limit_query_result_limit_exceeds_rows() {
         let columns = vec!["id".to_string()];
-        let rows = vec![Row::new(vec![Value::I64(1)])];
+        let rows = vec![vec![Value::I64(1)]];
         let memory_result = MemoryQueryResult::new(columns, rows);
         let mut result = LimitQueryResult::new(Box::new(memory_result), 100);
 

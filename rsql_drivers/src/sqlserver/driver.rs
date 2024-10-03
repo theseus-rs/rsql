@@ -120,7 +120,7 @@ impl crate::Connection for Connection {
                         row_data.push(value);
                     }
                 }
-                rows.push(crate::Row::new(row_data));
+                rows.push(row_data);
             }
         }
 
@@ -278,10 +278,7 @@ mod test {
         assert_eq!(query_result.columns().await, vec!["id", "name"]);
         assert_eq!(
             query_result.next().await,
-            Some(crate::Row::new(vec![
-                Value::I32(1),
-                Value::String("foo".to_string())
-            ]))
+            Some(vec![Value::I32(1), Value::String("foo".to_string())])
         );
         assert!(query_result.next().await.is_none());
         Ok(())
@@ -341,7 +338,7 @@ mod test {
         let mut query_result = connection.query(sql).await?;
         assert_eq!(
             query_result.next().await,
-            Some(crate::Row::new(vec![
+            Some(vec![
                 Value::String("a".to_string()),
                 Value::String("a".to_string()),
                 Value::String("foo".to_string()),
@@ -364,7 +361,7 @@ mod test {
                     "2022-01-01 14:30:00",
                     "%Y-%m-%d %H:%M:%S"
                 )?)
-            ]))
+            ])
         );
         assert!(query_result.next().await.is_none());
 

@@ -1,7 +1,7 @@
 use crate::commands::Error::{InvalidOption, MissingArguments};
 use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use async_trait::async_trait;
-use rsql_drivers::{MemoryQueryResult, Row, Table, Value};
+use rsql_drivers::{MemoryQueryResult, Table, Value};
 use rsql_formatters::Results;
 use rust_i18n::t;
 
@@ -63,12 +63,12 @@ impl ShellCommand for Command {
                 } else {
                     t!("yes", locale = locale).to_string()
                 };
-                let row = Row::new(vec![
+                let row = vec![
                     Value::String(column.name().to_string()),
                     Value::String(column.data_type().to_string()),
                     Value::String(nullable),
                     Value::String(column.default().unwrap_or("").to_string()),
-                ]);
+                ];
                 table_column_rows.push(row);
             }
 
@@ -79,11 +79,11 @@ impl ShellCommand for Command {
                 } else {
                     t!("no", locale = locale).to_string()
                 };
-                let row = Row::new(vec![
+                let row = vec![
                     Value::String(index.name().to_string()),
                     Value::String(index.columns().join(&*list_delimiter)),
                     Value::String(unique),
-                ]);
+                ];
                 indexes_column_rows.push(row);
             }
         } else {

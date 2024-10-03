@@ -66,7 +66,7 @@ async fn process_data(
         let mut row_data = Vec::new();
 
         for (column, data) in row.into_iter().enumerate() {
-            let data = if data == &Value::Null {
+            let data = if data == Value::Null {
                 "NULL".to_string()
             } else {
                 if data.is_numeric() {
@@ -93,7 +93,7 @@ mod tests {
     use crate::writers::Output;
     use crate::Results::Execute;
     use indoc::indoc;
-    use rsql_drivers::{MemoryQueryResult, Row, Value};
+    use rsql_drivers::{MemoryQueryResult, Value};
     use std::time::Duration;
     use tabled::settings::Style;
 
@@ -112,7 +112,7 @@ mod tests {
     fn query_result_one_row() -> Results {
         let query_result = MemoryQueryResult::new(
             vec![COLUMN_HEADER.to_string()],
-            vec![Row::new(vec![Value::I64(12345)])],
+            vec![vec![Value::I64(12345)]],
         );
         Query(Box::new(query_result))
     }
@@ -120,10 +120,7 @@ mod tests {
     fn query_result_two_rows() -> Results {
         let query_result = MemoryQueryResult::new(
             vec![COLUMN_HEADER.to_string()],
-            vec![
-                Row::new(vec![Value::Null]),
-                Row::new(vec![Value::I64(12345)]),
-            ],
+            vec![vec![Value::Null], vec![Value::I64(12345)]],
         );
         Query(Box::new(query_result))
     }
@@ -135,11 +132,11 @@ mod tests {
                 "string".to_string(),
                 "text".to_string(),
             ],
-            vec![Row::new(vec![
+            vec![vec![
                 Value::I64(42),
                 Value::String("foo".to_string()),
                 Value::String("Lorem ipsum dolor sit amet".to_string()),
-            ])],
+            ]],
         );
         Query(Box::new(query_result))
     }

@@ -1,7 +1,7 @@
 use crate::error::Result;
 use crate::libsql::metadata;
 use crate::value::Value;
-use crate::{MemoryQueryResult, Metadata, QueryResult, Row};
+use crate::{MemoryQueryResult, Metadata, QueryResult};
 use async_trait::async_trait;
 use libsql::replication::Frames;
 use libsql::Builder;
@@ -92,7 +92,7 @@ impl crate::Connection for Connection {
                 let value = Self::convert_to_value(&query_row, index)?;
                 row.push(value);
             }
-            rows.push(Row::new(row));
+            rows.push(row);
         }
 
         let query_result = MemoryQueryResult::new(columns, rows);
@@ -128,7 +128,7 @@ impl Debug for Connection {
 
 #[cfg(test)]
 mod test {
-    use crate::{DriverManager, Row, Value};
+    use crate::{DriverManager, Value};
 
     const DATABASE_URL: &str = "libsql://?memory=true";
 
@@ -168,10 +168,7 @@ mod test {
         assert_eq!(query_result.columns().await, vec!["id", "name"]);
         assert_eq!(
             query_result.next().await,
-            Some(Row::new(vec![
-                Value::I64(1),
-                Value::String("foo".to_string())
-            ]))
+            Some(vec![Value::I64(1), Value::String("foo".to_string())])
         );
         assert!(query_result.next().await.is_none());
 
@@ -201,13 +198,13 @@ mod test {
         );
         assert_eq!(
             query_result.next().await,
-            Some(Row::new(vec![
+            Some(vec![
                 Value::String("foo".to_string()),
                 Value::I64(123),
                 Value::I64(456),
                 Value::F64(789.123),
                 Value::Bytes(vec![42])
-            ]))
+            ])
         );
         assert!(query_result.next().await.is_none());
 
@@ -226,7 +223,7 @@ mod test {
         if let Some(row) = query_result.next().await {
             assert_eq!(row.len(), 1);
 
-            value = row.get(0).cloned();
+            value = row.first().cloned();
         }
         assert!(query_result.next().await.is_none());
 
