@@ -5480,6 +5480,7 @@ dependencies = [
  "rust-i18n",
  "rustyline",
  "serde_json",
+ "sqlparser",
  "sys-locale",
  "tempfile",
  "termbg",
@@ -5521,6 +5522,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sha2",
+ "sqlparser",
  "sqlx 0.7.4",
  "test-log",
  "testcontainers",
@@ -6219,6 +6221,15 @@ checksum = "f895e3734318cc55f1fe66258926c9b910c124d47520339efecbb6c59cec7c1f"
 dependencies = [
  "nom",
  "unicode_categories",
+]
+
+[[package]]
+name = "sqlparser"
+version = "0.51.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5fe11944a61da0da3f592e19a45ebe5ab92dc14a779907ff1f08fbb797bfefc7"
+dependencies = [
+ "log",
 ]
 
 [[package]]

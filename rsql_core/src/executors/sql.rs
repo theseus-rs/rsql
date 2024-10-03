@@ -2,7 +2,7 @@ use crate::commands::LoopCondition;
 use crate::configuration::Configuration;
 use crate::executors::Result;
 use indicatif::ProgressStyle;
-use rsql_drivers::{Connection, LimitQueryResult};
+use rsql_drivers::{Connection, LimitQueryResult, StatementMetadata};
 use rsql_formatters;
 use rsql_formatters::writers::Output;
 use rsql_formatters::{FormatterManager, Results};
@@ -67,9 +67,9 @@ impl<'a> SqlExecutor<'a> {
         Span::current().pb_set_style(&ProgressStyle::with_template(
             "{span_child_prefix}{spinner}",
         )?);
-        let command = if sql.len() > 6 { &sql[..6] } else { "" };
+        let is_select = matches!(self.connection.parse_sql(sql), StatementMetadata::Query);
 
-        let results = if command.to_lowercase() == "select" {
+        let results = if is_select {
             let query_results = self.connection.query(sql).await?;
 
             if limit == 0 {
@@ -149,6 +149,10 @@ mod tests {
             .expect_execute()
             .with(eq(sql))
             .returning(|_| Ok(42));
+        connection
+            .expect_parse_sql()
+            .with(eq(sql))
+            .returning(|_| rsql_drivers::StatementMetadata::Unknown);
         let connection = &mut connection as &mut dyn Connection;
         let mut output = Output::default();
 
@@ -171,6 +175,10 @@ mod tests {
         let sql = "SELECT * FROM foo";
         let limit = 42;
         connection
+            .expect_parse_sql()
+            .with(eq(sql))
+            .returning(|_| rsql_drivers::StatementMetadata::Query);
+        connection
             .expect_query()
             .returning(|_| Ok(Box::<MemoryQueryResult>::default()));
         let connection = &mut connection as &mut dyn Connection;
@@ -190,6 +198,10 @@ mod tests {
         let formatter_manager = FormatterManager::default();
         let mut connection = MockConnection::new();
         let sql = "INSERT INTO foo";
+        connection
+            .expect_parse_sql()
+            .with(eq(sql))
+            .returning(|_| rsql_drivers::StatementMetadata::Unknown);
         connection
             .expect_execute()
             .with(eq(sql))

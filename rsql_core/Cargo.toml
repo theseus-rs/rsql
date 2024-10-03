@@ -28,15 +28,24 @@ rsql_formatters = { path = "../rsql_formatters", version = "0.13.13" }
 rust-i18n = { workspace = true }
 rustyline = { workspace = true }
 serde_json = { workspace = true, features = ["preserve_order"] }
+sqlparser = { workspace = true }
 sys-locale = { workspace = true }
 tempfile = { workspace = true }
 termbg = { workspace = true }
 thiserror = { workspace = true }
-tokio = { workspace = true, features = ["macros", "process", "rt", "rt-multi-thread"] }
+tokio = { workspace = true, features = [
+    "macros",
+    "process",
+    "rt",
+    "rt-multi-thread",
+] }
 tracing = { workspace = true }
 tracing-appender = { workspace = true }
 tracing-indicatif = { workspace = true }
-tracing-subscriber = { workspace = true, features = ["env-filter", "tracing-log"] }
+tracing-subscriber = { workspace = true, features = [
+    "env-filter",
+    "tracing-log",
+] }
 unicode-width = { workspace = true }
 url = { workspace = true }
 
@@ -86,7 +95,7 @@ all-formats = [
     "format-tsv",
     "format-unicode",
     "format-xml",
-    "format-yaml"
+    "format-yaml",
 ]
 format-ascii = ["rsql_formatters/ascii"]
 format-csv = ["rsql_formatters/csv"]

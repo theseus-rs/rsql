@@ -2,8 +2,10 @@ use crate::error::Result;
 use crate::sqlite::metadata;
 use crate::value::Value;
 use crate::Error::UnsupportedColumnType;
-use crate::{MemoryQueryResult, Metadata, QueryResult};
+use crate::{MemoryQueryResult, Metadata, QueryResult, StatementMetadata};
 use async_trait::async_trait;
+use sqlparser::ast::Statement;
+use sqlparser::dialect::{Dialect, SQLiteDialect};
 use sqlx::sqlite::{SqliteAutoVacuum, SqliteColumn, SqliteConnectOptions, SqliteRow};
 use sqlx::{Column, Row, SqlitePool, TypeInfo};
 use std::collections::HashMap;
@@ -102,6 +104,24 @@ impl crate::Connection for Connection {
     async fn close(&mut self) -> Result<()> {
         self.pool.close().await;
         Ok(())
+    }
+
+    fn dialect(&self) -> Box<dyn Dialect> {
+        Box::new(SQLiteDialect {})
+    }
+
+    fn match_statement(&self, statement: &Statement) -> StatementMetadata {
+        let default = self.default_match_statement(statement);
+        match default {
+            StatementMetadata::Unknown => match statement {
+                // missing: DETACH DATABASE
+                Statement::CreateVirtualTable { .. } | Statement::AttachDatabase { .. } => {
+                    StatementMetadata::DDL
+                }
+                _ => StatementMetadata::Unknown,
+            },
+            other => other,
+        }
     }
 }
 

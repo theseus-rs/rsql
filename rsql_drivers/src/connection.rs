@@ -4,6 +4,10 @@ use crate::Metadata;
 use async_trait::async_trait;
 use mockall::automock;
 use mockall::predicate::str;
+use sqlparser::ast::Statement;
+use sqlparser::dialect::{Dialect, GenericDialect};
+use sqlparser::parser::Parser;
+
 use std::fmt::Debug;
 
 /// Results from a query
@@ -81,6 +85,14 @@ impl QueryResult for MemoryQueryResult {
     }
 }
 
+#[derive(Debug, Clone)]
+pub enum StatementMetadata {
+    DDL,
+    DML,
+    Query,
+    Unknown,
+}
+
 /// Connection to a database
 #[automock]
 #[async_trait]
@@ -91,6 +103,45 @@ pub trait Connection: Debug + Send + Sync {
     }
     async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>>;
     async fn close(&mut self) -> Result<()>;
+
+    fn dialect(&self) -> Box<dyn Dialect> {
+        Box::new(GenericDialect)
+    }
+    fn parse_sql(&self, sql: &str) -> StatementMetadata {
+        let statements = Parser::parse_sql(self.dialect().as_ref(), sql).unwrap_or_default();
+
+        if let Some(statement) = statements.first() {
+            self.match_statement(statement)
+        } else {
+            let command = if sql.len() > 6 { &sql[..6] } else { "" };
+            if command.to_lowercase() == "select" {
+                StatementMetadata::Query
+            } else {
+                StatementMetadata::Unknown
+            }
+        }
+    }
+    fn default_match_statement(&self, statement: &Statement) -> StatementMetadata {
+        match statement {
+            Statement::CreateSchema { .. }
+            | Statement::CreateDatabase { .. }
+            | Statement::CreateView { .. }
+            | Statement::CreateIndex(_)
+            | Statement::CreateTable(_)
+            | Statement::CreateSequence { .. }
+            | Statement::AlterTable { .. }
+            | Statement::AlterIndex { .. }
+            | Statement::Drop { .. } => StatementMetadata::DDL,
+            Statement::Query(_) => StatementMetadata::Query,
+            Statement::Insert(_) | Statement::Update { .. } | Statement::Delete(_) => {
+                StatementMetadata::DML
+            }
+            _ => StatementMetadata::Unknown,
+        }
+    }
+    fn match_statement(&self, statement: &Statement) -> StatementMetadata {
+        self.default_match_statement(statement)
+    }
 }
 
 #[cfg(test)]
@@ -158,5 +209,84 @@ mod test {
         }
 
         assert_eq!(data, ["1".to_string()]);
+    }
+
+    #[derive(Debug)]
+    struct SampleConnection {}
+    #[async_trait]
+    impl Connection for SampleConnection {
+        async fn execute(&mut self, _sql: &str) -> Result<u64> {
+            Ok(0)
+        }
+
+        async fn metadata(&mut self) -> Result<Metadata> {
+            Ok(Metadata::default())
+        }
+
+        async fn query(&mut self, _sql: &str) -> Result<Box<dyn QueryResult>> {
+            Ok(Box::new(MemoryQueryResult::new(vec![], vec![])))
+        }
+
+        async fn close(&mut self) -> Result<()> {
+            Ok(())
+        }
+    }
+
+    #[test]
+    fn test_default_parse_sql() {
+        let connection = SampleConnection {};
+        let ddl_queries = vec![
+            "CREATE TABLE users (id INT, name VARCHAR(255))",
+            "ALTER TABLE products ADD COLUMN price DECIMAL(10, 2)",
+            "DROP VIEW old_view",
+            "CREATE INDEX idx_user_name ON users (name)",
+        ];
+
+        for query in ddl_queries {
+            let result = connection.parse_sql(query);
+            assert!(matches!(result, StatementMetadata::DDL));
+        }
+
+        let select_queries = vec![
+            "SELECT * FROM users",
+            "SELECT id, name FROM products WHERE price > 100",
+            "SELECT COUNT(*) FROM orders GROUP BY status",
+        ];
+
+        for query in select_queries {
+            let result = connection.parse_sql(query);
+            assert!(matches!(result, StatementMetadata::Query));
+        }
+
+        let data_manipulation_queries = vec![
+            "INSERT INTO users (id, name) VALUES (1, 'John')",
+            "UPDATE products SET price = 99.99 WHERE id = 1",
+            "DELETE FROM orders WHERE status = 'cancelled'",
+        ];
+
+        for query in data_manipulation_queries {
+            let result = connection.parse_sql(query);
+            assert!(matches!(result, StatementMetadata::DML));
+        }
+
+        let session_queries = vec![
+            "SET SESSION timezone = 'UTC'",
+            "SET TRANSACTION ISOLATION LEVEL READ COMMITTED",
+            "START TRANSACTION",
+            "COMMIT",
+            "ROLLBACK",
+        ];
+
+        for query in session_queries {
+            let result = connection.parse_sql(query);
+            assert!(matches!(result, StatementMetadata::Unknown));
+        }
+
+        let invalid_queries = vec!["SELECT", "INSERT IN table", "DROP"];
+
+        for query in invalid_queries {
+            let result = connection.parse_sql(query);
+            assert!(matches!(result, StatementMetadata::Unknown));
+        }
     }
 }
