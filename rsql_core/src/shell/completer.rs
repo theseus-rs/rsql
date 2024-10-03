@@ -784,7 +784,7 @@ mod test {
             index = new_index;
             keywords_found.push(last_token);
         }
-        let expected = vec![
+        let expected = [
             Keyword::AND,
             Keyword::WHERE,
             Keyword::ON,
@@ -802,10 +802,7 @@ mod test {
                     keyword: found_keyword,
                     ..
                 }) => assert_eq!(found_keyword, *expectation),
-                _ => assert!(
-                    false,
-                    "response from find_previous_keyword was not a keyword"
-                ),
+                _ => panic!("response from find_previous_keyword was not a keyword"),
             });
     }
 }
