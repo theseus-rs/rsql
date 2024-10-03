@@ -49,14 +49,13 @@ impl<'a> SqlExecutor<'a> {
         let mut options = self.configuration.get_formatter_options();
 
         let limit = self.configuration.results_limit;
-        let loop_condition = if contains_ddl(sql) {
+        let (mut results, statement_metadata) = self.execute_sql(sql, limit).await?;
+        options.elapsed = start.elapsed();
+        let loop_condition = if let StatementMetadata::DDL = statement_metadata {
             LoopCondition::ContinueRefreshMetadata
         } else {
             LoopCondition::Continue
         };
-        let mut results = self.execute_sql(sql, limit).await?;
-        options.elapsed = start.elapsed();
-
         formatter
             .format(&options, &mut results, self.output)
             .await?;
@@ -68,11 +67,16 @@ impl<'a> SqlExecutor<'a> {
     /// This function is split out so that it can be instrumented and a visual progress indicator
     /// can be shown without leaving artifacts in the output when the results are formatted.
     #[instrument(skip(self, sql, limit))]
-    async fn execute_sql(&mut self, sql: &str, limit: usize) -> Result<Results> {
+    async fn execute_sql(
+        &mut self,
+        sql: &str,
+        limit: usize,
+    ) -> Result<(Results, StatementMetadata)> {
         Span::current().pb_set_style(&ProgressStyle::with_template(
             "{span_child_prefix}{spinner}",
         )?);
-        let is_select = matches!(self.connection.parse_sql(sql), StatementMetadata::Query);
+        let statement_metadata = self.connection.parse_sql(sql);
+        let is_select = matches!(statement_metadata, StatementMetadata::Query);
 
         let results = if is_select {
             let query_results = self.connection.query(sql).await?;
@@ -87,7 +91,7 @@ impl<'a> SqlExecutor<'a> {
             Results::Execute(self.connection.execute(sql).await?)
         };
 
-        Ok(results)
+        Ok((results, statement_metadata))
     }
 }
 
@@ -99,19 +103,6 @@ impl Debug for SqlExecutor<'_> {
             .field("connection", &self.connection)
             .finish()
     }
-}
-
-fn contains_ddl(sql: &str) -> bool {
-    let ddl_keywords = [
-        "CREATE", "ALTER", "DROP", "TRUNCATE", "RENAME", "COMMENT", "GRANT", "REVOKE", "ANALYZE",
-        "VACUUM", "REINDEX", "CLUSTER",
-    ];
-
-    let sql_upper = sql.to_uppercase();
-
-    ddl_keywords
-        .iter()
-        .any(|&keyword| sql_upper.contains(keyword))
 }
 
 #[cfg(test)]
@@ -204,8 +195,9 @@ mod tests {
 
         let mut executor = SqlExecutor::new(&configuration, &formatter_manager, connection, output);
 
-        let results = executor.execute_sql(sql, limit).await?;
+        let (results, statement_metadata) = executor.execute_sql(sql, limit).await?;
         assert!(results.is_query());
+        assert!(matches!(statement_metadata, StatementMetadata::Query));
 
         Ok(())
     }
@@ -219,7 +211,7 @@ mod tests {
         connection
             .expect_parse_sql()
             .with(eq(sql))
-            .returning(|_| rsql_drivers::StatementMetadata::Unknown);
+            .returning(|_| rsql_drivers::StatementMetadata::DML);
         connection
             .expect_execute()
             .with(eq(sql))
@@ -229,8 +221,9 @@ mod tests {
 
         let mut executor = SqlExecutor::new(&configuration, &formatter_manager, connection, output);
 
-        let results = executor.execute_sql(sql, 0).await?;
+        let (results, statement_metadata) = executor.execute_sql(sql, 0).await?;
         assert!(results.is_execute());
+        assert!(matches!(statement_metadata, StatementMetadata::DML));
         if let Results::Execute(results) = results {
             assert_eq!(results, 42);
         }
