@@ -9,11 +9,14 @@ use sqlparser::parser::Parser;
 
 use std::fmt::Debug;
 
+/// A single row of a query result
+pub type Row = Vec<Value>;
+
 /// Results from a query
 #[async_trait]
 pub trait QueryResult: Debug + Send + Sync {
     async fn columns(&self) -> Vec<String>;
-    async fn next(&mut self) -> Option<Vec<Value>>;
+    async fn next(&mut self) -> Option<Row>;
 }
 
 /// Query result with a limit
@@ -57,12 +60,12 @@ impl QueryResult for LimitQueryResult {
 pub struct MemoryQueryResult {
     columns: Vec<String>,
     row_index: usize,
-    rows: Vec<Vec<Value>>,
+    rows: Vec<Row>,
 }
 
 impl MemoryQueryResult {
     #[must_use]
-    pub fn new(columns: Vec<String>, rows: Vec<Vec<Value>>) -> Self {
+    pub fn new(columns: Vec<String>, rows: Vec<Row>) -> Self {
         Self {
             columns,
             row_index: 0,

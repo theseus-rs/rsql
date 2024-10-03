@@ -1,3 +1,4 @@
+use crate::connection::Row;
 use crate::{snowflake::SnowflakeError, MemoryQueryResult, Metadata, QueryResult, Result, Value};
 use async_trait::async_trait;
 use base64::{engine::general_purpose::STANDARD, Engine};
@@ -237,7 +238,7 @@ impl SnowflakeConnection {
     fn parse_result_data(
         result_data: &serde_json::Value,
         column_definitions: &[ColumnDefinition],
-    ) -> Result<Vec<Vec<Value>>> {
+    ) -> Result<Vec<Row>> {
         result_data["data"]
             .as_array()
             .ok_or(SnowflakeError::ResponseContent(
