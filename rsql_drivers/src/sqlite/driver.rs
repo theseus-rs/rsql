@@ -2,7 +2,7 @@ use crate::error::Result;
 use crate::sqlite::metadata;
 use crate::value::Value;
 use crate::Error::UnsupportedColumnType;
-use crate::{MemoryQueryResult, Metadata, QueryMeta, QueryResult};
+use crate::{MemoryQueryResult, Metadata, QueryResult, StatementMetadata};
 use async_trait::async_trait;
 use sqlparser::ast::Statement;
 use sqlparser::dialect::{Dialect, SQLiteDialect};
@@ -110,15 +110,15 @@ impl crate::Connection for Connection {
         Box::new(SQLiteDialect {})
     }
 
-    fn match_statement(&self, statement: &Statement) -> QueryMeta {
+    fn match_statement(&self, statement: &Statement) -> StatementMetadata {
         let default = self.default_match_statement(statement);
         match default {
-            QueryMeta::Unknown => match statement {
+            StatementMetadata::Unknown => match statement {
                 // missing: DETACH DATABASE
                 Statement::CreateVirtualTable { .. } | Statement::AttachDatabase { .. } => {
-                    QueryMeta::DDL
+                    StatementMetadata::DDL
                 }
-                _ => QueryMeta::Unknown,
+                _ => StatementMetadata::Unknown,
             },
             other => other,
         }

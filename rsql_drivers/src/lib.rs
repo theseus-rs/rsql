@@ -35,7 +35,7 @@ mod sqlserver;
 mod value;
 
 pub use connection::{
-    Connection, LimitQueryResult, MemoryQueryResult, MockConnection, QueryMeta, QueryResult,
+    Connection, LimitQueryResult, MemoryQueryResult, MockConnection, QueryResult, StatementMetadata,
 };
 pub use driver::{Driver, DriverManager, MockDriver};
 pub use error::{Error, Result};

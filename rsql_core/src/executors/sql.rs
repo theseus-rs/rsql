@@ -2,7 +2,7 @@ use crate::commands::LoopCondition;
 use crate::configuration::Configuration;
 use crate::executors::Result;
 use indicatif::ProgressStyle;
-use rsql_drivers::{Connection, LimitQueryResult, QueryMeta};
+use rsql_drivers::{Connection, LimitQueryResult, StatementMetadata};
 use rsql_formatters;
 use rsql_formatters::writers::Output;
 use rsql_formatters::{FormatterManager, Results};
@@ -67,12 +67,7 @@ impl<'a> SqlExecutor<'a> {
         Span::current().pb_set_style(&ProgressStyle::with_template(
             "{span_child_prefix}{spinner}",
         )?);
-        let is_select = if let Some(query_meta) = self.connection.parse_sql(sql) {
-            matches!(query_meta, QueryMeta::Query)
-        } else {
-            let command = if sql.len() > 6 { &sql[..6] } else { "" };
-            command.to_lowercase() == "select"
-        };
+        let is_select = matches!(self.connection.parse_sql(sql), StatementMetadata::Query);
 
         let results = if is_select {
             let query_results = self.connection.query(sql).await?;
@@ -105,7 +100,7 @@ impl Debug for SqlExecutor<'_> {
 mod tests {
     use super::*;
     use crate::configuration::Configuration;
-    use mockall::predicate::{always, eq};
+    use mockall::predicate::eq;
     use rsql_drivers::{MemoryQueryResult, MockConnection};
 
     #[tokio::test]
@@ -157,7 +152,7 @@ mod tests {
         connection
             .expect_parse_sql()
             .with(eq(sql))
-            .returning(|_| None);
+            .returning(|_| rsql_drivers::StatementMetadata::Unknown);
         let connection = &mut connection as &mut dyn Connection;
         let mut output = Output::default();
 
@@ -182,11 +177,7 @@ mod tests {
         connection
             .expect_parse_sql()
             .with(eq(sql))
-            .returning(|_| None);
-        connection
-            .expect_parse_sql()
-            .with(always())
-            .returning(|_| None);
+            .returning(|_| rsql_drivers::StatementMetadata::Query);
         connection
             .expect_query()
             .returning(|_| Ok(Box::<MemoryQueryResult>::default()));
@@ -210,7 +201,7 @@ mod tests {
         connection
             .expect_parse_sql()
             .with(eq(sql))
-            .returning(|_| None);
+            .returning(|_| rsql_drivers::StatementMetadata::Unknown);
         connection
             .expect_execute()
             .with(eq(sql))
