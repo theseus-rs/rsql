@@ -3,7 +3,7 @@ use indoc::indoc;
 use regex::Regex;
 
 pub(crate) async fn get_metadata(connection: &mut dyn Connection) -> Result<Metadata> {
-    let mut metadata = Metadata::default();
+    let mut metadata = Metadata::with_dialect(connection.dialect());
 
     retrieve_schemas(connection, &mut metadata).await?;
 

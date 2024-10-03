@@ -1,9 +1,13 @@
+use std::{any::Any, ops::Deref};
+
 use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
+use sqlparser::dialect::{self, Dialect};
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct Metadata {
     schemas: IndexMap<String, Schema>,
+    dialect: MetadataDialect,
 }
 
 impl Metadata {
@@ -11,6 +15,15 @@ impl Metadata {
     pub fn new() -> Self {
         Self {
             schemas: IndexMap::new(),
+            dialect: MetadataDialect::Generic,
+        }
+    }
+
+    #[must_use]
+    pub fn with_dialect(dialect: Box<dyn Dialect>) -> Self {
+        Self {
+            schemas: IndexMap::new(),
+            dialect: dialect.into(),
         }
     }
 
@@ -37,6 +50,11 @@ impl Metadata {
     pub fn schemas(&self) -> Vec<&Schema> {
         let values: Vec<&Schema> = self.schemas.values().collect();
         values
+    }
+
+    #[must_use]
+    pub fn dialect(&self) -> Box<dyn Dialect> {
+        self.dialect.into()
     }
 }
 
@@ -221,6 +239,59 @@ impl Index {
     #[must_use]
     pub fn unique(&self) -> bool {
         self.unique
+    }
+}
+
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize)]
+pub enum MetadataDialect {
+    #[default]
+    Generic,
+    MySql,
+    PostgreSql,
+    MsSql,
+    Redshift,
+    SQLite,
+    DuckDb,
+    Snowflake,
+}
+
+impl From<Box<dyn Dialect>> for MetadataDialect {
+    fn from(value: Box<dyn Dialect>) -> Self {
+        let types = vec![
+            (dialect::GenericDialect.type_id(), Self::Generic),
+            (dialect::MySqlDialect {}.type_id(), Self::MySql),
+            (dialect::PostgreSqlDialect {}.type_id(), Self::PostgreSql),
+            (dialect::MsSqlDialect {}.type_id(), Self::MsSql),
+            (dialect::RedshiftSqlDialect {}.type_id(), Self::Redshift),
+            (dialect::SQLiteDialect {}.type_id(), Self::SQLite),
+            (dialect::DuckDbDialect {}.type_id(), Self::DuckDb),
+            (dialect::SnowflakeDialect {}.type_id(), Self::Snowflake),
+        ];
+        types
+            .into_iter()
+            .find_map(|(type_id, rsql_dialect)| {
+                if value.deref().type_id() == type_id {
+                    Some(rsql_dialect)
+                } else {
+                    None
+                }
+            })
+            .unwrap_or(Self::Generic)
+    }
+}
+
+impl From<MetadataDialect> for Box<dyn Dialect> {
+    fn from(value: MetadataDialect) -> Self {
+        match value {
+            MetadataDialect::Generic => Box::new(dialect::GenericDialect),
+            MetadataDialect::MySql => Box::new(dialect::MySqlDialect {}),
+            MetadataDialect::PostgreSql => Box::new(dialect::PostgreSqlDialect {}),
+            MetadataDialect::MsSql => Box::new(dialect::MsSqlDialect {}),
+            MetadataDialect::Redshift => Box::new(dialect::RedshiftSqlDialect {}),
+            MetadataDialect::SQLite => Box::new(dialect::SQLiteDialect {}),
+            MetadataDialect::DuckDb => Box::new(dialect::DuckDbDialect {}),
+            MetadataDialect::Snowflake => Box::new(dialect::SnowflakeDialect {}),
+        }
     }
 }
 

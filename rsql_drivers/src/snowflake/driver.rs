@@ -319,7 +319,7 @@ impl crate::Connection for SnowflakeConnection {
     }
 
     async fn metadata(&mut self) -> Result<Metadata> {
-        Ok(Metadata::default())
+        Ok(Metadata::with_dialect(self.dialect()))
     }
 
     async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {

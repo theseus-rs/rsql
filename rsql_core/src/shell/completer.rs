@@ -1,7 +1,6 @@
 use rsql_drivers::{Metadata, Table};
 use rustyline::completion::{Candidate, Completer, Pair};
 use rustyline::Context;
-use sqlparser::dialect::GenericDialect;
 use sqlparser::keywords::Keyword;
 use sqlparser::tokenizer::{Token, TokenWithLocation, Tokenizer};
 use std::matches;
@@ -209,11 +208,18 @@ impl ReplCompleter {
         }
     }
 
+    /// identifies table names and aliases in `tokens`
+    /// returns vector of tuples with `Table` and optional alias String
     fn tables_in_query(&self, tokens: &[TokenWithLocation]) -> Vec<(&Table, Option<String>)> {
         let tokens_no_location: Vec<_> = tokens
             .iter()
-            .filter(|token| !matches!(token.token, Token::Whitespace(_)))
-            .map(|token_with_location| &token_with_location.token)
+            .filter_map(|token| {
+                if matches!(token.token, Token::Whitespace(_)) {
+                    None
+                } else {
+                    Some(&token.token)
+                }
+            })
             .collect();
         let table_aliases: Vec<_> = tokens_no_location
             .windows(3)
@@ -272,30 +278,25 @@ impl ReplCompleter {
     ) -> Suggestion {
         let token_string = token_at_cursor.token.to_string().trim().to_string();
         debug!("token at cursor: {token_at_cursor}");
-        let token_idx = tokens
+        let Some(token_idx) = tokens
             .iter()
             .enumerate()
             .rfind(|(_, token)| token.location == token_at_cursor.location)
-            .map(|(i, _)| i);
-
-        if token_idx.is_none() {
-            // revisit this
+            .map(|(i, _)| i.saturating_sub(1))
+        else {
             return Suggestion::default();
-        }
-        let token_idx = token_idx
-            .expect("expected to find index of token_at_cursor")
-            .saturating_sub(1);
+        };
+
         let token_before_cursor_search = tokens
             .iter()
             .enumerate()
             .rfind(|(i, token)| *i <= token_idx && !matches!(token.token, Token::Whitespace(_)));
 
-        if token_before_cursor_search.is_none() {
+        let Some((token_before_cursor_idx, token_before_cursor)) = token_before_cursor_search
+        else {
             return Suggestion::Keyword(token_string);
-        }
+        };
 
-        let (token_before_cursor_idx, token_before_cursor) =
-            token_before_cursor_search.expect("should have found a token before cursor");
         Self::suggest_on_last_token(
             tokens,
             tables,
@@ -409,14 +410,14 @@ impl ReplCompleter {
                 .iter()
                 .find(|(table, _)| table.name() == table_name)
                 .map(|(table, _)| {
-                    let starts_with = match &token_at_cursor.token {
+                    let prefix = match &token_at_cursor.token {
                         Token::Period => String::new(),
                         token => token.to_string().trim().to_string(),
                     };
                     table
                         .columns()
                         .into_iter()
-                        .filter(|column| column.name().starts_with(&starts_with))
+                        .filter(|column| column.name().starts_with(&prefix))
                         .map(|column| Pair {
                             display: format!("Column: {}", column.name()),
                             replacement: column.name().to_string(),
@@ -424,7 +425,7 @@ impl ReplCompleter {
                         .collect::<Vec<Pair>>()
                 })
                 .unwrap_or_default(),
-            Suggestion::TableInQuery(starts_with) => tables
+            Suggestion::TableInQuery(prefix) => tables
                 .iter()
                 .flat_map(|(table, alias)| {
                     if let Some(alias) = alias {
@@ -433,7 +434,7 @@ impl ReplCompleter {
                         vec![table.name().to_string()]
                     }
                 })
-                .filter(|table_alias| table_alias.starts_with(&starts_with))
+                .filter(|table_alias| table_alias.starts_with(&prefix))
                 .map(|table_alias| Pair {
                     display: format!("Table: {table_alias}"),
                     replacement: table_alias,
@@ -470,7 +471,7 @@ impl Completer for ReplCompleter {
         line: &str,
         pos: usize,
         _ctx: &Context,
-    ) -> Result<(usize, Vec<Pair>), rustyline::error::ReadlineError> {
+    ) -> Result<(usize, Vec<Self::Candidate>), rustyline::error::ReadlineError> {
         if !self.smart_completions {
             let start = line[..pos]
                 .rfind(|c: char| c.is_whitespace())
@@ -486,28 +487,20 @@ impl Completer for ReplCompleter {
 
         let cursor_location = u64::try_from(pos).unwrap_or(0);
         debug!("looking for completions line: {line}, pos: {cursor_location}");
-        let dialect = GenericDialect;
-        let tokens: Vec<_> = Tokenizer::new(&dialect, line)
+        let dialect = self.metadata.dialect();
+        let tokens: Vec<_> = Tokenizer::new(dialect.as_ref(), line)
             .tokenize_with_location()
-            .unwrap_or_default()
-            .into_iter()
-            .collect();
+            .unwrap_or_default();
 
-        let token_at_cursor = {
-            let token_at_cursor_search = tokens
-                .iter()
-                .enumerate()
-                .rfind(|(_, token)| token.location.column <= cursor_location);
-
-            // not sure if this will ever happen?
-            if token_at_cursor_search.is_none() {
-                return Ok((0, CANDIDATES.clone()));
-            }
-            token_at_cursor_search
-                .expect("should be a token at cursor")
-                .1
-                .to_owned()
+        let Some(token_at_cursor) = tokens
+            .iter()
+            .enumerate()
+            .rfind(|(_, token)| token.location.column <= cursor_location)
+            .map(|token| token.1.to_owned())
+        else {
+            return Ok((0, CANDIDATES.clone()));
         };
+
         let start = usize::try_from(token_at_cursor.location.column.saturating_sub(
             match token_at_cursor.token {
                 Token::Period | Token::Whitespace(_) => 0,
@@ -541,6 +534,7 @@ mod test {
     use crate::shell::helper::ReplHelper;
     use rsql_drivers::{Column, Schema};
     use rustyline::history::DefaultHistory;
+    use sqlparser::{dialect::GenericDialect, tokenizer::Word};
 
     #[test]
     fn test_complete() -> anyhow::Result<()> {
@@ -775,5 +769,39 @@ mod test {
         let mut metadata = Metadata::new();
         metadata.add(schema);
         metadata
+    }
+
+    #[test]
+    fn test_find_previous_keyword() {
+        let sql = "SELECT * FROM orders o JOIN users u ON o.user_id = u.id WHERE u.id = 7 AND o.total > 10.0";
+        let tokens = Tokenizer::new(&GenericDialect, sql)
+            .tokenize_with_location()
+            .expect("valid sql");
+        let mut index = tokens.len() - 1;
+
+        let mut keywords_found: Vec<&TokenWithLocation> = vec![];
+        while let Some((new_index, last_token)) = find_previous_keyword(&tokens, index) {
+            index = new_index;
+            keywords_found.push(last_token);
+        }
+        let expected = vec![
+            Keyword::AND,
+            Keyword::WHERE,
+            Keyword::ON,
+            Keyword::JOIN,
+            Keyword::FROM,
+            Keyword::SELECT,
+        ];
+        assert_eq!(keywords_found.len(), expected.len());
+
+        keywords_found.iter().zip(expected.iter()).for_each(|(found, expectation)| {
+            match found.token {
+                Token::Word(Word {
+                    keyword: found_keyword,
+                    ..
+                })  => assert_eq!(found_keyword, *expectation),
+                _ => assert!(false, "response from find_previous_keyword was not a keyword"),
+            }
+        });
     }
 }

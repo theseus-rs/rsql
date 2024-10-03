@@ -2,7 +2,7 @@ use crate::{Column, Connection, Index, Metadata, Result, Schema, Table, Value};
 use indoc::indoc;
 
 pub(crate) async fn get_metadata(connection: &mut dyn Connection) -> Result<Metadata> {
-    let mut metadata = Metadata::default();
+    let mut metadata = Metadata::with_dialect(connection.dialect());
 
     retrieve_schemas(connection, &mut metadata).await?;
 
@@ -12,10 +12,10 @@ pub(crate) async fn get_metadata(connection: &mut dyn Connection) -> Result<Meta
 async fn retrieve_schemas(connection: &mut dyn Connection, metadata: &mut Metadata) -> Result<()> {
     let mut schemas = vec![];
     let sql = indoc! { r"
-        SELECT 
+        SELECT
             schema_name,
             schema_name = database() AS current_schema
-        FROM 
+        FROM
             information_schema.schemata
         ORDER BY
             schema_name
