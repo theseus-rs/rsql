@@ -2,7 +2,7 @@ use crate::duckdb::metadata;
 use crate::error::{Error, Result};
 use crate::value::Value;
 use crate::Error::UnsupportedColumnType;
-use crate::{MemoryQueryResult, Metadata, QueryMeta, QueryResult};
+use crate::{MemoryQueryResult, Metadata, QueryResult, StatementMetadata};
 use anyhow::anyhow;
 use async_trait::async_trait;
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime, TimeDelta};
@@ -109,17 +109,17 @@ impl crate::Connection for Connection {
         Box::new(DuckDbDialect {})
     }
 
-    fn match_statement(&self, statement: &Statement) -> QueryMeta {
+    fn match_statement(&self, statement: &Statement) -> StatementMetadata {
         let default = self.default_match_statement(statement);
         match default {
-            QueryMeta::Unknown => match statement {
+            StatementMetadata::Unknown => match statement {
                 Statement::Install { .. }
                 | Statement::AttachDuckDBDatabase { .. }
                 | Statement::CreateMacro { .. }
                 | Statement::CreateSecret { .. }
                 | Statement::DetachDuckDBDatabase { .. }
-                | Statement::Load { .. } => QueryMeta::DDL,
-                _ => QueryMeta::Unknown,
+                | Statement::Load { .. } => StatementMetadata::DDL,
+                _ => StatementMetadata::Unknown,
             },
             other => other,
         }
@@ -194,7 +194,7 @@ impl Connection {
 
 #[cfg(test)]
 mod test {
-    use crate::{DriverManager, QueryMeta, Row, Value};
+    use crate::{DriverManager, Row, StatementMetadata, Value};
     use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
     use indoc::indoc;
 
@@ -365,7 +365,7 @@ mod test {
 
         for sql in ddl_sql_statements {
             let statement_meta = connection.parse_sql(sql);
-            assert!(matches!(statement_meta, Some(QueryMeta::DDL)));
+            assert!(matches!(statement_meta, StatementMetadata::DDL));
         }
         Ok(())
     }

@@ -1,6 +1,8 @@
 use crate::error::Result;
-use crate::postgresql::driver::Connection;
+use crate::postgresql::driver::Connection as PgConnection;
+use crate::{Metadata, QueryResult};
 use async_trait::async_trait;
+use sqlparser::dialect::{Dialect, RedshiftSqlDialect};
 
 #[derive(Debug)]
 pub struct Driver;
@@ -18,6 +20,41 @@ impl crate::Driver for Driver {
     ) -> Result<Box<dyn crate::Connection>> {
         let connection = Connection::new(url, password).await?;
         Ok(Box::new(connection))
+    }
+}
+
+#[derive(Debug)]
+pub struct Connection {
+    inner: PgConnection,
+}
+
+impl Connection {
+    pub async fn new(url: String, password: Option<String>) -> Result<Self> {
+        let inner = PgConnection::new(url, password).await?;
+        Ok(Self { inner })
+    }
+}
+
+#[async_trait]
+impl crate::Connection for Connection {
+    async fn execute(&mut self, sql: &str) -> Result<u64> {
+        self.inner.execute(sql).await
+    }
+
+    async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {
+        self.inner.query(sql).await
+    }
+
+    async fn close(&mut self) -> Result<()> {
+        self.inner.close().await
+    }
+
+    async fn metadata(&mut self) -> Result<Metadata> {
+        self.inner.metadata().await
+    }
+
+    fn dialect(&self) -> Box<dyn Dialect> {
+        Box::new(RedshiftSqlDialect {})
     }
 }
 

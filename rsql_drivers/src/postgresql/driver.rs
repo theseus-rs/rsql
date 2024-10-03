@@ -2,7 +2,7 @@ use crate::error::Result;
 use crate::postgresql::metadata;
 use crate::value::Value;
 use crate::Error::UnsupportedColumnType;
-use crate::{Error, MemoryQueryResult, Metadata, QueryMeta, QueryResult};
+use crate::{Error, MemoryQueryResult, Metadata, QueryResult, StatementMetadata};
 use async_trait::async_trait;
 use bit_vec::BitVec;
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime, Utc};
@@ -149,14 +149,14 @@ impl crate::Connection for Connection {
         Box::new(PostgreSqlDialect {})
     }
 
-    fn match_statement(&self, statement: &Statement) -> QueryMeta {
+    fn match_statement(&self, statement: &Statement) -> StatementMetadata {
         let default = self.default_match_statement(statement);
         match default {
-            QueryMeta::Unknown => match statement {
+            StatementMetadata::Unknown => match statement {
                 Statement::CreateExtension { .. } | Statement::CreateFunction { .. } => {
-                    QueryMeta::DDL
+                    StatementMetadata::DDL
                 }
-                _ => QueryMeta::Unknown,
+                _ => StatementMetadata::Unknown,
             },
             other => other,
         }

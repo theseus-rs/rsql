@@ -429,7 +429,7 @@ mod tests {
         connection
             .expect_parse_sql()
             .with(eq(input))
-            .returning(|_| Some(rsql_drivers::QueryMeta::DML));
+            .returning(|_| rsql_drivers::StatementMetadata::DML);
         let mut output = Output::default();
 
         let mut executor = Executor::new(

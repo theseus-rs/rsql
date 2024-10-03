@@ -1,6 +1,6 @@
 use crate::error::{Error, Result};
 use crate::value::Value;
-use crate::{sqlite, MemoryQueryResult, Metadata, QueryMeta, QueryResult};
+use crate::{sqlite, MemoryQueryResult, Metadata, QueryResult, StatementMetadata};
 use anyhow::anyhow;
 use async_trait::async_trait;
 use rusqlite::types::ValueRef;
@@ -109,15 +109,15 @@ impl crate::Connection for Connection {
         Box::new(SQLiteDialect {})
     }
 
-    fn match_statement(&self, statement: &Statement) -> QueryMeta {
+    fn match_statement(&self, statement: &Statement) -> StatementMetadata {
         let default = self.default_match_statement(statement);
         match default {
-            QueryMeta::Unknown => match statement {
+            StatementMetadata::Unknown => match statement {
                 // missing: DETACH DATABASE
                 Statement::CreateVirtualTable { .. } | Statement::AttachDatabase { .. } => {
-                    QueryMeta::DDL
+                    StatementMetadata::DDL
                 }
-                _ => QueryMeta::Unknown,
+                _ => StatementMetadata::Unknown,
             },
             other => other,
         }

@@ -5,7 +5,7 @@ use async_trait::async_trait;
 use mockall::automock;
 use mockall::predicate::str;
 use sqlparser::ast::Statement;
-use sqlparser::dialect::Dialect;
+use sqlparser::dialect::{Dialect, GenericDialect};
 use sqlparser::parser::Parser;
 
 use std::fmt::Debug;
@@ -86,7 +86,7 @@ impl QueryResult for MemoryQueryResult {
 }
 
 #[derive(Debug, Clone)]
-pub enum QueryMeta {
+pub enum StatementMetadata {
     DDL,
     DML,
     Query,
@@ -104,13 +104,24 @@ pub trait Connection: Debug + Send + Sync {
     async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>>;
     async fn close(&mut self) -> Result<()>;
 
-    fn dialect(&self) -> Box<dyn Dialect>;
-    fn parse_sql(&self, sql: &str) -> Option<QueryMeta> {
-        let statements = Parser::parse_sql(self.dialect().as_ref(), sql).ok()?;
-        let statement = statements.first()?;
-        Some(self.match_statement(statement))
+    fn dialect(&self) -> Box<dyn Dialect> {
+        Box::new(GenericDialect)
     }
-    fn default_match_statement(&self, statement: &Statement) -> QueryMeta {
+    fn parse_sql(&self, sql: &str) -> StatementMetadata {
+        let statements = Parser::parse_sql(self.dialect().as_ref(), sql).unwrap_or_default();
+
+        if let Some(statement) = statements.first() {
+            self.match_statement(statement)
+        } else {
+            let command = if sql.len() > 6 { &sql[..6] } else { "" };
+            if command.to_lowercase() == "select" {
+                StatementMetadata::Query
+            } else {
+                StatementMetadata::Unknown
+            }
+        }
+    }
+    fn default_match_statement(&self, statement: &Statement) -> StatementMetadata {
         match statement {
             Statement::CreateSchema { .. }
             | Statement::CreateDatabase { .. }
@@ -120,23 +131,21 @@ pub trait Connection: Debug + Send + Sync {
             | Statement::CreateSequence { .. }
             | Statement::AlterTable { .. }
             | Statement::AlterIndex { .. }
-            | Statement::Drop { .. } => QueryMeta::DDL,
-            Statement::Query(_) => QueryMeta::Query,
+            | Statement::Drop { .. } => StatementMetadata::DDL,
+            Statement::Query(_) => StatementMetadata::Query,
             Statement::Insert(_) | Statement::Update { .. } | Statement::Delete(_) => {
-                QueryMeta::DML
+                StatementMetadata::DML
             }
-            _ => QueryMeta::Unknown,
+            _ => StatementMetadata::Unknown,
         }
     }
-    fn match_statement(&self, statement: &Statement) -> QueryMeta {
+    fn match_statement(&self, statement: &Statement) -> StatementMetadata {
         self.default_match_statement(statement)
     }
 }
 
 #[cfg(test)]
 mod test {
-    use sqlparser::dialect::GenericDialect;
-
     use super::*;
     use crate::Value;
 
@@ -221,10 +230,6 @@ mod test {
         async fn close(&mut self) -> Result<()> {
             Ok(())
         }
-
-        fn dialect(&self) -> Box<dyn Dialect> {
-            Box::new(GenericDialect)
-        }
     }
 
     #[test]
@@ -239,7 +244,7 @@ mod test {
 
         for query in ddl_queries {
             let result = connection.parse_sql(query);
-            assert!(matches!(result, Some(QueryMeta::DDL)));
+            assert!(matches!(result, StatementMetadata::DDL));
         }
 
         let select_queries = vec![
@@ -250,7 +255,7 @@ mod test {
 
         for query in select_queries {
             let result = connection.parse_sql(query);
-            assert!(matches!(result, Some(QueryMeta::Query)));
+            assert!(matches!(result, StatementMetadata::Query));
         }
 
         let data_manipulation_queries = vec![
@@ -261,7 +266,7 @@ mod test {
 
         for query in data_manipulation_queries {
             let result = connection.parse_sql(query);
-            assert!(matches!(result, Some(QueryMeta::DML)));
+            assert!(matches!(result, StatementMetadata::DML));
         }
 
         let session_queries = vec![
@@ -274,14 +279,14 @@ mod test {
 
         for query in session_queries {
             let result = connection.parse_sql(query);
-            assert!(matches!(result, Some(QueryMeta::Unknown)));
+            assert!(matches!(result, StatementMetadata::Unknown));
         }
 
         let invalid_queries = vec!["SELECT", "INSERT IN table", "DROP"];
 
         for query in invalid_queries {
             let result = connection.parse_sql(query);
-            assert!(result.is_none());
+            assert!(matches!(result, StatementMetadata::Unknown));
         }
     }
 }
