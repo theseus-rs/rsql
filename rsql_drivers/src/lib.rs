@@ -8,28 +8,28 @@ extern crate rust_i18n;
 mod connection;
 mod driver;
 #[cfg(feature = "duckdb")]
-pub mod duckdb;
+mod duckdb;
 mod error;
 #[cfg(feature = "libsql")]
-pub mod libsql;
+mod libsql;
 #[cfg(feature = "mariadb")]
-pub mod mariadb;
+mod mariadb;
 mod metadata;
-#[cfg(any(feature = "mariadb", feature = "mysql"))]
-pub mod mysql;
+#[cfg(feature = "mysql")]
+mod mysql;
 #[cfg(feature = "postgres")]
-pub mod postgres;
+mod postgres;
 #[cfg(feature = "postgresql")]
-pub mod postgresql;
+mod postgresql;
 #[cfg(feature = "redshift")]
 mod redshift;
 mod row;
 #[cfg(feature = "rusqlite")]
-pub mod rusqlite;
+mod rusqlite;
 #[cfg(feature = "snowflake")]
 mod snowflake;
 #[cfg(feature = "sqlite")]
-pub mod sqlite;
+mod sqlite;
 #[cfg(feature = "sqlserver")]
 mod sqlserver;
 mod value;
