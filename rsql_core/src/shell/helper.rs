@@ -19,8 +19,14 @@ impl ReplHelper {
         Self::new_with_metadata(configuration, Metadata::default())
     }
 
-    pub(crate) async fn with_connection(configuration: &Configuration,connection: &mut dyn Connection) -> Result<Self> {
-        Ok(Self::new_with_metadata(configuration, connection.metadata().await?))
+    pub(crate) async fn with_connection(
+        configuration: &Configuration,
+        connection: &mut dyn Connection,
+    ) -> Result<Self> {
+        Ok(Self::new_with_metadata(
+            configuration,
+            connection.metadata().await?,
+        ))
     }
 
     pub(crate) fn new_with_metadata(configuration: &Configuration, metadata: Metadata) -> Self {

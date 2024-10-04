@@ -1,28 +1,37 @@
 use std::{any::Any, ops::Deref};
 
+use chrono::{NaiveTime, TimeDelta};
 use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
 use sqlparser::dialect::{self, Dialect};
 
-
 #[derive(Debug, Clone, Default)]
 pub(crate) struct MetadataCache {
-    metadata: Option<Metadata>
+    metadata: Option<Metadata>,
+    timestamp: NaiveTime,
 }
 
 impl MetadataCache {
-    pub fn new(metadata: Option<Metadata>) -> Self {
-        Self{
-            metadata
+    pub fn new() -> Self {
+        let timestamp = chrono::Local::now().time();
+        Self {
+            metadata: None,
+            timestamp,
         }
     }
 
-    pub fn get(&self) -> Option<Metadata> {
+    pub fn get(&mut self) -> Option<Metadata> {
+        let now = chrono::Local::now().time();
+        let one_minute = TimeDelta::try_minutes(1).unwrap_or_default();
+        if self.timestamp + one_minute < now {
+            self.invalidate();
+        }
         self.metadata.clone()
     }
 
     pub fn set(&mut self, metadata: Metadata) {
         self.metadata = Some(metadata);
+        self.timestamp = chrono::Local::now().time();
     }
 
     pub fn invalidate(&mut self) {

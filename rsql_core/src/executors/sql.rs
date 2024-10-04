@@ -49,7 +49,7 @@ impl<'a> SqlExecutor<'a> {
         let mut options = self.configuration.get_formatter_options();
 
         let limit = self.configuration.results_limit;
-        let (mut results, statement_metadata) = self.execute_sql(sql, limit).await?;
+        let mut results = self.execute_sql(sql, limit).await?;
         options.elapsed = start.elapsed();
         formatter
             .format(&options, &mut results, self.output)
@@ -62,11 +62,7 @@ impl<'a> SqlExecutor<'a> {
     /// This function is split out so that it can be instrumented and a visual progress indicator
     /// can be shown without leaving artifacts in the output when the results are formatted.
     #[instrument(skip(self, sql, limit))]
-    async fn execute_sql(
-        &mut self,
-        sql: &str,
-        limit: usize,
-    ) -> Result<(Results, StatementMetadata)> {
+    async fn execute_sql(&mut self, sql: &str, limit: usize) -> Result<Results> {
         Span::current().pb_set_style(&ProgressStyle::with_template(
             "{span_child_prefix}{spinner}",
         )?);
@@ -86,7 +82,7 @@ impl<'a> SqlExecutor<'a> {
             Results::Execute(self.connection.execute(sql).await?)
         };
 
-        Ok((results, statement_metadata))
+        Ok(results)
     }
 }
 
@@ -190,9 +186,8 @@ mod tests {
 
         let mut executor = SqlExecutor::new(&configuration, &formatter_manager, connection, output);
 
-        let (results, statement_metadata) = executor.execute_sql(sql, limit).await?;
+        let results = executor.execute_sql(sql, limit).await?;
         assert!(results.is_query());
-        assert!(matches!(statement_metadata, StatementMetadata::Query));
 
         Ok(())
     }
@@ -216,9 +211,8 @@ mod tests {
 
         let mut executor = SqlExecutor::new(&configuration, &formatter_manager, connection, output);
 
-        let (results, statement_metadata) = executor.execute_sql(sql, 0).await?;
+        let results = executor.execute_sql(sql, 0).await?;
         assert!(results.is_execute());
-        assert!(matches!(statement_metadata, StatementMetadata::DML));
         if let Results::Execute(results) = results {
             assert_eq!(results, 42);
         }

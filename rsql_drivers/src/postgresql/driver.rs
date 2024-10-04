@@ -90,8 +90,12 @@ impl Connection {
 
         let options = PgConnectOptions::from_str(database_url.as_str())?;
         let pool = PgPool::connect_with(options).await?;
-        let metadata_cache = MetadataCache::new(None);
-        let connection = Connection { postgresql, pool, metadata_cache };
+        let metadata_cache = MetadataCache::new();
+        let connection = Connection {
+            metadata_cache,
+            postgresql,
+            pool,
+        };
 
         Ok(connection)
     }

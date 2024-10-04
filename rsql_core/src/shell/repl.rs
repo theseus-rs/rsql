@@ -384,7 +384,10 @@ mod test {
             .with_configuration(configuration)
             .build();
         let mut connection = MockConnection::new();
-        connection.expect_metadata().with().returning(|| Ok(Metadata::default()));
+        connection
+            .expect_metadata()
+            .with()
+            .returning(|| Ok(Metadata::default()));
         let _ = shell.editor("history.txt", &mut connection).await?;
         Ok(())
     }
