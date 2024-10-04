@@ -94,7 +94,7 @@ impl crate::Connection for Connection {
                 let value = Self::convert_to_value(&row, column)?;
                 row_data.push(value);
             }
-            rows.push(crate::Row::new(row_data));
+            rows.push(row_data);
         }
 
         let query_result = MemoryQueryResult::new(columns, rows);
@@ -210,7 +210,7 @@ impl Connection {
 
 #[cfg(test)]
 mod test {
-    use crate::{DriverManager, Row, Value};
+    use crate::{DriverManager, Value};
 
     const DATABASE_URL: &str = "sqlite://?memory=true";
 
@@ -240,10 +240,7 @@ mod test {
         assert_eq!(query_result.columns().await, vec!["id", "name"]);
         assert_eq!(
             query_result.next().await,
-            Some(Row::new(vec![
-                Value::I64(1),
-                Value::String("foo".to_string())
-            ]))
+            Some(vec![Value::I64(1), Value::String("foo".to_string())])
         );
         assert!(query_result.next().await.is_none());
 
@@ -273,13 +270,13 @@ mod test {
         );
         assert_eq!(
             query_result.next().await,
-            Some(Row::new(vec![
+            Some(vec![
                 Value::String("foo".to_string()),
                 Value::I8(123),
                 Value::I64(456),
                 Value::F64(789.123),
                 Value::Bytes(vec![42])
-            ]))
+            ])
         );
         assert!(query_result.next().await.is_none());
 
@@ -298,7 +295,7 @@ mod test {
         if let Some(row) = query_result.next().await {
             assert_eq!(row.len(), 1);
 
-            value = row.get(0).cloned();
+            value = row.first().cloned();
         }
 
         assert!(query_result.next().await.is_none());

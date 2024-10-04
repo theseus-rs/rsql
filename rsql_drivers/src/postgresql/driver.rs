@@ -137,7 +137,7 @@ impl crate::Connection for Connection {
                 let value = Self::convert_to_value(&row, column)?;
                 row_data.push(value);
             }
-            rows.push(crate::Row::new(row_data));
+            rows.push(row_data);
         }
 
         let query_result = MemoryQueryResult::new(columns, rows);
@@ -375,7 +375,7 @@ impl Connection {
 
 #[cfg(test)]
 mod test {
-    use crate::{DriverManager, Row, Value};
+    use crate::{DriverManager, Value};
     use chrono::{NaiveDate, NaiveDateTime, NaiveTime, Utc};
     use serde_json::json;
 
@@ -407,10 +407,7 @@ mod test {
         assert_eq!(query_result.columns().await, vec!["id", "name"]);
         assert_eq!(
             query_result.next().await,
-            Some(Row::new(vec![
-                Value::I32(1),
-                Value::String("foo".to_string())
-            ]))
+            Some(vec![Value::I32(1), Value::String("foo".to_string())])
         );
         assert!(query_result.next().await.is_none());
 
@@ -430,7 +427,7 @@ mod test {
         if let Some(row) = query_result.next().await {
             assert_eq!(row.len(), 1);
 
-            value = row.get(0).cloned();
+            value = row.first().cloned();
         }
         assert!(query_result.next().await.is_none());
 

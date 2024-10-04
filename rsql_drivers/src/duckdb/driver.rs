@@ -94,7 +94,7 @@ impl crate::Connection for Connection {
                 let value = Self::convert_to_value(query_row, column_name, index)?;
                 row.push(value);
             }
-            rows.push(crate::Row::new(row));
+            rows.push(row);
         }
 
         let query_result = MemoryQueryResult::new(columns, rows);
@@ -194,7 +194,7 @@ impl Connection {
 
 #[cfg(test)]
 mod test {
-    use crate::{DriverManager, Row, StatementMetadata, Value};
+    use crate::{DriverManager, StatementMetadata, Value};
     use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
     use indoc::indoc;
 
@@ -226,10 +226,7 @@ mod test {
         assert_eq!(query_result.columns().await, vec!["id", "name"]);
         assert_eq!(
             query_result.next().await,
-            Some(Row::new(vec![
-                Value::I32(1),
-                Value::String("foo".to_string())
-            ]))
+            Some(vec![Value::I32(1), Value::String("foo".to_string())])
         );
         assert!(query_result.next().await.is_none());
 

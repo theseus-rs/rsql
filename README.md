@@ -34,9 +34,23 @@ irm https://github.com/theseus-rs/rsql/releases/latest/download/rsql_cli-install
 For more information, and additional installations instructions (cargo, homebrew, msi),
 visit the [rsql](https://theseus-rs.github.io/rsql/rsql_cli/) site.
 
-## Quick Demo
-
 ![](./rsql_cli/resources/demo.gif)
+
+## Features
+
+| Feature             |                                                                                                 |
+|---------------------|-------------------------------------------------------------------------------------------------|
+| Databases           | DuckDB, LibSQL (Turso), MariaDB, MySQL, PostgreSQL, Redshift, Snowflake, SQLite3, SQL Server    |
+| Embedded PostgreSQL | ✅                                                                                               |
+| Syntax Highlighting | ✅                                                                                               |
+| Result Highlighting | ✅                                                                                               |
+| History             | ✅                                                                                               |
+| SQL File Execution  | ✅                                                                                               |
+| Output Formats      | ascii, csv, expanded, html, json, jsonl, markdown, plain, psql, sqlite, tsv, unicode, xml, yaml |
+| Localized Interface | 40+ languages¹                                                                                  |
+| Key Bindings        | emacs, vi                                                                                       |
+
+¹ Computer translations; human translations welcome
 
 ## Usage
 
@@ -68,22 +82,6 @@ rsql --url "<url>" -- "<query>"
 
 ¹ `libsql` needs to be enabled with the `libsql` feature flag; it is disabled by default as it conflicts
 with `rusqlite`.
-
-## Features
-
-| Feature             |                                                                                                 |
-|---------------------|-------------------------------------------------------------------------------------------------|
-| Databases           | DuckDB, LibSQL (Turso), MariaDB, MySQL, PostgreSQL, Snowflake, SQLite3, SQL Server              |
-| Embedded PostgreSQL | ✅                                                                                               |
-| Syntax Highlighting | ✅                                                                                               |
-| Result Highlighting | ✅                                                                                               |
-| History             | ✅                                                                                               |
-| SQL File Execution  | ✅                                                                                               |
-| Output Formats      | ascii, csv, expanded, html, json, jsonl, markdown, plain, psql, sqlite, tsv, unicode, xml, yaml |
-| Localized Interface | 40+ languages¹                                                                                  |
-| Key Bindings        | emacs, vi                                                                                       |
-
-¹ Computer translations; human translations welcome
 
 ## Safety
 

@@ -70,6 +70,7 @@ all = [
     "postgres",
     "postgresql",
     "rusqlite",
+    "redshift",
     "snowflake",
     "sqlite",
     "sqlserver"
