@@ -61,19 +61,13 @@ impl<'a> Executor<'a> {
     pub async fn execute(&mut self, input: &str) -> Result<LoopCondition> {
         let input = input.trim();
         let commands = self.parse_commands(input)?;
-        let mut resultant_loop_condition = LoopCondition::Continue;
         for command in commands {
-            resultant_loop_condition = match &self.execute_command(command.as_str()).await? {
-                LoopCondition::Exit(exit_code) => LoopCondition::Exit(*exit_code),
-                LoopCondition::ContinueRefreshMetadata => LoopCondition::ContinueRefreshMetadata,
-                LoopCondition::Continue => resultant_loop_condition,
-            };
-            if matches!(resultant_loop_condition, LoopCondition::Exit(_)) {
-                break;
+            if let LoopCondition::Exit(exit_code) = self.execute_command(command.as_str()).await? {
+                return Ok(LoopCondition::Exit(exit_code));
             }
         }
 
-        Ok(resultant_loop_condition)
+        Ok(LoopCondition::Continue)
     }
 
     async fn execute_command(&mut self, input: &str) -> Result<LoopCondition> {

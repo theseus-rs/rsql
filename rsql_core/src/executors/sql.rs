@@ -51,15 +51,10 @@ impl<'a> SqlExecutor<'a> {
         let limit = self.configuration.results_limit;
         let (mut results, statement_metadata) = self.execute_sql(sql, limit).await?;
         options.elapsed = start.elapsed();
-        let loop_condition = if let StatementMetadata::DDL = statement_metadata {
-            LoopCondition::ContinueRefreshMetadata
-        } else {
-            LoopCondition::Continue
-        };
         formatter
             .format(&options, &mut results, self.output)
             .await?;
-        Ok(loop_condition)
+        Ok(LoopCondition::Continue)
     }
 
     /// Execute the SQL and return the results.

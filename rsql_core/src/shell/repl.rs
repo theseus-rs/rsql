@@ -6,7 +6,7 @@ use crate::shell::helper::ReplHelper;
 use crate::shell::Result;
 use crate::shell::ShellArgs;
 use colored::Colorize;
-use rsql_drivers::{Connection, DriverManager, Metadata};
+use rsql_drivers::{Connection, DriverManager};
 use rsql_formatters::writers::Output;
 use rsql_formatters::FormatterManager;
 use rustyline::config::Configurer;
@@ -99,7 +99,7 @@ impl Shell {
                 .evaluate(connection, &DefaultHistory::new(), input.to_string())
                 .await?
             {
-                LoopCondition::Continue | LoopCondition::ContinueRefreshMetadata => 0,
+                LoopCondition::Continue => 0,
                 LoopCondition::Exit(exit_code) => *exit_code,
             }
         } else {
@@ -110,12 +110,12 @@ impl Shell {
         Ok(exit_code)
     }
 
-    fn editor(
+    async fn editor(
         &self,
         history_file: &str,
-        metadata: Metadata,
+        connection: &mut dyn Connection,
     ) -> Result<Editor<ReplHelper, FileHistory>> {
-        let helper = ReplHelper::new_with_metadata(&self.configuration, metadata);
+        let helper = ReplHelper::with_connection(&self.configuration, connection).await?;
         let mut editor = Editor::<ReplHelper, FileHistory>::new()?;
         if self.configuration.color {
             editor.set_color_mode(ColorMode::Forced);
@@ -144,17 +144,9 @@ impl Shell {
             Some(ref file) => String::from(file.to_string_lossy()),
             None => String::new(),
         };
-        let mut metadata = connection.metadata().await?;
-        let mut is_metadata_stale = false;
-
         loop {
             // Create a new editor for each iteration in order to read any changes to the configuration.
-            metadata = if is_metadata_stale {
-                connection.metadata().await?
-            } else {
-                metadata
-            };
-            let mut editor = self.editor(history_file.as_str(), metadata.clone())?;
+            let mut editor = self.editor(history_file.as_str(), connection).await?;
             let locale = self.configuration.locale.as_str();
             let prompt = t!(
                 "prompt",
@@ -169,10 +161,6 @@ impl Shell {
                         .await
                     {
                         Ok(LoopCondition::Continue) => LoopCondition::Continue,
-                        Ok(LoopCondition::ContinueRefreshMetadata) => {
-                            is_metadata_stale = true;
-                            LoopCondition::Continue
-                        }
                         Ok(LoopCondition::Exit(exit_code)) => LoopCondition::Exit(*exit_code),
                         Err(_error) => LoopCondition::Exit(1),
                     };
@@ -313,7 +301,7 @@ impl Shell {
 #[cfg(test)]
 mod test {
     use super::*;
-    use rsql_drivers::{MockConnection, MockDriver};
+    use rsql_drivers::{Metadata, MockConnection, MockDriver};
     use rustyline::history::DefaultHistory;
 
     #[test]
@@ -385,7 +373,7 @@ mod test {
         Ok(())
     }
 
-    fn test_editor(color: bool) -> anyhow::Result<()> {
+    async fn test_editor(color: bool) -> anyhow::Result<()> {
         let configuration = Configuration {
             bail_on_error: false,
             color,
@@ -395,18 +383,20 @@ mod test {
         let shell = ShellBuilder::default()
             .with_configuration(configuration)
             .build();
-        let _ = shell.editor("history.txt", Metadata::default())?;
+        let mut connection = MockConnection::new();
+        connection.expect_metadata().with().returning(|| Ok(Metadata::default()));
+        let _ = shell.editor("history.txt", &mut connection).await?;
         Ok(())
     }
 
     #[tokio::test]
     async fn test_editor_color_true() -> anyhow::Result<()> {
-        test_editor(true)
+        test_editor(true).await
     }
 
     #[tokio::test]
     async fn test_editor_color_false() -> anyhow::Result<()> {
-        test_editor(false)
+        test_editor(false).await
     }
 
     #[tokio::test]

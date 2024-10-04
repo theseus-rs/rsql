@@ -4,6 +4,32 @@ use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
 use sqlparser::dialect::{self, Dialect};
 
+
+#[derive(Debug, Clone, Default)]
+pub(crate) struct MetadataCache {
+    metadata: Option<Metadata>
+}
+
+impl MetadataCache {
+    pub fn new(metadata: Option<Metadata>) -> Self {
+        Self{
+            metadata
+        }
+    }
+
+    pub fn get(&self) -> Option<Metadata> {
+        self.metadata.clone()
+    }
+
+    pub fn set(&mut self, metadata: Metadata) {
+        self.metadata = Some(metadata);
+    }
+
+    pub fn invalidate(&mut self) {
+        self.metadata = None;
+    }
+}
+
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct Metadata {
     schemas: IndexMap<String, Schema>,

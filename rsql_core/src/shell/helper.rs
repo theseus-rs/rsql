@@ -1,6 +1,7 @@
 use crate::configuration::Configuration;
 use crate::shell::completer::ReplCompleter;
-use rsql_drivers::Metadata;
+use crate::shell::Result;
+use rsql_drivers::{Connection, Metadata};
 use rsql_formatters::Highlighter;
 use rustyline::completion::Completer;
 use rustyline::hint::{Hinter, HistoryHinter};
@@ -16,6 +17,10 @@ impl ReplHelper {
     #[cfg(test)]
     pub(crate) fn new(configuration: &Configuration) -> Self {
         Self::new_with_metadata(configuration, Metadata::default())
+    }
+
+    pub(crate) async fn with_connection(configuration: &Configuration,connection: &mut dyn Connection) -> Result<Self> {
+        Ok(Self::new_with_metadata(configuration, connection.metadata().await?))
     }
 
     pub(crate) fn new_with_metadata(configuration: &Configuration, metadata: Metadata) -> Self {

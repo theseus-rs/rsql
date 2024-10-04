@@ -15,7 +15,6 @@ use std::fmt::Debug;
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum LoopCondition {
     Continue,
-    ContinueRefreshMetadata,
     Exit(i32),
 }
 
