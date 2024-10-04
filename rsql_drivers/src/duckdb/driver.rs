@@ -1,5 +1,6 @@
 use crate::duckdb::metadata;
 use crate::error::{Error, Result};
+use crate::metadata::MetadataCache;
 use crate::value::Value;
 use crate::Error::UnsupportedColumnType;
 use crate::{MemoryQueryResult, Metadata, QueryResult, StatementMetadata};
@@ -38,6 +39,7 @@ impl crate::Driver for Driver {
 #[derive(Debug)]
 pub(crate) struct Connection {
     connection: Arc<Mutex<duckdb::Connection>>,
+    metadata_cache: MetadataCache,
 }
 
 impl Connection {
@@ -56,8 +58,10 @@ impl Connection {
             duckdb::Connection::open(file)?
         };
 
+        let metadata_cache = MetadataCache::new();
         Ok(Connection {
             connection: Arc::new(Mutex::new(connection)),
+            metadata_cache,
         })
     }
 }
@@ -70,11 +74,22 @@ impl crate::Connection for Connection {
             Err(error) => return Err(Error::IoError(anyhow!("Error: {:?}", error))),
         };
         let rows = connection.execute(sql, [])?;
+
+        if let StatementMetadata::DDL = self.parse_sql(sql) {
+            self.metadata_cache.invalidate();
+        }
+
         Ok(rows as u64)
     }
 
     async fn metadata(&mut self) -> Result<Metadata> {
-        metadata::get_metadata(self).await
+        if let Some(metadata) = self.metadata_cache.get() {
+            Ok(metadata)
+        } else {
+            let metadata = metadata::get_metadata(self).await?;
+            self.metadata_cache.set(metadata.clone());
+            Ok(metadata)
+        }
     }
 
     async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {

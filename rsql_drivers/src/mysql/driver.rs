@@ -1,8 +1,9 @@
 use crate::error::Result;
+use crate::metadata::MetadataCache;
 use crate::mysql::metadata;
 use crate::value::Value;
 use crate::Error::UnsupportedColumnType;
-use crate::{MemoryQueryResult, Metadata, QueryResult};
+use crate::{MemoryQueryResult, Metadata, QueryResult, StatementMetadata};
 use async_trait::async_trait;
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 use sqlparser::dialect::{Dialect, MySqlDialect};
@@ -34,13 +35,18 @@ impl crate::Driver for Driver {
 #[derive(Debug)]
 pub(crate) struct Connection {
     pool: MySqlPool,
+    metadata_cache: MetadataCache,
 }
 
 impl Connection {
     pub(crate) async fn new(url: String, _password: Option<String>) -> Result<Connection> {
         let options = MySqlConnectOptions::from_str(url.as_str())?;
         let pool = MySqlPool::connect_with(options).await?;
-        let connection = Connection { pool };
+        let metadata_cache = MetadataCache::new();
+        let connection = Connection {
+            pool,
+            metadata_cache,
+        };
 
         Ok(connection)
     }
@@ -50,11 +56,20 @@ impl Connection {
 impl crate::Connection for Connection {
     async fn execute(&mut self, sql: &str) -> Result<u64> {
         let rows = sqlx::query(sql).execute(&self.pool).await?.rows_affected();
+        if let StatementMetadata::DDL = self.parse_sql(sql) {
+            self.metadata_cache.invalidate();
+        }
         Ok(rows)
     }
 
     async fn metadata(&mut self) -> Result<Metadata> {
-        metadata::get_metadata(self).await
+        if let Some(metadata) = self.metadata_cache.get() {
+            Ok(metadata)
+        } else {
+            let metadata = metadata::get_metadata(self).await?;
+            self.metadata_cache.set(metadata.clone());
+            Ok(metadata)
+        }
     }
 
     async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {

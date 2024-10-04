@@ -1,4 +1,5 @@
 use crate::error::Result;
+use crate::metadata::MetadataCache;
 use crate::value::Value;
 use crate::Error::UnsupportedColumnType;
 use crate::{postgresql, Error, MemoryQueryResult, Metadata, QueryResult, StatementMetadata};
@@ -43,6 +44,7 @@ impl crate::Driver for Driver {
 pub(crate) struct Connection {
     postgresql: Option<PostgreSQL>,
     client: Client,
+    metadata_cache: MetadataCache,
 }
 
 impl Connection {
@@ -91,7 +93,12 @@ impl Connection {
                 eprintln!("connection error: {e}");
             }
         });
-        let connection = Connection { postgresql, client };
+        let metadata_cache = MetadataCache::new();
+        let connection = Connection {
+            postgresql,
+            client,
+            metadata_cache,
+        };
 
         Ok(connection)
     }
@@ -105,7 +112,13 @@ impl crate::Connection for Connection {
     }
 
     async fn metadata(&mut self) -> Result<Metadata> {
-        postgresql::metadata::get_metadata(self).await
+        if let Some(metadata) = self.metadata_cache.get() {
+            Ok(metadata)
+        } else {
+            let metadata = postgresql::metadata::get_metadata(self).await?;
+            self.metadata_cache.set(metadata.clone());
+            Ok(metadata)
+        }
     }
 
     async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {

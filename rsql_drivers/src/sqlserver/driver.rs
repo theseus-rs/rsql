@@ -1,8 +1,9 @@
 use crate::error::Result;
+use crate::metadata::MetadataCache;
 use crate::sqlserver::metadata;
 use crate::value::Value;
 use crate::Error::UnsupportedColumnType;
-use crate::{MemoryQueryResult, Metadata, QueryResult};
+use crate::{MemoryQueryResult, Metadata, QueryResult, StatementMetadata};
 use async_trait::async_trait;
 use futures_util::stream::TryStreamExt;
 use sqlparser::dialect::{Dialect, MsSqlDialect};
@@ -34,6 +35,7 @@ impl crate::Driver for Driver {
 #[derive(Debug)]
 pub(crate) struct Connection {
     client: Client<Compat<TcpStream>>,
+    metadata_cache: MetadataCache,
 }
 
 impl Connection {
@@ -82,7 +84,11 @@ impl Connection {
         tcp.set_nodelay(true)?;
 
         let client = Client::connect(config, tcp.compat_write()).await?;
-        let connection = Connection { client };
+        let metadata_cache = MetadataCache::new();
+        let connection = Connection {
+            client,
+            metadata_cache,
+        };
 
         Ok(connection)
     }
@@ -93,11 +99,20 @@ impl crate::Connection for Connection {
     async fn execute(&mut self, sql: &str) -> Result<u64> {
         let result = self.client.execute(sql, &[]).await?;
         let rows = result.rows_affected()[0];
+        if let StatementMetadata::DDL = self.parse_sql(sql) {
+            self.metadata_cache.invalidate();
+        }
         Ok(rows)
     }
 
     async fn metadata(&mut self) -> Result<Metadata> {
-        metadata::get_metadata(self).await
+        if let Some(metadata) = self.metadata_cache.get() {
+            Ok(metadata)
+        } else {
+            let metadata = metadata::get_metadata(self).await?;
+            self.metadata_cache.set(metadata.clone());
+            Ok(metadata)
+        }
     }
 
     async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {
