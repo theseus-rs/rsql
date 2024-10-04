@@ -589,6 +589,7 @@ mod test {
         let results_limit = 42;
         let results_rows = false;
         let results_timer = false;
+        let smart_completions = true;
 
         let configuration = ConfigurationBuilder::new(program_name, version)
             .with_bail_on_error(bail_on_error)
@@ -612,6 +613,7 @@ mod test {
             .with_results_limit(results_limit)
             .with_results_rows(results_rows)
             .with_results_timer(results_timer)
+            .with_smart_completions(smart_completions)
             .build();
 
         assert_eq!(configuration.program_name, program_name);

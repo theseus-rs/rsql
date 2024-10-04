@@ -108,6 +108,11 @@ impl Connection {
 impl crate::Connection for Connection {
     async fn execute(&mut self, sql: &str) -> Result<u64> {
         let rows = self.client.execute(sql, &[]).await?;
+
+        if let StatementMetadata::DDL = self.parse_sql(sql) {
+            self.metadata_cache.invalidate();
+        }
+
         Ok(rows)
     }
 
@@ -329,6 +334,24 @@ mod test {
             Some(vec![Value::I32(1), Value::String("foo".to_string())])
         );
         assert!(query_result.next().await.is_none());
+
+        let db_metadata = connection.metadata().await?;
+        let schema = db_metadata
+            .current_schema()
+            .expect("expected at least one schema");
+        assert!(schema.tables().iter().any(|table| table.name() == "person"));
+
+        connection
+            .execute("CREATE TABLE products (id INTEGER, name VARCHAR(20))")
+            .await?;
+        let db_metadata = connection.metadata().await?;
+        let schema = db_metadata
+            .current_schema()
+            .expect("expected at least one schema");
+        assert!(schema
+            .tables()
+            .iter()
+            .any(|table| table.name() == "products"));
 
         connection.close().await?;
         Ok(())

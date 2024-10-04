@@ -701,6 +701,19 @@ mod test {
         assert!(candidates.iter().any(|c| c.replacement() == "o"));
         assert!(candidates.iter().any(|c| c.replacement() == "users"));
         assert!(candidates.iter().any(|c| c.replacement() == "orders"));
+
+        let (start, candidates) = completer
+            .complete(
+                "SELECT * FROM users AS u JOIN orders AS o ON ",
+                45,
+                &Context::new(&DefaultHistory::new()),
+            )
+            .expect("valid completion call");
+        assert_eq!(start, 45);
+        assert!(candidates.iter().any(|c| c.replacement() == "u"));
+        assert!(candidates.iter().any(|c| c.replacement() == "o"));
+        assert!(candidates.iter().any(|c| c.replacement() == "users"));
+        assert!(candidates.iter().any(|c| c.replacement() == "orders"));
     }
 
     #[test]
@@ -804,5 +817,10 @@ mod test {
                 }) => assert_eq!(found_keyword, *expectation),
                 _ => panic!("response from find_previous_keyword was not a keyword"),
             });
+    }
+
+    #[test]
+    fn test_suggestion_default() {
+        assert!(matches!(Suggestion::default(), Suggestion::Keyword(s) if s == String::new()));
     }
 }
