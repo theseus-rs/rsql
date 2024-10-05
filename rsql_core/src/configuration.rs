@@ -492,6 +492,9 @@ impl ConfigFile {
         if let Ok(history_ignore_dups) = config.get("shell.history.ignore_dups") {
             configuration.history_ignore_dups = history_ignore_dups;
         }
+        if let Ok(smart_completions) = config.get("shell.smart.completions") {
+            configuration.smart_completions = smart_completions;
+        }
 
         configuration.theme = theme(config)?;
 

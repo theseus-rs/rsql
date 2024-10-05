@@ -1,0 +1,8 @@
+{"version": 2, "width": 147, "height": 39, "timestamp": 1728148528, "env": {"SHELL": "/bin/zsh", "TERM": "xterm-256color"}}
+[0.019947, "o", "\u001b]11;?\u001b\\"]
+[0.048731, "o", "⠁ connect [00:00:00] [                                                                                                        ] 0 B/0 B (0 B/s, 0s)"]
+[0.048823, "o", "\r\u001b[2K"]
+[0.057655, "o", "rsql> \u001b[38;2;131;148;150m.color\u001b[0m\r\n"]
+[0.057814, "o", "Color: on\r\n"]
+[1.096595, "o", "rsql> \u001b[38;2;131;148;150m.completions off\u001b[0m\r\n"]
+[2.143149, "o", "rsql> \u001b[38;2;131;148;150m.completions \u001b[38;2;133;153;0mon\u001b[0m\r\n"]
