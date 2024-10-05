@@ -88,10 +88,7 @@ impl Connection {
 
         let options = PgConnectOptions::from_str(database_url.as_str())?;
         let pool = PgPool::connect_with(options).await?;
-        let connection = Connection {
-            postgresql,
-            pool,
-        };
+        let connection = Connection { postgresql, pool };
 
         Ok(connection)
     }

@@ -7,8 +7,8 @@ use sqlparser::ast::Statement;
 use sqlparser::dialect::{Dialect, GenericDialect};
 use sqlparser::parser::Parser;
 
-use std::fmt::Debug;
 use chrono::{NaiveTime, TimeDelta};
+use std::fmt::Debug;
 
 /// A single row of a query result
 pub type Row = Vec<Value>;
@@ -161,7 +161,11 @@ impl CachedMetadataConnection {
     #[must_use]
     pub fn new(connection: Box<dyn Connection>) -> Self {
         let timestamp = chrono::Local::now().time();
-        Self { connection, metadata: None, timestamp }
+        Self {
+            connection,
+            metadata: None,
+            timestamp,
+        }
     }
 }
 

@@ -82,9 +82,7 @@ impl Connection {
         tcp.set_nodelay(true)?;
 
         let client = Client::connect(config, tcp.compat_write()).await?;
-        let connection = Connection {
-            client,
-        };
+        let connection = Connection { client };
 
         Ok(connection)
     }

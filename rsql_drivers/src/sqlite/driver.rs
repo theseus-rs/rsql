@@ -58,9 +58,7 @@ impl Connection {
             .auto_vacuum(SqliteAutoVacuum::None)
             .create_if_missing(true);
         let pool = SqlitePool::connect_with(options).await?;
-        let connection = Connection {
-            pool,
-        };
+        let connection = Connection { pool };
 
         Ok(connection)
     }

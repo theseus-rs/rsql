@@ -40,9 +40,7 @@ impl Connection {
     pub(crate) async fn new(url: String, _password: Option<String>) -> Result<Connection> {
         let options = MySqlConnectOptions::from_str(url.as_str())?;
         let pool = MySqlPool::connect_with(options).await?;
-        let connection = Connection {
-            pool,
-        };
+        let connection = Connection { pool };
 
         Ok(connection)
     }

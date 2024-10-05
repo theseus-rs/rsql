@@ -61,10 +61,7 @@ impl Connection {
 
         let connection = database.connect()?;
 
-        Ok(Connection {
-            connection,
-            url,
-        })
+        Ok(Connection { connection, url })
     }
 }
 

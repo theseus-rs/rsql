@@ -1,3 +1,4 @@
+use crate::connection::CachedMetadataConnection;
 use crate::error::Result;
 use crate::Connection;
 use crate::Error::DriverNotFound;
@@ -8,7 +9,6 @@ use std::collections::BTreeMap;
 use std::fmt::Debug;
 use tracing::instrument;
 use url::Url;
-use crate::connection::CachedMetadataConnection;
 
 #[automock]
 #[async_trait]
@@ -62,7 +62,7 @@ impl DriverManager {
                 let connection = driver.connect(url, password).await?;
                 let connection = Box::new(CachedMetadataConnection::new(connection));
                 Ok(connection)
-            },
+            }
             None => Err(DriverNotFound {
                 identifier: scheme.to_string(),
             }),

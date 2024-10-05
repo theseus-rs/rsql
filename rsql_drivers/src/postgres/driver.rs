@@ -91,10 +91,7 @@ impl Connection {
                 eprintln!("connection error: {e}");
             }
         });
-        let connection = Connection {
-            postgresql,
-            client,
-        };
+        let connection = Connection { postgresql, client };
 
         Ok(connection)
     }
