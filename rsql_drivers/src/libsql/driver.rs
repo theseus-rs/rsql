@@ -1,8 +1,6 @@
 use crate::error::Result;
 use crate::libsql::metadata;
-use crate::metadata::MetadataCache;
 use crate::value::Value;
-use crate::StatementMetadata;
 use crate::{MemoryQueryResult, Metadata, QueryResult};
 use async_trait::async_trait;
 use libsql::replication::Frames;
@@ -34,7 +32,6 @@ pub(crate) struct Connection {
     #[allow(clippy::struct_field_names)]
     connection: libsql::Connection,
     url: String,
-    metadata_cache: MetadataCache,
 }
 
 impl Connection {
@@ -63,12 +60,10 @@ impl Connection {
         };
 
         let connection = database.connect()?;
-        let metadata_cache = MetadataCache::new();
 
         Ok(Connection {
             connection,
             url,
-            metadata_cache,
         })
     }
 }
@@ -77,20 +72,11 @@ impl Connection {
 impl crate::Connection for Connection {
     async fn execute(&mut self, sql: &str) -> Result<u64> {
         let rows = self.connection.execute(sql, ()).await?;
-        if let StatementMetadata::DDL = self.parse_sql(sql) {
-            self.metadata_cache.invalidate();
-        }
         Ok(rows)
     }
 
     async fn metadata(&mut self) -> Result<Metadata> {
-        if let Some(metadata) = self.metadata_cache.get() {
-            Ok(metadata)
-        } else {
-            let metadata = metadata::get_metadata(self).await?;
-            self.metadata_cache.set(metadata.clone());
-            Ok(metadata)
-        }
+        metadata::get_metadata(self).await
     }
 
     async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {

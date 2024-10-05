@@ -203,6 +203,10 @@ impl Connection for CachedMetadataConnection {
     fn dialect(&self) -> Box<dyn Dialect> {
         self.connection.dialect()
     }
+
+    fn match_statement(&self, statement: &Statement) -> StatementMetadata {
+        self.connection.match_statement(statement)
+    }
 }
 
 #[cfg(test)]
