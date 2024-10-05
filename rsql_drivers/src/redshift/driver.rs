@@ -25,18 +25,23 @@ impl crate::Driver for Driver {
 
 #[derive(Debug)]
 pub struct Connection {
+    url: String,
     inner: PgConnection,
 }
 
 impl Connection {
     pub async fn new(url: String, password: Option<String>) -> Result<Self> {
-        let inner = PgConnection::new(url, password).await?;
-        Ok(Self { inner })
+        let inner = PgConnection::new(url.clone(), password).await?;
+        Ok(Self { url, inner })
     }
 }
 
 #[async_trait]
 impl crate::Connection for Connection {
+    fn url(&self) -> &String {
+        &self.url
+    }
+
     async fn execute(&mut self, sql: &str) -> Result<u64> {
         self.inner.execute(sql).await
     }
@@ -79,6 +84,7 @@ mod test {
         let database_url = format!("redshift://postgres:postgres@localhost:{port}/postgres");
         let driver_manager = DriverManager::default();
         let mut connection = driver_manager.connect(database_url.as_str()).await?;
+        assert_eq!(database_url, connection.url().as_str());
 
         let mut query_result = connection.query("SELECT 'foo'::TEXT").await?;
         let row = query_result.next().await.expect("no row");

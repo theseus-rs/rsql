@@ -181,7 +181,7 @@ mod test {
         let container = sqlserver_image.start().await?;
         let port = container.get_host_port_ipv4(1433).await?;
         let database_url =
-            &format!("sqlserver://sa:{PASSWORD}@127.0.0.1:{port}?TrustServerCertificate=true");
+            format!("sqlserver://sa:{PASSWORD}@127.0.0.1:{port}?TrustServerCertificate=true");
         let driver_manager = DriverManager::default();
         let mut connection = driver_manager.connect(database_url.as_str()).await?;
 

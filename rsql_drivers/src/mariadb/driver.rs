@@ -40,9 +40,10 @@ mod test {
         let container = mysql_image.start().await?;
         let port = container.get_host_port_ipv4(3306).await?;
 
-        let database_url = &format!("mariadb://root@127.0.0.1:{port}/test");
+        let database_url = format!("mariadb://root@127.0.0.1:{port}/test");
         let driver_manager = DriverManager::default();
         let mut connection = driver_manager.connect(database_url.as_str()).await?;
+        assert_eq!(database_url, connection.url().as_str());
 
         test_schema(&mut *connection).await?;
 

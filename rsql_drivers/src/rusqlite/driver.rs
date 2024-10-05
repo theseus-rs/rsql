@@ -32,6 +32,7 @@ impl crate::Driver for Driver {
 
 #[derive(Debug)]
 pub(crate) struct Connection {
+    url: String,
     connection: Arc<Mutex<rusqlite::Connection>>,
 }
 
@@ -52,6 +53,7 @@ impl Connection {
         };
 
         Ok(Connection {
+            url,
             connection: Arc::new(Mutex::new(connection)),
         })
     }
@@ -59,6 +61,10 @@ impl Connection {
 
 #[async_trait]
 impl crate::Connection for Connection {
+    fn url(&self) -> &String {
+        &self.url
+    }
+
     async fn execute(&mut self, sql: &str) -> Result<u64> {
         let connection = match self.connection.lock() {
             Ok(connection) => connection,
@@ -151,6 +157,8 @@ mod test {
     async fn test_driver_connect() -> anyhow::Result<()> {
         let driver_manager = DriverManager::default();
         let mut connection = driver_manager.connect(DATABASE_URL).await?;
+        assert_eq!(DATABASE_URL, connection.url());
+
         connection.close().await?;
         Ok(())
     }
