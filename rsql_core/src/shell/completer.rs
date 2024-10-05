@@ -11,7 +11,7 @@ use crate::configuration::Configuration;
 
 static CANDIDATES: LazyLock<Vec<Pair>> = LazyLock::new(init_candidates);
 
-#[allow(clippy::too_many_lines)]
+#[expect(clippy::too_many_lines)]
 fn init_candidates() -> Vec<Pair> {
     vec![
         Pair {

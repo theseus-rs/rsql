@@ -78,7 +78,6 @@ impl ConfigurationBuilder {
 
     /// Set the bail on error to use.
     #[must_use]
-    #[allow(dead_code)]
     pub fn with_bail_on_error(mut self, bail_on_error: bool) -> Self {
         self.configuration.bail_on_error = bail_on_error;
         self
@@ -86,7 +85,6 @@ impl ConfigurationBuilder {
 
     /// Set the color value.
     #[must_use]
-    #[allow(dead_code)]
     pub fn with_color(mut self, color: bool) -> Self {
         self.configuration.color = color;
         self
@@ -94,7 +92,6 @@ impl ConfigurationBuilder {
 
     /// Set the command identifier value.
     #[must_use]
-    #[allow(dead_code)]
     pub fn with_command_identifier<S: Into<String>>(mut self, command_identifier: S) -> Self {
         self.configuration.command_identifier = command_identifier.into();
         self
@@ -102,7 +99,6 @@ impl ConfigurationBuilder {
 
     /// Set the echo value.
     #[must_use]
-    #[allow(dead_code)]
     pub fn with_echo(mut self, echo: EchoMode) -> Self {
         self.configuration.echo = echo;
         self
@@ -110,7 +106,6 @@ impl ConfigurationBuilder {
 
     /// Set the log level to use.
     #[must_use]
-    #[allow(dead_code)]
     pub fn with_log_level(mut self, log_level: LevelFilter) -> Self {
         self.configuration.log_level = log_level;
         self
@@ -118,7 +113,6 @@ impl ConfigurationBuilder {
 
     /// Set the log directory to use.
     #[must_use]
-    #[allow(dead_code)]
     pub fn with_log_dir<P: Into<PathBuf>>(mut self, log_dir: P) -> Self {
         self.configuration.log_dir = Some(log_dir.into());
         self
@@ -126,7 +120,6 @@ impl ConfigurationBuilder {
 
     /// Set the log rotation to use.
     #[must_use]
-    #[allow(dead_code)]
     pub fn with_log_rotation(mut self, log_rotation: Rotation) -> Self {
         self.configuration.log_rotation = log_rotation;
         self
@@ -134,7 +127,6 @@ impl ConfigurationBuilder {
 
     /// Set the locale to use.
     #[must_use]
-    #[allow(dead_code)]
     pub fn with_locale<S: Into<String>>(mut self, locale: S) -> Self {
         self.configuration.locale = locale.into();
         self
@@ -142,7 +134,6 @@ impl ConfigurationBuilder {
 
     /// Set the edit mode to use.
     #[must_use]
-    #[allow(dead_code)]
     pub fn with_edit_mode(mut self, edit_mode: EditMode) -> Self {
         self.configuration.edit_mode = edit_mode;
         self
@@ -150,7 +141,6 @@ impl ConfigurationBuilder {
 
     /// Set the history to use.
     #[must_use]
-    #[allow(dead_code)]
     pub fn with_history(mut self, history: bool) -> Self {
         self.configuration.history = history;
         self
@@ -158,7 +148,6 @@ impl ConfigurationBuilder {
 
     /// Set the history file to use.
     #[must_use]
-    #[allow(dead_code)]
     pub fn with_history_file<P: Into<PathBuf>>(mut self, history_file: P) -> Self {
         self.configuration.history_file = Some(history_file.into());
         self
@@ -166,7 +155,6 @@ impl ConfigurationBuilder {
 
     /// Set the history limit to use.
     #[must_use]
-    #[allow(dead_code)]
     pub fn with_history_limit(mut self, history_limit: usize) -> Self {
         self.configuration.history_limit = history_limit;
         self
@@ -174,7 +162,6 @@ impl ConfigurationBuilder {
 
     /// Set the history ignore dups to use.
     #[must_use]
-    #[allow(dead_code)]
     pub fn with_history_ignore_dups(mut self, history_ignore_dups: bool) -> Self {
         self.configuration.history_ignore_dups = history_ignore_dups;
         self
@@ -182,7 +169,6 @@ impl ConfigurationBuilder {
 
     /// Set the theme to use.
     #[must_use]
-    #[allow(dead_code)]
     pub fn with_theme<S: Into<String>>(mut self, theme: S) -> Self {
         self.configuration.theme = theme.into();
         self
@@ -190,7 +176,6 @@ impl ConfigurationBuilder {
 
     /// Set the display of rows changed.
     #[must_use]
-    #[allow(dead_code)]
     pub fn with_results_changes(mut self, results_changes: bool) -> Self {
         self.configuration.results_changes = results_changes;
         self
@@ -198,7 +183,6 @@ impl ConfigurationBuilder {
 
     /// Set the display of the results' footer.
     #[must_use]
-    #[allow(dead_code)]
     pub fn with_results_footer(mut self, results_footer: bool) -> Self {
         self.configuration.results_footer = results_footer;
         self
@@ -206,7 +190,6 @@ impl ConfigurationBuilder {
 
     /// Set the results format to use.
     #[must_use]
-    #[allow(dead_code)]
     pub fn with_results_format<S: Into<String>>(mut self, results_format: S) -> Self {
         self.configuration.results_format = results_format.into();
         self
@@ -214,7 +197,6 @@ impl ConfigurationBuilder {
 
     /// Set the display of the results' header.
     #[must_use]
-    #[allow(dead_code)]
     pub fn with_results_header(mut self, results_header: bool) -> Self {
         self.configuration.results_header = results_header;
         self
@@ -222,7 +204,6 @@ impl ConfigurationBuilder {
 
     /// Set the limit for the number of results returned.
     #[must_use]
-    #[allow(dead_code)]
     pub fn with_results_limit(mut self, results_limit: usize) -> Self {
         self.configuration.results_limit = results_limit;
         self
@@ -230,7 +211,6 @@ impl ConfigurationBuilder {
 
     /// Set the display of rows returned.
     #[must_use]
-    #[allow(dead_code)]
     pub fn with_results_rows(mut self, results_rows: bool) -> Self {
         self.configuration.results_rows = results_rows;
         self
@@ -238,14 +218,12 @@ impl ConfigurationBuilder {
 
     /// Set the display of the results' timer.
     #[must_use]
-    #[allow(dead_code)]
     pub fn with_results_timer(mut self, results_timer: bool) -> Self {
         self.configuration.results_timer = results_timer;
         self
     }
 
     #[must_use]
-    #[allow(dead_code)]
     pub fn with_smart_completions(mut self, smart_completions: bool) -> Self {
         self.configuration.smart_completions = smart_completions;
         self
@@ -317,7 +295,7 @@ impl FromStr for EchoMode {
 
 /// The configuration for the application.
 #[derive(Clone, Debug, Eq, PartialEq)]
-#[allow(clippy::struct_excessive_bools)]
+#[expect(clippy::struct_excessive_bools)]
 pub struct Configuration {
     pub program_name: String,
     pub version: String,
