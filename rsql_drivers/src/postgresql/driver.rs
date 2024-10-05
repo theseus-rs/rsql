@@ -42,6 +42,7 @@ impl crate::Driver for Driver {
 
 #[derive(Debug)]
 pub(crate) struct Connection {
+    url: String,
     postgresql: Option<PostgreSQL>,
     pool: PgPool,
 }
@@ -57,7 +58,7 @@ impl Connection {
         let mut database_url = url.to_string();
 
         let postgresql = if embedded {
-            let mut settings = Settings::from_url(url)?;
+            let mut settings = Settings::from_url(url.clone())?;
 
             if !query_parameters.contains_key("version") {
                 let version = VersionReq::from_str(POSTGRESQL_EMBEDDED_VERSION)
@@ -88,7 +89,11 @@ impl Connection {
 
         let options = PgConnectOptions::from_str(database_url.as_str())?;
         let pool = PgPool::connect_with(options).await?;
-        let connection = Connection { postgresql, pool };
+        let connection = Connection {
+            url,
+            postgresql,
+            pool,
+        };
 
         Ok(connection)
     }
@@ -96,6 +101,10 @@ impl Connection {
 
 #[async_trait]
 impl crate::Connection for Connection {
+    fn url(&self) -> &String {
+        &self.url
+    }
+
     async fn execute(&mut self, sql: &str) -> Result<u64> {
         let rows = sqlx::query(sql).execute(&self.pool).await?.rows_affected();
         Ok(rows)
@@ -372,6 +381,7 @@ mod test {
     async fn test_driver_connect() -> anyhow::Result<()> {
         let driver_manager = DriverManager::default();
         let mut connection = driver_manager.connect(DATABASE_URL).await?;
+        assert_eq!(DATABASE_URL, connection.url());
         connection.close().await?;
         Ok(())
     }

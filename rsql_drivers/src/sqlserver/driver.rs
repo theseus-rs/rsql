@@ -33,6 +33,7 @@ impl crate::Driver for Driver {
 
 #[derive(Debug)]
 pub(crate) struct Connection {
+    url: String,
     client: Client<Compat<TcpStream>>,
 }
 
@@ -82,7 +83,7 @@ impl Connection {
         tcp.set_nodelay(true)?;
 
         let client = Client::connect(config, tcp.compat_write()).await?;
-        let connection = Connection { client };
+        let connection = Connection { url, client };
 
         Ok(connection)
     }
@@ -90,6 +91,10 @@ impl Connection {
 
 #[async_trait]
 impl crate::Connection for Connection {
+    fn url(&self) -> &String {
+        &self.url
+    }
+
     async fn execute(&mut self, sql: &str) -> Result<u64> {
         let result = self.client.execute(sql, &[]).await?;
         let rows = result.rows_affected()[0];
@@ -252,9 +257,10 @@ mod test {
         let container = sqlserver_image.start().await?;
         let port = container.get_host_port_ipv4(1433).await?;
         let database_url =
-            &format!("sqlserver://sa:{PASSWORD}@127.0.0.1:{port}?TrustServerCertificate=true");
+            format!("sqlserver://sa:{PASSWORD}@127.0.0.1:{port}?TrustServerCertificate=true");
         let driver_manager = DriverManager::default();
         let mut connection = driver_manager.connect(database_url.as_str()).await?;
+        assert_eq!(database_url, connection.url().as_str());
 
         test_connection_interface(&mut *connection).await?;
         test_data_types(&mut *connection).await?;

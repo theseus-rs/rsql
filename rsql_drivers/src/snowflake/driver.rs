@@ -33,12 +33,13 @@ impl crate::Driver for Driver {
         url: String,
         password: Option<String>,
     ) -> Result<Box<dyn crate::Connection>> {
-        Ok(Box::new(SnowflakeConnection::new(&url, password)?))
+        Ok(Box::new(SnowflakeConnection::new(url, password)?))
     }
 }
 
 #[derive(Debug)]
 pub(crate) struct SnowflakeConnection {
+    url: String,
     base_url: String,
     issuer: Option<String>,
     subject: Option<String>,
@@ -53,8 +54,8 @@ impl SnowflakeConnection {
     /// # Errors
     /// Errors if the URL is malformed, the account, user, private key, or public key are missing,
     /// or if the private key or public key files are missing or malformed
-    pub(crate) fn new(url: &str, password: Option<String>) -> Result<SnowflakeConnection> {
-        let parsed_url = Url::parse(url)?;
+    pub(crate) fn new(url: String, password: Option<String>) -> Result<SnowflakeConnection> {
+        let parsed_url = Url::parse(url.as_str())?;
         let query_params: HashMap<String, String> = parsed_url.query_pairs().into_owned().collect();
         let base_url = parsed_url
             .host_str()
@@ -70,6 +71,7 @@ impl SnowflakeConnection {
         if let Some(password) = password {
             let client = Mutex::new(Self::new_client_oauth(&password)?);
             Ok(Self {
+                url,
                 base_url,
                 issuer: None,
                 subject: None,
@@ -99,6 +101,7 @@ impl SnowflakeConnection {
 
             let client = Mutex::new(Self::new_client_keypair(&issuer, &subject, &key_pair)?);
             Ok(Self {
+                url,
                 base_url,
                 issuer: Some(issuer),
                 subject: Some(subject),
@@ -294,6 +297,10 @@ fn get_issuer_and_subject(public_key: &str, account: &str, user: &str) -> Result
 
 #[async_trait]
 impl crate::Connection for SnowflakeConnection {
+    fn url(&self) -> &String {
+        &self.url
+    }
+
     async fn execute(&mut self, sql: &str) -> Result<u64> {
         let response = self
             .request(sql)
@@ -641,11 +648,13 @@ mod test {
             .mount(&mock)
             .await;
 
-        let conn_str = "snowflake://abc123.snowflakecomputing.com/?user=test";
-        let mut conn = SnowflakeConnection::new(conn_str, Some("auth_token".to_string()))?;
-        conn.set_base_url(&mock.uri());
+        let database_url = "snowflake://abc123.snowflakecomputing.com/?user=test".to_string();
+        let mut connection =
+            SnowflakeConnection::new(database_url.clone(), Some("auth_token".to_string()))?;
+        assert_eq!(database_url, connection.url().as_str());
+        connection.set_base_url(&mock.uri());
 
-        let mut result = conn
+        let mut result = connection
             .query(
                 "SELECT Int, Float, Boolean, Time, Date, DateTimeNTZ, DateTimeTZ, FROM table LIMIT 2",
             )

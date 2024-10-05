@@ -29,8 +29,8 @@ impl crate::Driver for Driver {
 }
 
 pub(crate) struct Connection {
-    connection: libsql::Connection,
     url: String,
+    connection: libsql::Connection,
 }
 
 impl Connection {
@@ -60,12 +60,16 @@ impl Connection {
 
         let connection = database.connect()?;
 
-        Ok(Connection { connection, url })
+        Ok(Connection { url, connection })
     }
 }
 
 #[async_trait]
 impl crate::Connection for Connection {
+    fn url(&self) -> &String {
+        &self.url
+    }
+
     async fn execute(&mut self, sql: &str) -> Result<u64> {
         let rows = self.connection.execute(sql, ()).await?;
         Ok(rows)
@@ -146,6 +150,7 @@ mod test {
     async fn test_driver_connect() -> anyhow::Result<()> {
         let driver_manager = DriverManager::default();
         let mut connection = driver_manager.connect(DATABASE_URL).await?;
+        assert_eq!(DATABASE_URL, connection.url());
         connection.close().await?;
         Ok(())
     }
