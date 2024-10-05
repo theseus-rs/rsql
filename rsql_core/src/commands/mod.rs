@@ -3,6 +3,7 @@ pub mod changes;
 pub mod clear;
 pub mod color;
 pub mod command;
+pub mod completions;
 pub mod describe;
 pub mod drivers;
 pub mod echo;

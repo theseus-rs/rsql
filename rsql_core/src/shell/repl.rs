@@ -110,8 +110,12 @@ impl Shell {
         Ok(exit_code)
     }
 
-    fn editor(&self, history_file: &str) -> Result<Editor<ReplHelper, FileHistory>> {
-        let helper = ReplHelper::new(&self.configuration);
+    async fn editor(
+        &self,
+        history_file: &str,
+        connection: &mut dyn Connection,
+    ) -> Result<Editor<ReplHelper, FileHistory>> {
+        let helper = ReplHelper::with_connection(&self.configuration, connection).await?;
         let mut editor = Editor::<ReplHelper, FileHistory>::new()?;
         if self.configuration.color {
             editor.set_color_mode(ColorMode::Forced);
@@ -140,10 +144,9 @@ impl Shell {
             Some(ref file) => String::from(file.to_string_lossy()),
             None => String::new(),
         };
-
         loop {
             // Create a new editor for each iteration in order to read any changes to the configuration.
-            let mut editor = self.editor(history_file.as_str())?;
+            let mut editor = self.editor(history_file.as_str(), connection).await?;
             let locale = self.configuration.locale.as_str();
             let prompt = t!(
                 "prompt",
@@ -298,7 +301,7 @@ impl Shell {
 #[cfg(test)]
 mod test {
     use super::*;
-    use rsql_drivers::{MockConnection, MockDriver};
+    use rsql_drivers::{Metadata, MockConnection, MockDriver};
     use rustyline::history::DefaultHistory;
 
     #[test]
@@ -370,7 +373,7 @@ mod test {
         Ok(())
     }
 
-    fn test_editor(color: bool) -> anyhow::Result<()> {
+    async fn test_editor(color: bool) -> anyhow::Result<()> {
         let configuration = Configuration {
             bail_on_error: false,
             color,
@@ -380,18 +383,23 @@ mod test {
         let shell = ShellBuilder::default()
             .with_configuration(configuration)
             .build();
-        let _ = shell.editor("history.txt")?;
+        let mut connection = MockConnection::new();
+        connection
+            .expect_metadata()
+            .with()
+            .returning(|| Ok(Metadata::default()));
+        let _ = shell.editor("history.txt", &mut connection).await?;
         Ok(())
     }
 
     #[tokio::test]
     async fn test_editor_color_true() -> anyhow::Result<()> {
-        test_editor(true)
+        test_editor(true).await
     }
 
     #[tokio::test]
     async fn test_editor_color_false() -> anyhow::Result<()> {
-        test_editor(false)
+        test_editor(false).await
     }
 
     #[tokio::test]

@@ -1,3 +1,4 @@
+use crate::connection::CachedMetadataConnection;
 use crate::error::Result;
 use crate::Connection;
 use crate::Error::DriverNotFound;
@@ -57,7 +58,11 @@ impl DriverManager {
         let url = url.to_string();
 
         match &self.get(scheme) {
-            Some(driver) => driver.connect(url, password).await,
+            Some(driver) => {
+                let connection = driver.connect(url, password).await?;
+                let connection = Box::new(CachedMetadataConnection::new(connection));
+                Ok(connection)
+            }
             None => Err(DriverNotFound {
                 identifier: scheme.to_string(),
             }),

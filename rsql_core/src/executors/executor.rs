@@ -62,8 +62,8 @@ impl<'a> Executor<'a> {
         let input = input.trim();
         let commands = self.parse_commands(input)?;
         for command in commands {
-            if let LoopCondition::Exit(exit_code) = &self.execute_command(command.as_str()).await? {
-                return Ok(LoopCondition::Exit(*exit_code));
+            if let LoopCondition::Exit(exit_code) = self.execute_command(command.as_str()).await? {
+                return Ok(LoopCondition::Exit(exit_code));
             }
         }
 
@@ -125,7 +125,6 @@ impl<'a> Executor<'a> {
 
             executor.execute(input).await?
         };
-
         Ok(loop_condition)
     }
 }

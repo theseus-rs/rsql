@@ -51,7 +51,6 @@ impl<'a> SqlExecutor<'a> {
         let limit = self.configuration.results_limit;
         let mut results = self.execute_sql(sql, limit).await?;
         options.elapsed = start.elapsed();
-
         formatter
             .format(&options, &mut results, self.output)
             .await?;
@@ -67,7 +66,8 @@ impl<'a> SqlExecutor<'a> {
         Span::current().pb_set_style(&ProgressStyle::with_template(
             "{span_child_prefix}{spinner}",
         )?);
-        let is_select = matches!(self.connection.parse_sql(sql), StatementMetadata::Query);
+        let statement_metadata = self.connection.parse_sql(sql);
+        let is_select = matches!(statement_metadata, StatementMetadata::Query);
 
         let results = if is_select {
             let query_results = self.connection.query(sql).await?;
@@ -201,7 +201,7 @@ mod tests {
         connection
             .expect_parse_sql()
             .with(eq(sql))
-            .returning(|_| rsql_drivers::StatementMetadata::Unknown);
+            .returning(|_| rsql_drivers::StatementMetadata::DML);
         connection
             .expect_execute()
             .with(eq(sql))

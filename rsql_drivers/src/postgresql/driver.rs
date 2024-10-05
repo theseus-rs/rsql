@@ -371,6 +371,7 @@ impl Connection {
 
 #[cfg(test)]
 mod test {
+
     use crate::{DriverManager, Value};
     use chrono::{NaiveDate, NaiveDateTime, NaiveTime, Utc};
     use serde_json::json;
@@ -407,6 +408,12 @@ mod test {
             Some(vec![Value::I32(1), Value::String("foo".to_string())])
         );
         assert!(query_result.next().await.is_none());
+
+        let db_metadata = connection.metadata().await?;
+        let schema = db_metadata
+            .current_schema()
+            .expect("expected at least one schema");
+        assert!(schema.tables().iter().any(|table| table.name() == "person"));
 
         connection.close().await?;
         Ok(())

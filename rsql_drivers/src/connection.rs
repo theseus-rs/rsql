@@ -7,6 +7,7 @@ use sqlparser::ast::Statement;
 use sqlparser::dialect::{Dialect, GenericDialect};
 use sqlparser::parser::Parser;
 
+use chrono::{NaiveTime, TimeDelta};
 use std::fmt::Debug;
 
 /// A single row of a query result
@@ -147,6 +148,73 @@ pub trait Connection: Debug + Send + Sync {
 
     fn match_statement(&self, statement: &Statement) -> StatementMetadata {
         self.default_match_statement(statement)
+    }
+}
+
+#[derive(Debug)]
+pub(crate) struct CachedMetadataConnection {
+    connection: Box<dyn Connection>,
+    metadata: Option<Metadata>,
+    timestamp: NaiveTime,
+}
+
+impl CachedMetadataConnection {
+    #[must_use]
+    pub fn new(connection: Box<dyn Connection>) -> Self {
+        let timestamp = chrono::Local::now().time();
+        Self {
+            connection,
+            metadata: None,
+            timestamp,
+        }
+    }
+}
+
+#[async_trait]
+impl Connection for CachedMetadataConnection {
+    fn url(&self) -> &String {
+        self.connection.url()
+    }
+
+    async fn execute(&mut self, sql: &str) -> Result<u64> {
+        if let StatementMetadata::DDL = self.parse_sql(sql) {
+            self.metadata = None;
+        }
+
+        self.connection.execute(sql).await
+    }
+
+    async fn metadata(&mut self) -> Result<Metadata> {
+        let now = chrono::Local::now().time();
+        let one_minute = TimeDelta::try_minutes(1).unwrap_or_default();
+
+        if self.timestamp + one_minute < now {
+            self.metadata = None;
+        }
+
+        if let Some(metadata) = &self.metadata {
+            Ok(metadata.clone())
+        } else {
+            let metadata = self.connection.metadata().await?;
+            self.metadata = Some(metadata.clone());
+            Ok(metadata)
+        }
+    }
+
+    async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {
+        self.connection.query(sql).await
+    }
+
+    async fn close(&mut self) -> Result<()> {
+        self.connection.close().await
+    }
+
+    fn dialect(&self) -> Box<dyn Dialect> {
+        self.connection.dialect()
+    }
+
+    fn match_statement(&self, statement: &Statement) -> StatementMetadata {
+        self.connection.match_statement(statement)
     }
 }
 

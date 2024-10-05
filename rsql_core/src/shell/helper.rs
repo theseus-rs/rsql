@@ -1,23 +1,60 @@
 use crate::configuration::Configuration;
+use crate::shell::completer::ReplCompleter;
+use crate::shell::Result;
+use rsql_drivers::{Connection, Metadata};
 use rsql_formatters::Highlighter;
+use rustyline::completion::Completer;
 use rustyline::hint::{Hinter, HistoryHinter};
 use rustyline::validate::{ValidationContext, ValidationResult, Validator};
 use rustyline::{Context, Helper};
 
 pub(crate) struct ReplHelper {
     pub(crate) highlighter: Highlighter,
+    pub(crate) completer: ReplCompleter,
 }
 
 impl ReplHelper {
+    #[cfg(test)]
     pub(crate) fn new(configuration: &Configuration) -> Self {
+        Self::new_with_metadata(configuration, Metadata::default())
+    }
+
+    pub(crate) async fn with_connection(
+        configuration: &Configuration,
+        connection: &mut dyn Connection,
+    ) -> Result<Self> {
+        Ok(Self::new_with_metadata(
+            configuration,
+            connection.metadata().await?,
+        ))
+    }
+
+    pub(crate) fn new_with_metadata(configuration: &Configuration, metadata: Metadata) -> Self {
         let options = configuration.get_formatter_options();
         let highlighter = Highlighter::new(&options, "sql");
+        let completer = ReplCompleter::with_config(configuration, metadata);
 
-        Self { highlighter }
+        Self {
+            highlighter,
+            completer,
+        }
     }
 }
 
 impl Helper for ReplHelper {}
+
+impl Completer for ReplHelper {
+    type Candidate = <ReplCompleter as Completer>::Candidate;
+
+    fn complete(
+        &self,
+        line: &str,
+        pos: usize,
+        ctx: &Context<'_>,
+    ) -> rustyline::Result<(usize, Vec<Self::Candidate>)> {
+        self.completer.complete(line, pos, ctx)
+    }
+}
 
 impl Hinter for ReplHelper {
     type Hint = String;

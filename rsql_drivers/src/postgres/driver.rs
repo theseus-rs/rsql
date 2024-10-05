@@ -327,6 +327,12 @@ mod test {
         );
         assert!(query_result.next().await.is_none());
 
+        let db_metadata = connection.metadata().await?;
+        let schema = db_metadata
+            .current_schema()
+            .expect("expected at least one schema");
+        assert!(schema.tables().iter().any(|table| table.name() == "person"));
+
         connection.close().await?;
         Ok(())
     }
