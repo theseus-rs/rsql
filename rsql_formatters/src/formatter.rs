@@ -8,7 +8,7 @@ use std::time::Duration;
 
 /// Options for formatters
 #[derive(Debug)]
-#[allow(clippy::struct_excessive_bools)]
+#[expect(clippy::struct_excessive_bools)]
 pub struct FormatterOptions {
     pub changes: bool,
     pub color: bool,

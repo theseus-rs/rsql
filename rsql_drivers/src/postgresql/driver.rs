@@ -173,7 +173,7 @@ impl crate::Connection for Connection {
 }
 
 impl Connection {
-    #[allow(clippy::too_many_lines)]
+    #[expect(clippy::too_many_lines)]
     fn convert_to_value(row: &PgRow, column: &PgColumn) -> Result<Value> {
         let column_type = column.type_info();
         let postgresql_type = &**column_type;

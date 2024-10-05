@@ -482,7 +482,7 @@ mod test {
     use wiremock::matchers::{method, path};
     use wiremock::{Mock, MockServer, ResponseTemplate};
 
-    #[allow(clippy::too_many_lines)]
+    #[expect(clippy::too_many_lines)]
     fn initial_response_json() -> serde_json::Value {
         json!({
             "resultSetMetaData": {

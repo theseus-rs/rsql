@@ -142,7 +142,7 @@ impl crate::Connection for Connection {
     }
 }
 
-#[allow(clippy::same_functions_in_if_condition)]
+#[expect(clippy::same_functions_in_if_condition)]
 fn convert_to_value(row: &Row, column: &Column, index: usize) -> Result<Value> {
     let column_name = column.name();
 

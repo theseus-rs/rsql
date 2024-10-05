@@ -73,7 +73,6 @@ impl DriverManager {
 /// Default implementation for the `DriverManager`
 impl Default for DriverManager {
     fn default() -> Self {
-        #[allow(unused_mut)]
         let mut drivers = DriverManager::new();
 
         #[cfg(any(feature = "mysql", feature = "postgresql", feature = "sqlite"))]

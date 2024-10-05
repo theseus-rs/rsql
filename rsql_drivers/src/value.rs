@@ -14,15 +14,10 @@ pub enum Value {
     I32(i32),
     I64(i64),
     I128(i128),
-    #[allow(dead_code)]
     U8(u8),
-    #[allow(dead_code)]
     U16(u16),
-    #[allow(dead_code)]
     U32(u32),
-    #[allow(dead_code)]
     U64(u64),
-    #[allow(dead_code)]
     U128(u128),
     F32(f32),
     F64(f64),
@@ -78,7 +73,7 @@ impl Value {
 
     #[must_use]
     pub fn is_numeric(&self) -> bool {
-        #[allow(clippy::match_like_matches_macro)]
+        #[expect(clippy::match_like_matches_macro)]
         match self {
             Value::I8(_) | Value::I16(_) | Value::I32(_) | Value::I64(_) | Value::I128(_) => true,
             Value::U8(_) | Value::U16(_) | Value::U32(_) | Value::U64(_) | Value::U128(_) => true,

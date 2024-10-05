@@ -42,7 +42,7 @@ pub(crate) struct Connection {
 }
 
 impl Connection {
-    #[allow(clippy::unused_async)]
+    #[expect(clippy::unused_async)]
     pub(crate) async fn new(url: String) -> Result<Connection> {
         let parsed_url = Url::parse(url.as_str())?;
         let mut params: HashMap<String, String> = parsed_url.query_pairs().into_owned().collect();

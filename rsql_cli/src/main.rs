@@ -33,7 +33,7 @@ enum Color {
 }
 
 #[derive(Debug, Default, Parser)]
-#[allow(clippy::struct_field_names)]
+#[expect(clippy::struct_field_names)]
 pub(crate) struct Args {
     /// The shell arguments
     #[clap(flatten)]

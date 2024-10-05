@@ -199,7 +199,6 @@ mod test {
     use serde_json::json;
     use testcontainers::runners::AsyncRunner;
 
-    #[allow(dead_code)]
     #[tokio::test]
     async fn test_container() -> anyhow::Result<()> {
         // Skip tests on GitHub Actions for non-Linux platforms; the test containers fail to run.
