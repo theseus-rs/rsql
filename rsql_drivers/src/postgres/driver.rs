@@ -1,5 +1,4 @@
 use crate::error::Result;
-use crate::metadata::MetadataCache;
 use crate::value::Value;
 use crate::Error::UnsupportedColumnType;
 use crate::{postgresql, Error, MemoryQueryResult, Metadata, QueryResult, StatementMetadata};
@@ -44,7 +43,6 @@ impl crate::Driver for Driver {
 pub(crate) struct Connection {
     postgresql: Option<PostgreSQL>,
     client: Client,
-    metadata_cache: MetadataCache,
 }
 
 impl Connection {
@@ -93,11 +91,9 @@ impl Connection {
                 eprintln!("connection error: {e}");
             }
         });
-        let metadata_cache = MetadataCache::new();
         let connection = Connection {
             postgresql,
             client,
-            metadata_cache,
         };
 
         Ok(connection)
@@ -108,22 +104,11 @@ impl Connection {
 impl crate::Connection for Connection {
     async fn execute(&mut self, sql: &str) -> Result<u64> {
         let rows = self.client.execute(sql, &[]).await?;
-
-        if let StatementMetadata::DDL = self.parse_sql(sql) {
-            self.metadata_cache.invalidate();
-        }
-
         Ok(rows)
     }
 
     async fn metadata(&mut self) -> Result<Metadata> {
-        if let Some(metadata) = self.metadata_cache.get() {
-            Ok(metadata)
-        } else {
-            let metadata = postgresql::metadata::get_metadata(self).await?;
-            self.metadata_cache.set(metadata.clone());
-            Ok(metadata)
-        }
+        postgresql::metadata::get_metadata(self).await
     }
 
     async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {
@@ -340,18 +325,6 @@ mod test {
             .current_schema()
             .expect("expected at least one schema");
         assert!(schema.tables().iter().any(|table| table.name() == "person"));
-
-        connection
-            .execute("CREATE TABLE products (id INTEGER, name VARCHAR(20))")
-            .await?;
-        let db_metadata = connection.metadata().await?;
-        let schema = db_metadata
-            .current_schema()
-            .expect("expected at least one schema");
-        assert!(schema
-            .tables()
-            .iter()
-            .any(|table| table.name() == "products"));
 
         connection.close().await?;
         Ok(())

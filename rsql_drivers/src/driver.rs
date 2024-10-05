@@ -8,6 +8,7 @@ use std::collections::BTreeMap;
 use std::fmt::Debug;
 use tracing::instrument;
 use url::Url;
+use crate::connection::CachedMetadataConnection;
 
 #[automock]
 #[async_trait]
@@ -57,7 +58,11 @@ impl DriverManager {
         let url = url.to_string();
 
         match &self.get(scheme) {
-            Some(driver) => driver.connect(url, password).await,
+            Some(driver) => {
+                let connection = driver.connect(url, password).await?;
+                let connection = Box::new(CachedMetadataConnection::new(connection));
+                Ok(connection)
+            },
             None => Err(DriverNotFound {
                 identifier: scheme.to_string(),
             }),
