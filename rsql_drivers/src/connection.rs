@@ -172,7 +172,6 @@ impl CachedMetadataConnection {
 
 #[async_trait]
 impl Connection for CachedMetadataConnection {
-
     fn url(&self) -> &String {
         self.connection.url()
     }
