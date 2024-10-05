@@ -33,6 +33,7 @@ impl crate::Driver for Driver {
 
 #[derive(Debug)]
 pub(crate) struct Connection {
+    url: String,
     pool: MySqlPool,
 }
 
@@ -40,7 +41,7 @@ impl Connection {
     pub(crate) async fn new(url: String, _password: Option<String>) -> Result<Connection> {
         let options = MySqlConnectOptions::from_str(url.as_str())?;
         let pool = MySqlPool::connect_with(options).await?;
-        let connection = Connection { pool };
+        let connection = Connection { url, pool };
 
         Ok(connection)
     }
@@ -48,6 +49,10 @@ impl Connection {
 
 #[async_trait]
 impl crate::Connection for Connection {
+    fn url(&self) -> &String {
+        &self.url
+    }
+
     async fn execute(&mut self, sql: &str) -> Result<u64> {
         let rows = sqlx::query(sql).execute(&self.pool).await?.rows_affected();
         Ok(rows)
@@ -207,9 +212,10 @@ mod test {
         let container = mysql_image.start().await?;
         let port = container.get_host_port_ipv4(3306).await?;
 
-        let database_url = &format!("mysql://root@127.0.0.1:{port}/mysql");
+        let database_url = format!("mysql://root@127.0.0.1:{port}/mysql");
         let driver_manager = DriverManager::default();
         let mut connection = driver_manager.connect(database_url.as_str()).await?;
+        assert_eq!(database_url, connection.url().as_str());
 
         test_connection_interface(&mut *connection).await?;
         test_data_types(&mut *connection).await?;

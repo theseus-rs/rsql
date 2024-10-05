@@ -99,6 +99,7 @@ pub enum StatementMetadata {
 #[automock]
 #[async_trait]
 pub trait Connection: Debug + Send + Sync {
+    fn url(&self) -> &String;
     async fn execute(&mut self, sql: &str) -> Result<u64>;
     async fn metadata(&mut self) -> Result<Metadata> {
         unimplemented!()
@@ -216,10 +217,16 @@ mod test {
         assert_eq!(data, ["1".to_string()]);
     }
 
-    #[derive(Debug)]
-    struct SampleConnection {}
+    #[derive(Debug, PartialEq)]
+    struct SampleConnection {
+        url: String,
+    }
     #[async_trait]
     impl Connection for SampleConnection {
+        fn url(&self) -> &String {
+            &self.url
+        }
+
         async fn execute(&mut self, _sql: &str) -> Result<u64> {
             Ok(0)
         }
@@ -239,7 +246,9 @@ mod test {
 
     #[test]
     fn test_default_parse_sql() {
-        let connection = SampleConnection {};
+        let connection = SampleConnection {
+            url: "test".to_string(),
+        };
         let ddl_queries = vec![
             "CREATE TABLE users (id INT, name VARCHAR(255))",
             "ALTER TABLE products ADD COLUMN price DECIMAL(10, 2)",
