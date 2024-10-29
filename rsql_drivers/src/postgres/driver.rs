@@ -18,7 +18,7 @@ use tokio_postgres::{Client, Column, NoTls, Row};
 use tracing::debug;
 use url::Url;
 
-const POSTGRESQL_EMBEDDED_VERSION: &str = "=17.0.0";
+const POSTGRESQL_EMBEDDED_VERSION: &str = "=17.0.1";
 
 #[derive(Debug)]
 pub struct Driver;
