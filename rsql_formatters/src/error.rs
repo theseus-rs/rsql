@@ -68,6 +68,8 @@ impl From<std::string::FromUtf8Error> for Error {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use quick_xml::errors::IllFormedError::UnmatchedEndTag;
+    use quick_xml::Error::IllFormed;
     use test_log::test;
 
     #[cfg(any(
@@ -88,9 +90,12 @@ mod tests {
     #[cfg(any(feature = "html", feature = "xml"))]
     #[test]
     fn test_quick_xml_error() {
-        let error = quick_xml::Error::UnknownPrefix("test".as_bytes().to_vec());
+        let error = IllFormed(UnmatchedEndTag("test".to_string()));
         let io_error = Error::from(error);
-        assert_eq!(io_error.to_string(), "Unknown namespace prefix '\"test\"'");
+        assert_eq!(
+            io_error.to_string(),
+            "ill-formed document: close tag `</test>` does not match any open tag"
+        );
     }
 
     #[cfg(any(feature = "json", feature = "jsonl"))]

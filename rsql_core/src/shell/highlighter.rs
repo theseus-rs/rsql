@@ -1,5 +1,5 @@
 use crate::shell::helper::ReplHelper;
-use rustyline::highlight::Highlighter;
+use rustyline::highlight::{CmdKind, Highlighter};
 use std::borrow::Cow;
 
 impl Highlighter for ReplHelper {
@@ -7,7 +7,7 @@ impl Highlighter for ReplHelper {
         self.highlighter.highlight(line).expect("highlight")
     }
 
-    fn highlight_char(&self, line: &str, pos: usize, _forced: bool) -> bool {
+    fn highlight_char(&self, line: &str, pos: usize, _kind: CmdKind) -> bool {
         let _ = (line, pos);
         true
     }
@@ -47,7 +47,7 @@ mod test {
         let configuration = Configuration::default();
         let helper = ReplHelper::new(&configuration);
         let line = "SELECT";
-        let highlighted = helper.highlight_char(line, 0, false);
+        let highlighted = helper.highlight_char(line, 0, CmdKind::ForcedRefresh);
         assert!(highlighted);
     }
 }
