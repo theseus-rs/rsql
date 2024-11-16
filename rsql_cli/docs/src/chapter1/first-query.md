@@ -2,6 +2,12 @@
 
 The following examples show how to run a simple query using the `rsql` CLI tool for different database engines.
 
+### CockroachDB
+
+```shell
+rsql --url "cockroachdb://<user[:password>]@<host>[:<port>]/<database>" -- "SELECT version();"
+```
+
 ### DuckDB
 
 ```shell

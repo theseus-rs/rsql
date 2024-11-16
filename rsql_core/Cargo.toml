@@ -59,6 +59,7 @@ tokio = { workspace = true }
 all = ["all-drivers", "all-formats"]
 default = []
 all-drivers = [
+    "driver-cockroachdb",
     "driver-duckdb",
     "driver-mariadb",
     "driver-mysql",
@@ -70,6 +71,7 @@ all-drivers = [
     "driver-sqlite",
     "driver-sqlserver",
 ]
+driver-cockroachdb = ["rsql_drivers/cockroachdb"]
 driver-duckdb = ["rsql_drivers/duckdb"]
 driver-libsql = ["rsql_drivers/libsql"]
 driver-mariadb = ["rsql_drivers/mariadb"]
