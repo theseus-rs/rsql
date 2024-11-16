@@ -19,7 +19,7 @@ use std::string::ToString;
 use tracing::debug;
 use url::Url;
 
-const POSTGRESQL_EMBEDDED_VERSION: &str = "=17.0.1";
+const POSTGRESQL_EMBEDDED_VERSION: &str = "=17.1.0";
 
 #[derive(Debug)]
 pub struct Driver;
