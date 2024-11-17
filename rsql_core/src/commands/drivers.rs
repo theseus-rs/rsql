@@ -79,6 +79,8 @@ mod tests {
         assert_eq!(result, LoopCondition::Continue);
         let drivers_output = output.to_string();
         let drivers: Vec<&str> = vec![
+            #[cfg(feature = "driver-cockroachdb")]
+            "cockroachdb",
             #[cfg(feature = "driver-duckdb")]
             "duckdb",
             #[cfg(feature = "driver-libsql")]

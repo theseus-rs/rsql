@@ -2,7 +2,7 @@
 authors.workspace = true
 build = "build.rs"
 categories = ["command-line-utilities", "database"]
-description = "rsql is a CLI for DuckDB, LibSQL, MariaDB, MySQL, PostgreSQL, Redshift, Snowflake, SQLite3 and SQL Server."
+description = "rsql is a CLI for CockroachDB, DuckDB, LibSQL, MariaDB, MySQL, PostgreSQL, Redshift, Snowflake, SQLite3 and SQL Server."
 documentation = "https://theseus-rs.github.io/rsql/rsql_cli/"
 edition.workspace = true
 homepage = "https://theseus-rs.github.io/rsql/rsql_cli/"

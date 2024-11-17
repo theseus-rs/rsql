@@ -2,7 +2,6 @@ use crate::error::Result;
 use crate::postgresql::driver::Connection as PgConnection;
 use crate::{Metadata, QueryResult};
 use async_trait::async_trait;
-use sqlparser::dialect::{Dialect, RedshiftSqlDialect};
 
 #[derive(Debug)]
 pub struct Driver;
@@ -10,7 +9,7 @@ pub struct Driver;
 #[async_trait]
 impl crate::Driver for Driver {
     fn identifier(&self) -> &'static str {
-        "redshift"
+        "cockroachdb"
     }
 
     async fn connect(
@@ -56,9 +55,5 @@ impl crate::Connection for Connection {
 
     async fn metadata(&mut self) -> Result<Metadata> {
         self.inner.metadata().await
-    }
-
-    fn dialect(&self) -> Box<dyn Dialect> {
-        Box::new(RedshiftSqlDialect {})
     }
 }

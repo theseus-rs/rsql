@@ -38,18 +38,18 @@ visit the [rsql](https://theseus-rs.github.io/rsql/rsql_cli/) site.
 
 ## Features
 
-| Feature               |                                                                                                 |
-|-----------------------|-------------------------------------------------------------------------------------------------|
-| Databases             | DuckDB, LibSQL (Turso), MariaDB, MySQL, PostgreSQL, Redshift, Snowflake, SQLite3, SQL Server    |
-| Syntax Highlighting   | ✅                                                                                               |
-| Result Highlighting   | ✅                                                                                               |
-| Query Auto-completion | ✅                                                                                               |
-| History               | ✅                                                                                               |
-| SQL File Execution    | ✅                                                                                               |
-| Embedded PostgreSQL   | ✅                                                                                               |
-| Output Formats        | ascii, csv, expanded, html, json, jsonl, markdown, plain, psql, sqlite, tsv, unicode, xml, yaml |
-| Localized Interface   | 40+ languages¹                                                                                  |
-| Key Bindings          | emacs, vi                                                                                       |
+| Feature               |                                                                                                           |
+|-----------------------|-----------------------------------------------------------------------------------------------------------|
+| Databases             | CockroachDB, DuckDB, LibSQL (Turso), MariaDB, MySQL, PostgreSQL, Redshift, Snowflake, SQLite3, SQL Server |
+| Syntax Highlighting   | ✅                                                                                                         |
+| Result Highlighting   | ✅                                                                                                         |
+| Query Auto-completion | ✅                                                                                                         |
+| History               | ✅                                                                                                         |
+| SQL File Execution    | ✅                                                                                                         |
+| Embedded PostgreSQL   | ✅                                                                                                         |
+| Output Formats        | ascii, csv, expanded, html, json, jsonl, markdown, plain, psql, sqlite, tsv, unicode, xml, yaml           |
+| Localized Interface   | 40+ languages¹                                                                                            |
+| Key Bindings          | emacs, vi                                                                                                 |
 
 ¹ Computer translations; human translations welcome
 
@@ -67,19 +67,20 @@ rsql --url "<url>"
 rsql --url "<url>" -- "<query>"
 ```
 
-| Driver            | URL                                                                                                                       |
-|-------------------|---------------------------------------------------------------------------------------------------------------------------|
-| duckdb            | `duckdb://?<memory=true>[&file=<database_file>]`                                                                          |
-| libsql¹           | `libsql://<host>?[<memory=true>][&file=<database_file>][&auth_token=<token>]`                                             |
-| mariadb (sqlx)    | `mariadb://<user>[:<password>]@<host>[:<port>]/<database>`                                                                |
-| mysql (sqlx)      | `mysql://<user>[:<password>]@<host>[:<port>]/<database>`                                                                  |
-| postgres          | `postgres://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`                                               |
-| postgresql (sqlx) | `postgresql://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`                                             |
-| redshift (sqlx)   | `redshift://<user[:password>]@<host>[:<port>]/<database>`                                                                 |
-| rusqlite          | `rusqlite://?<memory=true>[&file=<database_file>]`                                                                        |
-| snowflake         | `snowflake://<user>[:<token>]@<account>.snowflakecomputing.com/[?private_key_file=pkey_file&public_key_file=pubkey_file]` |
-| sqlite (sqlx)     | `sqlite://?<memory=true>[&file=<database_file>]`                                                                          |
-| sqlserver         | `sqlserver://<user>[:<password>]@<host>[:<port>]/<database>`                                                              |
+| Driver             | URL                                                                                                                       |
+|--------------------|---------------------------------------------------------------------------------------------------------------------------|
+| cockroachdb (sqlx) | `cockroachdb://<user[:password>]@<host>[:<port>]/<database>`                                                              |
+| duckdb             | `duckdb://?<memory=true>[&file=<database_file>]`                                                                          |
+| libsql¹            | `libsql://<host>?[<memory=true>][&file=<database_file>][&auth_token=<token>]`                                             |
+| mariadb (sqlx)     | `mariadb://<user>[:<password>]@<host>[:<port>]/<database>`                                                                |
+| mysql (sqlx)       | `mysql://<user>[:<password>]@<host>[:<port>]/<database>`                                                                  |
+| postgres           | `postgres://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`                                               |
+| postgresql (sqlx)  | `postgresql://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`                                             |
+| redshift (sqlx)    | `redshift://<user[:password>]@<host>[:<port>]/<database>`                                                                 |
+| rusqlite           | `rusqlite://?<memory=true>[&file=<database_file>]`                                                                        |
+| snowflake          | `snowflake://<user>[:<token>]@<account>.snowflakecomputing.com/[?private_key_file=pkey_file&public_key_file=pubkey_file]` |
+| sqlite (sqlx)      | `sqlite://?<memory=true>[&file=<database_file>]`                                                                          |
+| sqlserver          | `sqlserver://<user>[:<password>]@<host>[:<port>]/<database>`                                                              |
 
 ¹ `libsql` needs to be enabled with the `libsql` feature flag; it is disabled by default as it conflicts
 with `rusqlite`.

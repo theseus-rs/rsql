@@ -78,6 +78,8 @@ impl Default for DriverManager {
         #[cfg(any(feature = "mysql", feature = "postgresql", feature = "sqlite"))]
         sqlx::any::install_default_drivers();
 
+        #[cfg(feature = "cockroachdb")]
+        drivers.add(Box::new(crate::cockroachdb::Driver));
         #[cfg(feature = "duckdb")]
         drivers.add(Box::new(crate::duckdb::Driver));
         #[cfg(feature = "libsql")]
@@ -136,6 +138,9 @@ mod tests {
     fn test_driver_manager_default() {
         let driver_manager = DriverManager::default();
         let driver_count = 0;
+
+        #[cfg(feature = "cockroachdb")]
+        let driver_count = driver_count + 1;
 
         #[cfg(feature = "duckdb")]
         let driver_count = driver_count + 1;

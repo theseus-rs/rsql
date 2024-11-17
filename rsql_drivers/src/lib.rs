@@ -6,6 +6,8 @@
 #[macro_use]
 extern crate rust_i18n;
 
+#[cfg(feature = "cockroachdb")]
+mod cockroachdb;
 mod connection;
 mod driver;
 #[cfg(feature = "duckdb")]
