@@ -10,6 +10,7 @@ keywords.workspace = true
 license.workspace = true
 name = "rsql_cli"
 repository.workspace = true
+rust-version.workspace = true
 version.workspace = true
 
 [package.metadata.wix]
@@ -36,14 +37,12 @@ inquire = { workspace = true }
 os_info = { workspace = true }
 rsql_core = { path = "../rsql_core", version = "0.14.1", features = ["all"] }
 rust-i18n = { workspace = true }
-semver = { workspace = true }
 serde = { workspace = true }
 supports-color = { workspace = true }
 tokio = { workspace = true, features = ["rt", "rt-multi-thread", "macros"] }
 tracing = { workspace = true }
 
 [dev-dependencies]
-indoc = { workspace = true }
 tempfile = { workspace = true }
 tokio = { workspace = true }
 
