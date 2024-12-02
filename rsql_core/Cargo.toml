@@ -7,6 +7,7 @@ keywords.workspace = true
 license.workspace = true
 name = "rsql_core"
 repository.workspace = true
+rust-version.workspace = true
 version.workspace = true
 
 [dependencies]
@@ -27,7 +28,6 @@ rsql_drivers = { path = "../rsql_drivers", version = "0.14.1" }
 rsql_formatters = { path = "../rsql_formatters", version = "0.14.1" }
 rust-i18n = { workspace = true }
 rustyline = { workspace = true }
-serde_json = { workspace = true, features = ["preserve_order"] }
 sqlparser = { workspace = true }
 sys-locale = { workspace = true }
 tempfile = { workspace = true }
@@ -47,7 +47,6 @@ tracing-subscriber = { workspace = true, features = [
     "tracing-log",
 ] }
 unicode-width = { workspace = true }
-url = { workspace = true }
 
 [dev-dependencies]
 criterion = { workspace = true, features = ["async_tokio"] }
