@@ -25,6 +25,8 @@ jwt-simple = { workspace = true, optional = true, default-features = false, feat
 libsql = { workspace = true, optional = true }
 mockall = { workspace = true }
 num-format = { workspace = true }
+polars = { workspace = true, optional = true, features = ["lazy", "json", "polars-sql"] }
+polars-sql = { workspace = true, optional = true }
 postgresql_embedded = { workspace = true, optional = true }
 regex = { workspace = true }
 reqwest = { workspace = true, optional = true, features = ["json", "gzip"] }
@@ -65,6 +67,8 @@ wiremock = { workspace = true }
 [features]
 all = [
     "cockroachdb",
+    "csv",
+    "delimited",
     "duckdb",
     "mariadb",
     "mysql",
@@ -74,11 +78,20 @@ all = [
     "rusqlite",
     "snowflake",
     "sqlite",
-    "sqlserver"
+    "sqlserver",
+    "tsv",
 ]
 default = []
 cockroachdb = [
     "postgresql",
+]
+csv = [
+    "dep:polars",
+    "dep:polars-sql",
+]
+delimited = [
+    "dep:polars",
+    "dep:polars-sql",
 ]
 duckdb = [
     "dep:duckdb"
@@ -123,6 +136,10 @@ sqlserver = [
     "dep:futures-util",
     "dep:tiberius",
     "dep:tokio-util",
+]
+tsv = [
+    "dep:polars",
+    "dep:polars-sql",
 ]
 
 [lints.clippy]

@@ -9,6 +9,10 @@ extern crate rust_i18n;
 #[cfg(feature = "cockroachdb")]
 mod cockroachdb;
 mod connection;
+#[cfg(feature = "csv")]
+mod csv;
+#[cfg(feature = "delimited")]
+mod delimited;
 mod driver;
 #[cfg(feature = "duckdb")]
 mod duckdb;
@@ -20,6 +24,8 @@ mod mariadb;
 mod metadata;
 #[cfg(feature = "mysql")]
 mod mysql;
+#[cfg(any(feature = "csv", feature = "delimited", feature = "tsv"))]
+mod polars;
 #[cfg(feature = "postgres")]
 mod postgres;
 #[cfg(feature = "postgresql")]
@@ -34,6 +40,8 @@ mod snowflake;
 mod sqlite;
 #[cfg(feature = "sqlserver")]
 mod sqlserver;
+#[cfg(feature = "tsv")]
+mod tsv;
 mod value;
 
 pub use connection::{

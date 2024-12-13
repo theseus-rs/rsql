@@ -59,6 +59,8 @@ all = ["all-drivers", "all-formats"]
 default = []
 all-drivers = [
     "driver-cockroachdb",
+    "driver-csv",
+    "driver-delimited",
     "driver-duckdb",
     "driver-mariadb",
     "driver-mysql",
@@ -69,8 +71,11 @@ all-drivers = [
     "driver-snowflake",
     "driver-sqlite",
     "driver-sqlserver",
+    "driver-tsv",
 ]
 driver-cockroachdb = ["rsql_drivers/cockroachdb"]
+driver-csv = ["rsql_drivers/csv"]
+driver-delimited = ["rsql_drivers/delimited"]
 driver-duckdb = ["rsql_drivers/duckdb"]
 driver-libsql = ["rsql_drivers/libsql"]
 driver-mariadb = ["rsql_drivers/mariadb"]
@@ -82,6 +87,7 @@ driver-rusqlite = ["rsql_drivers/rusqlite"]
 driver-snowflake = ["rsql_drivers/snowflake"]
 driver-sqlite = ["rsql_drivers/sqlite"]
 driver-sqlserver = ["rsql_drivers/sqlserver"]
+driver-tsv = ["rsql_drivers/tsv"]
 all-formats = [
     "format-ascii",
     "format-csv",

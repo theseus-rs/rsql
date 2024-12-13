@@ -40,6 +40,13 @@ jobs:
             os: windows-2022
 
     steps:
+      - name: Maximize build space
+        if: ${{ startsWith(matrix.platform, 'linux-') }}
+        uses: easimon/maximize-build-space@master
+        with:
+          remove-android: "true"
+          remove-dotnet: "true"
+
       - name: Checkout source code
         uses: actions/checkout@v4
 
@@ -50,7 +57,7 @@ jobs:
 
       # aws-lc-rs requires nasm: https://github.com/rustls/rustls/issues/1913
       - name: Install NASM
-        if: ${{ startsWith(matrix.os, 'windows-') }}
+        if: ${{ startsWith(matrix.platform, 'windows-') }}
         uses: ilammy/setup-nasm@v1
 
       - name: Install cargo-llvm-cov
@@ -59,7 +66,7 @@ jobs:
           tool: cargo-llvm-cov
 
       - name: Tests
-        if: ${{ !startsWith(matrix.os, 'ubuntu-') }}
+        if: ${{ !startsWith(matrix.platform, 'linux-') }}
         env:
           CARGO_TERM_COLOR: always
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
@@ -70,7 +77,7 @@ jobs:
           cargo test --workspace --features all
 
       - name: Tests
-        if: ${{ startsWith(matrix.os, 'ubuntu-') }}
+        if: ${{ startsWith(matrix.platform, 'linux-') }}
         env:
           CARGO_TERM_COLOR: always
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
@@ -78,10 +85,10 @@ jobs:
           RUST_LOG: "info"
           RUST_LOG_SPAN_EVENTS: full
         run: |
-          cargo llvm-cov --workspace --lcov --output-path lcov.info
+          cargo llvm-cov --workspace --lcov --jobs 1 --output-path lcov.info
 
       - name: Upload to codecov.io
-        if: ${{ startsWith(matrix.os, 'ubuntu-') }}
+        if: ${{ startsWith(matrix.platform, 'linux-') }}
         uses: codecov/codecov-action@v4
         with:
           files: lcov.info

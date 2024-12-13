@@ -25,8 +25,8 @@ allow = [
     "OpenSSL",
     "PostgreSQL",
     "Unicode-3.0",
-    "Unicode-DFS-2016",
     "WTFPL",
+    "Zlib",
 ]
 
 [advisories]
@@ -35,7 +35,6 @@ ignore = [
     "RUSTSEC-2023-0086",
     "RUSTSEC-2024-0320",
     "RUSTSEC-2024-0363",
-    "RUSTSEC-2024-0370",
 ]
 
 # https://embarkstudios.github.io/cargo-deny/checks/bans/cfg.html
