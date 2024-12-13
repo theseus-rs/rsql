@@ -149,6 +149,156 @@ impl Serialize for Value {
     }
 }
 
+impl From<Option<Value>> for Value {
+    fn from(value: Option<Value>) -> Self {
+        value.unwrap_or(Value::Null)
+    }
+}
+
+impl From<bool> for Value {
+    fn from(value: bool) -> Self {
+        Value::Bool(value)
+    }
+}
+
+impl From<Vec<u8>> for Value {
+    fn from(value: Vec<u8>) -> Self {
+        Value::Bytes(value)
+    }
+}
+
+impl From<i8> for Value {
+    fn from(value: i8) -> Self {
+        Value::I8(value)
+    }
+}
+
+impl From<u8> for Value {
+    fn from(value: u8) -> Self {
+        Value::U8(value)
+    }
+}
+
+impl From<i16> for Value {
+    fn from(value: i16) -> Self {
+        Value::I16(value)
+    }
+}
+
+impl From<u16> for Value {
+    fn from(value: u16) -> Self {
+        Value::U16(value)
+    }
+}
+
+impl From<i32> for Value {
+    fn from(value: i32) -> Self {
+        Value::I32(value)
+    }
+}
+
+impl From<u32> for Value {
+    fn from(value: u32) -> Self {
+        Value::U32(value)
+    }
+}
+
+impl From<i64> for Value {
+    fn from(value: i64) -> Self {
+        Value::I64(value)
+    }
+}
+
+impl From<u64> for Value {
+    fn from(value: u64) -> Self {
+        Value::U64(value)
+    }
+}
+
+impl From<isize> for Value {
+    fn from(value: isize) -> Self {
+        Value::I64(value as i64)
+    }
+}
+
+impl From<usize> for Value {
+    fn from(value: usize) -> Self {
+        Value::U64(value as u64)
+    }
+}
+
+impl From<i128> for Value {
+    fn from(value: i128) -> Self {
+        Value::I128(value)
+    }
+}
+
+impl From<u128> for Value {
+    fn from(value: u128) -> Self {
+        Value::U128(value)
+    }
+}
+
+impl From<f32> for Value {
+    fn from(value: f32) -> Self {
+        Value::F32(value)
+    }
+}
+
+impl From<f64> for Value {
+    fn from(value: f64) -> Self {
+        Value::F64(value)
+    }
+}
+
+impl From<&str> for Value {
+    fn from(value: &str) -> Self {
+        Value::String(value.to_string())
+    }
+}
+
+impl From<String> for Value {
+    fn from(value: String) -> Self {
+        Value::String(value)
+    }
+}
+
+impl From<chrono::NaiveDate> for Value {
+    fn from(value: chrono::NaiveDate) -> Self {
+        Value::Date(value)
+    }
+}
+
+impl From<chrono::NaiveTime> for Value {
+    fn from(value: chrono::NaiveTime) -> Self {
+        Value::Time(value)
+    }
+}
+
+impl From<chrono::NaiveDateTime> for Value {
+    fn from(value: chrono::NaiveDateTime) -> Self {
+        Value::DateTime(value)
+    }
+}
+
+impl From<uuid::Uuid> for Value {
+    fn from(value: uuid::Uuid) -> Self {
+        Value::Uuid(value)
+    }
+}
+
+impl From<serde_json::Value> for Value {
+    fn from(value: serde_json::Value) -> Self {
+        Value::Json(value)
+    }
+}
+
+impl From<Vec<Value>> for Value {
+    fn from(value: Vec<Value>) -> Self {
+        Value::Array(value)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -509,5 +659,146 @@ mod tests {
         );
         assert_eq!(json!(Value::Array(array.clone())), json!(array.clone()));
         Ok(())
+    }
+
+    #[test]
+    fn test_from_option() {
+        let value: Option<Value> = None;
+        assert_eq!(Value::from(value), Value::Null);
+    }
+
+    #[test]
+    fn test_from_bool() {
+        assert_eq!(Value::from(true), Value::Bool(true));
+    }
+
+    #[test]
+    fn test_from_vec_u8() {
+        assert_eq!(Value::from(vec![42]), Value::Bytes(vec![42]));
+    }
+
+    #[test]
+    fn test_from_i8() {
+        assert_eq!(Value::from(i8::MIN), Value::I8(i8::MIN));
+    }
+
+    #[test]
+    fn test_from_u8() {
+        assert_eq!(Value::from(u8::MAX), Value::U8(u8::MAX));
+    }
+
+    #[test]
+    fn test_from_i16() {
+        assert_eq!(Value::from(i16::MIN), Value::I16(i16::MIN));
+    }
+
+    #[test]
+    fn test_from_u16() {
+        assert_eq!(Value::from(u16::MAX), Value::U16(u16::MAX));
+    }
+
+    #[test]
+    fn test_from_i32() {
+        assert_eq!(Value::from(i32::MIN), Value::I32(i32::MIN));
+    }
+
+    #[test]
+    fn test_from_u32() {
+        assert_eq!(Value::from(u32::MAX), Value::U32(u32::MAX));
+    }
+
+    #[test]
+    fn test_from_i64() {
+        assert_eq!(Value::from(i64::MIN), Value::I64(i64::MIN));
+    }
+
+    #[test]
+    fn test_from_u64() {
+        assert_eq!(Value::from(u64::MAX), Value::U64(u64::MAX));
+    }
+
+    #[test]
+    fn test_from_isize() {
+        assert_eq!(Value::from(isize::MIN), Value::I64(isize::MIN as i64));
+    }
+
+    #[test]
+    fn test_from_usize() {
+        assert_eq!(Value::from(usize::MAX), Value::U64(usize::MAX as u64));
+    }
+
+    #[test]
+    fn test_from_i128() {
+        assert_eq!(Value::from(i128::MIN), Value::I128(i128::MIN));
+    }
+
+    #[test]
+    fn test_from_u128() {
+        assert_eq!(Value::from(u128::MAX), Value::U128(u128::MAX));
+    }
+
+    #[test]
+    fn test_from_f32() {
+        assert_eq!(Value::from(42.1f32), Value::F32(42.1f32));
+    }
+
+    #[test]
+    fn test_from_f64() {
+        assert_eq!(Value::from(42.1f64), Value::F64(42.1f64));
+    }
+
+    #[test]
+    fn test_from_str() {
+        assert_eq!(Value::from("foo"), Value::String("foo".to_string()));
+    }
+
+    #[test]
+    fn test_from_string() {
+        assert_eq!(
+            Value::from("foo".to_string()),
+            Value::String("foo".to_string())
+        );
+    }
+
+    #[test]
+    fn test_from_naive_date() {
+        let date = NaiveDate::from_ymd_opt(2000, 12, 31).expect("Invalid date");
+        assert_eq!(Value::from(date), Value::Date(date));
+    }
+
+    #[test]
+    fn test_from_naive_time() {
+        let time = NaiveTime::from_hms_milli_opt(12, 13, 14, 15).expect("Invalid time");
+        assert_eq!(Value::from(time), Value::Time(time));
+    }
+
+    #[test]
+    fn test_from_naive_date_time() {
+        let date = NaiveDate::from_ymd_opt(2000, 12, 31).expect("Invalid date");
+        let time = NaiveTime::from_hms_milli_opt(12, 13, 14, 15).expect("Invalid time");
+        let datetime = NaiveDateTime::new(date, time);
+        assert_eq!(Value::from(datetime), Value::DateTime(datetime));
+    }
+
+    #[test]
+    fn test_from_uuid() -> Result<()> {
+        let uuid = "acf5b3e3-4099-4f34-81c7-5803cbc87a2d";
+        assert_eq!(
+            Value::from(Uuid::from_str(uuid)?),
+            Value::Uuid(Uuid::from_str(uuid)?)
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn test_from_json() {
+        let json = json!({"foo": "bar", "baz": 123});
+        assert_eq!(Value::from(json.clone()), Value::Json(json.clone()));
+    }
+
+    #[test]
+    fn test_from_vec_value() {
+        let array = vec![Value::Bool(true), Value::I8(42)];
+        assert_eq!(Value::from(array.clone()), Value::Array(array.clone()));
     }
 }
