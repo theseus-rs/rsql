@@ -40,13 +40,6 @@ jobs:
             os: windows-2022
 
     steps:
-      - name: Maximize build space
-        if: ${{ startsWith(matrix.platform, 'linux-') }}
-        uses: easimon/maximize-build-space@master
-        with:
-          remove-android: "true"
-          remove-dotnet: "true"
-
       - name: Checkout source code
         uses: actions/checkout@v4
 
