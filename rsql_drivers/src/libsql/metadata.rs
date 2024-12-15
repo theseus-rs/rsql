@@ -156,7 +156,7 @@ async fn retrieve_indexes(connection: &mut dyn Connection, schema: &mut Schema) 
 mod test {
     use crate::DriverManager;
 
-    const DATABASE_URL: &str = "libsql://?memory=true";
+    const DATABASE_URL: &str = "libsql://";
 
     #[tokio::test]
     async fn test_schema() -> anyhow::Result<()> {

@@ -15,7 +15,7 @@ pub fn rusqlite_benchmark(criterion: &mut Criterion) {
 
 async fn rusqlite() -> Result<i32> {
     let args = ShellArgs {
-        url: "rusqlite://?memory=true".to_string(),
+        url: "rusqlite://".to_string(),
         commands: vec!["SELECT 1".to_string()],
         ..ShellArgs::default()
     };

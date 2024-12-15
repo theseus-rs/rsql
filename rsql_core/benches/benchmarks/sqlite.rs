@@ -13,7 +13,7 @@ pub fn sqlite_benchmark(criterion: &mut Criterion) {
 
 async fn sqlite() -> Result<i32> {
     let args = ShellArgs {
-        url: "sqlite://?memory=true".to_string(),
+        url: "sqlite://".to_string(),
         commands: vec!["SELECT 1".to_string()],
         ..ShellArgs::default()
     };

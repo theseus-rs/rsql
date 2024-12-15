@@ -1,5 +1,6 @@
 use crate::duckdb::metadata;
 use crate::error::{Error, Result};
+use crate::url::UrlExtension;
 use crate::value::Value;
 use crate::Error::UnsupportedColumnType;
 use crate::{MemoryQueryResult, Metadata, QueryResult, StatementMetadata};
@@ -10,7 +11,6 @@ use duckdb::types::{TimeUnit, ValueRef};
 use duckdb::Row;
 use sqlparser::ast::Statement;
 use sqlparser::dialect::{Dialect, DuckDbDialect};
-use std::collections::HashMap;
 use std::ops::Add;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
@@ -45,16 +45,10 @@ impl Connection {
     #[expect(clippy::unused_async)]
     pub(crate) async fn new(url: String) -> Result<Connection> {
         let parsed_url = Url::parse(url.as_str())?;
-        let mut params: HashMap<String, String> = parsed_url.query_pairs().into_owned().collect();
-        let memory = params
-            .remove("memory")
-            .map_or(false, |value| value == "true");
-
-        let connection = if memory {
-            duckdb::Connection::open_in_memory()?
+        let connection = if let Ok(file_name) = parsed_url.to_file() {
+            duckdb::Connection::open(file_name)?
         } else {
-            let file = params.get("file").map_or("", |value| value.as_str());
-            duckdb::Connection::open(file)?
+            duckdb::Connection::open_in_memory()?
         };
 
         Ok(Connection {
@@ -200,11 +194,12 @@ impl Connection {
 
 #[cfg(test)]
 mod test {
+    use crate::test::dataset_url;
     use crate::{DriverManager, StatementMetadata, Value};
     use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
     use indoc::indoc;
 
-    const DATABASE_URL: &str = "duckdb://?memory=true";
+    const DATABASE_URL: &str = "duckdb://";
 
     #[tokio::test]
     async fn test_driver_connect() -> anyhow::Result<()> {
@@ -217,34 +212,26 @@ mod test {
 
     #[tokio::test]
     async fn test_connection_interface() -> anyhow::Result<()> {
+        let database_url = dataset_url("duckdb", "users.duckdb");
         let driver_manager = DriverManager::default();
-        let mut connection = driver_manager.connect(DATABASE_URL).await?;
+        let mut connection = driver_manager.connect(&database_url).await?;
 
-        let _ = connection
-            .execute("CREATE TABLE person (id INTEGER, name TEXT)")
+        let mut query_result = connection
+            .query("SELECT id, name FROM users ORDER BY id")
             .await?;
 
-        let rows = connection
-            .execute("INSERT INTO person (id, name) VALUES (1, 'foo')")
-            .await?;
-        assert_eq!(rows, 1);
-
-        let mut query_result = connection.query("SELECT id, name FROM person").await?;
         assert_eq!(query_result.columns().await, vec!["id", "name"]);
         assert_eq!(
             query_result.next().await,
-            Some(vec![Value::I32(1), Value::String("foo".to_string())])
+            Some(vec![Value::I32(1), Value::String("John Doe".to_string())])
+        );
+        assert_eq!(
+            query_result.next().await,
+            Some(vec![Value::I32(2), Value::String("Jane Smith".to_string())])
         );
         assert!(query_result.next().await.is_none());
 
         connection.close().await?;
-
-        let db_metadata = connection.metadata().await?;
-        let schema = db_metadata
-            .current_schema()
-            .expect("expected at least one schema");
-        assert!(schema.tables().iter().any(|table| table.name() == "person"));
-
         Ok(())
     }
 

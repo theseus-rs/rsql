@@ -21,9 +21,9 @@ impl UrlExtension for Url {
         let path = &url[start_index..end_index];
 
         #[cfg(target_os = "windows")]
-        let path = if path.contains(':') && path.starts_with('/') {
-            // Strip preceding '/' Windows absolute path (e.g. /C:/foo)
-            path.strip_prefix('/').unwrap()
+        let path = if path.contains(':') {
+            // Strip preceding '/' character for Windows absolute path (e.g. /C:/foo)
+            path.strip_prefix('/').unwrap_or(path)
         } else {
             path
         };

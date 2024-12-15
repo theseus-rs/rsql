@@ -16,7 +16,11 @@ pub(crate) fn dataset_url<S: AsRef<str>>(scheme: S, file_name: S) -> String {
         .to_string()
         .replace(path::MAIN_SEPARATOR, "/");
     #[cfg(target_os = "windows")]
-    let dataset_path = format!("/{dataset_path}");
+    let dataset_path = if dataset_path.is_empty() {
+        dataset_path
+    } else {
+        format!("/{dataset_path}")
+    };
 
     format!("{scheme}://{dataset_path}")
 }

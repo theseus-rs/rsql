@@ -11,7 +11,7 @@ rsql --url "cockroachdb://<user[:password>]@<host>[:<port>]/<database>" -- "SELE
 ### DuckDB
 
 ```shell
-rsql --url "duckdb://?memory=true" -- "SELECT version();"
+rsql --url "duckdb://" -- "SELECT version();"
 ```
 
 ### LibSQL
@@ -53,7 +53,7 @@ rsql --url "redshift://<user[:password>]@<host>[:<port>]/<database>" -- "SELECT 
 ### Rusqlite
 
 ```shell
-rsql --url "rusqlite://?memory=true" -- "SELECT sqlite_version();"
+rsql --url "rusqlite://" -- "SELECT sqlite_version();"
 ```
 
 ### Snowflake
@@ -71,5 +71,5 @@ rsql --url "snowflake://<user>[:<token>]@<account>.snowflakecomputing.com/" -- "
 ### Sqlite
 
 ```shell
-rsql --url "sqlite://?memory=true" -- "SELECT sqlite_version();"
+rsql --url "sqlite://" -- "SELECT sqlite_version();"
 ```
