@@ -59,6 +59,7 @@ all = ["all-drivers", "all-formats"]
 default = []
 all-drivers = [
     "driver-arrow",
+    "driver-avro",
     "driver-cockroachdb",
     "driver-csv",
     "driver-delimited",
@@ -78,6 +79,7 @@ all-drivers = [
     "driver-tsv",
 ]
 driver-arrow = ["rsql_drivers/arrow"]
+driver-avro = ["rsql_drivers/avro"]
 driver-cockroachdb = ["rsql_drivers/cockroachdb"]
 driver-csv = ["rsql_drivers/csv"]
 driver-delimited = ["rsql_drivers/delimited"]

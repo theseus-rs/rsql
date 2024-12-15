@@ -38,18 +38,18 @@ visit the [rsql](https://theseus-rs.github.io/rsql/rsql_cli/) site.
 
 ## Features
 
-| Feature               |                                                                                                                                             |
-|-----------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
-| Databases             | CockroachDB, CSV, Delimited, DuckDB, JSON, JSONL, LibSQL (Turso), MariaDB, MySQL, PostgreSQL, Redshift, Snowflake, SQLite3, SQL Server, TSV |
-| Syntax Highlighting   | ✅                                                                                                                                           |
-| Result Highlighting   | ✅                                                                                                                                           |
-| Query Auto-completion | ✅                                                                                                                                           |
-| History               | ✅                                                                                                                                           |
-| SQL File Execution    | ✅                                                                                                                                           |
-| Embedded PostgreSQL   | ✅                                                                                                                                           |
-| Output Formats        | ascii, csv, expanded, html, json, jsonl, markdown, plain, psql, sqlite, tsv, unicode, xml, yaml                                             |
-| Localized Interface   | 40+ languages¹                                                                                                                              |
-| Key Bindings          | emacs, vi                                                                                                                                   |
+| Feature               |                                                                                                                                                                   |
+|-----------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Databases             | Arrow, Avro, CockroachDB, CSV, Delimited, DuckDB, JSON, JSONL, LibSQL (Turso), MariaDB, MySQL, Parquet, PostgreSQL, Redshift, Snowflake, SQLite3, SQL Server, TSV |
+| Syntax Highlighting   | ✅                                                                                                                                                                 |
+| Result Highlighting   | ✅                                                                                                                                                                 |
+| Query Auto-completion | ✅                                                                                                                                                                 |
+| History               | ✅                                                                                                                                                                 |
+| SQL File Execution    | ✅                                                                                                                                                                 |
+| Embedded PostgreSQL   | ✅                                                                                                                                                                 |
+| Output Formats        | ascii, csv, expanded, html, json, jsonl, markdown, plain, psql, sqlite, tsv, unicode, xml, yaml                                                                   |
+| Localized Interface   | 40+ languages¹                                                                                                                                                    |
+| Key Bindings          | emacs, vi                                                                                                                                                         |
 
 ¹ Computer translations; human translations welcome
 
@@ -70,6 +70,7 @@ rsql --url "<url>" -- "<query>"
 | Driver             | URL                                                                                                                       |
 |--------------------|---------------------------------------------------------------------------------------------------------------------------|
 | arrow (polars)     | `arrow://?file=<file>`                                                                                                    |
+| avro (polars)      | `avro://?file=<file>`                                                                                                     |
 | cockroachdb (sqlx) | `cockroachdb://<user[:password>]@<host>[:<port>]/<database>`                                                              |
 | csv (polars)       | `csv://?file=<file>[&has_header=<true/false>][&quote=<char>][&skip_rows=<n>]`                                             |
 | delimited (polars) | `delimited://?file=<file>[&separator=<char>][&has_header=<true/false>][&quote=<char>][&skip_rows=<n>]`                    |

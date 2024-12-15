@@ -44,6 +44,7 @@ impl From<libsql::Error> for Error {
 /// Converts a [`polars::error::PolarsError`] into an [`IoError`](Error::IoError)
 #[cfg(any(
     feature = "arrow",
+    feature = "avro",
     feature = "csv",
     feature = "delimited",
     feature = "json",
@@ -159,6 +160,7 @@ mod test {
 
     #[cfg(any(
         feature = "arrow",
+        feature = "avro",
         feature = "csv",
         feature = "delimited",
         feature = "json",

@@ -8,6 +8,8 @@ extern crate rust_i18n;
 
 #[cfg(feature = "arrow")]
 mod arrow;
+#[cfg(feature = "avro")]
+mod avro;
 #[cfg(feature = "cockroachdb")]
 mod cockroachdb;
 mod connection;
@@ -34,6 +36,7 @@ mod mysql;
 mod parquet;
 #[cfg(any(
     feature = "arrow",
+    feature = "avro",
     feature = "csv",
     feature = "delimited",
     feature = "json",

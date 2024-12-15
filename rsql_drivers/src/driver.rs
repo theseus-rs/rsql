@@ -80,6 +80,8 @@ impl Default for DriverManager {
 
         #[cfg(feature = "arrow")]
         drivers.add(Box::new(crate::arrow::Driver));
+        #[cfg(feature = "avro")]
+        drivers.add(Box::new(crate::avro::Driver));
         #[cfg(feature = "cockroachdb")]
         drivers.add(Box::new(crate::cockroachdb::Driver));
         #[cfg(feature = "csv")]
@@ -154,6 +156,9 @@ mod tests {
         let driver_count = 0;
 
         #[cfg(feature = "arrow")]
+        let driver_count = driver_count + 1;
+
+        #[cfg(feature = "avro")]
         let driver_count = driver_count + 1;
 
         #[cfg(feature = "cockroachdb")]
