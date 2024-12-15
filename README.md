@@ -69,6 +69,7 @@ rsql --url "<url>" -- "<query>"
 
 | Driver             | URL                                                                                                                       |
 |--------------------|---------------------------------------------------------------------------------------------------------------------------|
+| arrow (polars)     | `arrow://?file=<file>`                                                                                                    |
 | cockroachdb (sqlx) | `cockroachdb://<user[:password>]@<host>[:<port>]/<database>`                                                              |
 | csv (polars)       | `csv://?file=<file>[&has_header=<true/false>][&quote=<char>][&skip_rows=<n>]`                                             |
 | delimited (polars) | `delimited://?file=<file>[&separator=<char>][&has_header=<true/false>][&quote=<char>][&skip_rows=<n>]`                    |

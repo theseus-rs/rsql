@@ -12,6 +12,7 @@ The drivers command displays the available database drivers.
 
 | Driver        | Description                                                                                            | URL                                                                                                                       |
 |---------------|--------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|
+| `arrow`       | Arrow IPC file driver provided by [Polars](https://github.com/pola-rs/polars)                          | `arrow://?file=<file>`                                                                                                    |
 | `cockroachdb` | CockroachDB driver provided by [SQLx](https://github.com/launchbadge/sqlx)                             | `redshift://<user>[:<password>]@<host>[:<port>]/<database>`                                                               |
 | `csv`         | Comma Separated Value (CSV) file driver provided by [Polars](https://github.com/pola-rs/polars)        | `csv://?file=<file>[&has_header=<true/false>][&quote=<char>][&skip_rows=<n>]`                                             |
 | `delimited`   | Delimited file driver provided by [Polars](https://github.com/pola-rs/polars)                          | `delimited://?file=<file>[&separator=<char>][&has_header=<true/false>][&quote=<char>][&skip_rows=<n>]`                    |
