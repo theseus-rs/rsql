@@ -1,11 +1,12 @@
 use crate::error::Result;
 use crate::polars::metadata;
-use crate::Error::ConversionError;
+use crate::Error::{ConversionError, InvalidUrl};
 use crate::{MemoryQueryResult, Metadata, QueryResult, Value};
 use async_trait::async_trait;
 use polars::prelude::AnyValue;
 use polars_sql::SQLContext;
 use std::fmt::{Debug, Formatter};
+use std::path::Path;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
@@ -30,6 +31,17 @@ impl Connection {
     pub(crate) fn context(&self) -> Arc<Mutex<SQLContext>> {
         self.context.clone()
     }
+}
+
+/// Get the table name from the file name
+pub(crate) fn get_table_name(file_name: &str) -> Result<String> {
+    let file_name = Path::new(file_name)
+        .file_name()
+        .ok_or(InvalidUrl("Invalid file name".to_string()))?
+        .to_str()
+        .ok_or(InvalidUrl("Invalid file name".to_string()))?;
+    let table_name = file_name.split('.').next().unwrap_or(file_name);
+    Ok(table_name.to_string())
 }
 
 #[async_trait]
