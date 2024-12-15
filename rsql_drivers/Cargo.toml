@@ -25,7 +25,7 @@ jwt-simple = { workspace = true, optional = true, default-features = false, feat
 libsql = { workspace = true, optional = true }
 mockall = { workspace = true }
 num-format = { workspace = true }
-polars = { workspace = true, optional = true, features = ["lazy", "json", "polars-sql"] }
+polars = { workspace = true, optional = true, features = ["lazy", "json", "parquet", "polars-sql"] }
 polars-sql = { workspace = true, optional = true }
 postgresql_embedded = { workspace = true, optional = true }
 regex = { workspace = true }
@@ -74,6 +74,7 @@ all = [
     "jsonl",
     "mariadb",
     "mysql",
+    "parquet",
     "postgres",
     "postgresql",
     "redshift",
@@ -115,6 +116,10 @@ mariadb = [
 mysql = [
     "dep:sqlx",
     "sqlx/mysql",
+]
+parquet = [
+    "dep:polars",
+    "dep:polars-sql",
 ]
 postgres = [
     "dep:postgresql_embedded",

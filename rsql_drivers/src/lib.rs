@@ -28,7 +28,16 @@ mod mariadb;
 mod metadata;
 #[cfg(feature = "mysql")]
 mod mysql;
-#[cfg(any(feature = "csv", feature = "delimited", feature = "tsv"))]
+#[cfg(feature = "parquet")]
+mod parquet;
+#[cfg(any(
+    feature = "csv",
+    feature = "delimited",
+    feature = "json",
+    feature = "jsonl",
+    feature = "parquet",
+    feature = "tsv"
+))]
 mod polars;
 #[cfg(feature = "postgres")]
 mod postgres;
