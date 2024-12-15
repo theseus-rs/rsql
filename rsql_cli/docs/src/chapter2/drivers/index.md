@@ -13,6 +13,8 @@ The drivers command displays the available database drivers.
 | Driver        | Description                                                                                            | URL                                                                                                                       |
 |---------------|--------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|
 | `cockroachdb` | CockroachDB driver provided by [SQLx](https://github.com/launchbadge/sqlx)                             | `redshift://<user>[:<password>]@<host>[:<port>]/<database>`                                                               |
+| `csv`         | Comma Separated Value (CSV) file driver provided by [Polars](https://github.com/pola-rs/polars)        | `csv://?file=<file>[&has_header=<true/false>][&quote=<char>][&skip_rows=<n>]`                                             |
+| `delimited`   | Delimited file driver provided by [Polars](https://github.com/pola-rs/polars)                          | `delimited://?file=<file>[&separator=<char>][&has_header=<true/false>][&quote=<char>][&skip_rows=<n>]`                    |
 | `duckdb`      | DuckDB provided by [DuckDB](https://duckdb.org/)                                                       | `duckdb://?<memory=true>[&file=<database_file>]`                                                                          |
 | `libsql`      | LibSQL provided by [Turso](https://github.com/tursodatabase/libsql)                                    | `libsql://<host>?[<memory=true>][&file=<database_file>][&auth_token=<token>]`                                             |
 | `mariadb`     | MariaDB provided by [SQLx](https://github.com/launchbadge/sqlx)                                        | `mariadb://<user>[:<password>]@<host>[:<port>]/<database>`                                                                |
@@ -24,6 +26,7 @@ The drivers command displays the available database drivers.
 | `snowflake`   | Snowflake provided by [Snowflake SQL API](https://docs.snowflake.com/en/developer-guide/sql-api/index) | `snowflake://<user>[:<token>]@<account>.snowflakecomputing.com/[?private_key_file=pkey_file&public_key_file=pubkey_file]` |
 | `sqlite`      | SQLite provided by [SQLx](https://github.com/launchbadge/sqlx)                                         | `sqlite://?<memory=true>[&file=<database_file>]`                                                                          |
 | `sqlserver`   | SQL Server provided by [Tiberius](https://github.com/prisma/tiberius)                                  | `sqlserver://<user>[:<password>]@<host>[:<port>]/<database>`                                                              |
+| `tsv`         | Tab Separated Value (TSV) file driver provided by [Polars](https://github.com/pola-rs/polars)          | `tsv://?file=<file>[&has_header=<true/false>][&quote=<char>][&skip_rows=<n>]`                                             |
 
 ### Examples
 

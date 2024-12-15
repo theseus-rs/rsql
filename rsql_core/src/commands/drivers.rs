@@ -81,6 +81,10 @@ mod tests {
         let drivers: Vec<&str> = vec![
             #[cfg(feature = "driver-cockroachdb")]
             "cockroachdb",
+            #[cfg(feature = "driver-csv")]
+            "csv",
+            #[cfg(feature = "driver-delimited")]
+            "delimited",
             #[cfg(feature = "driver-duckdb")]
             "duckdb",
             #[cfg(feature = "driver-libsql")]
@@ -103,6 +107,8 @@ mod tests {
             "sqlite",
             #[cfg(feature = "driver-sqlserver")]
             "sqlserver",
+            #[cfg(feature = "driver-tsv")]
+            "tsv",
         ];
 
         let available_drivers = drivers.join(", ");

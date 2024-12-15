@@ -2,12 +2,15 @@ pub type Result<T, E = Error> = core::result::Result<T, E>;
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
+    /// Data type conversion error
+    #[error("{0}")]
+    ConversionError(String),
     /// Error when a driver for an identifier is not found
     #[error("driver not found for identifier [{identifier}]")]
     DriverNotFound { identifier: String },
     /// Error parsing a URL
-    #[error(transparent)]
-    InvalidUrl(#[from] url::ParseError),
+    #[error("{0}")]
+    InvalidUrl(String),
     /// IO error
     #[error(transparent)]
     IoError(anyhow::Error),
@@ -34,6 +37,14 @@ impl From<duckdb::Error> for Error {
 #[cfg(feature = "libsql")]
 impl From<libsql::Error> for Error {
     fn from(error: libsql::Error) -> Self {
+        Error::IoError(error.into())
+    }
+}
+
+/// Converts a [`polars::error::PolarsError`] into an [`IoError`](Error::IoError)
+#[cfg(any(feature = "csv", feature = "delimited", feature = "tsv"))]
+impl From<polars::error::PolarsError> for Error {
+    fn from(error: polars::error::PolarsError) -> Self {
         Error::IoError(error.into())
     }
 }
@@ -106,6 +117,13 @@ impl From<std::string::FromUtf8Error> for Error {
     }
 }
 
+/// Convert [`url::ParseError`] to [`IoError`](Error::IoError)
+impl From<url::ParseError> for Error {
+    fn from(error: url::ParseError) -> Self {
+        Error::InvalidUrl(error.to_string())
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -129,6 +147,15 @@ mod test {
             io_error.to_string(),
             "Failed to connect to database: `test`"
         );
+    }
+
+    #[cfg(any(feature = "csv", feature = "delimited", feature = "tsv"))]
+    #[test]
+    fn test_polars_error() {
+        let error = polars::error::PolarsError::NoData("test".into());
+        let io_error = Error::from(error);
+
+        assert_eq!(io_error.to_string(), "no data: test");
     }
 
     #[test]
@@ -183,5 +210,13 @@ mod test {
             error.to_string(),
             "invalid utf-8 sequence of 1 bytes from index 1"
         );
+    }
+
+    #[test]
+    fn test_url_parse_error() {
+        let error = url::ParseError::EmptyHost;
+        let io_error = Error::from(error);
+
+        assert_eq!(io_error.to_string(), "empty host");
     }
 }

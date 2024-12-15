@@ -80,6 +80,10 @@ impl Default for DriverManager {
 
         #[cfg(feature = "cockroachdb")]
         drivers.add(Box::new(crate::cockroachdb::Driver));
+        #[cfg(feature = "csv")]
+        drivers.add(Box::new(crate::csv::Driver));
+        #[cfg(feature = "delimited")]
+        drivers.add(Box::new(crate::delimited::Driver));
         #[cfg(feature = "duckdb")]
         drivers.add(Box::new(crate::duckdb::Driver));
         #[cfg(feature = "libsql")]
@@ -96,12 +100,14 @@ impl Default for DriverManager {
         drivers.add(Box::new(crate::redshift::Driver));
         #[cfg(feature = "rusqlite")]
         drivers.add(Box::new(crate::rusqlite::Driver));
+        #[cfg(feature = "snowflake")]
+        drivers.add(Box::new(crate::snowflake::Driver));
         #[cfg(feature = "sqlite")]
         drivers.add(Box::new(crate::sqlite::Driver));
         #[cfg(feature = "sqlserver")]
         drivers.add(Box::new(crate::sqlserver::Driver));
-        #[cfg(feature = "snowflake")]
-        drivers.add(Box::new(crate::snowflake::Driver));
+        #[cfg(feature = "tsv")]
+        drivers.add(Box::new(crate::tsv::Driver));
 
         drivers
     }
@@ -142,6 +148,12 @@ mod tests {
         #[cfg(feature = "cockroachdb")]
         let driver_count = driver_count + 1;
 
+        #[cfg(feature = "csv")]
+        let driver_count = driver_count + 1;
+
+        #[cfg(feature = "delimited")]
+        let driver_count = driver_count + 1;
+
         #[cfg(feature = "duckdb")]
         let driver_count = driver_count + 1;
 
@@ -173,6 +185,9 @@ mod tests {
         let driver_count = driver_count + 1;
 
         #[cfg(feature = "sqlserver")]
+        let driver_count = driver_count + 1;
+
+        #[cfg(feature = "tsv")]
         let driver_count = driver_count + 1;
 
         assert_eq!(driver_manager.drivers.len(), driver_count);

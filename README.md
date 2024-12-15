@@ -38,18 +38,18 @@ visit the [rsql](https://theseus-rs.github.io/rsql/rsql_cli/) site.
 
 ## Features
 
-| Feature               |                                                                                                           |
-|-----------------------|-----------------------------------------------------------------------------------------------------------|
-| Databases             | CockroachDB, DuckDB, LibSQL (Turso), MariaDB, MySQL, PostgreSQL, Redshift, Snowflake, SQLite3, SQL Server |
-| Syntax Highlighting   | ✅                                                                                                         |
-| Result Highlighting   | ✅                                                                                                         |
-| Query Auto-completion | ✅                                                                                                         |
-| History               | ✅                                                                                                         |
-| SQL File Execution    | ✅                                                                                                         |
-| Embedded PostgreSQL   | ✅                                                                                                         |
-| Output Formats        | ascii, csv, expanded, html, json, jsonl, markdown, plain, psql, sqlite, tsv, unicode, xml, yaml           |
-| Localized Interface   | 40+ languages¹                                                                                            |
-| Key Bindings          | emacs, vi                                                                                                 |
+| Feature               |                                                                                                                                |
+|-----------------------|--------------------------------------------------------------------------------------------------------------------------------|
+| Databases             | CockroachDB, CSV, Delimited, DuckDB, LibSQL (Turso), MariaDB, MySQL, PostgreSQL, Redshift, Snowflake, SQLite3, SQL Server, TSV |
+| Syntax Highlighting   | ✅                                                                                                                              |
+| Result Highlighting   | ✅                                                                                                                              |
+| Query Auto-completion | ✅                                                                                                                              |
+| History               | ✅                                                                                                                              |
+| SQL File Execution    | ✅                                                                                                                              |
+| Embedded PostgreSQL   | ✅                                                                                                                              |
+| Output Formats        | ascii, csv, expanded, html, json, jsonl, markdown, plain, psql, sqlite, tsv, unicode, xml, yaml                                |
+| Localized Interface   | 40+ languages¹                                                                                                                 |
+| Key Bindings          | emacs, vi                                                                                                                      |
 
 ¹ Computer translations; human translations welcome
 
@@ -70,6 +70,8 @@ rsql --url "<url>" -- "<query>"
 | Driver             | URL                                                                                                                       |
 |--------------------|---------------------------------------------------------------------------------------------------------------------------|
 | cockroachdb (sqlx) | `cockroachdb://<user[:password>]@<host>[:<port>]/<database>`                                                              |
+| csv (polars)       | `csv://?file=<file>[&has_header=<true/false>][&quote=<char>][&skip_rows=<n>]`                                             |
+| delimited (polars) | `delimited://?file=<file>[&separator=<char>][&has_header=<true/false>][&quote=<char>][&skip_rows=<n>]`                    |
 | duckdb             | `duckdb://?<memory=true>[&file=<database_file>]`                                                                          |
 | libsql¹            | `libsql://<host>?[<memory=true>][&file=<database_file>][&auth_token=<token>]`                                             |
 | mariadb (sqlx)     | `mariadb://<user>[:<password>]@<host>[:<port>]/<database>`                                                                |
@@ -81,6 +83,7 @@ rsql --url "<url>" -- "<query>"
 | snowflake          | `snowflake://<user>[:<token>]@<account>.snowflakecomputing.com/[?private_key_file=pkey_file&public_key_file=pubkey_file]` |
 | sqlite (sqlx)      | `sqlite://?<memory=true>[&file=<database_file>]`                                                                          |
 | sqlserver          | `sqlserver://<user>[:<password>]@<host>[:<port>]/<database>`                                                              |
+| tsv (polars)       | `tsv://?file=<file>[&has_header=<true/false>][&quote=<char>][&skip_rows=<n>]`                                             |
 
 ¹ `libsql` needs to be enabled with the `libsql` feature flag; it is disabled by default as it conflicts
 with `rusqlite`.
