@@ -81,6 +81,8 @@ mod tests {
         let drivers: Vec<&str> = vec![
             #[cfg(feature = "driver-arrow")]
             "arrow",
+            #[cfg(feature = "driver-avro")]
+            "avro",
             #[cfg(feature = "driver-cockroachdb")]
             "cockroachdb",
             #[cfg(feature = "driver-csv")]
