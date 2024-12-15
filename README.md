@@ -69,18 +69,18 @@ rsql --url "<url>" -- "<query>"
 
 | Driver             | URL                                                                                                                       |
 |--------------------|---------------------------------------------------------------------------------------------------------------------------|
-| arrow (polars)     | `arrow://<file>`                                                                                                          |
-| avro (polars)      | `avro://<file>`                                                                                                           |
+| arrow (polars)     | `arrow://?file=<file>`                                                                                                    |
+| avro (polars)      | `avro://?file=<file>`                                                                                                     |
 | cockroachdb (sqlx) | `cockroachdb://<user[:password>]@<host>[:<port>]/<database>`                                                              |
-| csv (polars)       | `csv://<file>[?has_header=<true/false>][&quote=<char>][&skip_rows=<n>]`                                                   |
-| delimited (polars) | `delimited://<file>[?separator=<char>][&has_header=<true/false>][&quote=<char>][&skip_rows=<n>]`                          |
+| csv (polars)       | `csv://?file=<file>[&has_header=<true/false>][&quote=<char>][&skip_rows=<n>]`                                             |
+| delimited (polars) | `delimited://?file=<file>[&separator=<char>][&has_header=<true/false>][&quote=<char>][&skip_rows=<n>]`                    |
 | duckdb             | `duckdb://?<memory=true>[&file=<database_file>]`                                                                          |
-| json (polars)      | `json://<file>`                                                                                                           |
-| jsonl (polars)     | `jsonl://<file>`                                                                                                          |
+| json (polars)      | `json://?file=<file>`                                                                                                     |
+| jsonl (polars)     | `jsonl://?file=<file>`                                                                                                    |
 | libsql¹            | `libsql://<host>?[<memory=true>][&file=<database_file>][&auth_token=<token>]`                                             |
 | mariadb (sqlx)     | `mariadb://<user>[:<password>]@<host>[:<port>]/<database>`                                                                |
 | mysql (sqlx)       | `mysql://<user>[:<password>]@<host>[:<port>]/<database>`                                                                  |
-| parquet (polars)   | `parquet://<file>`                                                                                                        |
+| parquet (polars)   | `parquet://?file=<file>`                                                                                                  |
 | postgres           | `postgres://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`                                               |
 | postgresql (sqlx)  | `postgresql://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`                                             |
 | redshift (sqlx)    | `redshift://<user[:password>]@<host>[:<port>]/<database>`                                                                 |
@@ -88,7 +88,7 @@ rsql --url "<url>" -- "<query>"
 | snowflake          | `snowflake://<user>[:<token>]@<account>.snowflakecomputing.com/[?private_key_file=pkey_file&public_key_file=pubkey_file]` |
 | sqlite (sqlx)      | `sqlite://?<memory=true>[&file=<database_file>]`                                                                          |
 | sqlserver          | `sqlserver://<user>[:<password>]@<host>[:<port>]/<database>`                                                              |
-| tsv (polars)       | `tsv://<file>[?has_header=<true/false>][&quote=<char>][&skip_rows=<n>]`                                                   |
+| tsv (polars)       | `tsv://?file=<file>[&has_header=<true/false>][&quote=<char>][&skip_rows=<n>]`                                             |
 
 ¹ `libsql` needs to be enabled with the `libsql` feature flag; it is disabled by default as it conflicts
 with `rusqlite`.

@@ -1,10 +1,12 @@
 use crate::error::Result;
 use crate::polars::Connection;
+use crate::Error::InvalidUrl;
 use async_trait::async_trait;
 use polars::io::avro::AvroReader;
 use polars::io::SerReader;
 use polars::prelude::IntoLazy;
 use polars_sql::SQLContext;
+use std::collections::HashMap;
 use std::fs::File;
 use url::Url;
 
@@ -23,7 +25,13 @@ impl crate::Driver for Driver {
         _password: Option<String>,
     ) -> Result<Box<dyn crate::Connection>> {
         let parsed_url = Url::parse(url.as_str())?;
-        let file_name = parsed_url.path();
+        let query_parameters: HashMap<String, String> =
+            parsed_url.query_pairs().into_owned().collect();
+
+        // Read Options
+        let file_name = query_parameters
+            .get("file")
+            .ok_or(InvalidUrl("Missing file parameter".to_string()))?;
         let file = File::open(file_name)?;
 
         let data_frame = AvroReader::new(file).set_rechunk(true).finish()?;
@@ -44,7 +52,7 @@ mod test {
     const CRATE_DIRECTORY: &str = env!("CARGO_MANIFEST_DIR");
 
     fn database_url() -> String {
-        format!("avro://{CRATE_DIRECTORY}/../datasets/users.avro")
+        format!("avro://?file={CRATE_DIRECTORY}/../datasets/users.avro")
     }
 
     #[tokio::test]

@@ -1,6 +1,6 @@
 use crate::error::Result;
 use crate::polars::Connection;
-use crate::Error::ConversionError;
+use crate::Error::{ConversionError, InvalidUrl};
 use async_trait::async_trait;
 use polars::io::SerReader;
 use polars::prelude::{IntoLazy, JsonLineReader};
@@ -29,7 +29,9 @@ impl crate::Driver for Driver {
             parsed_url.query_pairs().into_owned().collect();
 
         // Read Options
-        let file_name = parsed_url.path();
+        let file_name = query_parameters
+            .get("file")
+            .ok_or(InvalidUrl("Missing file parameter".to_string()))?;
         let file = File::open(file_name)?;
         let ignore_errors = query_parameters
             .get("ignore_errors")
@@ -70,7 +72,7 @@ mod test {
     const CRATE_DIRECTORY: &str = env!("CARGO_MANIFEST_DIR");
 
     fn database_url() -> String {
-        format!("jsonl://{CRATE_DIRECTORY}/../datasets/users.jsonl")
+        format!("jsonl://?file={CRATE_DIRECTORY}/../datasets/users.jsonl")
     }
 
     #[tokio::test]
