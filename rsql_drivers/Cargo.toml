@@ -70,6 +70,8 @@ all = [
     "csv",
     "delimited",
     "duckdb",
+    "json",
+    "jsonl",
     "mariadb",
     "mysql",
     "postgres",
@@ -95,6 +97,14 @@ delimited = [
 ]
 duckdb = [
     "dep:duckdb"
+]
+json = [
+    "dep:polars",
+    "dep:polars-sql",
+]
+jsonl = [
+    "dep:polars",
+    "dep:polars-sql",
 ]
 libsql = [
     "dep:libsql"

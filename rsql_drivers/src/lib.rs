@@ -17,6 +17,10 @@ mod driver;
 #[cfg(feature = "duckdb")]
 mod duckdb;
 mod error;
+#[cfg(feature = "json")]
+mod json;
+#[cfg(feature = "jsonl")]
+mod jsonl;
 #[cfg(feature = "libsql")]
 mod libsql;
 #[cfg(feature = "mariadb")]
