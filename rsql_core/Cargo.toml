@@ -58,6 +58,7 @@ tokio = { workspace = true }
 all = ["all-drivers", "all-formats"]
 default = []
 all-drivers = [
+    "driver-arrow",
     "driver-cockroachdb",
     "driver-csv",
     "driver-delimited",
@@ -76,6 +77,7 @@ all-drivers = [
     "driver-sqlserver",
     "driver-tsv",
 ]
+driver-arrow = ["rsql_drivers/arrow"]
 driver-cockroachdb = ["rsql_drivers/cockroachdb"]
 driver-csv = ["rsql_drivers/csv"]
 driver-delimited = ["rsql_drivers/delimited"]

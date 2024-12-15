@@ -25,7 +25,7 @@ jwt-simple = { workspace = true, optional = true, default-features = false, feat
 libsql = { workspace = true, optional = true }
 mockall = { workspace = true }
 num-format = { workspace = true }
-polars = { workspace = true, optional = true, features = ["lazy", "json", "parquet", "polars-sql"] }
+polars = { workspace = true, optional = true, features = ["ipc", "lazy", "json", "parquet", "polars-sql"] }
 polars-sql = { workspace = true, optional = true }
 postgresql_embedded = { workspace = true, optional = true }
 regex = { workspace = true }
@@ -66,6 +66,7 @@ wiremock = { workspace = true }
 
 [features]
 all = [
+    "arrow",
     "cockroachdb",
     "csv",
     "delimited",
@@ -85,6 +86,10 @@ all = [
     "tsv",
 ]
 default = []
+arrow = [
+    "dep:polars",
+    "dep:polars-sql",
+]
 cockroachdb = [
     "postgresql",
 ]
