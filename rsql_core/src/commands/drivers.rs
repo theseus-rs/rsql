@@ -97,6 +97,8 @@ mod tests {
             "mariadb",
             #[cfg(feature = "driver-mysql")]
             "mysql",
+            #[cfg(feature = "driver-parquet")]
+            "parquet",
             #[cfg(feature = "driver-postgresql")]
             "postgres",
             #[cfg(feature = "driver-postgresql")]

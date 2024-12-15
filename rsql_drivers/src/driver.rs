@@ -96,6 +96,8 @@ impl Default for DriverManager {
         drivers.add(Box::new(crate::mariadb::Driver));
         #[cfg(feature = "mysql")]
         drivers.add(Box::new(crate::mysql::Driver));
+        #[cfg(feature = "parquet")]
+        drivers.add(Box::new(crate::parquet::Driver));
         #[cfg(feature = "postgres")]
         drivers.add(Box::new(crate::postgres::Driver));
         #[cfg(feature = "postgresql")]
@@ -174,6 +176,9 @@ mod tests {
         let driver_count = driver_count + 1;
 
         #[cfg(feature = "mysql")]
+        let driver_count = driver_count + 1;
+
+        #[cfg(feature = "parquet")]
         let driver_count = driver_count + 1;
 
         #[cfg(feature = "postgres")]

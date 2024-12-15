@@ -66,6 +66,7 @@ all-drivers = [
     "driver-jsonl",
     "driver-mariadb",
     "driver-mysql",
+    "driver-parquet",
     "driver-postgres",
     "driver-postgresql",
     "driver-redshift",
@@ -84,6 +85,7 @@ driver-jsonl = ["rsql_drivers/jsonl"]
 driver-libsql = ["rsql_drivers/libsql"]
 driver-mariadb = ["rsql_drivers/mariadb"]
 driver-mysql = ["rsql_drivers/mysql"]
+driver-parquet = ["rsql_drivers/parquet"]
 driver-postgres = ["rsql_drivers/postgres"]
 driver-postgresql = ["rsql_drivers/postgresql"]
 driver-redshift = ["rsql_drivers/redshift"]

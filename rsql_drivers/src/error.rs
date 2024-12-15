@@ -42,7 +42,14 @@ impl From<libsql::Error> for Error {
 }
 
 /// Converts a [`polars::error::PolarsError`] into an [`IoError`](Error::IoError)
-#[cfg(any(feature = "csv", feature = "delimited", feature = "tsv"))]
+#[cfg(any(
+    feature = "csv",
+    feature = "delimited",
+    feature = "json",
+    feature = "jsonl",
+    feature = "parquet",
+    feature = "tsv"
+))]
 impl From<polars::error::PolarsError> for Error {
     fn from(error: polars::error::PolarsError) -> Self {
         Error::IoError(error.into())
@@ -149,7 +156,14 @@ mod test {
         );
     }
 
-    #[cfg(any(feature = "csv", feature = "delimited", feature = "tsv"))]
+    #[cfg(any(
+        feature = "csv",
+        feature = "delimited",
+        feature = "json",
+        feature = "jsonl",
+        feature = "parquet",
+        feature = "tsv"
+    ))]
     #[test]
     fn test_polars_error() {
         let error = polars::error::PolarsError::NoData("test".into());
