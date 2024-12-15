@@ -87,6 +87,10 @@ mod tests {
             "delimited",
             #[cfg(feature = "driver-duckdb")]
             "duckdb",
+            #[cfg(feature = "driver-json")]
+            "json",
+            #[cfg(feature = "driver-jsonl")]
+            "jsonl",
             #[cfg(feature = "driver-libsql")]
             "libsql",
             #[cfg(feature = "driver-mariadb")]
