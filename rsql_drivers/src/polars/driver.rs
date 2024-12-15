@@ -34,7 +34,8 @@ impl Connection {
 }
 
 /// Get the table name from the file name
-pub(crate) fn get_table_name(file_name: &str) -> Result<String> {
+pub(crate) fn get_table_name<S: AsRef<str>>(file_name: S) -> Result<String> {
+    let file_name = file_name.as_ref();
     let file_name = Path::new(file_name)
         .file_name()
         .ok_or(InvalidUrl("Invalid file name".to_string()))?

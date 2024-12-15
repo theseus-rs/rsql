@@ -59,8 +59,11 @@ mod snowflake;
 mod sqlite;
 #[cfg(feature = "sqlserver")]
 mod sqlserver;
+#[cfg(test)]
+mod test;
 #[cfg(feature = "tsv")]
 mod tsv;
+mod url;
 mod value;
 
 pub use connection::{
