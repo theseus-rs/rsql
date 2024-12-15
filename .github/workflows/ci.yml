@@ -31,7 +31,7 @@ jobs:
 
         include:
           - platform: linux-x64
-            os: ubuntu-24.04
+            os: [ self-hosted, Linux, X64 ]
           - platform: macos-arm64
             os: macos-15
           - platform: macos-x64
@@ -78,7 +78,7 @@ jobs:
           RUST_LOG: "info"
           RUST_LOG_SPAN_EVENTS: full
         run: |
-          cargo llvm-cov --workspace --lcov --jobs 1 --output-path lcov.info
+          cargo llvm-cov --workspace --lcov --jobs 2 --output-path lcov.info
 
       - name: Upload to codecov.io
         if: ${{ startsWith(matrix.platform, 'linux-') }}
