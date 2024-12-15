@@ -8,6 +8,7 @@ use polars_sql::SQLContext;
 use std::collections::HashMap;
 use std::fmt::Debug;
 use std::fs::File;
+use std::path::Path;
 use url::Url;
 
 #[derive(Debug)]
@@ -93,9 +94,16 @@ impl crate::Driver for Driver {
             .into_reader_with_file_handle(file)
             .finish()?;
 
-        let table_name = crate::polars::driver::get_table_name(file_name)?;
+        // Use the file name prefix as the table name
+        let file_name = Path::new(file_name)
+            .file_name()
+            .ok_or(InvalidUrl("Invalid file name".to_string()))?
+            .to_str()
+            .ok_or(InvalidUrl("Invalid file name".to_string()))?;
+        let table_name = file_name.split('.').next().unwrap_or(file_name);
+
         let mut context = SQLContext::new();
-        context.register(table_name.as_str(), data_frame.lazy());
+        context.register(table_name, data_frame.lazy());
 
         let connection = Connection::new(url, context).await?;
         Ok(Box::new(connection))

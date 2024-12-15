@@ -86,10 +86,6 @@ impl Default for DriverManager {
         drivers.add(Box::new(crate::delimited::Driver));
         #[cfg(feature = "duckdb")]
         drivers.add(Box::new(crate::duckdb::Driver));
-        #[cfg(feature = "json")]
-        drivers.add(Box::new(crate::json::Driver));
-        #[cfg(feature = "jsonl")]
-        drivers.add(Box::new(crate::jsonl::Driver));
         #[cfg(feature = "libsql")]
         drivers.add(Box::new(crate::libsql::Driver));
         #[cfg(feature = "mariadb")]
@@ -159,12 +155,6 @@ mod tests {
         let driver_count = driver_count + 1;
 
         #[cfg(feature = "duckdb")]
-        let driver_count = driver_count + 1;
-
-        #[cfg(feature = "json")]
-        let driver_count = driver_count + 1;
-
-        #[cfg(feature = "jsonl")]
         let driver_count = driver_count + 1;
 
         #[cfg(feature = "libsql")]
