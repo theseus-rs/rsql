@@ -16,19 +16,18 @@ impl crate::Driver for Driver {
         url: String,
         password: Option<String>,
     ) -> Result<Box<dyn crate::Connection>> {
-        let url = format!("{url}&separator=,");
+        let url = format!("{url}?separator=,");
         DelimitedDriver.connect(url, password).await
     }
 }
 
 #[cfg(test)]
 mod test {
+    use crate::test::dataset_url;
     use crate::{DriverManager, Value};
 
-    const CRATE_DIRECTORY: &str = env!("CARGO_MANIFEST_DIR");
-
     fn database_url() -> String {
-        format!("csv://?file={CRATE_DIRECTORY}/../datasets/users.csv")
+        dataset_url("csv", "users.csv")
     }
 
     #[tokio::test]
@@ -36,7 +35,7 @@ mod test {
         let database_url = database_url();
         let driver_manager = DriverManager::default();
         let mut connection = driver_manager.connect(&database_url).await?;
-        let expected_url = format!("{database_url}&separator=,");
+        let expected_url = format!("{database_url}?separator=,");
         assert_eq!(&expected_url, connection.url());
         connection.close().await?;
         Ok(())
