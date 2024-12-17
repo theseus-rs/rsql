@@ -1,6 +1,12 @@
 [workspace]
 default-members = ["rsql_cli", "rsql_core", "rsql_drivers", "rsql_formatters"]
-members = ["rsql_cli", "rsql_core", "rsql_drivers", "rsql_formatters"]
+members = [
+    "examples/*",
+    "rsql_cli",
+    "rsql_core",
+    "rsql_drivers",
+    "rsql_formatters"
+]
 resolver = "2"
 
 [workspace.package]

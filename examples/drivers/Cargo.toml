@@ -1,0 +1,10 @@
+[package]
+edition.workspace = true
+name = "drivers"
+publish = false
+license.workspace = true
+version.workspace = true
+
+[dependencies]
+rsql_drivers = { path = "../../rsql_drivers", features = ["sqlite"] }
+tokio = { workspace = true, features = ["full"] }
