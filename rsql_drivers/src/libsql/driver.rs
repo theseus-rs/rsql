@@ -36,26 +36,23 @@ pub(crate) struct Connection {
 impl Connection {
     pub(crate) async fn new(url: String) -> Result<Connection> {
         let parsed_url = Url::parse(url.as_str())?;
-        let mut params: HashMap<String, String> = parsed_url.query_pairs().into_owned().collect();
-        let memory = params
-            .remove("memory")
-            .map_or(false, |value| value == "true");
-        let file = params.get("file").map_or("", |value| value.as_str());
+        let host = parsed_url.host();
+        let file_name = parsed_url.path();
 
-        let database = if memory {
-            Builder::new_local(":memory:").build().await?
-        } else if !file.is_empty() {
-            let db = Builder::new_local_replica(file).build().await?;
-            let frames = Frames::Vec(vec![]);
-            db.sync_frames(frames).await?;
-            db
-        } else {
-            let host = parsed_url.host().expect("Host is required").to_string();
+        let database = if let Some(host) = host {
+            let params: HashMap<String, String> = parsed_url.query_pairs().into_owned().collect();
             let auth_token = params.get("auth_token").map_or("", |value| value.as_str());
             let database_url = format!("libsql://{host}");
             Builder::new_remote(database_url, auth_token.to_string())
                 .build()
                 .await?
+        } else if file_name.is_empty() {
+            Builder::new_local(":memory:").build().await?
+        } else {
+            let db = Builder::new_local_replica(file_name).build().await?;
+            let frames = Frames::Vec(vec![]);
+            db.sync_frames(frames).await?;
+            db
         };
 
         let connection = database.connect()?;
@@ -134,7 +131,7 @@ impl Debug for Connection {
 mod test {
     use crate::{DriverManager, Value};
 
-    const DATABASE_URL: &str = "libsql://?memory=true";
+    const DATABASE_URL: &str = "libsql://";
 
     #[tokio::test]
     async fn test_debug() -> anyhow::Result<()> {

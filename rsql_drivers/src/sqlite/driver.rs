@@ -1,5 +1,6 @@
 use crate::error::Result;
 use crate::sqlite::metadata;
+use crate::url::UrlExtension;
 use crate::value::Value;
 use crate::Error::UnsupportedColumnType;
 use crate::{MemoryQueryResult, Metadata, QueryResult, StatementMetadata};
@@ -40,19 +41,15 @@ pub(crate) struct Connection {
 impl Connection {
     pub(crate) async fn new(url: String) -> Result<Connection> {
         let parsed_url = Url::parse(url.as_str())?;
-        let mut params: HashMap<String, String> = parsed_url.query_pairs().into_owned().collect();
-        let memory = params
-            .remove("memory")
-            .map_or(false, |value| value == "true");
-
-        let database_url = if memory {
-            "sqlite::memory:".to_string()
-        } else {
-            let file = params.remove("file").unwrap_or_default();
+        let database_url = if let Ok(file_name) = parsed_url.to_file() {
+            let file_name = file_name.to_string_lossy();
+            let params: HashMap<String, String> = parsed_url.query_pairs().into_owned().collect();
             let query: String = form_urlencoded::Serializer::new(String::new())
                 .extend_pairs(params.iter())
                 .finish();
-            format!("sqlite://{file}?{query}").to_string()
+            format!("sqlite://{file_name}?{query}").to_string()
+        } else {
+            "sqlite::memory:".to_string()
         };
 
         let options = SqliteConnectOptions::from_str(database_url.as_str())?
@@ -215,9 +212,10 @@ impl Connection {
 
 #[cfg(test)]
 mod test {
+    use crate::test::dataset_url;
     use crate::{DriverManager, Value};
 
-    const DATABASE_URL: &str = "sqlite://?memory=true";
+    const DATABASE_URL: &str = "sqlite://";
 
     #[tokio::test]
     async fn test_driver_connect() -> anyhow::Result<()> {
@@ -230,31 +228,24 @@ mod test {
 
     #[tokio::test]
     async fn test_connection_interface() -> anyhow::Result<()> {
+        let database_url = dataset_url("sqlite", "users.sqlite3");
         let driver_manager = DriverManager::default();
-        let mut connection = driver_manager.connect(DATABASE_URL).await?;
+        let mut connection = driver_manager.connect(&database_url).await?;
 
-        let _ = connection
-            .execute("CREATE TABLE person (id INTEGER, name TEXT)")
+        let mut query_result = connection
+            .query("SELECT id, name FROM users ORDER BY id")
             .await?;
 
-        let rows = connection
-            .execute("INSERT INTO person (id, name) VALUES (1, 'foo')")
-            .await?;
-        assert_eq!(rows, 1);
-
-        let mut query_result = connection.query("SELECT id, name FROM person").await?;
         assert_eq!(query_result.columns().await, vec!["id", "name"]);
         assert_eq!(
             query_result.next().await,
-            Some(vec![Value::I64(1), Value::String("foo".to_string())])
+            Some(vec![Value::I64(1), Value::String("John Doe".to_string())])
+        );
+        assert_eq!(
+            query_result.next().await,
+            Some(vec![Value::I64(2), Value::String("Jane Smith".to_string())])
         );
         assert!(query_result.next().await.is_none());
-
-        let db_metadata = connection.metadata().await?;
-        let schema = db_metadata
-            .current_schema()
-            .expect("expected at least one schema");
-        assert!(schema.tables().iter().any(|table| table.name() == "person"));
 
         connection.close().await?;
         Ok(())

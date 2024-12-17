@@ -74,7 +74,7 @@ rsql --url "<url>" -- "<query>"
 | cockroachdb (sqlx) | `cockroachdb://<user[:password>]@<host>[:<port>]/<database>`                                                              |
 | csv (polars)       | `csv://<file>[?has_header=<true/false>][&quote=<char>][&skip_rows=<n>]`                                                   |
 | delimited (polars) | `delimited://<file>[?separator=<char>][&has_header=<true/false>][&quote=<char>][&skip_rows=<n>]`                          |
-| duckdb             | `duckdb://?<memory=true>[&file=<database_file>]`                                                                          |
+| duckdb             | `duckdb://[<file>]`                                                                          |
 | json (polars)      | `json://<file>`                                                                                                           |
 | jsonl (polars)     | `jsonl://<file>`                                                                                                          |
 | libsql¹            | `libsql://<host>?[<memory=true>][&file=<database_file>][&auth_token=<token>]`                                             |
@@ -84,9 +84,9 @@ rsql --url "<url>" -- "<query>"
 | postgres           | `postgres://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`                                               |
 | postgresql (sqlx)  | `postgresql://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`                                             |
 | redshift (sqlx)    | `redshift://<user[:password>]@<host>[:<port>]/<database>`                                                                 |
-| rusqlite           | `rusqlite://?<memory=true>[&file=<database_file>]`                                                                        |
+| rusqlite           | `rusqlite://[<file>]`                                                                                                     |
 | snowflake          | `snowflake://<user>[:<token>]@<account>.snowflakecomputing.com/[?private_key_file=pkey_file&public_key_file=pubkey_file]` |
-| sqlite (sqlx)      | `sqlite://?<memory=true>[&file=<database_file>]`                                                                          |
+| sqlite (sqlx)      | `sqlite://[<file>]`                                                                                                       |
 | sqlserver          | `sqlserver://<user>[:<password>]@<host>[:<port>]/<database>`                                                              |
 | tsv (polars)       | `tsv://<file>[?has_header=<true/false>][&quote=<char>][&skip_rows=<n>]`                                                   |
 

@@ -2,7 +2,7 @@ use clap::Parser;
 use clap_stdin::FileOrStdin;
 
 #[cfg(feature = "driver-rusqlite")]
-const DEFAULT_URL: &str = "rusqlite:://?memory=true";
+const DEFAULT_URL: &str = "rusqlite://";
 
 #[cfg(not(feature = "driver-rusqlite"))]
 const DEFAULT_URL: &str = "";
