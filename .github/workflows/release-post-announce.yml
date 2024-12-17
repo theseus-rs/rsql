@@ -65,7 +65,7 @@ jobs:
           # - { target: thumbv8m.main-none-eabi, os: ubuntu-latest }
           # - { target: thumbv8m.main-none-eabihf, os: ubuntu-latest }
           # - { target: wasm32-unknown-emscripten, os: ubuntu-latest }
-          - { target: x86_64-apple-darwin, os: macos-12 }
+          - { target: x86_64-apple-darwin, os: macos-13 }
           # - { target: x86_64-linux-android, os: ubuntu-latest }
           # - { target: x86_64-pc-windows-gnu, os: windows-latest }
           # - { target: x86_64-pc-windows-msvc, os: windows-latest }
