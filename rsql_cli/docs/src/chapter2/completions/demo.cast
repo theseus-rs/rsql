@@ -1,8 +1,8 @@
-{"version": 2, "width": 120, "height": 30, "timestamp": 1731776659, "env": {"SHELL": "/bin/zsh", "TERM": "xterm-256color"}}
-[0.027601, "o", "\u001b]11;?\u001b\\"]
-[0.068647, "o", "⠁ connect [00:00:00] [                                                                             ] 0 B/0 B (0 B/s, 0s)"]
-[0.068754, "o", "\r\u001b[2K"]
-[0.077758, "o", "rsql> \u001b[38;2;131;148;150m.color\u001b[0m\r\n"]
-[0.077971, "o", "Color: on\r\n"]
-[1.106684, "o", "rsql> \u001b[38;2;131;148;150m.completions off\u001b[0m\r\n"]
-[2.142948, "o", "rsql> \u001b[38;2;131;148;150m.completions \u001b[38;2;133;153;0mon\u001b[0m\r\n"]
+{"version": 2, "width": 147, "height": 40, "timestamp": 1734416147, "env": {"SHELL": "/bin/zsh", "TERM": "xterm-256color"}}
+[0.024209, "o", "\u001b]11;?\u001b\\"]
+[0.058636, "o", "⠁ connect [00:00:00] [                                                                                                        ] 0 B/0 B (0 B/s, 0s)"]
+[0.058724, "o", "\r\u001b[2K"]
+[0.069021, "o", "rsql> \u001b[38;2;131;148;150m.color\u001b[0m\r\n"]
+[0.069203, "o", "Color: on\r\n"]
+[1.105773, "o", "rsql> \u001b[38;2;131;148;150m.completions off\u001b[0m\r\n"]
+[2.145729, "o", "rsql> \u001b[38;2;131;148;150m.completions \u001b[38;2;133;153;0mon\u001b[0m\r\n"]
