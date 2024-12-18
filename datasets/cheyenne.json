@@ -1,0 +1,13 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      -104.820246,
+      41.139981
+    ]
+  },
+  "properties": {
+    "name": "Center of Cheyenne, Wyoming"
+  }
+}

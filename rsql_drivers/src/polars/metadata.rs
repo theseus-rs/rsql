@@ -1,5 +1,7 @@
 use crate::polars::Connection as PolarsConnection;
 use crate::{Column, Metadata, Result, Schema, Table};
+use polars::datatypes::{DataType, Field};
+use polars::prelude::SchemaExt;
 
 pub(crate) async fn get_metadata(connection: &mut PolarsConnection) -> Result<Metadata> {
     let mut metadata = Metadata::default();
@@ -29,25 +31,50 @@ async fn retrieve_schemas(
 
 async fn retrieve_tables(connection: &mut PolarsConnection, schema: &mut Schema) -> Result<()> {
     let context = connection.context();
-    let mut context = context.lock().await;
-    let tables = context.get_tables();
+    let context = context.lock().await;
+    let table_map = context.get_table_map();
 
-    for table_name in tables {
-        let sql = format!("SELECT * FROM {table_name} LIMIT 0");
-        let result = context.execute(sql.as_str())?;
-        let data_frame = result.collect()?;
+    for (table_name, lazy_frame) in table_map {
+        let data_frame = lazy_frame.collect()?;
+        let data_frame_schema = data_frame.schema();
 
         let mut table = Table::new(table_name);
-        for column in data_frame.get_columns() {
-            let column_name = column.name().to_string();
-            let column_type = column.dtype().to_string();
-            let column = Column::new(column_name, column_type, false, None);
-            table.add_column(column);
+        for field in data_frame_schema.iter_fields() {
+            add_table_column(&mut table, &String::new(), &field);
         }
         schema.add(table);
     }
 
     Ok(())
+}
+
+fn add_table_column(table: &mut Table, column_prefix: &String, field: &Field) {
+    let column_name = if column_prefix.is_empty() {
+        field.name().to_string()
+    } else {
+        format!("{column_prefix}.{}", field.name())
+    };
+    let data_type = field.dtype();
+    let column_type = data_type.to_string();
+    let column = Column::new(column_name.clone(), column_type, false, None);
+    table.add_column(column);
+
+    match data_type {
+        DataType::List(inner_data_type) => {
+            if let DataType::Struct(fields) = inner_data_type.as_ref() {
+                let column_prefix = format!("{column_name}[]");
+                for field in fields {
+                    add_table_column(table, &column_prefix, field);
+                }
+            }
+        }
+        DataType::Struct(fields) => {
+            for field in fields {
+                add_table_column(table, &column_name, field);
+            }
+        }
+        _ => {}
+    }
 }
 
 #[cfg(test)]
