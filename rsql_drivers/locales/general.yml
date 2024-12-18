@@ -7,3 +7,6 @@ list_delimiter:
   ar: "، "
   ja: "、"
   zh: "、"
+
+key_value_delimiter:
+  en: "="
