@@ -131,7 +131,8 @@ async fn retrieve_indexes(connection: &mut dyn Connection, schema: &mut Schema) 
                 AND ist.table_schema = current_schema()
             ORDER BY
                 ist.table_name,
-                index_name
+                index_name,
+                array_position(ix.indkey, a.attnum)
         "};
     let mut query_result = connection.query(sql).await?;
 
@@ -199,6 +200,9 @@ mod test {
                 ",
             )
             .await?;
+        let _ = connection
+            .execute("CREATE INDEX users_emails ON users (id, email)")
+            .await?;
 
         let metadata = connection.metadata().await?;
         let schema = metadata.current_schema().expect("schema");
@@ -244,7 +248,7 @@ mod test {
         assert!(!email_column.not_null());
         assert_eq!(email_column.default(), None);
 
-        assert_eq!(users_table.indexes().len(), 2);
+        assert_eq!(users_table.indexes().len(), 3);
         let primary_key_index = users_table.get_index("users_pkey").expect("index");
         assert_eq!(primary_key_index.name(), "users_pkey");
         assert_eq!(primary_key_index.columns(), ["id"]);
@@ -253,6 +257,10 @@ mod test {
         assert_eq!(email_index.name(), "users_email_key");
         assert_eq!(email_index.columns(), ["email"]);
         assert!(email_index.unique());
+        let users_emails_index = users_table.get_index("users_emails").expect("index");
+        assert_eq!(users_emails_index.name(), "users_emails");
+        assert_eq!(users_emails_index.columns(), ["id", "email"]);
+        assert!(!users_emails_index.unique());
 
         connection.close().await?;
         Ok(())
