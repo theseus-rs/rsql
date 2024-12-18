@@ -1,10 +1,12 @@
 use base64::engine::general_purpose::STANDARD;
 use base64::Engine;
+use indexmap::IndexMap;
 use num_format::{Locale, ToFormattedString};
 use serde::{Serialize, Serializer};
 use std::fmt;
+use std::hash::{Hash, Hasher};
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug)]
 pub enum Value {
     Null,
     Bool(bool),
@@ -28,6 +30,7 @@ pub enum Value {
     Uuid(uuid::Uuid),
     Json(serde_json::Value),
     Array(Vec<Value>),
+    Map(IndexMap<Value, Value>),
 }
 
 impl Value {
@@ -60,6 +63,23 @@ impl Value {
                 value
                     .iter()
                     .map(|value| value.to_formatted_string(locale))
+                    .collect::<Vec<String>>()
+                    .join(list_delimiter.as_str())
+            }
+            Value::Map(value) => {
+                let key_value_delimiter =
+                    t!("key_value_delimiter", locale = locale.name()).to_string();
+                let list_delimiter = t!("list_delimiter", locale = locale.name()).to_string();
+                value
+                    .iter()
+                    .map(|(key, value)| {
+                        format!(
+                            "{}{}{}",
+                            key.to_formatted_string(locale),
+                            key_value_delimiter,
+                            value.to_formatted_string(locale)
+                        )
+                    })
                     .collect::<Vec<String>>()
                     .join(list_delimiter.as_str())
             }
@@ -112,8 +132,92 @@ impl fmt::Display for Value {
                 .map(ToString::to_string)
                 .collect::<Vec<String>>()
                 .join(", "),
+            Value::Map(value) => value
+                .iter()
+                .map(|(key, value)| format!("{key}={value}"))
+                .collect::<Vec<String>>()
+                .join(", "),
         };
         write!(f, "{string_value}")
+    }
+}
+
+impl Eq for Value {}
+
+impl Hash for Value {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        match self {
+            Value::Null => 0.hash(state),
+            Value::Bool(value) => value.hash(state),
+            Value::Bytes(value) => value.hash(state),
+            Value::I8(value) => value.hash(state),
+            Value::I16(value) => value.hash(state),
+            Value::I32(value) => value.hash(state),
+            Value::I64(value) => value.hash(state),
+            Value::I128(value) => value.hash(state),
+            Value::U8(value) => value.hash(state),
+            Value::U16(value) => value.hash(state),
+            Value::U32(value) => value.hash(state),
+            Value::U64(value) => value.hash(state),
+            Value::U128(value) => value.hash(state),
+            Value::F32(value) => value.to_bits().hash(state),
+            Value::F64(value) => value.to_bits().hash(state),
+            Value::String(value) => value.hash(state),
+            Value::Date(value) => value.hash(state),
+            Value::Time(value) => value.hash(state),
+            Value::DateTime(value) => value.hash(state),
+            Value::Uuid(value) => value.hash(state),
+            Value::Json(value) => value.hash(state),
+            Value::Array(value) => value.hash(state),
+            Value::Map(value) => {
+                for (key, value) in value {
+                    key.hash(state);
+                    value.hash(state);
+                }
+            }
+        }
+    }
+}
+
+impl PartialEq for Value {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Value::Null, Value::Null) => true,
+            (Value::Bool(a), Value::Bool(b)) => a == b,
+            (Value::Bytes(a), Value::Bytes(b)) => a == b,
+            (Value::I8(a), Value::I8(b)) => a == b,
+            (Value::I16(a), Value::I16(b)) => a == b,
+            (Value::I32(a), Value::I32(b)) => a == b,
+            (Value::I64(a), Value::I64(b)) => a == b,
+            (Value::I128(a), Value::I128(b)) => a == b,
+            (Value::U8(a), Value::U8(b)) => a == b,
+            (Value::U16(a), Value::U16(b)) => a == b,
+            (Value::U32(a), Value::U32(b)) => a == b,
+            (Value::U64(a), Value::U64(b)) => a == b,
+            (Value::U128(a), Value::U128(b)) => a == b,
+            (Value::F32(a), Value::F32(b)) => a == b,
+            (Value::F64(a), Value::F64(b)) => a == b,
+            (Value::String(a), Value::String(b)) => a == b,
+            (Value::Date(a), Value::Date(b)) => a == b,
+            (Value::Time(a), Value::Time(b)) => a == b,
+            (Value::DateTime(a), Value::DateTime(b)) => a == b,
+            (Value::Uuid(a), Value::Uuid(b)) => a == b,
+            (Value::Json(a), Value::Json(b)) => a == b,
+            (Value::Array(a), Value::Array(b)) => a == b,
+            (Value::Map(a), Value::Map(b)) => {
+                if a.len() != b.len() {
+                    return false;
+                }
+
+                // Compare keys and values in an order-dependent manner
+                a.iter()
+                    .zip(b.iter())
+                    .all(|((a_key, a_value), (b_key, b_value))| {
+                        a_key == b_key && a_value == b_value
+                    })
+            }
+            _ => false,
+        }
     }
 }
 
@@ -145,6 +249,7 @@ impl Serialize for Value {
             Value::Uuid(value) => serializer.serialize_str(&value.to_string()),
             Value::Json(ref value) => value.serialize(serializer),
             Value::Array(ref value) => value.serialize(serializer),
+            Value::Map(ref value) => value.serialize(serializer),
         }
     }
 }
@@ -296,6 +401,12 @@ impl From<serde_json::Value> for Value {
 impl From<Vec<Value>> for Value {
     fn from(value: Vec<Value>) -> Self {
         Value::Array(value)
+    }
+}
+
+impl From<IndexMap<Value, Value>> for Value {
+    fn from(value: IndexMap<Value, Value>) -> Self {
+        Value::Map(value)
     }
 }
 
@@ -662,6 +773,23 @@ mod tests {
     }
 
     #[test]
+    fn test_map() {
+        let mut map = IndexMap::new();
+        map.insert(Value::String("foo".to_string()), Value::I32(123));
+        map.insert(Value::String("bar".to_string()), Value::I32(456));
+        map.insert(Value::String("baz".to_string()), Value::I32(789));
+        assert_eq!(
+            "foo=123, bar=456, baz=789",
+            Value::Map(map.clone()).to_formatted_string(&Locale::en)
+        );
+        assert_eq!(
+            "foo=123, bar=456, baz=789",
+            Value::Map(map.clone()).to_string()
+        );
+        assert_eq!(json!(Value::Map(map.clone())), json!(map.clone()));
+    }
+
+    #[test]
     fn test_from_option() {
         let value: Option<Value> = None;
         assert_eq!(Value::from(value), Value::Null);
@@ -800,5 +928,12 @@ mod tests {
     fn test_from_vec_value() {
         let array = vec![Value::Bool(true), Value::I8(42)];
         assert_eq!(Value::from(array.clone()), Value::Array(array.clone()));
+    }
+
+    #[test]
+    fn test_from_index_map() {
+        let mut map = IndexMap::new();
+        map.insert(Value::String("foo".to_string()), Value::I32(123));
+        assert_eq!(Value::from(map.clone()), Value::Map(map.clone()));
     }
 }
