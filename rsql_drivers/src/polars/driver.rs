@@ -1,9 +1,9 @@
 use crate::error::Result;
 use crate::polars::metadata;
+use crate::polars::value::ToValue;
 use crate::Error::{ConversionError, InvalidUrl};
-use crate::{MemoryQueryResult, Metadata, QueryResult, Value};
+use crate::{MemoryQueryResult, Metadata, QueryResult};
 use async_trait::async_trait;
-use polars::prelude::AnyValue;
 use polars_sql::SQLContext;
 use std::fmt::{Debug, Formatter};
 use std::path::Path;
@@ -82,23 +82,7 @@ impl crate::Connection for Connection {
                         "Failed to convert DataFrame to QueryResult".to_string(),
                     ))?
                 };
-                let value = match data {
-                    AnyValue::Null => Value::Null,
-                    AnyValue::Boolean(v) => Value::Bool(v),
-                    AnyValue::Binary(v) => Value::Bytes(v.to_vec()),
-                    AnyValue::Float32(v) => Value::F32(v),
-                    AnyValue::Float64(v) => Value::F64(v),
-                    AnyValue::Int8(v) => Value::I8(v),
-                    AnyValue::Int16(v) => Value::I16(v),
-                    AnyValue::Int32(v) => Value::I32(v),
-                    AnyValue::Int64(v) => Value::I64(v),
-                    AnyValue::String(v) => Value::String(v.to_string()),
-                    AnyValue::UInt8(v) => Value::U8(v),
-                    AnyValue::UInt16(v) => Value::U16(v),
-                    AnyValue::UInt32(v) => Value::U32(v),
-                    AnyValue::UInt64(v) => Value::U64(v),
-                    _ => Value::String(data.to_string()),
-                };
+                let value = data.to_value();
                 row.push(value);
             }
         }
