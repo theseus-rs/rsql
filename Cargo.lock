@@ -2029,7 +2029,7 @@ checksum = "1435fa1053d8b2fbbe9be7e97eca7f33d37b28409959813daefc1446a14247f1"
 
 [[package]]
 name = "drivers"
-version = "0.15.0"
+version = "0.15.1"
 dependencies = [
  "rsql_drivers",
  "tokio",
@@ -6325,7 +6325,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_cli"
-version = "0.15.0"
+version = "0.15.1"
 dependencies = [
  "anyhow",
  "axoupdater",
@@ -6348,7 +6348,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_core"
-version = "0.15.0"
+version = "0.15.1"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -6385,7 +6385,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_drivers"
-version = "0.15.0"
+version = "0.15.1"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -6429,7 +6429,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_formatters"
-version = "0.15.0"
+version = "0.15.1"
 dependencies = [
  "ansi_colours",
  "anyhow",
