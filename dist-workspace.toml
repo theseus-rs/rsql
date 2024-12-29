@@ -8,7 +8,7 @@ cargo-auditable = true
 # Whether to use cargo-cyclonedx to generate an SBOM
 cargo-cyclonedx = true
 # The preferred dist version to use in CI (Cargo.toml SemVer syntax)
-cargo-dist-version = "0.26.1"
+cargo-dist-version = "0.27.0"
 # CI backends to support
 ci = "github"
 # Whether dist should create a Github Release or use an existing draft
