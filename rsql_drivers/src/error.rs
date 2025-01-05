@@ -6,8 +6,8 @@ pub enum Error {
     #[error("{0}")]
     ConversionError(String),
     /// Error when a driver for an identifier is not found
-    #[error("driver not found for identifier [{identifier}]")]
-    DriverNotFound { identifier: String },
+    #[error("driver not found for: {0}")]
+    DriverNotFound(String),
     /// Error parsing a URL
     #[error("{0}")]
     InvalidUrl(String),

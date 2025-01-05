@@ -350,6 +350,7 @@ mod test {
         mock_driver
             .expect_identifier()
             .returning(|| driver_identifier);
+        mock_driver.expect_file_media_type().returning(|| None);
         mock_driver.expect_connect().returning(|_, _| {
             let mut mock_connection = MockConnection::new();
             mock_connection.expect_close().returning(|| Ok(()));

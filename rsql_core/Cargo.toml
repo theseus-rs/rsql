@@ -64,6 +64,7 @@ all-drivers = [
     "driver-csv",
     "driver-delimited",
     "driver-duckdb",
+    "driver-file",
     "driver-json",
     "driver-jsonl",
     "driver-mariadb",
@@ -84,6 +85,7 @@ driver-cockroachdb = ["rsql_drivers/cockroachdb"]
 driver-csv = ["rsql_drivers/csv"]
 driver-delimited = ["rsql_drivers/delimited"]
 driver-duckdb = ["rsql_drivers/duckdb"]
+driver-file = ["rsql_drivers/file"]
 driver-json = ["rsql_drivers/json"]
 driver-jsonl = ["rsql_drivers/jsonl"]
 driver-libsql = ["rsql_drivers/libsql"]

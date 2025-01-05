@@ -22,6 +22,7 @@ allow = [
     "LGPL-3.0",
     "MIT",
     "MPL-2.0",
+    "OGL-UK-3.0",
     "OpenSSL",
     "PostgreSQL",
     "Unicode-3.0",

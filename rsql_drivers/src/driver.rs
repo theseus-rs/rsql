@@ -5,7 +5,7 @@ use crate::Error::DriverNotFound;
 use async_trait::async_trait;
 use mockall::automock;
 use mockall::predicate::str;
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashMap};
 use std::fmt::Debug;
 use tracing::instrument;
 use url::Url;
@@ -15,12 +15,16 @@ use url::Url;
 pub trait Driver: Debug + Send + Sync {
     fn identifier(&self) -> &'static str;
     async fn connect(&self, url: String, password: Option<String>) -> Result<Box<dyn Connection>>;
+    fn file_media_type(&self) -> Option<&'static str> {
+        None
+    }
 }
 
 /// Manages available drivers
 #[derive(Debug)]
 pub struct DriverManager {
     drivers: BTreeMap<&'static str, Box<dyn Driver>>,
+    media_type_identifier_map: HashMap<&'static str, &'static str>,
 }
 
 impl DriverManager {
@@ -29,12 +33,18 @@ impl DriverManager {
     pub fn new() -> Self {
         DriverManager {
             drivers: BTreeMap::new(),
+            media_type_identifier_map: HashMap::new(),
         }
     }
 
     /// Add a new driver to the list of available drivers
     pub fn add(&mut self, driver: Box<dyn Driver>) {
         let identifier = driver.identifier();
+        if let Some(media_type) = driver.file_media_type() {
+            let _ = self
+                .media_type_identifier_map
+                .insert(media_type, identifier);
+        }
         let _ = &self.drivers.insert(identifier, driver);
     }
 
@@ -42,6 +52,14 @@ impl DriverManager {
     #[must_use]
     pub fn get(&self, identifier: &str) -> Option<&dyn Driver> {
         self.drivers.get(identifier).map(AsRef::as_ref)
+    }
+
+    /// Get a drivers by name
+    #[must_use]
+    pub fn from_media_type(&self, media_type: &str) -> Option<&dyn Driver> {
+        self.media_type_identifier_map
+            .get(media_type)
+            .and_then(|identifier| self.get(identifier))
     }
 
     /// Get an iterator over the available drivers
@@ -63,9 +81,7 @@ impl DriverManager {
                 let connection = Box::new(CachedMetadataConnection::new(connection));
                 Ok(connection)
             }
-            None => Err(DriverNotFound {
-                identifier: scheme.to_string(),
-            }),
+            None => Err(DriverNotFound(scheme.to_string())),
         }
     }
 }
@@ -90,6 +106,8 @@ impl Default for DriverManager {
         drivers.add(Box::new(crate::delimited::Driver));
         #[cfg(feature = "duckdb")]
         drivers.add(Box::new(crate::duckdb::Driver));
+        #[cfg(feature = "file")]
+        drivers.add(Box::new(crate::file::Driver));
         #[cfg(feature = "json")]
         drivers.add(Box::new(crate::json::Driver));
         #[cfg(feature = "jsonl")]
@@ -133,6 +151,7 @@ mod tests {
         let identifier = "test";
         let mut mock_driver = MockDriver::new();
         mock_driver.expect_identifier().returning(|| identifier);
+        mock_driver.expect_file_media_type().returning(|| None);
 
         let mut driver_manager = DriverManager::new();
         assert_eq!(driver_manager.drivers.len(), 0);
@@ -157,61 +176,44 @@ mod tests {
 
         #[cfg(feature = "arrow")]
         let driver_count = driver_count + 1;
-
         #[cfg(feature = "avro")]
         let driver_count = driver_count + 1;
-
         #[cfg(feature = "cockroachdb")]
         let driver_count = driver_count + 1;
-
         #[cfg(feature = "csv")]
         let driver_count = driver_count + 1;
-
         #[cfg(feature = "delimited")]
         let driver_count = driver_count + 1;
-
         #[cfg(feature = "duckdb")]
         let driver_count = driver_count + 1;
-
+        #[cfg(feature = "file")]
+        let driver_count = driver_count + 1;
         #[cfg(feature = "json")]
         let driver_count = driver_count + 1;
-
         #[cfg(feature = "jsonl")]
         let driver_count = driver_count + 1;
-
         #[cfg(feature = "libsql")]
         let driver_count = driver_count + 1;
-
         #[cfg(feature = "mariadb")]
         let driver_count = driver_count + 1;
-
         #[cfg(feature = "mysql")]
         let driver_count = driver_count + 1;
-
         #[cfg(feature = "parquet")]
         let driver_count = driver_count + 1;
-
         #[cfg(feature = "postgres")]
         let driver_count = driver_count + 1;
-
         #[cfg(feature = "postgresql")]
         let driver_count = driver_count + 1;
-
         #[cfg(feature = "redshift")]
         let driver_count = driver_count + 1;
-
         #[cfg(feature = "rusqlite")]
         let driver_count = driver_count + 1;
-
         #[cfg(feature = "snowflake")]
         let driver_count = driver_count + 1;
-
         #[cfg(feature = "sqlite")]
         let driver_count = driver_count + 1;
-
         #[cfg(feature = "sqlserver")]
         let driver_count = driver_count + 1;
-
         #[cfg(feature = "tsv")]
         let driver_count = driver_count + 1;
 
@@ -223,6 +225,7 @@ mod tests {
         let identifier = "test";
         let mut mock_driver = MockDriver::new();
         mock_driver.expect_identifier().returning(|| identifier);
+        mock_driver.expect_file_media_type().returning(|| None);
         mock_driver
             .expect_connect()
             .returning(|_, _| Ok(Box::new(MockConnection::new())));
