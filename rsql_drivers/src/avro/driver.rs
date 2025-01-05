@@ -36,6 +36,10 @@ impl crate::Driver for Driver {
         let connection = Connection::new(url, context).await?;
         Ok(Box::new(connection))
     }
+
+    fn file_media_type(&self) -> Option<&'static str> {
+        Some("application/vnd.apache.avro.file")
+    }
 }
 
 #[cfg(test)]

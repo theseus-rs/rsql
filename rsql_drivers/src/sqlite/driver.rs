@@ -30,6 +30,10 @@ impl crate::Driver for Driver {
         let connection = Connection::new(url).await?;
         Ok(Box::new(connection))
     }
+
+    fn file_media_type(&self) -> Option<&'static str> {
+        Some("application/x-sqlite3")
+    }
 }
 
 #[derive(Debug)]

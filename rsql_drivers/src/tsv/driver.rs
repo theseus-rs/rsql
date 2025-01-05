@@ -19,6 +19,10 @@ impl crate::Driver for Driver {
         let url = format!("{url}?separator=%09");
         DelimitedDriver.connect(url, password).await
     }
+
+    fn file_media_type(&self) -> Option<&'static str> {
+        Some("text/tab-separated-values")
+    }
 }
 
 #[cfg(test)]

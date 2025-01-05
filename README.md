@@ -74,10 +74,11 @@ rsql --url "<url>" -- "<query>"
 | cockroachdb (sqlx) | `cockroachdb://<user[:password>]@<host>[:<port>]/<database>`                                                              |
 | csv (polars)       | `csv://<file>[?has_header=<true/false>][&quote=<char>][&skip_rows=<n>]`                                                   |
 | delimited (polars) | `delimited://<file>[?separator=<char>][&has_header=<true/false>][&quote=<char>][&skip_rows=<n>]`                          |
-| duckdb             | `duckdb://[<file>]`                                                                          |
+| duckdb             | `duckdb://[<file>]`                                                                                                       |
+| file¹              | `file://<file>`                                                                                                           |
 | json (polars)      | `json://<file>`                                                                                                           |
 | jsonl (polars)     | `jsonl://<file>`                                                                                                          |
-| libsql¹            | `libsql://<host>?[<memory=true>][&file=<database_file>][&auth_token=<token>]`                                             |
+| libsql²            | `libsql://<host>?[<memory=true>][&file=<database_file>][&auth_token=<token>]`                                             |
 | mariadb (sqlx)     | `mariadb://<user>[:<password>]@<host>[:<port>]/<database>`                                                                |
 | mysql (sqlx)       | `mysql://<user>[:<password>]@<host>[:<port>]/<database>`                                                                  |
 | parquet (polars)   | `parquet://<file>`                                                                                                        |
@@ -90,7 +91,8 @@ rsql --url "<url>" -- "<query>"
 | sqlserver          | `sqlserver://<user>[:<password>]@<host>[:<port>]/<database>`                                                              |
 | tsv (polars)       | `tsv://<file>[?has_header=<true/false>][&quote=<char>][&skip_rows=<n>]`                                                   |
 
-¹ `libsql` needs to be enabled with the `libsql` feature flag; it is disabled by default as it conflicts
+¹ the `file` driver will attempt to detect the type of file and automatically use the appropriate driver.
+² `libsql` needs to be enabled with the `libsql` feature flag; it is disabled by default as it conflicts
 with `rusqlite`.
 
 ## Safety

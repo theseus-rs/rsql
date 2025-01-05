@@ -21,6 +21,7 @@ mod driver;
 #[cfg(feature = "duckdb")]
 mod duckdb;
 mod error;
+mod file;
 #[cfg(feature = "json")]
 mod json;
 #[cfg(feature = "jsonl")]
