@@ -79,6 +79,7 @@ all-drivers = [
     "driver-sqlserver",
     "driver-tsv",
     "driver-xml",
+    "driver-yaml",
 ]
 driver-arrow = ["rsql_drivers/arrow"]
 driver-avro = ["rsql_drivers/avro"]
@@ -102,6 +103,7 @@ driver-sqlite = ["rsql_drivers/sqlite"]
 driver-sqlserver = ["rsql_drivers/sqlserver"]
 driver-tsv = ["rsql_drivers/tsv"]
 driver-xml = ["rsql_drivers/xml"]
+driver-yaml = ["rsql_drivers/yaml"]
 all-formats = [
     "format-ascii",
     "format-csv",

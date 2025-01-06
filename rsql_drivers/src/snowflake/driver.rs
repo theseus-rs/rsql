@@ -3,6 +3,7 @@ use crate::{snowflake::SnowflakeError, MemoryQueryResult, Metadata, QueryResult,
 use async_trait::async_trait;
 use base64::{engine::general_purpose::STANDARD, Engine};
 use chrono::{DateTime, NaiveDate, NaiveDateTime, NaiveTime, Utc};
+use file_type::FileType;
 use jwt_simple::prelude::{Claims, Duration, RS256KeyPair, RS256PublicKey, RSAKeyPairLike};
 use reqwest::header::HeaderMap;
 use serde_json::json;
@@ -34,6 +35,10 @@ impl crate::Driver for Driver {
         password: Option<String>,
     ) -> Result<Box<dyn crate::Connection>> {
         Ok(Box::new(SnowflakeConnection::new(url, password)?))
+    }
+
+    fn supports_file_type(&self, _file_type: &FileType) -> bool {
+        false
     }
 }
 

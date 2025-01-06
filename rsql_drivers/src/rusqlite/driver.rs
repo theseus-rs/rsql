@@ -4,6 +4,7 @@ use crate::value::Value;
 use crate::{sqlite, MemoryQueryResult, Metadata, QueryResult, StatementMetadata};
 use anyhow::anyhow;
 use async_trait::async_trait;
+use file_type::FileType;
 use rusqlite::types::ValueRef;
 use rusqlite::Row;
 use sqlparser::ast::Statement;
@@ -27,6 +28,10 @@ impl crate::Driver for Driver {
     ) -> Result<Box<dyn crate::Connection>> {
         let connection = Connection::new(url).await?;
         Ok(Box::new(connection))
+    }
+
+    fn supports_file_type(&self, _file_type: &FileType) -> bool {
+        false
     }
 }
 

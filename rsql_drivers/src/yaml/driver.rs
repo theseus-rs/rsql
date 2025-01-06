@@ -1,15 +1,17 @@
 use crate::error::Result;
 use crate::polars::Connection;
 use crate::url::UrlExtension;
-use crate::Error::ConversionError;
+use crate::Error::{ConversionError, IoError};
 use async_trait::async_trait;
 use file_type::FileType;
 use polars::io::SerReader;
-use polars::prelude::{CsvParseOptions, CsvReadOptions, IntoLazy};
+use polars::prelude::{IntoLazy, JsonReader};
 use polars_sql::SQLContext;
+use serde_json::json;
 use std::collections::HashMap;
-use std::fmt::Debug;
-use std::fs::File;
+use std::io::Cursor;
+use std::num::NonZeroUsize;
+use tokio::fs::read_to_string;
 use url::Url;
 
 #[derive(Debug)]
@@ -18,7 +20,7 @@ pub struct Driver;
 #[async_trait]
 impl crate::Driver for Driver {
     fn identifier(&self) -> &'static str {
-        "delimited"
+        "yaml"
     }
 
     async fn connect(
@@ -30,12 +32,15 @@ impl crate::Driver for Driver {
         let query_parameters: HashMap<String, String> =
             parsed_url.query_pairs().into_owned().collect();
 
-        // Read Options
         let file_name = parsed_url.to_file()?.to_string_lossy().to_string();
-        let file = File::open(&file_name)?;
-        let has_header = query_parameters
-            .get("has_header")
-            .map_or(true, |v| v == "true");
+        let json = {
+            let yaml = read_to_string(&file_name).await?;
+            let yaml_value: serde_yaml::Value =
+                serde_yaml::from_str(&yaml).map_err(|error| IoError(error.into()))?;
+            let value = json!(yaml_value);
+            serde_json::to_string(&value).map_err(|error| IoError(error.into()))?
+        };
+
         let ignore_errors = query_parameters
             .get("ignore_errors")
             .map_or(false, |v| v == "true");
@@ -47,50 +52,17 @@ impl crate::Driver for Driver {
                 if length == 0 {
                     None
                 } else {
-                    Some(length)
+                    NonZeroUsize::new(length)
                 }
             }
-            None => Some(100),
-        };
-        let skip_rows = query_parameters
-            .get("skip_rows")
-            .unwrap_or(&"0".to_string())
-            .parse::<usize>()
-            .map_err(|error| ConversionError(error.to_string()))?;
-        let skip_rows_after_header = query_parameters
-            .get("skip_rows_after_header")
-            .unwrap_or(&"0".to_string())
-            .parse::<usize>()
-            .map_err(|error| ConversionError(error.to_string()))?;
-
-        // Parse Options
-        let eol = match query_parameters.get("eol") {
-            Some(eol) => string_to_ascii_char(eol)?,
-            None => b'\n',
-        };
-        let quote = match query_parameters.get("quote") {
-            Some(quote) => Some(string_to_ascii_char(quote)?),
-            None => None,
-        };
-        let separator = match query_parameters.get("separator") {
-            Some(separator) => string_to_ascii_char(separator)?,
-            None => b',',
+            None => NonZeroUsize::new(100),
         };
 
-        let data_frame = CsvReadOptions::default()
-            .with_has_header(has_header)
+        let cursor = Cursor::new(json.as_bytes());
+        let data_frame = JsonReader::new(cursor)
+            .infer_schema_len(infer_schema_length)
+            .set_rechunk(true)
             .with_ignore_errors(ignore_errors)
-            .with_infer_schema_length(infer_schema_length)
-            .with_skip_rows(skip_rows)
-            .with_skip_rows_after_header(skip_rows_after_header)
-            .with_parse_options(
-                CsvParseOptions::default()
-                    .with_eol_char(eol)
-                    .with_quote_char(quote)
-                    .with_separator(separator),
-            )
-            .with_rechunk(true)
-            .into_reader_with_file_handle(file)
             .finish()?;
 
         let table_name = crate::polars::driver::get_table_name(file_name)?;
@@ -101,23 +73,13 @@ impl crate::Driver for Driver {
         Ok(Box::new(connection))
     }
 
-    fn supports_file_type(&self, _file_type: &FileType) -> bool {
-        false
+    fn supports_file_type(&self, file_type: &FileType) -> bool {
+        if file_type.media_types().contains(&"text/x-yaml") {
+            return true;
+        }
+        // Fallback to the specific file type identifier if the media type is not available
+        file_type.id() == "fmt/818"
     }
-}
-
-fn string_to_ascii_char(value: &String) -> Result<u8> {
-    let chars = value.chars().collect::<Vec<char>>();
-    if chars.len() != 1 {
-        return Err(ConversionError(format!(
-            "Invalid character length; expected 1 character: {value}"
-        )));
-    }
-    let char = chars[0];
-    if !char.is_ascii() {
-        return Err(ConversionError(format!("Invalid character: {char}")));
-    }
-    u8::try_from(char).map_err(|error| ConversionError(error.to_string()))
 }
 
 #[cfg(test)]
@@ -126,8 +88,7 @@ mod test {
     use crate::{DriverManager, Value};
 
     fn database_url() -> String {
-        let path = dataset_url("delimited", "users.pipe");
-        format!("{path}?separator=|")
+        dataset_url("yaml", "users.yaml")
     }
 
     #[tokio::test]

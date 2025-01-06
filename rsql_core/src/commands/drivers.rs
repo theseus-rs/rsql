@@ -123,6 +123,8 @@ mod tests {
             "tsv",
             #[cfg(feature = "driver-xml")]
             "xml",
+            #[cfg(feature = "driver-yaml")]
+            "yaml",
         ];
 
         let available_drivers = drivers.join(", ");

@@ -6,6 +6,7 @@ use crate::{Error, MemoryQueryResult, Metadata, QueryResult, StatementMetadata};
 use async_trait::async_trait;
 use bit_vec::BitVec;
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime, Utc};
+use file_type::FileType;
 use postgresql_embedded::{PostgreSQL, Settings, Status, VersionReq};
 use sqlparser::ast::Statement;
 use sqlparser::dialect::{Dialect, PostgreSqlDialect};
@@ -37,6 +38,10 @@ impl crate::Driver for Driver {
     ) -> Result<Box<dyn crate::Connection>> {
         let connection = Connection::new(url, password).await?;
         Ok(Box::new(connection))
+    }
+
+    fn supports_file_type(&self, _file_type: &FileType) -> bool {
+        false
     }
 }
 

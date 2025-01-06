@@ -34,6 +34,7 @@ The drivers command displays the available database drivers.
 | `sqlserver`   | SQL Server provided by [Tiberius](https://github.com/prisma/tiberius)                                  | `sqlserver://<user>[:<password>]@<host>[:<port>]/<database>`                                                              |
 | `tsv`         | Tab Separated Value (TSV) provided by [Polars](https://github.com/pola-rs/polars)                      | `tsv://<file>[?has_header=<true/false>][&quote=<char>][&skip_rows=<n>]`                                                   |
 | `xml`         | Extensible Markup Language (XML) provided by [Polars](https://github.com/pola-rs/polars)               | `xml://<file>`                                                                                                            |
+| `yaml`        | Extensible Markup Language (YAML) provided by [Polars](https://github.com/pola-rs/polars)              | `yaml://<file>`                                                                                                           |
 
 ### Examples
 

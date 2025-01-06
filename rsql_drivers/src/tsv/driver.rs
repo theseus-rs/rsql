@@ -1,6 +1,7 @@
 use crate::delimited::driver::Driver as DelimitedDriver;
 use crate::error::Result;
 use async_trait::async_trait;
+use file_type::FileType;
 
 #[derive(Debug)]
 pub struct Driver;
@@ -20,8 +21,10 @@ impl crate::Driver for Driver {
         DelimitedDriver.connect(url, password).await
     }
 
-    fn file_media_type(&self) -> Option<&'static str> {
-        Some("text/tab-separated-values")
+    fn supports_file_type(&self, file_type: &FileType) -> bool {
+        file_type
+            .media_types()
+            .contains(&"text/tab-separated-values")
     }
 }
 

@@ -3,6 +3,7 @@ use crate::libsql::metadata;
 use crate::value::Value;
 use crate::{MemoryQueryResult, Metadata, QueryResult};
 use async_trait::async_trait;
+use file_type::FileType;
 use libsql::replication::Frames;
 use libsql::Builder;
 use std::collections::HashMap;
@@ -25,6 +26,10 @@ impl crate::Driver for Driver {
     ) -> Result<Box<dyn crate::Connection>> {
         let connection = Connection::new(url).await?;
         Ok(Box::new(connection))
+    }
+
+    fn supports_file_type(&self, _file_type: &FileType) -> bool {
+        false
     }
 }
 
