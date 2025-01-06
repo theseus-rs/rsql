@@ -67,6 +67,8 @@ mod test;
 mod tsv;
 mod url;
 mod value;
+#[cfg(feature = "xml")]
+mod xml;
 
 pub use connection::{
     Connection, LimitQueryResult, MemoryQueryResult, MockConnection, QueryResult, StatementMetadata,

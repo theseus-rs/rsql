@@ -78,6 +78,7 @@ all-drivers = [
     "driver-sqlite",
     "driver-sqlserver",
     "driver-tsv",
+    "driver-xml",
 ]
 driver-arrow = ["rsql_drivers/arrow"]
 driver-avro = ["rsql_drivers/avro"]
@@ -100,6 +101,7 @@ driver-snowflake = ["rsql_drivers/snowflake"]
 driver-sqlite = ["rsql_drivers/sqlite"]
 driver-sqlserver = ["rsql_drivers/sqlserver"]
 driver-tsv = ["rsql_drivers/tsv"]
+driver-xml = ["rsql_drivers/xml"]
 all-formats = [
     "format-ascii",
     "format-csv",

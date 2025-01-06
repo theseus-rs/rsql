@@ -136,6 +136,8 @@ impl Default for DriverManager {
         drivers.add(Box::new(crate::sqlserver::Driver));
         #[cfg(feature = "tsv")]
         drivers.add(Box::new(crate::tsv::Driver));
+        #[cfg(feature = "xml")]
+        drivers.add(Box::new(crate::xml::Driver));
 
         drivers
     }
@@ -215,6 +217,8 @@ mod tests {
         #[cfg(feature = "sqlserver")]
         let driver_count = driver_count + 1;
         #[cfg(feature = "tsv")]
+        let driver_count = driver_count + 1;
+        #[cfg(feature = "xml")]
         let driver_count = driver_count + 1;
 
         assert_eq!(driver_manager.drivers.len(), driver_count);
