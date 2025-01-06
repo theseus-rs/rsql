@@ -2,6 +2,7 @@ use crate::error::Result;
 use crate::postgresql::driver::Connection as PgConnection;
 use crate::{Metadata, QueryResult};
 use async_trait::async_trait;
+use file_type::FileType;
 
 #[derive(Debug)]
 pub struct Driver;
@@ -19,6 +20,10 @@ impl crate::Driver for Driver {
     ) -> Result<Box<dyn crate::Connection>> {
         let connection = Connection::new(url, password).await?;
         Ok(Box::new(connection))
+    }
+
+    fn supports_file_type(&self, _file_type: &FileType) -> bool {
+        false
     }
 }
 

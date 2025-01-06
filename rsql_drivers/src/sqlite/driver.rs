@@ -5,6 +5,7 @@ use crate::value::Value;
 use crate::Error::UnsupportedColumnType;
 use crate::{MemoryQueryResult, Metadata, QueryResult, StatementMetadata};
 use async_trait::async_trait;
+use file_type::FileType;
 use sqlparser::ast::Statement;
 use sqlparser::dialect::{Dialect, SQLiteDialect};
 use sqlx::sqlite::{SqliteAutoVacuum, SqliteColumn, SqliteConnectOptions, SqliteRow};
@@ -31,8 +32,8 @@ impl crate::Driver for Driver {
         Ok(Box::new(connection))
     }
 
-    fn file_media_type(&self) -> Option<&'static str> {
-        Some("application/x-sqlite3")
+    fn supports_file_type(&self, file_type: &FileType) -> bool {
+        file_type.media_types().contains(&"application/x-sqlite3")
     }
 }
 

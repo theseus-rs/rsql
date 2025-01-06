@@ -6486,6 +6486,7 @@ dependencies = [
  "rust_decimal",
  "serde",
  "serde_json",
+ "serde_yaml",
  "sha2",
  "sqlparser",
  "sqlx 0.7.4",

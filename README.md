@@ -91,6 +91,7 @@ rsql --url "<url>" -- "<query>"
 | sqlserver          | `sqlserver://<user>[:<password>]@<host>[:<port>]/<database>`                                                              |
 | tsv (polars)       | `tsv://<file>[?has_header=<true/false>][&quote=<char>][&skip_rows=<n>]`                                                   |
 | xml                | `xml://<file>`                                                                                                            |
+| yaml               | `yaml://<file>`                                                                                                           |
 
 ¹ the `file` driver will attempt to detect the type of file and automatically use the appropriate driver.  
 ² `libsql` needs to be enabled with the `libsql` feature flag; it is disabled by default as it conflicts

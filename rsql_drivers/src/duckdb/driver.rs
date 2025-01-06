@@ -9,6 +9,7 @@ use async_trait::async_trait;
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime, TimeDelta};
 use duckdb::types::{TimeUnit, ValueRef};
 use duckdb::Row;
+use file_type::FileType;
 use sqlparser::ast::Statement;
 use sqlparser::dialect::{Dialect, DuckDbDialect};
 use std::ops::Add;
@@ -34,8 +35,10 @@ impl crate::Driver for Driver {
         Ok(Box::new(connection))
     }
 
-    fn file_media_type(&self) -> Option<&'static str> {
-        Some("application/vnd.duckdb.file")
+    fn supports_file_type(&self, file_type: &FileType) -> bool {
+        file_type
+            .media_types()
+            .contains(&"application/vnd.duckdb.file")
     }
 }
 

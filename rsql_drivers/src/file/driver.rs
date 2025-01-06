@@ -27,10 +27,7 @@ impl crate::Driver for Driver {
             .await
             .map_err(|error| IoError(error.into()))?;
         let driver_manager = DriverManager::default();
-        let driver = file_type
-            .media_types()
-            .into_iter()
-            .find_map(|media_type| driver_manager.from_media_type(media_type));
+        let driver = driver_manager.get_by_file_type(file_type);
 
         match driver {
             Some(driver) => {
@@ -46,6 +43,10 @@ impl crate::Driver for Driver {
                 file_type.media_types()
             ))),
         }
+    }
+
+    fn supports_file_type(&self, _file_type: &FileType) -> bool {
+        false
     }
 }
 
@@ -86,6 +87,8 @@ mod test {
                     SELECT user.* FROM cte_user
                 "}),
             ),
+            #[cfg(feature = "yaml")]
+            (dataset_url("file", "users.yaml"), None),
         ];
         for (database_url, sql) in database_urls {
             test_file_driver(database_url.as_str(), sql).await?;

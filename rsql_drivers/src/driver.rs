@@ -3,9 +3,10 @@ use crate::error::Result;
 use crate::Connection;
 use crate::Error::DriverNotFound;
 use async_trait::async_trait;
+use file_type::FileType;
 use mockall::automock;
 use mockall::predicate::str;
-use std::collections::{BTreeMap, HashMap};
+use std::collections::BTreeMap;
 use std::fmt::Debug;
 use tracing::instrument;
 use url::Url;
@@ -15,16 +16,13 @@ use url::Url;
 pub trait Driver: Debug + Send + Sync {
     fn identifier(&self) -> &'static str;
     async fn connect(&self, url: String, password: Option<String>) -> Result<Box<dyn Connection>>;
-    fn file_media_type(&self) -> Option<&'static str> {
-        None
-    }
+    fn supports_file_type(&self, file_type: &FileType) -> bool;
 }
 
 /// Manages available drivers
 #[derive(Debug)]
 pub struct DriverManager {
     drivers: BTreeMap<&'static str, Box<dyn Driver>>,
-    media_type_identifier_map: HashMap<&'static str, &'static str>,
 }
 
 impl DriverManager {
@@ -33,18 +31,12 @@ impl DriverManager {
     pub fn new() -> Self {
         DriverManager {
             drivers: BTreeMap::new(),
-            media_type_identifier_map: HashMap::new(),
         }
     }
 
     /// Add a new driver to the list of available drivers
     pub fn add(&mut self, driver: Box<dyn Driver>) {
         let identifier = driver.identifier();
-        if let Some(media_type) = driver.file_media_type() {
-            let _ = self
-                .media_type_identifier_map
-                .insert(media_type, identifier);
-        }
         let _ = &self.drivers.insert(identifier, driver);
     }
 
@@ -56,10 +48,11 @@ impl DriverManager {
 
     /// Get a drivers by name
     #[must_use]
-    pub fn from_media_type(&self, media_type: &str) -> Option<&dyn Driver> {
-        self.media_type_identifier_map
-            .get(media_type)
-            .and_then(|identifier| self.get(identifier))
+    pub fn get_by_file_type(&self, file_type: &FileType) -> Option<&dyn Driver> {
+        self.drivers
+            .iter()
+            .find(|(_, driver)| driver.supports_file_type(file_type))
+            .map(|(_, driver)| driver.as_ref())
     }
 
     /// Get an iterator over the available drivers
@@ -138,6 +131,8 @@ impl Default for DriverManager {
         drivers.add(Box::new(crate::tsv::Driver));
         #[cfg(feature = "xml")]
         drivers.add(Box::new(crate::xml::Driver));
+        #[cfg(feature = "yaml")]
+        drivers.add(Box::new(crate::yaml::Driver));
 
         drivers
     }
@@ -153,7 +148,7 @@ mod tests {
         let identifier = "test";
         let mut mock_driver = MockDriver::new();
         mock_driver.expect_identifier().returning(|| identifier);
-        mock_driver.expect_file_media_type().returning(|| None);
+        mock_driver.expect_supports_file_type().returning(|_| false);
 
         let mut driver_manager = DriverManager::new();
         assert_eq!(driver_manager.drivers.len(), 0);
@@ -220,6 +215,8 @@ mod tests {
         let driver_count = driver_count + 1;
         #[cfg(feature = "xml")]
         let driver_count = driver_count + 1;
+        #[cfg(feature = "yaml")]
+        let driver_count = driver_count + 1;
 
         assert_eq!(driver_manager.drivers.len(), driver_count);
     }
@@ -229,7 +226,7 @@ mod tests {
         let identifier = "test";
         let mut mock_driver = MockDriver::new();
         mock_driver.expect_identifier().returning(|| identifier);
-        mock_driver.expect_file_media_type().returning(|| None);
+        mock_driver.expect_supports_file_type().returning(|_| false);
         mock_driver
             .expect_connect()
             .returning(|_, _| Ok(Box::new(MockConnection::new())));

@@ -5,6 +5,7 @@ use crate::Error::UnsupportedColumnType;
 use crate::{MemoryQueryResult, Metadata, QueryResult};
 use async_trait::async_trait;
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
+use file_type::FileType;
 use sqlparser::dialect::{Dialect, MySqlDialect};
 use sqlx::mysql::{MySqlColumn, MySqlConnectOptions, MySqlRow};
 use sqlx::types::time::OffsetDateTime;
@@ -28,6 +29,10 @@ impl crate::Driver for Driver {
     ) -> Result<Box<dyn crate::Connection>> {
         let connection = Connection::new(url, password).await?;
         Ok(Box::new(connection))
+    }
+
+    fn supports_file_type(&self, _file_type: &FileType) -> bool {
+        false
     }
 }
 

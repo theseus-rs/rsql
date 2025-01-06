@@ -69,6 +69,8 @@ mod url;
 mod value;
 #[cfg(feature = "xml")]
 mod xml;
+#[cfg(feature = "yaml")]
+mod yaml;
 
 pub use connection::{
     Connection, LimitQueryResult, MemoryQueryResult, MockConnection, QueryResult, StatementMetadata,

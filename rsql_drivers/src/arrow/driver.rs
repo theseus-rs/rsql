@@ -2,6 +2,7 @@ use crate::error::Result;
 use crate::polars::Connection;
 use crate::url::UrlExtension;
 use async_trait::async_trait;
+use file_type::FileType;
 use polars::io::SerReader;
 use polars::prelude::{IntoLazy, IpcReader};
 use polars_sql::SQLContext;
@@ -36,8 +37,10 @@ impl crate::Driver for Driver {
         Ok(Box::new(connection))
     }
 
-    fn file_media_type(&self) -> Option<&'static str> {
-        Some("application/vnd.apache.arrow.file")
+    fn supports_file_type(&self, file_type: &FileType) -> bool {
+        file_type
+            .media_types()
+            .contains(&"application/vnd.apache.arrow.file")
     }
 }
 
