@@ -29,6 +29,7 @@ num-format = { workspace = true }
 polars = { workspace = true, optional = true, features = ["avro", "ipc", "lazy", "json", "parquet", "polars-sql"] }
 polars-sql = { workspace = true, optional = true }
 postgresql_embedded = { workspace = true, optional = true }
+quick-xml = { workspace = true, optional = true, features = ["serde"] }
 regex = { workspace = true }
 reqwest = { workspace = true, optional = true, features = ["json", "gzip"] }
 rusqlite = { workspace = true, features = ["bundled-full"], optional = true }
@@ -87,6 +88,7 @@ all = [
     "sqlite",
     "sqlserver",
     "tsv",
+    "xml",
 ]
 default = []
 arrow = [
@@ -170,6 +172,11 @@ sqlserver = [
 tsv = [
     "dep:polars",
     "dep:polars-sql",
+]
+xml = [
+    "dep:polars",
+    "dep:polars-sql",
+    "dep:quick-xml",
 ]
 
 [lints.clippy]

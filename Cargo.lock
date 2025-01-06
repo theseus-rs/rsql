@@ -6478,6 +6478,7 @@ dependencies = [
  "polars",
  "polars-sql",
  "postgresql_embedded",
+ "quick-xml 0.37.2",
  "regex",
  "reqwest",
  "rusqlite",

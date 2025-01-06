@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<data>
+    <user>
+        <id>1</id>
+        <name>John Doe</name>
+    </user>
+    <user>
+        <id>2</id>
+        <name>Jane Smith</name>
+    </user>
+</data>

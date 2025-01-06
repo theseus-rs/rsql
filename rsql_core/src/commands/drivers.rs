@@ -121,6 +121,8 @@ mod tests {
             "sqlserver",
             #[cfg(feature = "driver-tsv")]
             "tsv",
+            #[cfg(feature = "driver-xml")]
+            "xml",
         ];
 
         let available_drivers = drivers.join(", ");

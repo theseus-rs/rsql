@@ -53,33 +53,52 @@ impl crate::Driver for Driver {
 mod test {
     use crate::test::dataset_url;
     use crate::{DriverManager, Value};
+    use indoc::indoc;
 
     #[tokio::test]
     async fn test_file_drivers() -> anyhow::Result<()> {
         let database_urls = vec![
-            dataset_url("file", "users.arrow"),
-            dataset_url("file", "users.avro"),
-            dataset_url("file", "users.csv"),
-            dataset_url("file", "users.duckdb"),
-            dataset_url("file", "users.json"),
-            dataset_url("file", "users.jsonl"),
-            dataset_url("file", "users.parquet"),
-            dataset_url("file", "users.sqlite3"),
-            dataset_url("file", "users.tsv"),
+            #[cfg(feature = "arrow")]
+            (dataset_url("file", "users.arrow"), None),
+            #[cfg(feature = "avro")]
+            (dataset_url("file", "users.avro"), None),
+            #[cfg(feature = "csv")]
+            (dataset_url("file", "users.csv"), None),
+            #[cfg(feature = "duckdb")]
+            (dataset_url("file", "users.duckdb"), None),
+            #[cfg(feature = "json")]
+            (dataset_url("file", "users.json"), None),
+            #[cfg(feature = "jsonl")]
+            (dataset_url("file", "users.jsonl"), None),
+            #[cfg(feature = "parquet")]
+            (dataset_url("file", "users.parquet"), None),
+            #[cfg(feature = "sqlite")]
+            (dataset_url("file", "users.sqlite3"), None),
+            #[cfg(feature = "tsv")]
+            (dataset_url("file", "users.tsv"), None),
+            #[cfg(feature = "xml")]
+            (
+                dataset_url("file", "users.xml"),
+                Some(indoc! {r"
+                    WITH cte_user AS (
+                        SELECT unnest(data.user) FROM users
+                    )
+                    SELECT user.* FROM cte_user
+                "}),
+            ),
         ];
-        for database_url in database_urls {
-            test_file_driver(database_url.as_str()).await?;
+        for (database_url, sql) in database_urls {
+            test_file_driver(database_url.as_str(), sql).await?;
         }
         Ok(())
     }
 
-    async fn test_file_driver(database_url: &str) -> anyhow::Result<()> {
+    async fn test_file_driver(database_url: &str, sql: Option<&str>) -> anyhow::Result<()> {
+        let sql = sql.unwrap_or("SELECT id, name FROM users ORDER BY id");
         let driver_manager = DriverManager::default();
         let mut connection = driver_manager.connect(database_url).await?;
 
-        let mut query_result = connection
-            .query("SELECT id, name FROM users ORDER BY id")
-            .await?;
+        let mut query_result = connection.query(sql).await?;
 
         assert_eq!(query_result.columns().await, vec!["id", "name"]);
         assert_eq!(
