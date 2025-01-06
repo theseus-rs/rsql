@@ -24,8 +24,8 @@ indicatif = { workspace = true }
 indoc = { workspace = true }
 num-format = { workspace = true }
 regex = { workspace = true }
-rsql_drivers = { path = "../rsql_drivers", version = "0.15.2" }
-rsql_formatters = { path = "../rsql_formatters", version = "0.15.2" }
+rsql_drivers = { path = "../rsql_drivers", version = "0.15.1" }
+rsql_formatters = { path = "../rsql_formatters", version = "0.15.1" }
 rust-i18n = { workspace = true }
 rustyline = { workspace = true }
 sqlparser = { workspace = true }
