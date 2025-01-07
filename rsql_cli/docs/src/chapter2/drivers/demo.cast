@@ -1,6 +1,6 @@
-{"version": 2, "width": 147, "height": 40, "timestamp": 1734416077, "env": {"SHELL": "/bin/zsh", "TERM": "xterm-256color"}}
-[0.024766, "o", "\u001b]11;?\u001b\\"]
-[0.049036, "o", "⠁ connect [00:00:00] [                                                                                                        ] 0 B/0 B (0 B/s, 0s)"]
-[0.049151, "o", "\r\u001b[2K"]
-[0.059281, "o", "rsql> \u001b[38;2;131;148;150m.drivers\u001b[0m\r\n"]
-[0.059479, "o", "Drivers: arrow, avro, cockroachdb, csv, delimited, duckdb, json, jsonl, mariadb, mysql, parquet, postgres, postgresql, redshift, rusqlite, snowflake, sqlite, sqlserver, tsv\r\n"]
+{"version": 2, "width": 120, "height": 30, "timestamp": 1736209276, "env": {"SHELL": "/bin/zsh", "TERM": "xterm-256color"}}
+[0.024328, "o", "\u001b]11;?\u001b\\"]
+[0.049917, "o", "⠁ connect [00:00:00] [                                                                             ] 0 B/0 B (0 B/s, 0s)"]
+[0.050007, "o", "\r\u001b[2K"]
+[0.060633, "o", "rsql> \u001b[38;2;131;148;150m.drivers\u001b[0m\r\n"]
+[0.06082, "o", "Drivers: arrow, avro, cockroachdb, csv, delimited, duckdb, file, json, jsonl, mariadb, mysql, parquet, postgres, postgresql, redshift, rusqlite, snowflake, sqlite, sqlserver, tsv, xml, yaml\r\n"]

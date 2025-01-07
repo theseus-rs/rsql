@@ -38,18 +38,18 @@ visit the [rsql](https://theseus-rs.github.io/rsql/rsql_cli/) site.
 
 ## Features
 
-| Feature               |                                                                                                                                                                        |
-|-----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Databases             | Arrow, Avro, CockroachDB, CSV, Delimited, DuckDB, JSON, JSONL, LibSQL (Turso), MariaDB, MySQL, Parquet, PostgreSQL, Redshift, Snowflake, SQLite3, SQL Server, TSV, XML |
-| Syntax Highlighting   | ✅                                                                                                                                                                      |
-| Result Highlighting   | ✅                                                                                                                                                                      |
-| Query Auto-completion | ✅                                                                                                                                                                      |
-| History               | ✅                                                                                                                                                                      |
-| SQL File Execution    | ✅                                                                                                                                                                      |
-| Embedded PostgreSQL   | ✅                                                                                                                                                                      |
-| Output Formats        | ascii, csv, expanded, html, json, jsonl, markdown, plain, psql, sqlite, tsv, unicode, xml, yaml                                                                        |
-| Localized Interface   | 40+ languages¹                                                                                                                                                         |
-| Key Bindings          | emacs, vi                                                                                                                                                              |
+| Feature               |                                                                                                                                                                              |
+|-----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Databases             | Arrow, Avro, CockroachDB, CSV, Delimited, DuckDB, JSON, JSONL, LibSQL (Turso), MariaDB, MySQL, Parquet, PostgreSQL, Redshift, Snowflake, SQLite3, SQL Server, TSV, XML, YAML |
+| Syntax Highlighting   | ✅                                                                                                                                                                            |
+| Result Highlighting   | ✅                                                                                                                                                                            |
+| Query Auto-completion | ✅                                                                                                                                                                            |
+| History               | ✅                                                                                                                                                                            |
+| SQL File Execution    | ✅                                                                                                                                                                            |
+| Embedded PostgreSQL   | ✅                                                                                                                                                                            |
+| Output Formats        | ascii, csv, expanded, html, json, jsonl, markdown, plain, psql, sqlite, tsv, unicode, xml, yaml                                                                              |
+| Localized Interface   | 40+ languages¹                                                                                                                                                               |
+| Key Bindings          | emacs, vi                                                                                                                                                                    |
 
 ¹ Computer translations; human translations welcome
 
