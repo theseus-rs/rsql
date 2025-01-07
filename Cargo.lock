@@ -2322,9 +2322,9 @@ dependencies = [
 
 [[package]]
 name = "file_type"
-version = "0.1.0"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c4a319dc193e449ca9185d302fc557a8325e88c38d4e1efd23cba6b54e15fc23"
+checksum = "2c2282c8ef44bd7b313d9b12cab5b242aa33f7db8116c119d2b626aa7d7b37cb"
 dependencies = [
  "include_dir",
  "jiff",
