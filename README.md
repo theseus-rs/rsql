@@ -38,18 +38,18 @@ visit the [rsql](https://theseus-rs.github.io/rsql/rsql_cli/) site.
 
 ## Features
 
-| Feature               |                                                                                                                                                                              |
-|-----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Databases             | Arrow, Avro, CockroachDB, CSV, Delimited, DuckDB, JSON, JSONL, LibSQL (Turso), MariaDB, MySQL, Parquet, PostgreSQL, Redshift, Snowflake, SQLite3, SQL Server, TSV, XML, YAML |
-| Syntax Highlighting   | ✅                                                                                                                                                                            |
-| Result Highlighting   | ✅                                                                                                                                                                            |
-| Query Auto-completion | ✅                                                                                                                                                                            |
-| History               | ✅                                                                                                                                                                            |
-| SQL File Execution    | ✅                                                                                                                                                                            |
-| Embedded PostgreSQL   | ✅                                                                                                                                                                            |
-| Output Formats        | ascii, csv, expanded, html, json, jsonl, markdown, plain, psql, sqlite, tsv, unicode, xml, yaml                                                                              |
-| Localized Interface   | 40+ languages¹                                                                                                                                                               |
-| Key Bindings          | emacs, vi                                                                                                                                                                    |
+| Feature               |                                                                                                                                                                                          |
+|-----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Databases             | Arrow, Avro, CockroachDB, CSV, Delimited, DuckDB, Excel, JSON, JSONL, LibSQL (Turso), MariaDB, MySQL, ODS, Parquet, PostgreSQL, Redshift, Snowflake, SQLite3, SQL Server, TSV, XML, YAML |
+| Syntax Highlighting   | ✅                                                                                                                                                                                        |
+| Result Highlighting   | ✅                                                                                                                                                                                        |
+| Query Auto-completion | ✅                                                                                                                                                                                        |
+| History               | ✅                                                                                                                                                                                        |
+| SQL File Execution    | ✅                                                                                                                                                                                        |
+| Embedded PostgreSQL   | ✅                                                                                                                                                                                        |
+| Output Formats        | ascii, csv, expanded, html, json, jsonl, markdown, plain, psql, sqlite, tsv, unicode, xml, yaml                                                                                          |
+| Localized Interface   | 40+ languages¹                                                                                                                                                                           |
+| Key Bindings          | emacs, vi                                                                                                                                                                                |
 
 ¹ Computer translations; human translations welcome
 
@@ -75,12 +75,14 @@ rsql --url "<url>" -- "<query>"
 | csv (polars)       | `csv://<file>[?has_header=<true/false>][&quote=<char>][&skip_rows=<n>]`                                                   |
 | delimited (polars) | `delimited://<file>[?separator=<char>][&has_header=<true/false>][&quote=<char>][&skip_rows=<n>]`                          |
 | duckdb             | `duckdb://[<file>]`                                                                                                       |
+| excel              | `excel://<file>`                                                                                                          |
 | file¹              | `file://<file>`                                                                                                           |
 | json (polars)      | `json://<file>`                                                                                                           |
 | jsonl (polars)     | `jsonl://<file>`                                                                                                          |
 | libsql²            | `libsql://<host>?[<memory=true>][&file=<database_file>][&auth_token=<token>]`                                             |
 | mariadb (sqlx)     | `mariadb://<user>[:<password>]@<host>[:<port>]/<database>`                                                                |
 | mysql (sqlx)       | `mysql://<user>[:<password>]@<host>[:<port>]/<database>`                                                                  |
+| ods                | `ods://<file>`                                                                                                            |
 | parquet (polars)   | `parquet://<file>`                                                                                                        |
 | postgres           | `postgres://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`                                               |
 | postgresql (sqlx)  | `postgresql://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`                                             |
