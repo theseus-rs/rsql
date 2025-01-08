@@ -80,11 +80,11 @@ impl crate::Driver for Driver {
 }
 
 /// Convert XML to JSON so that it can be read by Polars
-fn xml_to_json(xml: &str) -> Result<serde_json::Value> {
+fn xml_to_json(xml: &str) -> Result<Value> {
     let mut reader = Reader::from_str(xml);
     reader.config_mut().trim_text(true);
     let mut buffer = Vec::new();
-    let mut stack: Vec<(String, IndexMap<String, serde_json::Value>)> = Vec::new();
+    let mut stack: Vec<(String, IndexMap<String, Value>)> = Vec::new();
 
     loop {
         match reader.read_event_into(&mut buffer) {
@@ -126,7 +126,7 @@ fn xml_to_json(xml: &str) -> Result<serde_json::Value> {
                     if let Some((_, parent_map)) = stack.last_mut() {
                         match parent_map.get_mut(&name) {
                             Some(existing) => {
-                                if let serde_json::Value::Array(arr) = existing {
+                                if let Value::Array(arr) = existing {
                                     arr.push(value);
                                 } else {
                                     let prev = std::mem::replace(

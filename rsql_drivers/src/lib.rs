@@ -21,6 +21,8 @@ mod driver;
 #[cfg(feature = "duckdb")]
 mod duckdb;
 mod error;
+#[cfg(feature = "excel")]
+mod excel;
 #[cfg(feature = "file")]
 mod file;
 #[cfg(feature = "json")]
@@ -34,6 +36,8 @@ mod mariadb;
 mod metadata;
 #[cfg(feature = "mysql")]
 mod mysql;
+#[cfg(feature = "ods")]
+mod ods;
 #[cfg(feature = "parquet")]
 mod parquet;
 #[cfg(any(
@@ -41,10 +45,14 @@ mod parquet;
     feature = "avro",
     feature = "csv",
     feature = "delimited",
+    feature = "excel",
     feature = "json",
     feature = "jsonl",
+    feature = "ods",
     feature = "parquet",
-    feature = "tsv"
+    feature = "tsv",
+    feature = "xml",
+    feature = "yaml",
 ))]
 mod polars;
 #[cfg(feature = "postgres")]

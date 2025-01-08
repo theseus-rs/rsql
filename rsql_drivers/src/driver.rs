@@ -99,6 +99,8 @@ impl Default for DriverManager {
         drivers.add(Box::new(crate::delimited::Driver));
         #[cfg(feature = "duckdb")]
         drivers.add(Box::new(crate::duckdb::Driver));
+        #[cfg(feature = "excel")]
+        drivers.add(Box::new(crate::excel::Driver));
         #[cfg(feature = "file")]
         drivers.add(Box::new(crate::file::Driver));
         #[cfg(feature = "json")]
@@ -111,6 +113,8 @@ impl Default for DriverManager {
         drivers.add(Box::new(crate::mariadb::Driver));
         #[cfg(feature = "mysql")]
         drivers.add(Box::new(crate::mysql::Driver));
+        #[cfg(feature = "ods")]
+        drivers.add(Box::new(crate::ods::Driver));
         #[cfg(feature = "parquet")]
         drivers.add(Box::new(crate::parquet::Driver));
         #[cfg(feature = "postgres")]
@@ -183,6 +187,8 @@ mod tests {
         let driver_count = driver_count + 1;
         #[cfg(feature = "duckdb")]
         let driver_count = driver_count + 1;
+        #[cfg(feature = "excel")]
+        let driver_count = driver_count + 1;
         #[cfg(feature = "file")]
         let driver_count = driver_count + 1;
         #[cfg(feature = "json")]
@@ -194,6 +200,8 @@ mod tests {
         #[cfg(feature = "mariadb")]
         let driver_count = driver_count + 1;
         #[cfg(feature = "mysql")]
+        let driver_count = driver_count + 1;
+        #[cfg(feature = "ods")]
         let driver_count = driver_count + 1;
         #[cfg(feature = "parquet")]
         let driver_count = driver_count + 1;

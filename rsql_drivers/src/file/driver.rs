@@ -67,10 +67,14 @@ mod test {
             (dataset_url("file", "users.csv"), None),
             #[cfg(feature = "duckdb")]
             (dataset_url("file", "users.duckdb"), None),
+            #[cfg(feature = "excel")]
+            (dataset_url("file", "users.xlsx"), None),
             #[cfg(feature = "json")]
             (dataset_url("file", "users.json"), None),
             #[cfg(feature = "jsonl")]
             (dataset_url("file", "users.jsonl"), None),
+            #[cfg(feature = "ods")]
+            (dataset_url("file", "users.ods"), None),
             #[cfg(feature = "parquet")]
             (dataset_url("file", "users.parquet"), None),
             #[cfg(feature = "sqlite")]

@@ -1173,6 +1173,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "calamine"
+version = "0.26.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "138646b9af2c5d7f1804ea4bf93afc597737d2bd4f7341d67c48b03316976eb1"
+dependencies = [
+ "byteorder",
+ "codepage",
+ "encoding_rs",
+ "log",
+ "quick-xml 0.31.0",
+ "serde",
+ "zip",
+]
+
+[[package]]
 name = "camino"
 version = "1.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1408,6 +1423,15 @@ dependencies = [
  "libc",
  "wasix",
  "wasm-bindgen",
+]
+
+[[package]]
+name = "codepage"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "48f68d061bc2828ae826206326e61251aca94c1e4a5305cf52d9138639c918b4"
+dependencies = [
+ "encoding_rs",
 ]
 
 [[package]]
@@ -2322,9 +2346,9 @@ dependencies = [
 
 [[package]]
 name = "file_type"
-version = "0.2.0"
+version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2c2282c8ef44bd7b313d9b12cab5b242aa33f7db8116c119d2b626aa7d7b37cb"
+checksum = "40fc3dba1cbdadc5154a5354f067785e7b16692ae4e27588b2de8dafadfcfdbb"
 dependencies = [
  "include_dir",
  "jiff",
@@ -5886,6 +5910,16 @@ dependencies = [
 
 [[package]]
 name = "quick-xml"
+version = "0.31.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1004a344b30a54e2ee58d66a71b32d2db2feb0a31f9a2d302bf0536f15de2a33"
+dependencies = [
+ "encoding_rs",
+ "memchr",
+]
+
+[[package]]
+name = "quick-xml"
 version = "0.32.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1d3a6e5838b60e0e8fa7a43f22ade549a37d61f8bdbe636d0d7816191de969c2"
@@ -6464,6 +6498,7 @@ dependencies = [
  "async-trait",
  "base64 0.22.1",
  "bit-vec",
+ "calamine",
  "chrono",
  "duckdb",
  "file_type",

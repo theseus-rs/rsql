@@ -15,6 +15,7 @@ anyhow = { workspace = true }
 async-trait = { workspace = true }
 base64 = { workspace = true }
 bit-vec = { workspace = true, optional = true }
+calamine = { workspace = true, optional = true }
 chrono = { workspace = true, features = ["serde"] }
 duckdb = { workspace = true, features = ["bundled"], optional = true }
 file_type = { workspace = true, optional = true }
@@ -75,11 +76,13 @@ all = [
     "csv",
     "delimited",
     "duckdb",
+    "excel",
     "file",
     "json",
     "jsonl",
     "mariadb",
     "mysql",
+    "ods",
     "parquet",
     "postgres",
     "postgresql",
@@ -115,6 +118,11 @@ delimited = [
 duckdb = [
     "dep:duckdb",
 ]
+excel = [
+    "dep:polars",
+    "dep:polars-sql",
+    "dep:calamine",
+]
 file = [
     "dep:file_type",
 ]
@@ -135,6 +143,9 @@ mariadb = [
 mysql = [
     "dep:sqlx",
     "sqlx/mysql",
+]
+ods = [
+    "excel",
 ]
 parquet = [
     "dep:polars",

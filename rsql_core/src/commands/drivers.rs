@@ -91,6 +91,8 @@ mod tests {
             "delimited",
             #[cfg(feature = "driver-duckdb")]
             "duckdb",
+            #[cfg(feature = "driver-excel")]
+            "excel",
             #[cfg(feature = "driver-file")]
             "file",
             #[cfg(feature = "driver-json")]
@@ -103,6 +105,8 @@ mod tests {
             "mariadb",
             #[cfg(feature = "driver-mysql")]
             "mysql",
+            #[cfg(feature = "driver-ods")]
+            "ods",
             #[cfg(feature = "driver-parquet")]
             "parquet",
             #[cfg(feature = "driver-postgresql")]
