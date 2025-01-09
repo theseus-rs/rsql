@@ -43,7 +43,7 @@ sha2 = { workspace = true, optional = true }
 sqlparser = { workspace = true }
 sqlx = { workspace = true, features = ["bit-vec", "chrono", "json", "macros", "runtime-tokio", "rust_decimal", "time", "uuid"], optional = true }
 thiserror = { workspace = true }
-tokio = { workspace = true, features = ["rt", "rt-multi-thread", "macros"] }
+tokio = { workspace = true, features = ["rt", "macros"] }
 tokio-postgres = { workspace = true, features = ["array-impls", "with-bit-vec-0_6", "with-chrono-0_4", "with-serde_json-1", "with-uuid-1"], optional = true }
 tokio-util = { workspace = true, features = ["compat"], optional = true }
 tracing = { workspace = true }
@@ -61,6 +61,9 @@ default-features = false
 features = ["bigdecimal", "chrono", "rust_decimal", "tds73", "time", "vendored-openssl"]
 optional = true
 workspace = true
+
+[target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dependencies]
+getrandom = { workspace = true, features = ["js"] }
 
 [dev-dependencies]
 testcontainers = { workspace = true }
