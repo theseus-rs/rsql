@@ -28,16 +28,28 @@ jobs:
           - macos-arm64
           - macos-x64
           - windows-x64
+          - wasm32-unknown
+          - wasm32-wasi
 
         include:
           - platform: linux-x64
             os: [ self-hosted, Linux, X64 ]
+            target: x86_64-unknown-linux-gnu
           - platform: macos-arm64
             os: macos-15
+            target: aarch64-apple-darwin
           - platform: macos-x64
             os: macos-13
+            target: x86_64-apple-darwin
           - platform: windows-x64
             os: windows-2022
+            target: x86_64-pc-windows-msvc
+          - platform: wasm32-unknown
+            os: ubuntu-latest
+            target: wasm32-unknown-unknown
+          - platform: wasm32-wasi
+            os: ubuntu-latest
+            target: wasm32-wasip1-threads
 
     steps:
       - name: Checkout source code
@@ -58,8 +70,19 @@ jobs:
         with:
           tool: cargo-llvm-cov
 
-      - name: Tests
-        if: ${{ !startsWith(matrix.platform, 'linux-') }}
+      - name: Build
+        if: ${{ startsWith(matrix.platform, 'wasm32-') }}
+        env:
+          CARGO_TERM_COLOR: always
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          RUST_BACKTRACE: 1
+          RUST_LOG: info
+        run: |
+          rustup target install ${{ matrix.target }}
+          cargo build --package rsql_drivers --target ${{ matrix.target }}
+
+      - name: Test
+        if: ${{ !startsWith(matrix.platform, 'linux-') && !startsWith(matrix.platform, 'wasm32-') }}
         env:
           CARGO_TERM_COLOR: always
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
@@ -69,7 +92,7 @@ jobs:
         run: |
           cargo test --workspace --features all
 
-      - name: Tests
+      - name: Test
         if: ${{ startsWith(matrix.platform, 'linux-') }}
         env:
           CARGO_TERM_COLOR: always
