@@ -35,7 +35,7 @@ impl crate::Driver for Driver {
         let file = File::open(&file_name)?;
         let ignore_errors = query_parameters
             .get("ignore_errors")
-            .map_or(false, |v| v == "true");
+            .is_some_and(|value| value == "true");
         let infer_schema_length = match query_parameters.get("infer_schema_length") {
             Some(infer_schema_length) => {
                 let length = infer_schema_length

@@ -75,14 +75,14 @@ rsql --url "<url>" -- "<query>"
 | csv (polars)       | `csv://<file>[?has_header=<true/false>][&quote=<char>][&skip_rows=<n>]`                                                   |
 | delimited (polars) | `delimited://<file>[?separator=<char>][&has_header=<true/false>][&quote=<char>][&skip_rows=<n>]`                          |
 | duckdb             | `duckdb://[<file>]`                                                                                                       |
-| excel              | `excel://<file>`                                                                                                          |
+| excel              | `excel://<file>[?has_header=<true/false>][&skip_rows=<n>]`                                                                |
 | file¹              | `file://<file>`                                                                                                           |
 | json (polars)      | `json://<file>`                                                                                                           |
 | jsonl (polars)     | `jsonl://<file>`                                                                                                          |
 | libsql²            | `libsql://<host>?[<memory=true>][&file=<database_file>][&auth_token=<token>]`                                             |
 | mariadb (sqlx)     | `mariadb://<user>[:<password>]@<host>[:<port>]/<database>`                                                                |
 | mysql (sqlx)       | `mysql://<user>[:<password>]@<host>[:<port>]/<database>`                                                                  |
-| ods                | `ods://<file>`                                                                                                            |
+| ods                | `ods://<file>[?has_header=<true/false>][&skip_rows=<n>]`                                                                  |
 | parquet (polars)   | `parquet://<file>`                                                                                                        |
 | postgres           | `postgres://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`                                               |
 | postgresql (sqlx)  | `postgresql://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`                                             |
