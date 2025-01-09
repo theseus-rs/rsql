@@ -110,6 +110,7 @@ async fn retrieve_indexes(connection: &mut dyn Connection, schema: &mut Schema) 
                 index_name
         "};
     let mut query_result = connection.query(sql).await?;
+    let regex = Regex::new(r"\((.*?)\)")?;
 
     while let Some(row) = query_result.next().await {
         let table_name = match row.first() {
@@ -123,7 +124,6 @@ async fn retrieve_indexes(connection: &mut dyn Connection, schema: &mut Schema) 
         let columns = match row.get(2) {
             Some(value) => {
                 let sql = value.to_string();
-                let regex = Regex::new(r"\((.*?)\)")?;
                 let mut columns: Vec<String> = Vec::new();
 
                 for captures in regex.captures_iter(sql.as_str()) {

@@ -48,7 +48,7 @@ impl Connection {
         let mut params: HashMap<String, String> = parsed_url.query_pairs().into_owned().collect();
         let trust_server_certificate = params
             .remove("TrustServerCertificate")
-            .map_or(false, |value| value == "true");
+            .is_some_and(|value| value == "true");
         let encryption = params
             .remove("encryption")
             .unwrap_or("required".to_string());

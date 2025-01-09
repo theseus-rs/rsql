@@ -37,10 +37,10 @@ impl crate::Driver for Driver {
         let file_name = parsed_url.to_file()?.to_string_lossy().to_string();
         let has_header = query_parameters
             .get("has_header")
-            .map_or(true, |v| v == "true");
+            .map_or(true, |value| value == "true");
         let ignore_errors = query_parameters
             .get("ignore_errors")
-            .map_or(false, |v| v == "true");
+            .is_some_and(|value| value == "true");
         let infer_schema_length = match query_parameters.get("infer_schema_length") {
             Some(infer_schema_length) => {
                 let length = infer_schema_length

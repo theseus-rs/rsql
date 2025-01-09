@@ -58,7 +58,7 @@ impl Connection {
             parsed_url.query_pairs().into_owned().collect();
         let embedded = query_parameters
             .get("embedded")
-            .map_or(false, |v| v == "true");
+            .is_some_and(|value| value == "true");
         let mut database_url = url.to_string().replace("postgres://", "postgresql://");
 
         let postgresql = if embedded {
