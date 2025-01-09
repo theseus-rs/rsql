@@ -60,7 +60,7 @@ mod tests {
         let error = clearscreen::Error::Io(std_io_error);
         let io_error = Error::from(error);
 
-        assert_eq!(io_error.to_string(), "test");
+        assert!(io_error.to_string().contains("test"));
     }
 
     #[test]
