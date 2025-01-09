@@ -3,7 +3,7 @@
 ### Usage
 
 ```text
-.sleep <seconds>
+.limit [rows]
 ```
 
 ### Description
