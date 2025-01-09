@@ -18,7 +18,7 @@ bit-vec = { workspace = true, optional = true }
 calamine = { workspace = true, optional = true }
 chrono = { workspace = true, features = ["serde"] }
 duckdb = { workspace = true, features = ["bundled"], optional = true }
-file_type = { workspace = true, optional = true }
+file_type = { workspace = true }
 form_urlencoded = { workspace = true, optional = true }
 futures-util = { workspace = true, optional = true }
 indexmap = { workspace = true, features = ["serde"] }
@@ -124,7 +124,6 @@ excel = [
     "dep:calamine",
 ]
 file = [
-    "dep:file_type",
 ]
 json = [
     "dep:polars",
