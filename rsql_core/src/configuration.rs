@@ -530,11 +530,11 @@ fn theme(config: &Config) -> Result<String> {
     let mode = match termbg::theme(timeout) {
         Ok(termbg::Theme::Dark) => dark_light::Mode::Dark,
         Ok(termbg::Theme::Light) => dark_light::Mode::Light,
-        Err(_) => dark_light::detect(),
+        Err(_) => dark_light::detect().unwrap_or(dark_light::Mode::Unspecified),
     };
 
     let config_key = match mode {
-        dark_light::Mode::Dark | dark_light::Mode::Default => "shell.theme.dark",
+        dark_light::Mode::Dark | dark_light::Mode::Unspecified => "shell.theme.dark",
         dark_light::Mode::Light => "shell.theme.light",
     };
 
