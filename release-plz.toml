@@ -1,0 +1,35 @@
+[workspace]
+changelog_path = "./CHANGELOG.md"
+git_release_enable = false
+git_tag_enable = false
+pr_name = "rsql-v{{ version }}"
+release_always = false
+
+[[package]]
+name = "rsql_cli"
+changelog_update = true
+changelog_include = [
+    "rsql_core",
+    "rsql_drivers",
+    "rsql_formatters",
+]
+git_release_enable = true
+git_release_name = "v{{ version }}"
+git_tag_enable = true
+git_tag_name = "v{{ version }}"
+
+[changelog]
+body = """
+
+## `{{ package }}` - [{{ version | trim_start_matches(pat="v") }}]{%- if release_link -%}({{ release_link }}){% endif %} - {{ timestamp | date(format="%Y-%m-%d") }}
+{% for group, commits in commits | group_by(attribute="group") %}
+### {{ group | upper_first }}
+{% for commit in commits %}
+{%- if commit.scope -%}
+- *({{commit.scope}})* {% if commit.breaking %}[**breaking**] {% endif %}{{ commit.message }}{%- if commit.links %} ({% for link in commit.links %}[{{link.text}}]({{link.href}}) {% endfor -%}){% endif %}
+{% else -%}
+- {% if commit.breaking %}[**breaking**] {% endif %}{{ commit.message }}
+{% endif -%}
+{% endfor -%}
+{% endfor -%}
+"""
