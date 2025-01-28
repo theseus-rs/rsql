@@ -80,7 +80,6 @@ impl ToValue for AnyValue<'_> {
 mod test {
     use super::*;
     use polars::datatypes::{DataType, Field, PlSmallStr};
-    use polars::export::num::FloatConst;
     use polars::prelude::NamedFrom;
     use polars::series::Series;
 
@@ -122,7 +121,7 @@ mod test {
 
     #[test]
     fn test_float32() {
-        let pi = f32::PI();
+        let pi = std::f32::consts::PI;
         let any_value = AnyValue::Float32(pi);
         let value = any_value.to_value();
         assert_eq!(Value::F32(pi), value);
@@ -130,7 +129,7 @@ mod test {
 
     #[test]
     fn test_float64() {
-        let pi = f64::PI();
+        let pi = std::f64::consts::PI;
         let any_value = AnyValue::Float64(pi);
         let value = any_value.to_value();
         assert_eq!(Value::F64(pi), value);
