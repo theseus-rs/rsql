@@ -74,11 +74,12 @@ impl crate::Driver for Driver {
     }
 
     fn supports_file_type(&self, file_type: &FileType) -> bool {
-        if file_type.media_types().contains(&"text/x-yaml") {
-            return true;
-        }
-        // Fallback to the specific file type identifier if the media type is not available
-        file_type.id() == "fmt/818"
+        let extensions = file_type.extensions();
+        let media_types = file_type.media_types();
+        media_types.contains(&"text/x-yaml")
+            || media_types.contains(&"application/yaml")
+            || extensions.contains(&"yml")
+            || extensions.contains(&"yaml")
     }
 }
 

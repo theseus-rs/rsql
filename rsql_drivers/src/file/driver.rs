@@ -23,9 +23,8 @@ impl crate::Driver for Driver {
     ) -> Result<Box<dyn crate::Connection>> {
         let parsed_url = Url::parse(url.as_str())?;
         let file_name = parsed_url.to_file()?.to_string_lossy().to_string();
-        let file_type = FileType::try_from_file(&file_name)
-            .await
-            .map_err(|error| IoError(error.into()))?;
+        let file_type =
+            FileType::try_from_file(&file_name).map_err(|error| IoError(error.into()))?;
         let driver_manager = DriverManager::default();
         let driver = driver_manager.get_by_file_type(file_type);
 

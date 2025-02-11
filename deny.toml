@@ -22,7 +22,6 @@ allow = [
     "LGPL-3.0",
     "MIT",
     "MPL-2.0",
-    "OGL-UK-3.0",
     "OpenSSL",
     "PostgreSQL",
     "Unicode-3.0",
@@ -33,7 +32,6 @@ allow = [
 [advisories]
 ignore = [
     "RUSTSEC-2023-0071",
-    "RUSTSEC-2023-0086",
     "RUSTSEC-2024-0320",
     "RUSTSEC-2024-0363",
 ]
