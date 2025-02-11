@@ -25,6 +25,7 @@ impl crate::Driver for Driver {
         file_type
             .media_types()
             .contains(&"text/tab-separated-values")
+            || file_type.extensions().contains(&"tsv")
     }
 }
 
