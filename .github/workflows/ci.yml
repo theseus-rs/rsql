@@ -24,18 +24,22 @@ jobs:
       fail-fast: false
       matrix:
         platform:
+          - linux-arm
           - linux-x64
-          - macos-arm64
+          - macos-arm
           - macos-x64
           - windows-x64
           - wasm32-unknown
           - wasm32-wasi
 
         include:
+          - platform: linux-arm
+            os: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
           - platform: linux-x64
             os: [ self-hosted, Linux, X64 ]
             target: x86_64-unknown-linux-gnu
-          - platform: macos-arm64
+          - platform: macos-arm
             os: macos-15
             target: aarch64-apple-darwin
           - platform: macos-x64
@@ -82,7 +86,7 @@ jobs:
           cargo build --package rsql_drivers --target ${{ matrix.target }}
 
       - name: Test
-        if: ${{ !startsWith(matrix.platform, 'linux-') && !startsWith(matrix.platform, 'wasm32-') }}
+        if: ${{ matrix.platform != 'linux-x64' && !startsWith(matrix.platform, 'wasm32-') }}
         env:
           CARGO_TERM_COLOR: always
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
@@ -93,7 +97,7 @@ jobs:
           cargo test --workspace --features all
 
       - name: Test
-        if: ${{ startsWith(matrix.platform, 'linux-') }}
+        if: ${{ matrix.platform == 'linux-x64' }}
         env:
           CARGO_TERM_COLOR: always
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
@@ -104,7 +108,7 @@ jobs:
           cargo llvm-cov --workspace --lcov --jobs 2 --output-path lcov.info
 
       - name: Upload to codecov.io
-        if: ${{ startsWith(matrix.platform, 'linux-') }}
+        if: ${{ matrix.platform == 'linux-x64' }}
         uses: codecov/codecov-action@v4
         with:
           files: lcov.info
