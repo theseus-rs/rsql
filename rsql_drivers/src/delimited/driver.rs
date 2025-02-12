@@ -31,6 +31,18 @@ impl crate::Driver for Driver {
             parsed_url.query_pairs().into_owned().collect();
 
         // Read Options
+        #[cfg(target_os = "windows")]
+        let file_name = if parsed_url.has_host() {
+            // On Windows, the host is the drive letter and the path is the file path.
+            let host = parsed_url
+                .host_str()
+                .unwrap_or_default()
+                .replace("%3A", ":");
+            format!("{host}{}", parsed_url.path())
+        } else {
+            parsed_url.to_file()?.to_string_lossy().to_string()
+        };
+        #[cfg(not(target_os = "windows"))]
         let file_name = parsed_url.to_file()?.to_string_lossy().to_string();
         let file = File::open(&file_name)?;
         let has_header = query_parameters

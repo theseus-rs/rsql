@@ -103,6 +103,10 @@ impl Default for DriverManager {
         drivers.add(Box::new(crate::excel::Driver));
         #[cfg(feature = "file")]
         drivers.add(Box::new(crate::file::Driver));
+        #[cfg(feature = "http")]
+        drivers.add(Box::new(crate::http::Driver));
+        #[cfg(feature = "https")]
+        drivers.add(Box::new(crate::https::Driver));
         #[cfg(feature = "json")]
         drivers.add(Box::new(crate::json::Driver));
         #[cfg(feature = "jsonl")]
@@ -190,6 +194,10 @@ mod tests {
         #[cfg(feature = "excel")]
         let driver_count = driver_count + 1;
         #[cfg(feature = "file")]
+        let driver_count = driver_count + 1;
+        #[cfg(feature = "http")]
+        let driver_count = driver_count + 1;
+        #[cfg(feature = "https")]
         let driver_count = driver_count + 1;
         #[cfg(feature = "json")]
         let driver_count = driver_count + 1;

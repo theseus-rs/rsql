@@ -25,6 +25,10 @@ mod error;
 mod excel;
 #[cfg(feature = "file")]
 mod file;
+#[cfg(feature = "http")]
+mod http;
+#[cfg(feature = "https")]
+mod https;
 #[cfg(feature = "json")]
 mod json;
 #[cfg(feature = "jsonl")]

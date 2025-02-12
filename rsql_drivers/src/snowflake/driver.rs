@@ -133,8 +133,13 @@ impl SnowflakeConnection {
             .try_into()
             .map_err(|_| SnowflakeError::MalformedHeaders)?;
 
+        let version: &str = env!("CARGO_PKG_VERSION");
+        let os = std::env::consts::OS;
+        let arch = std::env::consts::ARCH;
+        let user_agent = format!("rsql/{version} ({os}; {arch})");
+
         reqwest::ClientBuilder::new()
-            .user_agent("rsql-Snowflake-Driver")
+            .user_agent(user_agent)
             .default_headers(header_map)
             .build()
             .map_err(|_| SnowflakeError::ClientCreation.into())

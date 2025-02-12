@@ -77,6 +77,8 @@ rsql --url "<url>" -- "<query>"
 | duckdb             | `duckdb://[<file>]`                                                                                                       |
 | excel              | `excel://<file>[?has_header=<true/false>][&skip_rows=<n>]`                                                                |
 | file¹              | `file://<file>`                                                                                                           |
+| http               | `http://<path>[?_headers=<headers>]`                                                                                      |
+| https              | `https://<path>[?_headers=<headers>]`                                                                                     |
 | json (polars)      | `json://<file>`                                                                                                           |
 | jsonl (polars)     | `jsonl://<file>`                                                                                                          |
 | libsql²            | `libsql://<host>?[<memory=true>][&file=<database_file>][&auth_token=<token>]`                                             |
