@@ -8,7 +8,7 @@
 
 ### Description
 
-The drivers command displays the available database drivers.
+The drivers command displays the available data drivers.
 
 | Driver        | Description                                                                                            | URL                                                                                                                       |
 |---------------|--------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|

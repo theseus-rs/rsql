@@ -11,9 +11,8 @@
 [![License](https://img.shields.io/crates/l/rsql_cli)](https://github.com/theseus-rs/rsql_cli#license)
 [![Semantic Versioning](https://img.shields.io/badge/%E2%9A%99%EF%B8%8F_SemVer-2.0.0-blue)](https://semver.org/spec/v2.0.0.html)
 
-`rsql` is a command line interface for databases.  `rsql` is a modern, feature-rich, and user-friendly database client,
-that has been designed to be easy to use, and to provide a consistent experience across all supported databases. The
-project aims to provide reusable components for building other database clients.
+`rsql` is a command line SQL interface for data.  `rsql` is a modern, feature-rich, and user-friendly client, that has
+been designed to be easy to use, and to provide a consistent experience across all supported data sources.
 
 ## Getting Started
 
@@ -40,7 +39,7 @@ visit the [rsql](https://theseus-rs.github.io/rsql/rsql_cli/) site.
 
 | Feature               |                                                                                                                                                                                          |
 |-----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Databases             | Arrow, Avro, CockroachDB, CSV, Delimited, DuckDB, Excel, JSON, JSONL, LibSQL (Turso), MariaDB, MySQL, ODS, Parquet, PostgreSQL, Redshift, Snowflake, SQLite3, SQL Server, TSV, XML, YAML |
+| Data Sources          | Arrow, Avro, CockroachDB, CSV, Delimited, DuckDB, Excel, JSON, JSONL, LibSQL (Turso), MariaDB, MySQL, ODS, Parquet, PostgreSQL, Redshift, Snowflake, SQLite3, SQL Server, TSV, XML, YAML |
 | Syntax Highlighting   | ✅                                                                                                                                                                                        |
 | Result Highlighting   | ✅                                                                                                                                                                                        |
 | Query Auto-completion | ✅                                                                                                                                                                                        |

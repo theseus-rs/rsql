@@ -8,11 +8,11 @@
 
 ### Description
 
-The schemas command lists the schemas in the database.
+The schemas command lists the schemas in the data source.
 
 ### Examples
 
-List the schemas in the database:
+List the schemas in the data source:
 
 ```text
 .schemas
