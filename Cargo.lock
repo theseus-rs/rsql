@@ -6469,6 +6469,7 @@ dependencies = [
  "sha2",
  "sqlparser 0.52.0",
  "sqlx 0.7.4",
+ "tempfile",
  "testcontainers",
  "testcontainers-modules",
  "thiserror 2.0.11",

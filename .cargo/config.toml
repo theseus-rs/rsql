@@ -6,6 +6,8 @@ delimited = "run --manifest-path ./rsql_cli/Cargo.toml -- --url delimited://data
 duckdb = "run --manifest-path ./rsql_cli/Cargo.toml -- --url duckdb://datasets/users.duckdb"
 excel = "run --manifest-path ./rsql_cli/Cargo.toml -- --url excel://datasets/users.xlsx"
 file = "run --manifest-path ./rsql_cli/Cargo.toml -- --url file://datasets/users.csv"
+http = "run --manifest-path ./rsql_cli/Cargo.toml -- --url http://raw.githubusercontent.com/theseus-rs/rsql/refs/heads/main/datasets/users.csv"
+https = "run --manifest-path ./rsql_cli/Cargo.toml -- --url https://raw.githubusercontent.com/theseus-rs/rsql/refs/heads/main/datasets/users.csv"
 # libsql currently conflicts with the rusqlite crate; hopefully the limbo rewrite in Rust will resolve this
 libsql = "run --manifest-path ./rsql_cli/Cargo.toml -- --url libsql://?memory=true"
 json = "run --manifest-path ./rsql_cli/Cargo.toml -- --url json://datasets/users.json"
@@ -19,3 +21,10 @@ sqlite = "run --manifest-path ./rsql_cli/Cargo.toml -- --url sqlite://datasets/u
 tsv = "run --manifest-path ./rsql_cli/Cargo.toml -- --url tsv://datasets/users.tsv"
 xml = "run --manifest-path ./rsql_cli/Cargo.toml -- --url xml://datasets/users.xml"
 yaml = "run --manifest-path ./rsql_cli/Cargo.toml -- --url yaml://datasets/users.yaml"
+
+#[target.x86_64-unknown-linux-gnu]
+#linker = "clang"
+#rustflags = ["-C", "link-arg=-fuse-ld=lld"]
+
+[target.x86_64-pc-windows-msvc]
+linker = "rust-lld.exe"

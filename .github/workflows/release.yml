@@ -49,7 +49,7 @@ on:
 jobs:
   # Run 'dist plan' (or host) to determine what tasks we need to do
   plan:
-    runs-on: "ubuntu-22.04"
+    runs-on: "ubuntu-20.04"
     outputs:
       val: ${{ steps.plan.outputs.manifest }}
       tag: ${{ !github.event.pull_request && github.ref_name || '' }}
@@ -180,7 +180,7 @@ jobs:
     needs:
       - plan
       - build-local-artifacts
-    runs-on: "ubuntu-22.04"
+    runs-on: "ubuntu-20.04"
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       BUILD_MANIFEST_NAME: target/distrib/global-dist-manifest.json
@@ -221,16 +221,16 @@ jobs:
       - id: cargo-cyclonedx
         shell: bash
         run: |
-          # Generate SBOM (.cdx.xml) files.
-          cargo cyclonedx -v
-          
-          # Move all SBOM (.cdx.xml) files under target/distrib/ since
-          # we expect all artifacts to be in that folder.
-          find . -name '*.cdx.xml' -exec mv '{}' target/distrib/ ';'
-          
-          echo "paths<<EOF" >> "$GITHUB_OUTPUT"
-          find . -name '*.cdx.xml' | tee -a "$GITHUB_OUTPUT"
-          echo "EOF" >> "$GITHUB_OUTPUT"
+            # Generate SBOM (.cdx.xml) files.
+            cargo cyclonedx -v
+
+            # Move all SBOM (.cdx.xml) files under target/distrib/ since
+            # we expect all artifacts to be in that folder.
+            find . -name '*.cdx.xml' -exec mv '{}' target/distrib/ ';'
+
+            echo "paths<<EOF" >> "$GITHUB_OUTPUT"
+            find . -name '*.cdx.xml' | tee -a "$GITHUB_OUTPUT"
+            echo "EOF" >> "$GITHUB_OUTPUT"
       - name: "Upload artifacts"
         uses: actions/upload-artifact@v4
         with:
@@ -249,7 +249,7 @@ jobs:
     if: ${{ always() && needs.plan.outputs.publishing == 'true' && (needs.build-global-artifacts.result == 'skipped' || needs.build-global-artifacts.result == 'success') && (needs.build-local-artifacts.result == 'skipped' || needs.build-local-artifacts.result == 'success') }}
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    runs-on: "ubuntu-22.04"
+    runs-on: "ubuntu-20.04"
     outputs:
       val: ${{ steps.host.outputs.manifest }}
     steps:
@@ -307,7 +307,7 @@ jobs:
     needs:
       - plan
       - host
-    runs-on: "ubuntu-22.04"
+    runs-on: "ubuntu-20.04"
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       PLAN: ${{ needs.plan.outputs.val }}
@@ -357,7 +357,7 @@ jobs:
     # still allowing individual publish jobs to skip themselves (for prereleases).
     # "host" however must run to completion, no skipping allowed!
     if: ${{ always() && needs.host.result == 'success' && (needs.publish-homebrew-formula.result == 'skipped' || needs.publish-homebrew-formula.result == 'success') }}
-    runs-on: "ubuntu-22.04"
+    runs-on: "ubuntu-20.04"
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:

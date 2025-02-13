@@ -42,6 +42,7 @@ serde_yaml = { workspace = true, optional = true }
 sha2 = { workspace = true, optional = true }
 sqlparser = { workspace = true }
 sqlx = { workspace = true, features = ["bit-vec", "chrono", "json", "macros", "runtime-tokio", "rust_decimal", "time", "uuid"], optional = true }
+tempfile = { workspace = true, optional = true }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["rt", "macros"] }
 tokio-postgres = { workspace = true, features = ["array-impls", "with-bit-vec-0_6", "with-chrono-0_4", "with-serde_json-1", "with-uuid-1"], optional = true }
@@ -81,6 +82,8 @@ all = [
     "duckdb",
     "excel",
     "file",
+    "http",
+    "https",
     "json",
     "jsonl",
     "mariadb",
@@ -127,6 +130,14 @@ excel = [
     "dep:calamine",
 ]
 file = [
+]
+http = [
+    "https",
+]
+https = [
+    "file",
+    "dep:reqwest",
+    "dep:tempfile",
 ]
 json = [
     "dep:polars",

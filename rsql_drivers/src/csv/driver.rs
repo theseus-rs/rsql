@@ -17,8 +17,11 @@ impl crate::Driver for Driver {
         url: String,
         password: Option<String>,
     ) -> Result<Box<dyn crate::Connection>> {
-        let url = format!("{url}?separator=,");
-        DelimitedDriver.connect(url, password).await
+        let mut parsed_url = url::Url::parse(&url)?;
+        parsed_url.query_pairs_mut().append_pair("separator", ",");
+        DelimitedDriver
+            .connect(parsed_url.to_string(), password)
+            .await
     }
 
     fn supports_file_type(&self, file_type: &FileType) -> bool {
@@ -40,8 +43,7 @@ mod test {
         let database_url = database_url();
         let driver_manager = DriverManager::default();
         let mut connection = driver_manager.connect(&database_url).await?;
-        let expected_url = format!("{database_url}?separator=,");
-        assert_eq!(&expected_url, connection.url());
+        assert!(connection.url().contains("separator=%2C"));
         connection.close().await?;
         Ok(())
     }
