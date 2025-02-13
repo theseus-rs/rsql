@@ -1,4 +1,5 @@
 [workspace]
+changelog_path = "./CHANGELOG.md"
 git_release_enable = false
 git_tag_enable = false
 pr_name = "rsql-v{{ version }}"
