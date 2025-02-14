@@ -1,0 +1,391 @@
+use crate::metadata;
+use async_trait::async_trait;
+use file_type::FileType;
+use rsql_driver::Error::{IoError, UnsupportedColumnType};
+use rsql_driver::{
+    MemoryQueryResult, Metadata, QueryResult, Result, StatementMetadata, UrlExtension, Value,
+};
+use sqlparser::ast::Statement;
+use sqlparser::dialect::{Dialect, SQLiteDialect};
+use sqlx::sqlite::{SqliteAutoVacuum, SqliteColumn, SqliteConnectOptions, SqliteRow};
+use sqlx::{Column, Row, SqlitePool, TypeInfo};
+use std::collections::HashMap;
+use std::str::FromStr;
+use url::{form_urlencoded, Url};
+
+#[derive(Debug)]
+pub struct Driver;
+
+#[async_trait]
+impl rsql_driver::Driver for Driver {
+    fn identifier(&self) -> &'static str {
+        "sqlite"
+    }
+
+    async fn connect(
+        &self,
+        url: &str,
+        _password: Option<String>,
+    ) -> Result<Box<dyn rsql_driver::Connection>> {
+        let connection = Connection::new(url).await?;
+        Ok(Box::new(connection))
+    }
+
+    fn supports_file_type(&self, file_type: &FileType) -> bool {
+        let media_types = file_type.media_types();
+        media_types.contains(&"application/vnd.sqlite3")
+            || media_types.contains(&"application/x-sqlite3")
+    }
+}
+
+#[derive(Debug)]
+pub struct Connection {
+    url: String,
+    pool: SqlitePool,
+}
+
+impl Connection {
+    pub(crate) async fn new(url: &str) -> Result<Connection> {
+        let parsed_url = Url::parse(url)?;
+        let database_url = if let Ok(file_name) = parsed_url.to_file() {
+            let file_name = file_name.to_string_lossy();
+            let params: HashMap<String, String> = parsed_url.query_pairs().into_owned().collect();
+            let query: String = form_urlencoded::Serializer::new(String::new())
+                .extend_pairs(params.iter())
+                .finish();
+            format!("sqlite://{file_name}?{query}").to_string()
+        } else {
+            "sqlite::memory:".to_string()
+        };
+
+        let options = SqliteConnectOptions::from_str(database_url.as_str())
+            .map_err(|error| IoError(error.to_string()))?
+            .auto_vacuum(SqliteAutoVacuum::None)
+            .create_if_missing(true);
+        let pool = SqlitePool::connect_with(options)
+            .await
+            .map_err(|error| IoError(error.to_string()))?;
+        let connection = Connection {
+            url: url.to_string(),
+            pool,
+        };
+
+        Ok(connection)
+    }
+}
+
+#[async_trait]
+impl rsql_driver::Connection for Connection {
+    fn url(&self) -> &String {
+        &self.url
+    }
+
+    async fn execute(&mut self, sql: &str) -> Result<u64> {
+        let rows = sqlx::query(sql)
+            .execute(&self.pool)
+            .await
+            .map_err(|error| IoError(error.to_string()))?
+            .rows_affected();
+        Ok(rows)
+    }
+
+    async fn metadata(&mut self) -> Result<Metadata> {
+        metadata::get_metadata(self).await
+    }
+
+    async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {
+        let query_rows = sqlx::query(sql)
+            .fetch_all(&self.pool)
+            .await
+            .map_err(|error| IoError(error.to_string()))?;
+        let columns: Vec<String> = query_rows
+            .first()
+            .map(|row| {
+                row.columns()
+                    .iter()
+                    .map(|column| column.name().to_string())
+                    .collect()
+            })
+            .unwrap_or_default();
+
+        let mut rows = Vec::new();
+        for row in query_rows {
+            let mut row_data = Vec::new();
+            for column in row.columns() {
+                let value = Self::convert_to_value(&row, column)?;
+                row_data.push(value);
+            }
+            rows.push(row_data);
+        }
+
+        let query_result = MemoryQueryResult::new(columns, rows);
+        Ok(Box::new(query_result))
+    }
+
+    async fn close(&mut self) -> Result<()> {
+        self.pool.close().await;
+        Ok(())
+    }
+
+    fn dialect(&self) -> Box<dyn Dialect> {
+        Box::new(SQLiteDialect {})
+    }
+
+    fn match_statement(&self, statement: &Statement) -> StatementMetadata {
+        let default = self.default_match_statement(statement);
+        match default {
+            StatementMetadata::Unknown => match statement {
+                // missing: DETACH DATABASE
+                Statement::CreateVirtualTable { .. } | Statement::AttachDatabase { .. } => {
+                    StatementMetadata::DDL
+                }
+                _ => StatementMetadata::Unknown,
+            },
+            other => other,
+        }
+    }
+}
+
+impl Connection {
+    fn convert_to_value(row: &SqliteRow, column: &SqliteColumn) -> Result<Value> {
+        let column_name = column.name();
+        let column_type = column.type_info();
+        let column_type_name = column_type.name();
+
+        match column_type_name {
+            "TEXT" => {
+                return match row
+                    .try_get(column_name)
+                    .map_err(|error| IoError(error.to_string()))?
+                {
+                    Some(v) => Ok(Value::String(v)),
+                    None => Ok(Value::Null),
+                };
+            }
+            // Not currently supported by sqlx
+            // "NUMERIC" => {
+            //     return match row.try_get(column_name)? {
+            //         Some(v) => Ok(Value::String(v)),
+            //         None => Ok(Value::Null),
+            //     };
+            // }
+            "INTEGER" => {
+                return match row
+                    .try_get(column_name)
+                    .map_err(|error| IoError(error.to_string()))?
+                {
+                    Some(v) => Ok(Value::I64(v)),
+                    None => Ok(Value::Null),
+                };
+            }
+            "REAL" => {
+                return match row
+                    .try_get(column_name)
+                    .map_err(|error| IoError(error.to_string()))?
+                {
+                    Some(v) => Ok(Value::F64(v)),
+                    None => Ok(Value::Null),
+                };
+            }
+            "BLOB" => {
+                return match row
+                    .try_get(column_name)
+                    .map_err(|error| IoError(error.to_string()))?
+                {
+                    Some(v) => Ok(Value::Bytes(v)),
+                    None => Ok(Value::Null),
+                };
+            }
+            _ => {}
+        }
+
+        if let Ok(value) = row.try_get::<Option<String>, &str>(column_name) {
+            match value {
+                Some(v) => Ok(Value::String(v)),
+                None => Ok(Value::Null),
+            }
+        } else if let Ok(value) = row.try_get::<Option<Vec<u8>>, &str>(column_name) {
+            match value {
+                Some(v) => Ok(Value::Bytes(v)),
+                None => Ok(Value::Null),
+            }
+        } else if let Ok(value) = row.try_get::<Option<i8>, &str>(column_name) {
+            match value {
+                Some(v) => Ok(Value::I8(v)),
+                None => Ok(Value::Null),
+            }
+        } else if let Ok(value) = row.try_get::<Option<i16>, &str>(column_name) {
+            match value {
+                Some(v) => Ok(Value::I16(v)),
+                None => Ok(Value::Null),
+            }
+        } else if let Ok(value) = row.try_get::<Option<i32>, &str>(column_name) {
+            match value {
+                Some(v) => Ok(Value::I32(v)),
+                None => Ok(Value::Null),
+            }
+        } else if let Ok(value) = row.try_get::<Option<f32>, &str>(column_name) {
+            match value {
+                Some(v) => Ok(Value::F32(v)),
+                None => Ok(Value::Null),
+            }
+        } else {
+            let column_type = column.type_info();
+            let type_name = format!("{column_type:?}");
+
+            Err(UnsupportedColumnType {
+                column_name: column_name.to_string(),
+                column_type: type_name,
+            })
+        }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use rsql_driver::Driver;
+    use rsql_driver_test_utils::dataset_url;
+
+    const DATABASE_URL: &str = "sqlite://";
+
+    #[tokio::test]
+    async fn test_driver_connect() -> Result<()> {
+        let driver = crate::Driver;
+        let mut connection = driver.connect(DATABASE_URL, None).await?;
+        assert_eq!(DATABASE_URL, connection.url());
+        connection.close().await?;
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_connection_interface() -> Result<()> {
+        let database_url = dataset_url("sqlite", "users.sqlite3");
+        let driver = crate::Driver;
+        let mut connection = driver.connect(&database_url, None).await?;
+
+        let mut query_result = connection
+            .query("SELECT id, name FROM users ORDER BY id")
+            .await?;
+
+        assert_eq!(query_result.columns().await, vec!["id", "name"]);
+        assert_eq!(
+            query_result.next().await,
+            Some(vec![Value::I64(1), Value::String("John Doe".to_string())])
+        );
+        assert_eq!(
+            query_result.next().await,
+            Some(vec![Value::I64(2), Value::String("Jane Smith".to_string())])
+        );
+        assert!(query_result.next().await.is_none());
+
+        connection.close().await?;
+        Ok(())
+    }
+
+    /// Ref: https://www.sqlite.org/datatype3.html
+    #[tokio::test]
+    async fn test_table_data_types() -> Result<()> {
+        let driver = crate::Driver;
+        let mut connection = driver.connect(DATABASE_URL, None).await?;
+
+        let _ = connection
+            .execute("CREATE TABLE t1(t TEXT, nu NUMERIC, i INTEGER, r REAL, no BLOB)")
+            .await?;
+
+        let rows = connection
+            .execute("INSERT INTO t1 (t, nu, i, r, no) VALUES ('foo', 123, 456, 789.123, x'2a')")
+            .await?;
+        assert_eq!(rows, 1);
+
+        let mut query_result = connection.query("SELECT t, nu, i, r, no FROM t1").await?;
+        assert_eq!(
+            query_result.columns().await,
+            vec!["t", "nu", "i", "r", "no"]
+        );
+        assert_eq!(
+            query_result.next().await,
+            Some(vec![
+                Value::String("foo".to_string()),
+                Value::I8(123),
+                Value::I64(456),
+                Value::F64(789.123),
+                Value::Bytes(vec![42])
+            ])
+        );
+        assert!(query_result.next().await.is_none());
+        connection.close().await?;
+        Ok(())
+    }
+
+    async fn test_data_type(sql: &str) -> Result<Option<Value>> {
+        let driver = crate::Driver;
+        let mut connection = driver.connect(DATABASE_URL, None).await?;
+        let mut query_result = connection.query(sql).await?;
+        let mut value: Option<Value> = None;
+
+        assert_eq!(query_result.columns().await.len(), 1);
+
+        if let Some(row) = query_result.next().await {
+            assert_eq!(row.len(), 1);
+
+            value = row.first().cloned();
+        }
+
+        assert!(query_result.next().await.is_none());
+
+        connection.close().await?;
+        Ok(value)
+    }
+
+    #[tokio::test]
+    async fn test_data_type_bytes() -> Result<()> {
+        assert_eq!(
+            test_data_type("SELECT x'2a'").await?,
+            Some(Value::Bytes(vec![42]))
+        );
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_data_type_i8() -> Result<()> {
+        assert_eq!(test_data_type("SELECT 127").await?, Some(Value::I8(127)));
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_data_type_i16() -> Result<()> {
+        assert_eq!(
+            test_data_type("SELECT 32767").await?,
+            Some(Value::I16(32_767))
+        );
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_data_type_i32() -> Result<()> {
+        assert_eq!(
+            test_data_type("SELECT 2147483647").await?,
+            Some(Value::I32(2_147_483_647))
+        );
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_data_type_f32() -> Result<()> {
+        assert_eq!(
+            test_data_type("SELECT 12345.678").await?,
+            Some(Value::F32(12_345.678))
+        );
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_data_type_string() -> Result<()> {
+        assert_eq!(
+            test_data_type("SELECT 'foo'").await?,
+            Some(Value::String("foo".to_string()))
+        );
+        Ok(())
+    }
+}

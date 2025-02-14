@@ -1,0 +1,30 @@
+[package]
+authors.workspace = true
+categories.workspace = true
+description = "rsql mysql driver"
+edition.workspace = true
+keywords.workspace = true
+license.workspace = true
+name = "rsql_driver_mysql"
+publish = false
+repository.workspace = true
+rust-version.workspace = true
+version.workspace = true
+
+[dependencies]
+async-trait = { workspace = true }
+chrono = { workspace = true }
+file_type = { workspace = true }
+indoc = { workspace = true }
+rsql_driver = { path = "../../rsql_driver", version = "0.15.4" }
+rust_decimal = { workspace = true }
+serde_json = { workspace = true, features = ["preserve_order"] }
+sqlparser = { workspace = true }
+sqlx = { workspace = true, features = ["bit-vec", "chrono", "json", "macros", "mysql", "runtime-tokio", "rust_decimal", "time", "uuid"] }
+
+[dev-dependencies]
+anyhow = { workspace = true }
+rsql_drivers = { path = "../../rsql_drivers", version = "0.15.4" }
+testcontainers = { workspace = true }
+testcontainers-modules = { workspace = true, features = ["mysql"] }
+tokio = { workspace = true, features = ["macros", "rt"] }

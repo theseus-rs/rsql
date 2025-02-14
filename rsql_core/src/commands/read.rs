@@ -141,7 +141,7 @@ mod tests {
         let connection = &mut MockConnection::new();
         connection
             .expect_close()
-            .returning(|| Err(rsql_drivers::Error::IoError(anyhow::anyhow!("Error"))));
+            .returning(|| Err(rsql_driver::Error::IoError("Error".to_string())));
         let options = CommandOptions {
             configuration,
             command_manager: &CommandManager::default(),

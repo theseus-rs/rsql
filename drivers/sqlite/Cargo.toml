@@ -1,0 +1,26 @@
+[package]
+authors.workspace = true
+categories.workspace = true
+description = "rsql sqlite driver"
+edition.workspace = true
+keywords.workspace = true
+license.workspace = true
+name = "rsql_driver_sqlite"
+publish = false
+repository.workspace = true
+rust-version.workspace = true
+version.workspace = true
+
+[dependencies]
+async-trait = { workspace = true }
+file_type = { workspace = true }
+form_urlencoded = { workspace = true }
+indoc = { workspace = true }
+rsql_driver = { path = "../../rsql_driver", version = "0.15.4" }
+sqlparser = { workspace = true }
+sqlx = { workspace = true, features = ["bit-vec", "chrono", "json", "macros", "runtime-tokio", "rust_decimal", "sqlite", "time", "uuid"] }
+url = { workspace = true }
+
+[dev-dependencies]
+rsql_driver_test_utils = { path = "../../drivers/test_utils", version = "0.15.4" }
+tokio = { workspace = true, features = ["macros", "rt"] }

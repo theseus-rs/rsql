@@ -1,27 +1,27 @@
-use crate::error::Result;
-use crate::https;
 use async_trait::async_trait;
 use file_type::FileType;
+use rsql_driver::Result;
 
 #[derive(Debug)]
 pub struct Driver;
 
 #[async_trait]
-impl crate::Driver for Driver {
+impl rsql_driver::Driver for Driver {
     fn identifier(&self) -> &'static str {
         "http"
     }
 
     async fn connect(
         &self,
-        url: String,
+        url: &str,
         password: Option<String>,
-    ) -> Result<Box<dyn crate::Connection>> {
-        https::driver::Driver.connect(url, password).await
+    ) -> Result<Box<dyn rsql_driver::Connection>> {
+        let driver = crate::https::Driver;
+        driver.connect(url, password).await
     }
 
     fn supports_file_type(&self, file_type: &FileType) -> bool {
-        let driver = https::Driver {};
+        let driver = crate::https::Driver;
         driver.supports_file_type(file_type)
     }
 }

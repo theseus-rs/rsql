@@ -1,43 +1,40 @@
-use crate::connection::CachedMetadataConnection;
-use crate::error::Result;
-use crate::url::UrlExtension;
 use crate::DriverManager;
-use crate::Error::{DriverNotFound, IoError};
 use async_trait::async_trait;
 use file_type::FileType;
+use rsql_driver::Error::IoError;
+use rsql_driver::{CachedMetadataConnection, Connection, Result, UrlExtension};
 use url::Url;
 
 #[derive(Debug)]
 pub struct Driver;
 
 #[async_trait]
-impl crate::Driver for Driver {
+impl rsql_driver::Driver for Driver {
     fn identifier(&self) -> &'static str {
         "file"
     }
 
-    async fn connect(
-        &self,
-        url: String,
-        _password: Option<String>,
-    ) -> Result<Box<dyn crate::Connection>> {
-        let parsed_url = Url::parse(url.as_str())?;
+    async fn connect(&self, url: &str, _password: Option<String>) -> Result<Box<dyn Connection>> {
+        let parsed_url = Url::parse(url)?;
         let file_name = parsed_url.to_file()?.to_string_lossy().to_string();
         let file_type =
-            FileType::try_from_file(&file_name).map_err(|error| IoError(error.into()))?;
+            FileType::try_from_file(&file_name).map_err(|error| IoError(error.to_string()))?;
         let driver_manager = DriverManager::default();
         let driver = driver_manager.get_by_file_type(file_type);
 
         match driver {
             Some(driver) => {
                 let scheme = format!("{}:", parsed_url.scheme());
-                let url = url.strip_prefix(&scheme).unwrap_or(&url);
+                let url = url.strip_prefix(&scheme).unwrap_or(url);
                 let url = format!("{}:{url}", driver.identifier());
-                let connection = driver_manager.connect(url.as_str()).await?;
+                let connection = driver_manager
+                    .connect(url.as_str())
+                    .await
+                    .map_err(|error| IoError(error.to_string()))?;
                 let connection = Box::new(CachedMetadataConnection::new(connection));
                 Ok(connection)
             }
-            None => Err(DriverNotFound(format!(
+            None => Err(IoError(format!(
                 "{file_name}: {:?}",
                 file_type.media_types()
             ))),
@@ -51,12 +48,13 @@ impl crate::Driver for Driver {
 
 #[cfg(test)]
 mod test {
-    use crate::test::dataset_url;
-    use crate::{DriverManager, Value};
+    use super::*;
     use indoc::indoc;
+    use rsql_driver::{Driver, Value};
+    use rsql_driver_test_utils::dataset_url;
 
     #[tokio::test]
-    async fn test_file_drivers() -> anyhow::Result<()> {
+    async fn test_file_drivers() -> Result<()> {
         let database_urls = vec![
             #[cfg(feature = "arrow")]
             (dataset_url("file", "users.arrow"), None),
@@ -99,10 +97,10 @@ mod test {
         Ok(())
     }
 
-    async fn test_file_driver(database_url: &str, sql: Option<&str>) -> anyhow::Result<()> {
+    async fn test_file_driver(database_url: &str, sql: Option<&str>) -> Result<()> {
         let sql = sql.unwrap_or("SELECT id, name FROM users ORDER BY id");
-        let driver_manager = DriverManager::default();
-        let mut connection = driver_manager.connect(database_url).await?;
+        let driver = crate::file::Driver;
+        let mut connection = driver.connect(database_url, None).await?;
 
         let mut query_result = connection.query(sql).await?;
 
