@@ -1,0 +1,14 @@
+[package]
+authors.workspace = true
+categories.workspace = true
+description = "rsql test utilities"
+edition.workspace = true
+keywords.workspace = true
+license.workspace = true
+name = "rsql_driver_test_utils"
+publish = false
+repository.workspace = true
+rust-version.workspace = true
+version.workspace = true
+
+[dependencies]

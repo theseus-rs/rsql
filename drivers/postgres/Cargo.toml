@@ -1,0 +1,31 @@
+[package]
+authors.workspace = true
+categories.workspace = true
+description = "rsql postgres driver"
+edition.workspace = true
+keywords.workspace = true
+license.workspace = true
+name = "rsql_driver_postgres"
+publish = false
+repository.workspace = true
+rust-version.workspace = true
+version.workspace = true
+
+[dependencies]
+async-trait = { workspace = true }
+bit-vec = { workspace = true }
+chrono = { workspace = true }
+file_type = { workspace = true }
+postgresql_embedded = { workspace = true }
+rsql_driver = { path = "../../rsql_driver", version = "0.15.4" }
+rsql_driver_postgresql = { path = "../../drivers/postgresql", version = "0.15.4" }
+serde_json = { workspace = true, features = ["preserve_order"] }
+sqlparser = { workspace = true }
+tokio = { workspace = true, features = ["rt"] }
+tokio-postgres = { workspace = true, features = ["array-impls", "with-bit-vec-0_6", "with-chrono-0_4", "with-serde_json-1", "with-uuid-1"] }
+tracing = { workspace = true }
+url = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["macros", "rt"] }
+

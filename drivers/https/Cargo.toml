@@ -1,0 +1,26 @@
+[package]
+authors.workspace = true
+categories.workspace = true
+description = "rsql https driver"
+edition.workspace = true
+keywords.workspace = true
+license.workspace = true
+name = "rsql_driver_https"
+publish = false
+repository.workspace = true
+rust-version.workspace = true
+version.workspace = true
+
+[dependencies]
+async-trait = { workspace = true }
+file_type = { workspace = true }
+futures-util = { workspace = true }
+reqwest = { workspace = true, features = ["json", "gzip"] }
+rsql_driver = { path = "../../rsql_driver", version = "0.15.4" }
+tempfile = { workspace = true }
+tokio = { workspace = true, features = ["fs"] }
+tracing = { workspace = true }
+url = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["macros", "rt"] }
