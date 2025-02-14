@@ -4,7 +4,10 @@ pub type Result<T, E = Error> = core::result::Result<T, E>;
 pub enum Error {
     /// Driver error
     #[error(transparent)]
-    DriverError(#[from] rsql_drivers::Error),
+    DriverError(#[from] rsql_driver::Error),
+    /// Drivers error
+    #[error(transparent)]
+    DriversError(#[from] rsql_drivers::Error),
     /// Executor error
     #[error(transparent)]
     ExecutorError(#[from] crate::executors::Error),

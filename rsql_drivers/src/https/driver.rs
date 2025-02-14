@@ -1,10 +1,10 @@
-use crate::error::Result;
-use crate::Error::{ConversionError, DriverNotFound, IoError};
-use crate::{Connection, DriverManager};
+use crate::DriverManager;
 use async_trait::async_trait;
 use file_type::FileType;
 use futures_util::StreamExt;
 use reqwest::header::HeaderMap;
+use rsql_driver::Error::{ConversionError, IoError};
+use rsql_driver::Result;
 use std::collections::HashMap;
 use std::fs::create_dir_all;
 use std::path::{Path, PathBuf};
@@ -18,19 +18,19 @@ use url::Url;
 pub struct Driver;
 
 #[async_trait]
-impl crate::Driver for Driver {
+impl rsql_driver::Driver for Driver {
     fn identifier(&self) -> &'static str {
         "https"
     }
 
     async fn connect(
         &self,
-        url: String,
+        url: &str,
         password: Option<String>,
-    ) -> Result<Box<dyn crate::Connection>> {
+    ) -> Result<Box<dyn rsql_driver::Connection>> {
         let temp_dir = TempDir::new()?;
         let (request_headers, file_path, file_type, response_headers) =
-            self.retrieve_file(&url, temp_dir.path()).await?;
+            self.retrieve_file(url, temp_dir.path()).await?;
         let file_path = file_path.to_string_lossy().to_string();
         #[cfg(target_os = "windows")]
         let file_path = file_path.replace(':', "%3A").replace('\\', "/");
@@ -41,11 +41,11 @@ impl crate::Driver for Driver {
         match driver {
             Some(driver) => {
                 let url = format!("{}://{file_path}", driver.identifier());
-                let mut connection = driver.connect(url, password).await?;
+                let mut connection = driver.connect(url.as_str(), password).await?;
                 create_header_tables(&mut connection, &request_headers, &response_headers).await?;
                 Ok(connection)
             }
-            None => Err(DriverNotFound(format!(
+            None => Err(IoError(format!(
                 "{file_path:?}: {:?}",
                 file_type.media_types()
             ))),
@@ -117,13 +117,13 @@ impl Driver {
         let client = reqwest::ClientBuilder::new()
             .default_headers(header_map)
             .build()
-            .map_err(|error| IoError(error.into()))?;
+            .map_err(|error| IoError(error.to_string()))?;
 
         let response = client
             .get(parsed_url.as_str())
             .send()
             .await
-            .map_err(|error| IoError(error.into()))?;
+            .map_err(|error| IoError(error.to_string()))?;
         let response_headers = response.headers();
         let response_headers: HashMap<String, String> = response_headers
             .iter()
@@ -143,13 +143,13 @@ impl Driver {
         let file_path = temp_dir.join(file_name);
         let mut file = File::create_new(&file_path)
             .await
-            .map_err(|error| IoError(error.into()))?;
+            .map_err(|error| IoError(error.to_string()))?;
         let mut stream = response.bytes_stream();
         while let Some(item) = stream.next().await {
-            let item = item.map_err(|error| IoError(error.into()))?;
+            let item = item.map_err(|error| IoError(error.to_string()))?;
             file.write_all(&item)
                 .await
-                .map_err(|error| IoError(error.into()))?;
+                .map_err(|error| IoError(error.to_string()))?;
         }
 
         let file_type = Self::file_type(content_type, &file_path)?;
@@ -169,13 +169,13 @@ impl Driver {
             }
         }
         let file_type =
-            FileType::try_from_file(file_path).map_err(|error| IoError(error.into()))?;
+            FileType::try_from_file(file_path).map_err(|error| IoError(error.to_string()))?;
         Ok(file_type)
     }
 }
 
 async fn create_header_tables(
-    connection: &mut Box<dyn Connection>,
+    connection: &mut Box<dyn rsql_driver::Connection>,
     request_headers: &HashMap<String, String>,
     response_headers: &HashMap<String, String>,
 ) -> Result<()> {
@@ -201,14 +201,15 @@ fn create_table_sql(table_name: &str, headers: &HashMap<String, String>) -> Stri
 
 #[cfg(test)]
 mod test {
-    use crate::{DriverManager, Value};
+    use super::*;
+    use rsql_driver::{Driver, Value};
 
     #[tokio::test]
-    async fn test_drivers() -> anyhow::Result<()> {
+    async fn test_drivers() -> Result<()> {
         let database_url =
             "https://raw.githubusercontent.com/theseus-rs/rsql/refs/heads/main/datasets/users.csv";
-        let driver_manager = DriverManager::default();
-        let mut connection = driver_manager.connect(database_url).await?;
+        let driver = crate::https::Driver;
+        let mut connection = driver.connect(database_url, None).await?;
 
         let mut query_result = connection
             .query("SELECT id, name FROM users ORDER BY id")

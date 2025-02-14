@@ -79,6 +79,7 @@ jobs:
           RUST_LOG: info
         run: |
           rustup target install ${{ matrix.target }}
+          cargo build --package rsql_driver --target ${{ matrix.target }}
           cargo build --package rsql_drivers --target ${{ matrix.target }}
 
       - name: Test

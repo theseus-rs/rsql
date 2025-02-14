@@ -1,3 +1,3 @@
-pub mod driver;
+mod driver;
 
 pub use driver::Driver;

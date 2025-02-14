@@ -1,0 +1,34 @@
+[package]
+name = "rsql_driver"
+authors.workspace = true
+categories.workspace = true
+edition.workspace = true
+keywords.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+version.workspace = true
+
+[dependencies]
+anyhow = { workspace = true }
+async-trait = { workspace = true }
+base64 = { workspace = true }
+chrono = { workspace = true, features = ["serde"] }
+file_type = { workspace = true }
+indexmap = { workspace = true, features = ["serde"] }
+mockall = { workspace = true }
+num-format = { workspace = true }
+rust-i18n = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true, features = ["preserve_order"] }
+sqlparser = { workspace = true }
+thiserror = { workspace = true }
+url = { workspace = true }
+uuid = { workspace = true, features = ["serde", "v4"] }
+
+[target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dependencies]
+getrandom = { workspace = true, features = ["js"] }
+
+[dev-dependencies]
+rsql_driver_test_utils = { path = "../drivers/test_utils", version = "0.15.4" }
+tokio = { workspace = true, features = ["macros", "rt"] }

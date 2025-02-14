@@ -6,7 +6,7 @@ pub type Result<T = LoopCondition, E = Error> = core::result::Result<T, E>;
 pub enum Error {
     /// Driver error
     #[error(transparent)]
-    DriverError(#[from] rsql_drivers::Error),
+    DriverError(#[from] rsql_driver::Error),
     /// Formatter error
     #[error(transparent)]
     FormatterError(#[from] rsql_formatters::Error),
