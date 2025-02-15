@@ -14,12 +14,12 @@ version.workspace = true
 [dependencies]
 async-trait = { workspace = true }
 file_type = { workspace = true }
-rsql_driver = { path = "../../rsql_driver", version = "0.15.4" }
-rsql_driver_sqlite = { path = "../../drivers/sqlite", version = "0.15.4" }
+rsql_driver = { path = "../../rsql_driver", version = "0.16.0" }
+rsql_driver_sqlite = { path = "../../drivers/sqlite", version = "0.16.0" }
 rusqlite = { workspace = true, features = ["bundled-full"] }
 sqlparser = { workspace = true }
 url = { workspace = true }
 
 [dev-dependencies]
-rsql_driver_test_utils = { path = "../../drivers/test_utils", version = "0.15.4" }
+rsql_driver_test_utils = { path = "../../drivers/test_utils", version = "0.16.0" }
 tokio = { workspace = true, features = ["macros", "rt"] }

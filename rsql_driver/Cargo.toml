@@ -30,5 +30,5 @@ uuid = { workspace = true, features = ["serde", "v4"] }
 getrandom = { workspace = true, features = ["js"] }
 
 [dev-dependencies]
-rsql_driver_test_utils = { path = "../drivers/test_utils", version = "0.15.4" }
+rsql_driver_test_utils = { path = "../drivers/test_utils", version = "0.16.0" }
 tokio = { workspace = true, features = ["macros", "rt"] }

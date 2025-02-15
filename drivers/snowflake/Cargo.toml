@@ -18,7 +18,7 @@ chrono = { workspace = true }
 file_type = { workspace = true }
 jwt-simple = { workspace = true, default-features = false, features = ["pure-rust"] }
 reqwest = { workspace = true, features = ["json", "gzip"] }
-rsql_driver = { path = "../../rsql_driver", version = "0.15.4" }
+rsql_driver = { path = "../../rsql_driver", version = "0.16.0" }
 serde_json = { workspace = true, features = ["preserve_order"] }
 sha2 = { workspace = true }
 sqlparser = { workspace = true }

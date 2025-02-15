@@ -14,13 +14,13 @@ version.workspace = true
 [dependencies]
 async-trait = { workspace = true }
 file_type = { workspace = true }
-rsql_driver = { path = "../../rsql_driver", version = "0.15.4" }
-rsql_driver_postgresql = { path = "../../drivers/postgresql", version = "0.15.4" }
+rsql_driver = { path = "../../rsql_driver", version = "0.16.0" }
+rsql_driver_postgresql = { path = "../../drivers/postgresql", version = "0.16.0" }
 sqlparser = { workspace = true }
 
 [dev-dependencies]
 anyhow = { workspace = true }
-rsql_drivers = { path = "../../rsql_drivers", version = "0.15.4" }
+rsql_drivers = { path = "../../rsql_drivers", version = "0.16.0" }
 testcontainers = { workspace = true }
 testcontainers-modules = { workspace = true, features = ["postgres"] }
 tokio = { workspace = true, features = ["macros", "rt"] }
