@@ -24,3 +24,8 @@ url = { workspace = true }
 [dev-dependencies]
 rsql_driver_test_utils = { path = "../../drivers/test_utils", version = "0.15.4" }
 tokio = { workspace = true, features = ["macros", "rt"] }
+
+[features]
+default = ["native-tls"]
+native-tls = ["sqlx/tls-native-tls"]
+rustls = ["sqlx/tls-rustls"]

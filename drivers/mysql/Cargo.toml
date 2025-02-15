@@ -28,3 +28,8 @@ rsql_drivers = { path = "../../rsql_drivers", version = "0.15.4" }
 testcontainers = { workspace = true }
 testcontainers-modules = { workspace = true, features = ["mysql"] }
 tokio = { workspace = true, features = ["macros", "rt"] }
+
+[features]
+default = ["native-tls"]
+native-tls = ["sqlx/tls-native-tls"]
+rustls = ["sqlx/tls-rustls"]

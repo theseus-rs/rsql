@@ -29,3 +29,11 @@ url = { workspace = true }
 [dev-dependencies]
 tokio = { workspace = true, features = ["macros", "rt"] }
 
+[features]
+default = ["native-tls"]
+native-tls = [
+    "postgresql_embedded/native-tls",
+]
+rustls = [
+    "postgresql_embedded/rustls-tls",
+]

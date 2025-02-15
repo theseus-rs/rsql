@@ -57,7 +57,7 @@ tokio = { workspace = true }
 
 [features]
 all = ["all-drivers", "all-formats"]
-default = []
+default = ["native-tls"]
 all-drivers = [
     "driver-arrow",
     "driver-avro",
@@ -143,6 +143,8 @@ format-tsv = ["rsql_formatters/tsv"]
 format-unicode = ["rsql_formatters/unicode"]
 format-xml = ["rsql_formatters/xml"]
 format-yaml = ["rsql_formatters/yaml"]
+native-tls = ["rsql_drivers/native-tls"]
+rustls = ["rsql_drivers/rustls"]
 
 [lints.clippy]
 unwrap_used = "deny"
