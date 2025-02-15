@@ -46,6 +46,11 @@ tracing = { workspace = true }
 tempfile = { workspace = true }
 tokio = { workspace = true }
 
+[features]
+default = ["native-tls"]
+native-tls = ["rsql_core/native-tls"]
+rustls = ["rsql_core/rustls"]
+
 [[bin]]
 name = "rsql"
 path = "src/main.rs"

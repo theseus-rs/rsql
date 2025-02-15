@@ -110,12 +110,32 @@ jsonl = ["dep:rsql_driver_jsonl"]
 libsql = ["dep:rsql_driver_libsql"]
 mariadb = ["dep:rsql_driver_mariadb"]
 mysql = ["dep:rsql_driver_mysql"]
+native-tls = [
+    "reqwest/native-tls",
+    "rsql_driver_cockroachdb/native-tls",
+    "rsql_driver_mariadb/native-tls",
+    "rsql_driver_mysql/native-tls",
+    "rsql_driver_postgres/native-tls",
+    "rsql_driver_postgresql/native-tls",
+    "rsql_driver_redshift/native-tls",
+    "rsql_driver_sqlite/native-tls",
+]
 ods = ["dep:rsql_driver_ods"]
 parquet = ["dep:rsql_driver_parquet"]
 postgres = ["dep:rsql_driver_postgres"]
 postgresql = ["dep:rsql_driver_postgresql"]
 redshift = ["dep:rsql_driver_redshift"]
 rusqlite = ["dep:rsql_driver_rusqlite"]
+rustls = [
+    "reqwest/rustls-tls-native-roots",
+    "rsql_driver_cockroachdb/rustls",
+    "rsql_driver_mariadb/rustls",
+    "rsql_driver_mysql/rustls",
+    "rsql_driver_postgres/rustls",
+    "rsql_driver_postgresql/rustls",
+    "rsql_driver_redshift/rustls",
+    "rsql_driver_sqlite/rustls",
+]
 snowflake = ["dep:rsql_driver_snowflake"]
 sqlite = ["dep:rsql_driver_sqlite"]
 sqlserver = ["dep:rsql_driver_sqlserver"]
