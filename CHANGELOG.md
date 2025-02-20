@@ -7,13 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## `rsql_driver` - [0.16.0](https://github.com/theseus-rs/rsql/releases/tag/rsql_driver-v0.16.0) - 2025-02-20
+## `rsql` - [0.16.0](https://github.com/theseus-rs/rsql/compare/v0.15.4...v0.16.0) - 2025-02-20
 
 ### Added
+
 - update to Rust 2024 edition
 - add tls support to cockroachdb, mariadb, mysql, postgres, postgresql, redshift drivers
 
 ### Other
+
 - refactor drivers into a crate per driver
 
 ## `rsql` - [0.15.4](https://github.com/theseus-rs/rsql/compare/v0.15.3...v0.15.4) - 2025-02-13
@@ -1144,7 +1146,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - update to read change log from github releases
 
 ##
-`rsql` - [v0.1.0](https://github.com/theseus-rs/rsql/compare/5b61f8ff37af505b7136f90846cfbff68b44628a...v0.1.0) - 2024-03-11
+
+`rsql` - [v0.1.0](https://github.com/theseus-rs/rsql/compare/5b61f8ff37af505b7136f90846cfbff68b44628a...v0.1.0) -
+2024-03-11
 
 ### Build
 
