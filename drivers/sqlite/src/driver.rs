@@ -11,7 +11,7 @@ use sqlx::sqlite::{SqliteAutoVacuum, SqliteColumn, SqliteConnectOptions, SqliteR
 use sqlx::{Column, Row, SqlitePool, TypeInfo};
 use std::collections::HashMap;
 use std::str::FromStr;
-use url::{form_urlencoded, Url};
+use url::{Url, form_urlencoded};
 
 #[derive(Debug)]
 pub struct Driver;

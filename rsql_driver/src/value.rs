@@ -1,5 +1,5 @@
-use base64::engine::general_purpose::STANDARD;
 use base64::Engine;
+use base64::engine::general_purpose::STANDARD;
 use indexmap::IndexMap;
 use num_format::{Locale, ToFormattedString};
 use serde::{Serialize, Serializer};
@@ -620,9 +620,11 @@ mod tests {
     fn test_f32() {
         assert!(!Value::F32(12_345.678).is_null());
         assert!(Value::F32(12_345.678).is_numeric());
-        assert!(Value::F32(12_345.678)
-            .to_formatted_string(&Locale::en)
-            .starts_with("12345."));
+        assert!(
+            Value::F32(12_345.678)
+                .to_formatted_string(&Locale::en)
+                .starts_with("12345.")
+        );
         assert!(Value::F32(12_345.678).to_string().starts_with("12345."));
         assert_eq!(json!(Value::F32(12_345.0)), json!(12_345.0));
     }
@@ -631,9 +633,11 @@ mod tests {
     fn test_f64() {
         assert!(!Value::F64(12_345.678_90).is_null());
         assert!(Value::F64(12_345.678_90).is_numeric());
-        assert!(Value::F64(12_345.678_90)
-            .to_formatted_string(&Locale::en)
-            .starts_with("12345."));
+        assert!(
+            Value::F64(12_345.678_90)
+                .to_formatted_string(&Locale::en)
+                .starts_with("12345.")
+        );
         assert!(Value::F64(12_345.678_90).to_string().starts_with("12345."));
         assert_eq!(json!(Value::F64(12_345.678_90)), json!(12_345.678_90));
     }

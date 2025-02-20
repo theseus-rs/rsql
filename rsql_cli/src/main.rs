@@ -11,7 +11,7 @@ use crate::update::check_for_newer_version;
 use anyhow::Result;
 use clap::{Parser, ValueEnum};
 use colored::Colorize;
-use rsql_core::commands::{help, quit, ShellCommand};
+use rsql_core::commands::{ShellCommand, help, quit};
 use rsql_core::configuration::{Configuration, ConfigurationBuilder};
 use rsql_core::shell::{ShellArgs, ShellBuilder};
 use rsql_core::writers::{Output, StdoutWriter};

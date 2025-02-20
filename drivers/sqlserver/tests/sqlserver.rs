@@ -5,9 +5,9 @@ use indoc::indoc;
 #[cfg(target_os = "linux")]
 use rsql_drivers::{Connection, DriverManager, Value};
 #[cfg(target_os = "linux")]
-use testcontainers::runners::AsyncRunner;
-#[cfg(target_os = "linux")]
 use testcontainers::ContainerRequest;
+#[cfg(target_os = "linux")]
+use testcontainers::runners::AsyncRunner;
 #[cfg(target_os = "linux")]
 use testcontainers_modules::mssql_server::MssqlServer;
 

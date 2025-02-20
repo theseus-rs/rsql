@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use calamine::{open_workbook_auto_from_rs, Data, Range, Reader};
+use calamine::{Data, Range, Reader, open_workbook_auto_from_rs};
 use file_type::FileType;
 use indexmap::IndexMap;
 use polars::io::SerReader;
@@ -8,7 +8,7 @@ use polars_sql::SQLContext;
 use rsql_driver::Error::{ConversionError, IoError};
 use rsql_driver::{Result, UrlExtension};
 use rsql_driver_polars::Connection;
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use std::collections::HashMap;
 use std::io::Cursor;
 use std::num::NonZeroUsize;
@@ -36,7 +36,7 @@ impl rsql_driver::Driver for Driver {
         let file_name = parsed_url.to_file()?.to_string_lossy().to_string();
         let has_header = query_parameters
             .get("has_header")
-            .map_or(true, |value| value == "true");
+            .is_none_or(|value| value == "true");
         let ignore_errors = query_parameters
             .get("ignore_errors")
             .is_some_and(|value| value == "true");

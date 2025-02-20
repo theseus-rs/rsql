@@ -8,7 +8,7 @@ use rsql_formatters::writers::Output;
 use rsql_formatters::{FormatterManager, Results};
 use std::fmt;
 use std::fmt::Debug;
-use tracing::{instrument, Span};
+use tracing::{Span, instrument};
 use tracing_indicatif::span_ext::IndicatifSpanExt;
 
 /// A SQL executor for interacting with a database.

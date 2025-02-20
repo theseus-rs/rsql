@@ -68,8 +68,8 @@ impl From<std::string::FromUtf8Error> for Error {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use quick_xml::errors::IllFormedError::UnmatchedEndTag;
     use quick_xml::Error::IllFormed;
+    use quick_xml::errors::IllFormedError::UnmatchedEndTag;
     use test_log::test;
 
     #[cfg(any(
@@ -111,7 +111,10 @@ mod tests {
     fn test_serde_yaml_error() {
         let serde_yaml_error = serde_yaml::from_str::<String>(">\n@").unwrap_err();
         let io_error = Error::from(serde_yaml_error);
-        assert_eq!(io_error.to_string(), "found character that cannot start any token at line 2 column 1, while scanning for the next token");
+        assert_eq!(
+            io_error.to_string(),
+            "found character that cannot start any token at line 2 column 1, while scanning for the next token"
+        );
     }
 
     #[test]

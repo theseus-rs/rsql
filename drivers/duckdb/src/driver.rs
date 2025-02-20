@@ -1,8 +1,8 @@
 use crate::metadata;
 use async_trait::async_trait;
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime, TimeDelta};
-use duckdb::types::{TimeUnit, ValueRef};
 use duckdb::Row;
+use duckdb::types::{TimeUnit, ValueRef};
 use file_type::FileType;
 use rsql_driver::Error::{IoError, UnsupportedColumnType};
 use rsql_driver::{

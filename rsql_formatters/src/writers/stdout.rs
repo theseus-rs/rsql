@@ -1,6 +1,6 @@
 use crate::writers::writer::Writer;
 use std::fmt::Display;
-use std::io::{stdout, Result, Write};
+use std::io::{Result, Write, stdout};
 
 #[derive(Debug, Default)]
 pub struct StdoutWriter;

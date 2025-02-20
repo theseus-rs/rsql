@@ -1,9 +1,9 @@
+use crate::Results;
+use crate::Results::Query;
 use crate::error::Result;
 use crate::footer::write_footer;
 use crate::formatter::FormatterOptions;
 use crate::writers::Output;
-use crate::Results;
-use crate::Results::Query;
 use csv::QuoteStyle;
 use rsql_drivers::Value;
 
@@ -59,9 +59,9 @@ async fn format_delimited(
 #[cfg(test)]
 mod test {
     use super::*;
+    use crate::Results::Execute;
     use crate::formatter::FormatterOptions;
     use crate::writers::Output;
-    use crate::Results::Execute;
     use indoc::indoc;
     use rsql_drivers::{MemoryQueryResult, Value};
     use std::time::Duration;

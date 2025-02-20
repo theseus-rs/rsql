@@ -46,7 +46,7 @@ impl rsql_driver::Driver for Driver {
         let file = File::open(&file_name)?;
         let has_header = query_parameters
             .get("has_header")
-            .map_or(true, |value| value == "true");
+            .is_none_or(|value| value == "true");
         let ignore_errors = query_parameters
             .get("ignore_errors")
             .is_some_and(|value| value == "true");
@@ -55,11 +55,7 @@ impl rsql_driver::Driver for Driver {
                 let length = infer_schema_length
                     .parse::<usize>()
                     .map_err(|error| ConversionError(error.to_string()))?;
-                if length == 0 {
-                    None
-                } else {
-                    Some(length)
-                }
+                if length == 0 { None } else { Some(length) }
             }
             None => Some(100),
         };

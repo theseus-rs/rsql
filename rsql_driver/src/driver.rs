@@ -1,5 +1,5 @@
-use crate::error::Result;
 use crate::Connection;
+use crate::error::Result;
 use async_trait::async_trait;
 use file_type::FileType;
 use mockall::automock;

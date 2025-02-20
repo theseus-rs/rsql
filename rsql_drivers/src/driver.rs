@@ -1,5 +1,5 @@
-use crate::error::Result;
 use crate::Error::DriverNotFound;
+use crate::error::Result;
 use file_type::FileType;
 use rsql_driver::Error::InvalidUrl;
 use rsql_driver::{CachedMetadataConnection, Connection, Driver};

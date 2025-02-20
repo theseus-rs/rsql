@@ -55,7 +55,7 @@ impl ShellCommand for Command {
                 return Err(InvalidOption {
                     command_name: self.name(locale).to_string(),
                     option: formatter_identifier.to_string(),
-                })
+                });
             }
         };
 

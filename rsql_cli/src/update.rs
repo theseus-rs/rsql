@@ -1,10 +1,10 @@
 use anyhow::Result;
 use axoupdater::AxoUpdater;
 use chrono::{DateTime, Duration, Utc};
-use inquire::ui::RenderConfig;
 use inquire::Confirm;
+use inquire::ui::RenderConfig;
 use rsql_core::configuration::Configuration;
-use std::fs::{create_dir_all, File};
+use std::fs::{File, create_dir_all};
 use std::io::{Read, Write};
 
 const UPDATE_CHECK_FILE: &str = "last_update_check";
