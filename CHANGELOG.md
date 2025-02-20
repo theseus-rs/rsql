@@ -14,7 +14,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - add tls support to cockroachdb, mariadb, mysql, postgres, postgresql, redshift drivers
 
 ### Other
-- update version to 0.16.0
 - refactor drivers into a crate per driver
 
 ## `rsql` - [0.15.4](https://github.com/theseus-rs/rsql/compare/v0.15.3...v0.15.4) - 2025-02-13
