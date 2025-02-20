@@ -18,7 +18,7 @@ duckdb = { workspace = true, features = ["bundled"] }
 file_type = { workspace = true }
 indoc = { workspace = true }
 regex = { workspace = true }
-rsql_driver = { path = "../../rsql_driver", version = "0.16.0" }
+rsql_driver = { path = "../../rsql_driver", version = "0.16.1" }
 sqlparser = { workspace = true }
 url = { workspace = true }
 

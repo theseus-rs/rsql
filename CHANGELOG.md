@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## `rsql_cli` - [0.16.1](https://github.com/theseus-rs/rsql/compare/v0.16.0...v0.16.1) - 2025-02-20
+
+### Added
+- update to Rust 2024 edition
+
+### Other
+- update version to 0.16.0
+- refactor drivers into a crate per driver
+
+## `rsql_driver` - [0.16.1](https://github.com/theseus-rs/rsql/compare/rsql_driver-v0.16.0...rsql_driver-v0.16.1) - 2025-02-20
+
+### Added
+- update to Rust 2024 edition
+
+### Other
+- update version to 0.16.0
+- refactor drivers into a crate per driver
+
 ## `rsql` - [0.16.0](https://github.com/theseus-rs/rsql/compare/v0.15.4...v0.16.0) - 2025-02-20
 
 ### Added

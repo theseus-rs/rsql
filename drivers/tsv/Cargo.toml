@@ -14,7 +14,7 @@ version.workspace = true
 [dependencies]
 async-trait = { workspace = true }
 file_type = { workspace = true }
-rsql_driver = { path = "../../rsql_driver", version = "0.16.0" }
+rsql_driver = { path = "../../rsql_driver", version = "0.16.1" }
 rsql_driver_delimited = { path = "../../drivers/delimited", version = "0.16.0" }
 url = { workspace = true }
 

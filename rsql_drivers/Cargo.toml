@@ -15,7 +15,7 @@ async-trait = { workspace = true, optional = true }
 file_type = { workspace = true }
 futures-util = { workspace = true, optional = true }
 reqwest = { workspace = true, features = ["json", "gzip"], optional = true }
-rsql_driver = { path = "../rsql_driver", version = "0.16.0" }
+rsql_driver = { path = "../rsql_driver", version = "0.16.1" }
 rsql_driver_arrow = { path = "../drivers/arrow", optional = true, version = "0.16.0" }
 rsql_driver_avro = { path = "../drivers/avro", optional = true, version = "0.16.0" }
 rsql_driver_cockroachdb = { path = "../drivers/cockroachdb", optional = true, version = "0.16.0" }
