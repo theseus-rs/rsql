@@ -10,6 +10,7 @@ name = "rsql_cli"
 changelog_update = true
 changelog_include = [
     "rsql_core",
+    "rsql_driver",
     "rsql_drivers",
     "rsql_formatters",
 ]
