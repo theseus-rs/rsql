@@ -71,11 +71,11 @@ resolver = "2"
 [workspace.package]
 authors = ["Brian Heineman <brian.heineman@gmail.com>"]
 categories = ["database"]
-edition = "2021"
+edition = "2024"
 keywords = ["database", "mysql", "postgresql", "sql", "sqlite"]
 license = "Apache-2.0 OR MIT"
 repository = "https://github.com/theseus-rs/rsql"
-rust-version = "1.84.0"
+rust-version = "1.85.0"
 version = "0.16.0"
 
 [workspace.dependencies]
@@ -99,7 +99,7 @@ dark-light = "2.0.0"
 dirs = "6.0.0"
 dotenvy = "0.15.7"
 duckdb = "0.10.2"
-file_type = "0.7.0"
+file_type = "0.7.2"
 form_urlencoded = "1.2.1"
 futures-util = "0.3.31"
 getrandom = "0.2.15"
@@ -114,7 +114,7 @@ num-format = "0.4.4"
 os_info = "3.9.1"
 polars = "0.46.0"
 polars-sql = "0.46.0"
-postgresql_embedded = "0.17.5"
+postgresql_embedded = "0.18.0"
 quick-xml = "0.37.2"
 regex = "1.11.1"
 reqwest = "0.12.12"

@@ -1,6 +1,6 @@
+use crate::Results::{Execute, Query};
 use crate::error::Result;
 use crate::writers::Output;
-use crate::Results::{Execute, Query};
 use crate::{FormatterOptions, Results};
 use colored::Colorize;
 use num_format::{Locale, ToFormattedString};

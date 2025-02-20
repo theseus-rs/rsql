@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use file_type::FileType;
-use polars::io::avro::AvroReader;
 use polars::io::SerReader;
+use polars::io::avro::AvroReader;
 use polars::prelude::IntoLazy;
 use polars_sql::SQLContext;
 use rsql_driver::Error::IoError;

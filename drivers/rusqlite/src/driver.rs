@@ -4,8 +4,8 @@ use rsql_driver::Error::IoError;
 use rsql_driver::{
     MemoryQueryResult, Metadata, QueryResult, Result, StatementMetadata, UrlExtension, Value,
 };
-use rusqlite::types::ValueRef;
 use rusqlite::Row;
+use rusqlite::types::ValueRef;
 use sqlparser::ast::Statement;
 use sqlparser::dialect::{Dialect, SQLiteDialect};
 use std::sync::{Arc, Mutex};

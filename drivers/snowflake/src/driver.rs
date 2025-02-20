@@ -1,6 +1,6 @@
 use crate::SnowflakeError;
 use async_trait::async_trait;
-use base64::{engine::general_purpose::STANDARD, Engine};
+use base64::{Engine, engine::general_purpose::STANDARD};
 use chrono::{DateTime, NaiveDate, NaiveDateTime, NaiveTime, Utc};
 use file_type::FileType;
 use jwt_simple::prelude::{Claims, Duration, RS256KeyPair, RS256PublicKey, RSAKeyPairLike};

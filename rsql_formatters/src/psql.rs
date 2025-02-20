@@ -1,7 +1,7 @@
 use crate::error::Result;
 use crate::formatter::FormatterOptions;
 use crate::writers::Output;
-use crate::{table, Results};
+use crate::{Results, table};
 use async_trait::async_trait;
 use tabled::settings::{Style, Theme};
 
@@ -29,8 +29,8 @@ impl crate::Formatter for Formatter {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::writers::Output;
     use crate::Formatter;
+    use crate::writers::Output;
     use indoc::indoc;
     use rsql_drivers::{MemoryQueryResult, Value};
     use std::time::Duration;

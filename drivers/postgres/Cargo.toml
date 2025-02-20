@@ -35,5 +35,5 @@ native-tls = [
     "postgresql_embedded/native-tls",
 ]
 rustls = [
-    "postgresql_embedded/rustls-tls",
+    "postgresql_embedded/rustls",
 ]

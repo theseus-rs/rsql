@@ -1,8 +1,8 @@
 use crate::commands::{CommandManager, LoopCondition};
 use crate::configuration::{Configuration, EchoMode};
+use crate::executors::Result;
 use crate::executors::command::CommandExecutor;
 use crate::executors::sql::SqlExecutor;
-use crate::executors::Result;
 use regex::Regex;
 use rsql_drivers::{Connection, DriverManager};
 use rsql_formatters::writers::Output;

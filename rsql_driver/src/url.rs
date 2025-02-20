@@ -1,6 +1,6 @@
 use crate::Error::IoError;
 use crate::Result;
-use std::path::{PathBuf, MAIN_SEPARATOR_STR};
+use std::path::{MAIN_SEPARATOR_STR, PathBuf};
 use url::Url;
 
 pub trait UrlExtension {

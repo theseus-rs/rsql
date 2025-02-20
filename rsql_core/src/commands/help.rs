@@ -65,8 +65,8 @@ impl ShellCommand for Command {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::commands::{footer, LoopCondition};
     use crate::commands::{CommandManager, CommandOptions};
+    use crate::commands::{LoopCondition, footer};
     use crate::configuration::Configuration;
     use crate::writers::Output;
     use indoc::indoc;
