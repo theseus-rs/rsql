@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - update to Rust 2024 edition
+- add tls support to cockroachdb, mariadb, mysql, postgres, postgresql, redshift drivers
 
 ### Other
 - update version to 0.16.0
