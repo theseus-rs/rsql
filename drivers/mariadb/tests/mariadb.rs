@@ -1,4 +1,6 @@
 #[cfg(target_os = "linux")]
+use rsql_driver::Driver;
+#[cfg(target_os = "linux")]
 use testcontainers::runners::AsyncRunner;
 
 #[cfg(target_os = "linux")]
@@ -10,8 +12,9 @@ async fn test_mariadb_driver() -> anyhow::Result<()> {
     let port = container.get_host_port_ipv4(3306).await?;
 
     let database_url = format!("mariadb://root@127.0.0.1:{port}/test");
-    let driver_manager = rsql_drivers::DriverManager::default();
-    let mut connection = driver_manager.connect(database_url.as_str()).await?;
+    let mut connection = rsql_driver_mariadb::Driver
+        .connect(database_url.as_str(), None)
+        .await?;
     assert_eq!(database_url, connection.url().as_str());
 
     test_schema(&mut *connection).await?;

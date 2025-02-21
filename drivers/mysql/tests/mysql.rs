@@ -3,7 +3,7 @@ use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 #[cfg(target_os = "linux")]
 use indoc::indoc;
 #[cfg(target_os = "linux")]
-use rsql_drivers::{Connection, DriverManager, Value};
+use rsql_driver::{Connection, Driver, Value};
 #[cfg(target_os = "linux")]
 use serde_json::json;
 #[cfg(target_os = "linux")]
@@ -18,8 +18,9 @@ async fn test_mysql_driver() -> anyhow::Result<()> {
     let port = container.get_host_port_ipv4(3306).await?;
 
     let database_url = format!("mysql://root@127.0.0.1:{port}/mysql");
-    let driver_manager = DriverManager::default();
-    let mut connection = driver_manager.connect(database_url.as_str()).await?;
+    let mut connection = rsql_driver_mysql::Driver
+        .connect(database_url.as_str(), None)
+        .await?;
     assert_eq!(database_url, connection.url().as_str());
 
     test_connection_interface(&mut *connection).await?;
@@ -152,8 +153,9 @@ async fn test_mysql_metadata() -> anyhow::Result<()> {
     let port = container.get_host_port_ipv4(3306).await?;
 
     let database_url = &format!("mysql://root@127.0.0.1:{port}/mysql");
-    let driver_manager = DriverManager::default();
-    let mut connection = driver_manager.connect(database_url.as_str()).await?;
+    let mut connection = rsql_driver_mysql::Driver
+        .connect(database_url.as_str(), None)
+        .await?;
 
     test_schema(&mut *connection).await?;
 
