@@ -6679,7 +6679,6 @@ dependencies = [
  "file_type",
  "indoc",
  "rsql_driver",
- "rsql_drivers",
  "rust_decimal",
  "serde_json",
  "sqlparser 0.52.0",

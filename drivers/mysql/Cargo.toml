@@ -23,7 +23,6 @@ sqlx = { workspace = true, features = ["bit-vec", "chrono", "json", "macros", "m
 
 [dev-dependencies]
 anyhow = { workspace = true }
-rsql_drivers = { path = "../../rsql_drivers", version = "0.16.0" }
 testcontainers = { workspace = true }
 testcontainers-modules = { workspace = true, features = ["mysql"] }
 tokio = { workspace = true, features = ["macros", "rt"] }
