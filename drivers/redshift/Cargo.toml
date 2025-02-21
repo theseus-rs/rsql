@@ -19,7 +19,6 @@ sqlparser = { workspace = true }
 
 [dev-dependencies]
 anyhow = { workspace = true }
-rsql_drivers = { path = "../../rsql_drivers", version = "0.16.0" }
 testcontainers = { workspace = true }
 testcontainers-modules = { workspace = true, features = ["postgres"] }
 tokio = { workspace = true, features = ["macros", "rt"] }

@@ -6776,7 +6776,6 @@ dependencies = [
  "file_type",
  "rsql_driver",
  "rsql_driver_postgresql",
- "rsql_drivers",
  "sqlparser 0.52.0",
  "testcontainers",
  "testcontainers-modules",
