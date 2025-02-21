@@ -6542,7 +6542,6 @@ dependencies = [
  "file_type",
  "rsql_driver",
  "rsql_driver_postgresql",
- "rsql_drivers",
  "testcontainers",
  "testcontainers-modules",
  "tokio",

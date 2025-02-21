@@ -1,5 +1,5 @@
 #[cfg(target_os = "linux")]
-use rsql_drivers::{DriverManager, Value};
+use rsql_driver::{Driver, Value};
 #[cfg(target_os = "linux")]
 use testcontainers::runners::AsyncRunner;
 
@@ -13,8 +13,9 @@ async fn test_cockroachdb_driver() -> anyhow::Result<()> {
     let port = container.get_host_port_ipv4(26257).await?;
 
     let database_url = format!("cockroachdb://root:postgres@localhost:{port}/defaultdb");
-    let driver_manager = DriverManager::default();
-    let mut connection = driver_manager.connect(database_url.as_str()).await?;
+    let mut connection = rsql_driver_cockroachdb::Driver
+        .connect(database_url.as_str(), None)
+        .await?;
     assert_eq!(database_url, connection.url().as_str());
 
     let mut query_result = connection.query("SELECT 1").await?;
