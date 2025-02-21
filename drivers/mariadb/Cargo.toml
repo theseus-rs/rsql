@@ -20,7 +20,6 @@ testcontainers-modules = { workspace = true, features = ["mariadb"] }
 
 [dev-dependencies]
 anyhow = { workspace = true }
-rsql_drivers = { path = "../../rsql_drivers", version = "0.16.0" }
 tokio = { workspace = true, features = ["macros", "rt"] }
 
 [features]

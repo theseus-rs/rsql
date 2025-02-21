@@ -6663,7 +6663,6 @@ dependencies = [
  "file_type",
  "rsql_driver",
  "rsql_driver_mysql",
- "rsql_drivers",
  "testcontainers",
  "testcontainers-modules",
  "tokio",
