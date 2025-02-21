@@ -6844,7 +6844,6 @@ dependencies = [
  "futures-util",
  "indoc",
  "rsql_driver",
- "rsql_drivers",
  "rust_decimal",
  "sqlparser 0.52.0",
  "testcontainers",
