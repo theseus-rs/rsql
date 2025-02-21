@@ -1,10 +1,11 @@
 [package]
-name = "rsql_driver"
 authors.workspace = true
 categories.workspace = true
+description = "rsql driver"
 edition.workspace = true
 keywords.workspace = true
 license.workspace = true
+name = "rsql_driver"
 repository.workspace = true
 rust-version.workspace = true
 version.workspace = true
