@@ -44,6 +44,8 @@ jobs:
           fetch-depth: 0
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
+      - name: Cargo version
+        run: cargo --version
       - name: Run release-plz
         uses: release-plz/action@v0.5
         with:
