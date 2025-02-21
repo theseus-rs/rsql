@@ -11,13 +11,9 @@ impl rsql_driver::Driver for Driver {
         "http"
     }
 
-    async fn connect(
-        &self,
-        url: &str,
-        password: Option<String>,
-    ) -> Result<Box<dyn rsql_driver::Connection>> {
+    async fn connect(&self, url: &str) -> Result<Box<dyn rsql_driver::Connection>> {
         let driver = crate::https::Driver;
-        driver.connect(url, password).await
+        driver.connect(url).await
     }
 
     fn supports_file_type(&self, file_type: &FileType) -> bool {

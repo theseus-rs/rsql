@@ -351,7 +351,7 @@ mod test {
             .expect_identifier()
             .returning(|| driver_identifier);
         mock_driver.expect_supports_file_type().returning(|_| false);
-        mock_driver.expect_connect().returning(|_, _| {
+        mock_driver.expect_connect().returning(|_| {
             let mut mock_connection = MockConnection::new();
             mock_connection.expect_close().returning(|| Ok(()));
             Ok(Box::new(mock_connection))

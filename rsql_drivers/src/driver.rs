@@ -54,12 +54,11 @@ impl DriverManager {
     pub async fn connect(&self, url: &str) -> Result<Box<dyn Connection>> {
         let parsed_url = Url::parse(url).map_err(|error| InvalidUrl(error.to_string()))?;
         let scheme = parsed_url.scheme();
-        let password = parsed_url.password().map(ToString::to_string);
         let url = url.to_string();
 
         match &self.get(scheme) {
             Some(driver) => {
-                let connection = driver.connect(&url, password).await?;
+                let connection = driver.connect(&url).await?;
                 let connection = Box::new(CachedMetadataConnection::new(connection));
                 Ok(connection)
             }
@@ -232,7 +231,7 @@ mod tests {
         mock_driver.expect_supports_file_type().returning(|_| false);
         mock_driver
             .expect_connect()
-            .returning(|_, _| Ok(Box::new(MockConnection::new())));
+            .returning(|_| Ok(Box::new(MockConnection::new())));
 
         let mut driver_manager = DriverManager::new();
         driver_manager.add(Box::new(mock_driver));

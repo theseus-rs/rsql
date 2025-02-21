@@ -162,7 +162,7 @@ mod test {
     #[tokio::test]
     async fn test_schema() -> Result<()> {
         let driver = crate::Driver;
-        let mut connection = driver.connect(DATABASE_URL, None).await?;
+        let mut connection = driver.connect(DATABASE_URL).await?;
 
         let _ = connection
             .execute("CREATE TABLE contacts (id INTEGER PRIMARY KEY, email VARCHAR(20) UNIQUE)")

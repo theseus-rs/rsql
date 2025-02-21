@@ -14,7 +14,7 @@ impl rsql_driver::Driver for Driver {
         "file"
     }
 
-    async fn connect(&self, url: &str, _password: Option<String>) -> Result<Box<dyn Connection>> {
+    async fn connect(&self, url: &str) -> Result<Box<dyn Connection>> {
         let parsed_url = Url::parse(url)?;
         let file_name = parsed_url.to_file()?.to_string_lossy().to_string();
         let file_type =
@@ -100,7 +100,7 @@ mod test {
     async fn test_file_driver(database_url: &str, sql: Option<&str>) -> Result<()> {
         let sql = sql.unwrap_or("SELECT id, name FROM users ORDER BY id");
         let driver = crate::file::Driver;
-        let mut connection = driver.connect(database_url, None).await?;
+        let mut connection = driver.connect(database_url).await?;
 
         let mut query_result = connection.query(sql).await?;
 

@@ -2,7 +2,7 @@ use crate::metadata;
 use async_trait::async_trait;
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 use file_type::FileType;
-use rsql_driver::Error::{IoError, UnsupportedColumnType};
+use rsql_driver::Error::{InvalidUrl, IoError, UnsupportedColumnType};
 use rsql_driver::{MemoryQueryResult, Metadata, QueryResult, Result, Value};
 use sqlparser::dialect::{Dialect, MySqlDialect};
 use sqlx::mysql::{MySqlColumn, MySqlConnectOptions, MySqlRow};
@@ -10,6 +10,7 @@ use sqlx::types::time::OffsetDateTime;
 use sqlx::{Column, MySqlPool, Row};
 use std::str::FromStr;
 use std::string::ToString;
+use url::Url;
 
 #[derive(Debug)]
 pub struct Driver;
@@ -20,11 +21,9 @@ impl rsql_driver::Driver for Driver {
         "mysql"
     }
 
-    async fn connect(
-        &self,
-        url: &str,
-        password: Option<String>,
-    ) -> Result<Box<dyn rsql_driver::Connection>> {
+    async fn connect(&self, url: &str) -> Result<Box<dyn rsql_driver::Connection>> {
+        let parsed_url = Url::parse(url).map_err(|error| InvalidUrl(error.to_string()))?;
+        let password = parsed_url.password().map(ToString::to_string);
         let connection = Connection::new(url, password).await?;
         Ok(Box::new(connection))
     }

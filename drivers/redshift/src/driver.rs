@@ -1,8 +1,10 @@
 use async_trait::async_trait;
 use file_type::FileType;
+use rsql_driver::Error::InvalidUrl;
 use rsql_driver::{Metadata, QueryResult, Result};
 use rsql_driver_postgresql::Connection as PgConnection;
 use sqlparser::dialect::{Dialect, RedshiftSqlDialect};
+use url::Url;
 
 #[derive(Debug)]
 pub struct Driver;
@@ -13,11 +15,9 @@ impl rsql_driver::Driver for Driver {
         "redshift"
     }
 
-    async fn connect(
-        &self,
-        url: &str,
-        password: Option<String>,
-    ) -> Result<Box<dyn rsql_driver::Connection>> {
+    async fn connect(&self, url: &str) -> Result<Box<dyn rsql_driver::Connection>> {
+        let parsed_url = Url::parse(url).map_err(|error| InvalidUrl(error.to_string()))?;
+        let password = parsed_url.password().map(ToString::to_string);
         let connection = Connection::new(url, password).await?;
         Ok(Box::new(connection))
     }

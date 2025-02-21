@@ -6684,6 +6684,7 @@ dependencies = [
  "testcontainers",
  "testcontainers-modules",
  "tokio",
+ "url",
 ]
 
 [[package]]
@@ -6779,6 +6780,7 @@ dependencies = [
  "testcontainers",
  "testcontainers-modules",
  "tokio",
+ "url",
 ]
 
 [[package]]

@@ -13,7 +13,7 @@ async fn test_mariadb_driver() -> anyhow::Result<()> {
 
     let database_url = format!("mariadb://root@127.0.0.1:{port}/test");
     let mut connection = rsql_driver_mariadb::Driver
-        .connect(database_url.as_str(), None)
+        .connect(database_url.as_str())
         .await?;
     assert_eq!(database_url, connection.url().as_str());
 

@@ -22,11 +22,7 @@ impl rsql_driver::Driver for Driver {
         "sqlite"
     }
 
-    async fn connect(
-        &self,
-        url: &str,
-        _password: Option<String>,
-    ) -> Result<Box<dyn rsql_driver::Connection>> {
+    async fn connect(&self, url: &str) -> Result<Box<dyn rsql_driver::Connection>> {
         let connection = Connection::new(url).await?;
         Ok(Box::new(connection))
     }
@@ -252,7 +248,7 @@ mod test {
     #[tokio::test]
     async fn test_driver_connect() -> Result<()> {
         let driver = crate::Driver;
-        let mut connection = driver.connect(DATABASE_URL, None).await?;
+        let mut connection = driver.connect(DATABASE_URL).await?;
         assert_eq!(DATABASE_URL, connection.url());
         connection.close().await?;
         Ok(())
@@ -262,7 +258,7 @@ mod test {
     async fn test_connection_interface() -> Result<()> {
         let database_url = dataset_url("sqlite", "users.sqlite3");
         let driver = crate::Driver;
-        let mut connection = driver.connect(&database_url, None).await?;
+        let mut connection = driver.connect(&database_url).await?;
 
         let mut query_result = connection
             .query("SELECT id, name FROM users ORDER BY id")
@@ -287,7 +283,7 @@ mod test {
     #[tokio::test]
     async fn test_table_data_types() -> Result<()> {
         let driver = crate::Driver;
-        let mut connection = driver.connect(DATABASE_URL, None).await?;
+        let mut connection = driver.connect(DATABASE_URL).await?;
 
         let _ = connection
             .execute("CREATE TABLE t1(t TEXT, nu NUMERIC, i INTEGER, r REAL, no BLOB)")
@@ -320,7 +316,7 @@ mod test {
 
     async fn test_data_type(sql: &str) -> Result<Option<Value>> {
         let driver = crate::Driver;
-        let mut connection = driver.connect(DATABASE_URL, None).await?;
+        let mut connection = driver.connect(DATABASE_URL).await?;
         let mut query_result = connection.query(sql).await?;
         let mut value: Option<Value> = None;
 

@@ -37,7 +37,7 @@ pub fn dataset_url<S: AsRef<str>>(scheme: S, file_name: S) -> String {
 async fn test_json_metadata() -> Result<()> {
     let database_url = dataset_url("json", "cheyenne.json");
     let driver = rsql_driver_json::Driver;
-    let mut connection = driver.connect(&database_url, None).await?;
+    let mut connection = driver.connect(&database_url).await?;
 
     let mut query_result = connection
         .query(

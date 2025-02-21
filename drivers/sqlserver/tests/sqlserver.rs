@@ -27,7 +27,7 @@ async fn test_sqlserver_driver() -> anyhow::Result<()> {
     let database_url =
         format!("sqlserver://sa:{PASSWORD}@127.0.0.1:{port}?TrustServerCertificate=true");
     let mut connection = rsql_driver_sqlserver::Driver
-        .connect(database_url.as_str(), None)
+        .connect(database_url.as_str())
         .await?;
     assert_eq!(database_url, connection.url().as_str());
 
@@ -165,7 +165,7 @@ async fn test_sqlserver_metadata() -> anyhow::Result<()> {
     let database_url =
         format!("sqlserver://sa:{PASSWORD}@127.0.0.1:{port}?TrustServerCertificate=true");
     let mut connection = rsql_driver_sqlserver::Driver
-        .connect(database_url.as_str(), None)
+        .connect(database_url.as_str())
         .await?;
 
     test_schema(&mut *connection).await?;

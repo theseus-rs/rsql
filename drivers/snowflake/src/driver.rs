@@ -5,7 +5,7 @@ use chrono::{DateTime, NaiveDate, NaiveDateTime, NaiveTime, Utc};
 use file_type::FileType;
 use jwt_simple::prelude::{Claims, Duration, RS256KeyPair, RS256PublicKey, RSAKeyPairLike};
 use reqwest::header::HeaderMap;
-use rsql_driver::Error::IoError;
+use rsql_driver::Error::{InvalidUrl, IoError};
 use rsql_driver::{MemoryQueryResult, Metadata, QueryResult, Result, Row, Value};
 use serde_json::json;
 use sha2::{Digest, Sha256};
@@ -30,11 +30,9 @@ impl rsql_driver::Driver for Driver {
         "snowflake"
     }
 
-    async fn connect(
-        &self,
-        url: &str,
-        password: Option<String>,
-    ) -> Result<Box<dyn rsql_driver::Connection>> {
+    async fn connect(&self, url: &str) -> Result<Box<dyn rsql_driver::Connection>> {
+        let parsed_url = Url::parse(url).map_err(|error| InvalidUrl(error.to_string()))?;
+        let password = parsed_url.password().map(ToString::to_string);
         Ok(Box::new(SnowflakeConnection::new(url, password)?))
     }
 

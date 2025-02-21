@@ -13,14 +13,10 @@ impl rsql_driver::Driver for Driver {
         "csv"
     }
 
-    async fn connect(
-        &self,
-        url: &str,
-        password: Option<String>,
-    ) -> Result<Box<dyn rsql_driver::Connection>> {
+    async fn connect(&self, url: &str) -> Result<Box<dyn rsql_driver::Connection>> {
         let mut parsed_url = Url::parse(url)?;
         parsed_url.query_pairs_mut().append_pair("separator", ",");
-        DelimitedDriver.connect(parsed_url.as_str(), password).await
+        DelimitedDriver.connect(parsed_url.as_str()).await
     }
 
     fn supports_file_type(&self, file_type: &FileType) -> bool {
@@ -42,7 +38,7 @@ mod test {
     async fn test_driver_connect() -> Result<()> {
         let database_url = database_url();
         let driver = crate::Driver;
-        let mut connection = driver.connect(&database_url, None).await?;
+        let mut connection = driver.connect(&database_url).await?;
         assert!(connection.url().contains("separator=%2C"));
         connection.close().await?;
         Ok(())
@@ -52,7 +48,7 @@ mod test {
     async fn test_connection_interface() -> Result<()> {
         let database_url = database_url();
         let driver = crate::Driver;
-        let mut connection = driver.connect(&database_url, None).await?;
+        let mut connection = driver.connect(&database_url).await?;
 
         let mut query_result = connection
             .query("SELECT id, name FROM users ORDER BY id")
