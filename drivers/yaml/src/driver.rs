@@ -22,11 +22,7 @@ impl rsql_driver::Driver for Driver {
         "yaml"
     }
 
-    async fn connect(
-        &self,
-        url: &str,
-        _password: Option<String>,
-    ) -> Result<Box<dyn rsql_driver::Connection>> {
+    async fn connect(&self, url: &str) -> Result<Box<dyn rsql_driver::Connection>> {
         let parsed_url = Url::parse(url)?;
         let query_parameters: HashMap<String, String> =
             parsed_url.query_pairs().into_owned().collect();
@@ -97,7 +93,7 @@ mod test {
     async fn test_driver_connect() -> Result<()> {
         let database_url = database_url();
         let driver = crate::Driver;
-        let mut connection = driver.connect(&database_url, None).await?;
+        let mut connection = driver.connect(&database_url).await?;
         assert_eq!(&database_url, connection.url());
         connection.close().await?;
         Ok(())
@@ -107,7 +103,7 @@ mod test {
     async fn test_connection_interface() -> Result<()> {
         let database_url = database_url();
         let driver = crate::Driver;
-        let mut connection = driver.connect(&database_url, None).await?;
+        let mut connection = driver.connect(&database_url).await?;
 
         let mut query_result = connection
             .query("SELECT id, name FROM users ORDER BY id")

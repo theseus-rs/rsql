@@ -10,6 +10,6 @@ use std::fmt::Debug;
 #[async_trait]
 pub trait Driver: Debug + Send + Sync {
     fn identifier(&self) -> &'static str;
-    async fn connect(&self, url: &str, password: Option<String>) -> Result<Box<dyn Connection>>;
+    async fn connect(&self, url: &str) -> Result<Box<dyn Connection>>;
     fn supports_file_type(&self, file_type: &FileType) -> bool;
 }

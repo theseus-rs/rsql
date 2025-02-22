@@ -20,6 +20,7 @@ rust_decimal = { workspace = true }
 serde_json = { workspace = true, features = ["preserve_order"] }
 sqlparser = { workspace = true }
 sqlx = { workspace = true, features = ["bit-vec", "chrono", "json", "macros", "mysql", "runtime-tokio", "rust_decimal", "time", "uuid"] }
+url = { workspace = true }
 
 [dev-dependencies]
 anyhow = { workspace = true }

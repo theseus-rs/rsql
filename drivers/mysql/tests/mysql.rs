@@ -19,7 +19,7 @@ async fn test_mysql_driver() -> anyhow::Result<()> {
 
     let database_url = format!("mysql://root@127.0.0.1:{port}/mysql");
     let mut connection = rsql_driver_mysql::Driver
-        .connect(database_url.as_str(), None)
+        .connect(database_url.as_str())
         .await?;
     assert_eq!(database_url, connection.url().as_str());
 
@@ -154,7 +154,7 @@ async fn test_mysql_metadata() -> anyhow::Result<()> {
 
     let database_url = &format!("mysql://root@127.0.0.1:{port}/mysql");
     let mut connection = rsql_driver_mysql::Driver
-        .connect(database_url.as_str(), None)
+        .connect(database_url.as_str())
         .await?;
 
     test_schema(&mut *connection).await?;

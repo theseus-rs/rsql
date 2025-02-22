@@ -3,7 +3,7 @@ use bit_vec::BitVec;
 use chrono::{DateTime, NaiveDate, NaiveDateTime, NaiveTime, Utc};
 use file_type::FileType;
 use postgresql_embedded::{PostgreSQL, Settings, Status, VersionReq};
-use rsql_driver::Error::{IoError, UnsupportedColumnType};
+use rsql_driver::Error::{InvalidUrl, IoError, UnsupportedColumnType};
 use rsql_driver::{MemoryQueryResult, Metadata, QueryResult, Result, StatementMetadata, Value};
 use sqlparser::ast::Statement;
 use sqlparser::dialect::{Dialect, PostgreSqlDialect};
@@ -28,11 +28,9 @@ impl rsql_driver::Driver for Driver {
         "postgres"
     }
 
-    async fn connect(
-        &self,
-        url: &str,
-        password: Option<String>,
-    ) -> Result<Box<dyn rsql_driver::Connection>> {
+    async fn connect(&self, url: &str) -> Result<Box<dyn rsql_driver::Connection>> {
+        let parsed_url = Url::parse(url).map_err(|error| InvalidUrl(error.to_string()))?;
+        let password = parsed_url.password().map(ToString::to_string);
         let connection = Connection::new(url, password).await?;
         Ok(Box::new(connection))
     }
@@ -337,7 +335,7 @@ mod test {
     #[tokio::test]
     async fn test_driver_connect() -> Result<()> {
         let driver = crate::Driver;
-        let mut connection = driver.connect(DATABASE_URL, None).await?;
+        let mut connection = driver.connect(DATABASE_URL).await?;
         assert_eq!(DATABASE_URL, connection.url());
         connection.close().await?;
         Ok(())
@@ -346,7 +344,7 @@ mod test {
     #[tokio::test]
     async fn test_connection_interface() -> Result<()> {
         let driver = crate::Driver;
-        let mut connection = driver.connect(DATABASE_URL, None).await?;
+        let mut connection = driver.connect(DATABASE_URL).await?;
 
         let _ = connection
             .execute("CREATE TABLE person (id INTEGER, name VARCHAR(20))")
@@ -377,7 +375,7 @@ mod test {
 
     async fn test_data_type(sql: &str) -> Result<Option<Value>> {
         let driver = crate::Driver;
-        let mut connection = driver.connect(DATABASE_URL, None).await?;
+        let mut connection = driver.connect(DATABASE_URL).await?;
 
         let mut query_result = connection.query(sql).await?;
         let mut value: Option<Value> = None;

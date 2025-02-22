@@ -14,7 +14,7 @@ async fn test_cockroachdb_driver() -> anyhow::Result<()> {
 
     let database_url = format!("cockroachdb://root:postgres@localhost:{port}/defaultdb");
     let mut connection = rsql_driver_cockroachdb::Driver
-        .connect(database_url.as_str(), None)
+        .connect(database_url.as_str())
         .await?;
     assert_eq!(database_url, connection.url().as_str());
 

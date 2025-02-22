@@ -11,12 +11,8 @@ impl rsql_driver::Driver for Driver {
         "ods"
     }
 
-    async fn connect(
-        &self,
-        url: &str,
-        _password: Option<String>,
-    ) -> Result<Box<dyn rsql_driver::Connection>> {
-        rsql_driver_excel::Driver.connect(url, _password).await
+    async fn connect(&self, url: &str) -> Result<Box<dyn rsql_driver::Connection>> {
+        rsql_driver_excel::Driver.connect(url).await
     }
 
     fn supports_file_type(&self, file_type: &FileType) -> bool {
@@ -40,7 +36,7 @@ mod test {
     async fn test_driver_connect() -> Result<()> {
         let database_url = database_url();
         let driver = crate::Driver;
-        let mut connection = driver.connect(&database_url, None).await?;
+        let mut connection = driver.connect(&database_url).await?;
         assert_eq!(&database_url, connection.url());
         connection.close().await?;
         Ok(())
@@ -50,7 +46,7 @@ mod test {
     async fn test_connection_interface() -> Result<()> {
         let database_url = database_url();
         let driver = crate::Driver;
-        let mut connection = driver.connect(&database_url, None).await?;
+        let mut connection = driver.connect(&database_url).await?;
 
         let mut query_result = connection
             .query("SELECT id, name FROM users ORDER BY id")

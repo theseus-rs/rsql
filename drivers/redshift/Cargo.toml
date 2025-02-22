@@ -16,6 +16,7 @@ file_type = { workspace = true }
 rsql_driver = { path = "../../rsql_driver", version = "0.16.0" }
 rsql_driver_postgresql = { path = "../../drivers/postgresql", version = "0.16.0" }
 sqlparser = { workspace = true }
+url = { workspace = true }
 
 [dev-dependencies]
 anyhow = { workspace = true }

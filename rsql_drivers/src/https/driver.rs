@@ -23,11 +23,7 @@ impl rsql_driver::Driver for Driver {
         "https"
     }
 
-    async fn connect(
-        &self,
-        url: &str,
-        password: Option<String>,
-    ) -> Result<Box<dyn rsql_driver::Connection>> {
+    async fn connect(&self, url: &str) -> Result<Box<dyn rsql_driver::Connection>> {
         let temp_dir = TempDir::new()?;
         let (request_headers, file_path, file_type, response_headers) =
             self.retrieve_file(url, temp_dir.path()).await?;
@@ -41,7 +37,7 @@ impl rsql_driver::Driver for Driver {
         match driver {
             Some(driver) => {
                 let url = format!("{}://{file_path}", driver.identifier());
-                let mut connection = driver.connect(url.as_str(), password).await?;
+                let mut connection = driver.connect(url.as_str()).await?;
                 create_header_tables(&mut connection, &request_headers, &response_headers).await?;
                 Ok(connection)
             }
@@ -209,7 +205,7 @@ mod test {
         let database_url =
             "https://raw.githubusercontent.com/theseus-rs/rsql/refs/heads/main/datasets/users.csv";
         let driver = crate::https::Driver;
-        let mut connection = driver.connect(database_url, None).await?;
+        let mut connection = driver.connect(database_url).await?;
 
         let mut query_result = connection
             .query("SELECT id, name FROM users ORDER BY id")

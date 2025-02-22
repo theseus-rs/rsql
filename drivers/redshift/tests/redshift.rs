@@ -14,7 +14,7 @@ async fn test_redshift_driver() -> anyhow::Result<()> {
 
     let database_url = format!("redshift://postgres:postgres@localhost:{port}/postgres");
     let mut connection = rsql_driver_redshift::Driver
-        .connect(database_url.as_str(), None)
+        .connect(database_url.as_str())
         .await?;
     assert_eq!(database_url, connection.url().as_str());
 

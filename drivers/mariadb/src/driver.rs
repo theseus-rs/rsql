@@ -11,12 +11,8 @@ impl rsql_driver::Driver for Driver {
         "mariadb"
     }
 
-    async fn connect(
-        &self,
-        url: &str,
-        password: Option<String>,
-    ) -> Result<Box<dyn rsql_driver::Connection>> {
-        rsql_driver_mysql::Driver.connect(url, password).await
+    async fn connect(&self, url: &str) -> Result<Box<dyn rsql_driver::Connection>> {
+        rsql_driver_mysql::Driver.connect(url).await
     }
 
     fn supports_file_type(&self, _file_type: &FileType) -> bool {

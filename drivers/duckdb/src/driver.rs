@@ -24,11 +24,7 @@ impl rsql_driver::Driver for Driver {
         "duckdb"
     }
 
-    async fn connect(
-        &self,
-        url: &str,
-        _password: Option<String>,
-    ) -> Result<Box<dyn rsql_driver::Connection>> {
+    async fn connect(&self, url: &str) -> Result<Box<dyn rsql_driver::Connection>> {
         let connection = Connection::new(url).await?;
         Ok(Box::new(connection))
     }
@@ -221,7 +217,7 @@ mod test {
     #[tokio::test]
     async fn test_driver_connect() -> Result<()> {
         let driver = crate::Driver;
-        let mut connection = driver.connect(DATABASE_URL, None).await?;
+        let mut connection = driver.connect(DATABASE_URL).await?;
         assert_eq!(DATABASE_URL, connection.url());
         connection.close().await?;
         Ok(())
@@ -231,7 +227,7 @@ mod test {
     async fn test_connection_interface() -> Result<()> {
         let database_url = dataset_url("duckdb", "users.duckdb");
         let driver = crate::Driver;
-        let mut connection = driver.connect(&database_url, None).await?;
+        let mut connection = driver.connect(&database_url).await?;
 
         let mut query_result = connection
             .query("SELECT id, name FROM users ORDER BY id")
@@ -256,7 +252,7 @@ mod test {
     #[tokio::test]
     async fn test_table_data_types() -> Result<()> {
         let driver = crate::Driver;
-        let mut connection = driver.connect(DATABASE_URL, None).await?;
+        let mut connection = driver.connect(DATABASE_URL).await?;
         let sql = indoc! {r"
             CREATE TABLE data_types (
                 varchar_type VARCHAR,
@@ -355,7 +351,7 @@ mod test {
     #[tokio::test]
     async fn test_dialect() -> Result<()> {
         let driver = crate::Driver;
-        let connection = driver.connect(DATABASE_URL, None).await?;
+        let connection = driver.connect(DATABASE_URL).await?;
         let dialect = connection.dialect();
 
         assert!(dialect.is_delimited_identifier_start('"'));
@@ -368,7 +364,7 @@ mod test {
     #[tokio::test]
     async fn test_parse_sql() -> Result<()> {
         let driver = crate::Driver;
-        let connection = driver.connect(DATABASE_URL, None).await?;
+        let connection = driver.connect(DATABASE_URL).await?;
 
         let ddl_sql_statements = [
             "INSTALL extension_name",

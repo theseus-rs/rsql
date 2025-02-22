@@ -11,13 +11,9 @@ impl rsql_driver::Driver for Driver {
         "cockroachdb"
     }
 
-    async fn connect(
-        &self,
-        url: &str,
-        password: Option<String>,
-    ) -> Result<Box<dyn rsql_driver::Connection>> {
+    async fn connect(&self, url: &str) -> Result<Box<dyn rsql_driver::Connection>> {
         let driver = rsql_driver_postgresql::Driver;
-        driver.connect(url, password).await
+        driver.connect(url).await
     }
 
     fn supports_file_type(&self, _file_type: &FileType) -> bool {
