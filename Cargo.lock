@@ -2390,9 +2390,9 @@ dependencies = [
 
 [[package]]
 name = "file_type"
-version = "0.7.2"
+version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4c86877cabe7f093ab5fca1f8dc505a551ebddbd72e706dc82d9dd1e11341074"
+checksum = "7d1b8ea0504bebb140f19745902a2d43eef59b9524aa4b8b4eaccbe96b88e938"
 dependencies = [
  "phf",
 ]
