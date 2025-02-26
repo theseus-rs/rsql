@@ -230,6 +230,14 @@ impl Connection {
             Type::TEXT_ARRAY | Type::VARCHAR_ARRAY | Type::CHAR_ARRAY | Type::BPCHAR_ARRAY => {
                 Self::get_array(row, column_index, |v: String| Value::String(v))?
             }
+            Type::NUMERIC => Self::get_single(row, column_index, |v: rust_decimal::Decimal| {
+                Value::String(v.to_string())
+            })?,
+            Type::NUMERIC_ARRAY => {
+                Self::get_single(row, column_index, |v: rust_decimal::Decimal| {
+                    Value::String(v.to_string())
+                })?
+            }
             Type::JSON | Type::JSONB => {
                 Self::get_single(row, column_index, |v: serde_json::Value| Value::Json(v))?
             }
@@ -451,6 +459,9 @@ mod test {
             assert_eq!(value[1], Value::String("101".to_string()));
         }
 
+        let result = test_data_type("SELECT CAST(1.234 as decimal)").await?;
+        let value = result.expect("value is None");
+        assert_eq!(value, Value::String("1.234".to_string()));
         Ok(())
     }
 
