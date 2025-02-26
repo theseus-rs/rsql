@@ -136,7 +136,7 @@ async fn test_data_types(connection: &mut dyn Connection) -> anyhow::Result<()> 
                 "2022-01-01 14:30:00",
                 "%Y-%m-%d %H:%M:%S"
             )?),
-            Value::Json(json!({"key": "value"}))
+            Value::from(json!({"key": "value"}))
         ])
     );
     assert!(query_result.next().await.is_none());

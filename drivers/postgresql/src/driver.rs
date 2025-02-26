@@ -248,11 +248,11 @@ impl Connection {
                 Value::Array(v.into_iter().map(|v| Value::U32(v.0)).collect())
             })?,
             "Json" | "Jsonb" => {
-                Self::get_value(row, column_name, |v: serde_json::Value| Value::Json(v))?
+                Self::get_value(row, column_name, |v: serde_json::Value| Value::from(v))?
             }
             "JsonArray" | "JsonbArray" => {
                 Self::get_value(row, column_name, |v: Vec<serde_json::Value>| {
-                    Value::Array(v.into_iter().map(Value::Json).collect())
+                    Value::Array(v.into_iter().map(Value::from).collect())
                 })?
             }
             // "Point" => Value::Null,
@@ -673,7 +673,7 @@ mod test {
     async fn test_data_type_json() -> Result<()> {
         let result = test_data_type(r#"SELECT CAST('{"key": "value"}' as json)"#).await?;
         let value = result.expect("value is None");
-        assert_eq!(value, Value::Json(json!({"key": "value"})));
+        assert_eq!(value, Value::from(json!({"key": "value"})));
         Ok(())
     }
 

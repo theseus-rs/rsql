@@ -21,7 +21,7 @@ mockall = { workspace = true }
 num-format = { workspace = true }
 rust-i18n = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
-serde_json = { workspace = true, features = ["preserve_order"] }
+serde_json = { workspace = true, optional = true, features = ["preserve_order"] }
 sqlparser = { workspace = true }
 thiserror = { workspace = true }
 url = { workspace = true }
@@ -32,4 +32,9 @@ getrandom = { workspace = true, features = ["js"] }
 
 [dev-dependencies]
 rsql_driver_test_utils = { path = "../drivers/test_utils", version = "0.16.0" }
+serde_json = { workspace = true, features = ["preserve_order"] }
 tokio = { workspace = true, features = ["macros", "rt"] }
+
+[features]
+default = []
+json = ["dep:serde_json"]

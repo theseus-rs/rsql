@@ -239,10 +239,10 @@ impl Connection {
                 })?
             }
             Type::JSON | Type::JSONB => {
-                Self::get_single(row, column_index, |v: serde_json::Value| Value::Json(v))?
+                Self::get_single(row, column_index, |v: serde_json::Value| Value::from(v))?
             }
             Type::JSON_ARRAY | Type::JSONB_ARRAY => {
-                Self::get_array(row, column_index, |v: serde_json::Value| Value::Json(v))?
+                Self::get_array(row, column_index, |v: serde_json::Value| Value::from(v))?
             }
             Type::BYTEA => {
                 let byte_value: Option<&[u8]> = row
@@ -601,7 +601,7 @@ mod test {
     async fn test_data_type_json() -> Result<()> {
         let result = test_data_type(r#"SELECT CAST('{"key": "value"}' as json)"#).await?;
         let value = result.expect("value is None");
-        assert_eq!(value, Value::Json(json!({"key": "value"})));
+        assert_eq!(value, Value::from(json!({"key": "value"})));
         Ok(())
     }
 

@@ -192,7 +192,7 @@ impl Connection {
             }
         } else if let Ok(value) = row.try_get::<Option<serde_json::Value>, &str>(column_name) {
             match value {
-                Some(v) => Ok(Value::Json(v)),
+                Some(v) => Ok(Value::from(v)),
                 None => Ok(Value::Null),
             }
         } else {

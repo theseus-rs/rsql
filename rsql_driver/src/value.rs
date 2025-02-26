@@ -28,7 +28,6 @@ pub enum Value {
     Time(chrono::NaiveTime),
     DateTime(chrono::NaiveDateTime),
     Uuid(uuid::Uuid),
-    Json(serde_json::Value),
     Array(Vec<Value>),
     Map(IndexMap<Value, Value>),
 }
@@ -57,7 +56,6 @@ impl Value {
             Value::Time(value) => value.to_string(),
             Value::DateTime(value) => value.to_string(),
             Value::Uuid(value) => value.to_string(),
-            Value::Json(value) => value.to_string(),
             Value::Array(value) => {
                 let list_delimiter = t!("list_delimiter", locale = locale.name()).to_string();
                 value
@@ -126,7 +124,6 @@ impl fmt::Display for Value {
             Value::Time(value) => value.to_string(),
             Value::DateTime(value) => value.to_string(),
             Value::Uuid(value) => value.to_string(),
-            Value::Json(value) => value.to_string(),
             Value::Array(value) => value
                 .iter()
                 .map(ToString::to_string)
@@ -167,7 +164,6 @@ impl Hash for Value {
             Value::Time(value) => value.hash(state),
             Value::DateTime(value) => value.hash(state),
             Value::Uuid(value) => value.hash(state),
-            Value::Json(value) => value.hash(state),
             Value::Array(value) => value.hash(state),
             Value::Map(value) => {
                 for (key, value) in value {
@@ -202,7 +198,6 @@ impl PartialEq for Value {
             (Value::Time(a), Value::Time(b)) => a == b,
             (Value::DateTime(a), Value::DateTime(b)) => a == b,
             (Value::Uuid(a), Value::Uuid(b)) => a == b,
-            (Value::Json(a), Value::Json(b)) => a == b,
             (Value::Array(a), Value::Array(b)) => a == b,
             (Value::Map(a), Value::Map(b)) => {
                 if a.len() != b.len() {
@@ -247,7 +242,6 @@ impl Serialize for Value {
             Value::Time(value) => serializer.serialize_str(&value.to_string()),
             Value::DateTime(value) => serializer.serialize_str(&value.to_string()),
             Value::Uuid(value) => serializer.serialize_str(&value.to_string()),
-            Value::Json(ref value) => value.serialize(serializer),
             Value::Array(ref value) => value.serialize(serializer),
             Value::Map(ref value) => value.serialize(serializer),
         }
@@ -392,9 +386,36 @@ impl From<uuid::Uuid> for Value {
     }
 }
 
+#[cfg(feature = "json")]
 impl From<serde_json::Value> for Value {
     fn from(value: serde_json::Value) -> Self {
-        Value::Json(value)
+        match value {
+            serde_json::Value::Null => Value::Null,
+            serde_json::Value::Bool(value) => Value::Bool(value),
+            serde_json::Value::Number(value) => {
+                if let Some(value) = value.as_u64() {
+                    Value::U64(value)
+                } else if let Some(value) = value.as_i64() {
+                    Value::I64(value)
+                } else if let Some(value) = value.as_f64() {
+                    Value::F64(value)
+                } else {
+                    Value::Null
+                }
+            }
+            serde_json::Value::String(value) => Value::String(value),
+            serde_json::Value::Array(value) => {
+                let value = value.into_iter().map(Value::from).collect::<Vec<Value>>();
+                Value::Array(value)
+            }
+            serde_json::Value::Object(value) => {
+                let value = value
+                    .into_iter()
+                    .map(|(key, value)| (Value::String(key), Value::from(value)))
+                    .collect::<IndexMap<Value, Value>>();
+                Value::Map(value)
+            }
+        }
     }
 }
 
@@ -719,25 +740,6 @@ mod tests {
     }
 
     #[test]
-    fn test_json() {
-        let original_json = json!({"foo": "bar", "baz": 123});
-        assert!(!Value::Json(original_json.clone()).is_null());
-        assert!(!Value::Json(original_json.clone()).is_numeric());
-        assert_eq!(
-            Value::Json(original_json.clone()).to_formatted_string(&Locale::en),
-            r#"{"foo":"bar","baz":123}"#
-        );
-        assert_eq!(
-            Value::Json(original_json.clone()).to_string(),
-            r#"{"foo":"bar","baz":123}"#
-        );
-        assert_eq!(
-            json!(Value::Json(original_json.clone())),
-            json!({"foo":"bar","baz":123})
-        );
-    }
-
-    #[test]
     fn test_array() -> Result<()> {
         let array = vec![
             Value::Null,
@@ -762,15 +764,14 @@ mod tests {
                 NaiveTime::from_hms_milli_opt(12, 13, 14, 15).expect("Invalid time"),
             )),
             Value::Uuid(Uuid::from_str("acf5b3e3-4099-4f34-81c7-5803cbc87a2d")?),
-            Value::Json(json!({"foo": "bar", "baz": 123})),
         ];
         assert_eq!(
             Value::Array(array.clone()).to_formatted_string(&Locale::en),
-            r#"null, true, 1, 2, 3, 12,345, 128, 5, 6, 7, 8, 128, 9.1, 10.42, foo, 2000-12-31, 12:13:14.015, 2000-12-31 12:13:14.015, acf5b3e3-4099-4f34-81c7-5803cbc87a2d, {"foo":"bar","baz":123}"#
+            "null, true, 1, 2, 3, 12,345, 128, 5, 6, 7, 8, 128, 9.1, 10.42, foo, 2000-12-31, 12:13:14.015, 2000-12-31 12:13:14.015, acf5b3e3-4099-4f34-81c7-5803cbc87a2d"
         );
         assert_eq!(
             Value::Array(array.clone()).to_string(),
-            r#"null, true, 1, 2, 3, 12345, 128, 5, 6, 7, 8, 128, 9.1, 10.42, foo, 2000-12-31, 12:13:14.015, 2000-12-31 12:13:14.015, acf5b3e3-4099-4f34-81c7-5803cbc87a2d, {"foo":"bar","baz":123}"#
+            "null, true, 1, 2, 3, 12345, 128, 5, 6, 7, 8, 128, 9.1, 10.42, foo, 2000-12-31, 12:13:14.015, 2000-12-31 12:13:14.015, acf5b3e3-4099-4f34-81c7-5803cbc87a2d"
         );
         assert_eq!(json!(Value::Array(array.clone())), json!(array.clone()));
         Ok(())
@@ -922,10 +923,53 @@ mod tests {
         Ok(())
     }
 
+    #[cfg(feature = "json")]
     #[test]
     fn test_from_json() {
-        let json = json!({"foo": "bar", "baz": 123});
-        assert_eq!(Value::from(json.clone()), Value::Json(json.clone()));
+        let json = json!(
+            {
+                "null": null,
+                "bool": true,
+                "i64": -123,
+                "u64": 123,
+                "f64": 1.23,
+                "string": "foo",
+                "array": [true, 42],
+                "map": {"key": "value"}
+            }
+        );
+        let value = Value::from(json);
+        let expected = Value::Map(
+            vec![
+                (Value::String("null".to_string()), Value::Null),
+                (Value::String("bool".to_string()), Value::Bool(true)),
+                (Value::String("i64".to_string()), Value::I64(-123)),
+                (Value::String("u64".to_string()), Value::U64(123)),
+                (Value::String("f64".to_string()), Value::F64(1.23)),
+                (
+                    Value::String("string".to_string()),
+                    Value::String("foo".to_string()),
+                ),
+                (
+                    Value::String("array".to_string()),
+                    Value::Array(vec![Value::Bool(true), Value::U64(42)]),
+                ),
+                (
+                    Value::String("map".to_string()),
+                    Value::Map(
+                        vec![(
+                            Value::String("key".to_string()),
+                            Value::String("value".to_string()),
+                        )]
+                        .into_iter()
+                        .collect(),
+                    ),
+                ),
+            ]
+            .into_iter()
+            .collect(),
+        );
+        assert_eq!(expected, value);
     }
 
     #[test]
