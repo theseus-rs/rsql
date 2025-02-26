@@ -24,6 +24,7 @@ pub enum Value {
     F32(f32),
     F64(f64),
     String(String),
+    Decimal(rust_decimal::Decimal),
     Date(chrono::NaiveDate),
     Time(chrono::NaiveTime),
     DateTime(chrono::NaiveDateTime),
@@ -52,6 +53,7 @@ impl Value {
             Value::F32(value) => value.to_string(),
             Value::F64(value) => value.to_string(),
             Value::String(value) => value.to_string(),
+            Value::Decimal(value) => value.to_string(),
             Value::Date(value) => value.to_string(),
             Value::Time(value) => value.to_string(),
             Value::DateTime(value) => value.to_string(),
@@ -95,7 +97,7 @@ impl Value {
         match self {
             Value::I8(_) | Value::I16(_) | Value::I32(_) | Value::I64(_) | Value::I128(_) => true,
             Value::U8(_) | Value::U16(_) | Value::U32(_) | Value::U64(_) | Value::U128(_) => true,
-            Value::F32(_) | Value::F64(_) => true,
+            Value::F32(_) | Value::F64(_) | Value::Decimal(_) => true,
             _ => false,
         }
     }
@@ -120,6 +122,7 @@ impl fmt::Display for Value {
             Value::F32(value) => value.to_string(),
             Value::F64(value) => value.to_string(),
             Value::String(value) => value.to_string(),
+            Value::Decimal(value) => value.to_string(),
             Value::Date(value) => value.to_string(),
             Value::Time(value) => value.to_string(),
             Value::DateTime(value) => value.to_string(),
@@ -160,6 +163,7 @@ impl Hash for Value {
             Value::F32(value) => value.to_bits().hash(state),
             Value::F64(value) => value.to_bits().hash(state),
             Value::String(value) => value.hash(state),
+            Value::Decimal(value) => value.hash(state),
             Value::Date(value) => value.hash(state),
             Value::Time(value) => value.hash(state),
             Value::DateTime(value) => value.hash(state),
@@ -194,6 +198,7 @@ impl PartialEq for Value {
             (Value::F32(a), Value::F32(b)) => a == b,
             (Value::F64(a), Value::F64(b)) => a == b,
             (Value::String(a), Value::String(b)) => a == b,
+            (Value::Decimal(a), Value::Decimal(b)) => a == b,
             (Value::Date(a), Value::Date(b)) => a == b,
             (Value::Time(a), Value::Time(b)) => a == b,
             (Value::DateTime(a), Value::DateTime(b)) => a == b,
@@ -238,6 +243,7 @@ impl Serialize for Value {
             Value::F32(value) => serializer.serialize_f32(value),
             Value::F64(value) => serializer.serialize_f64(value),
             Value::String(ref value) => serializer.serialize_str(value),
+            Value::Decimal(ref value) => serializer.serialize_str(&value.to_string()),
             Value::Date(value) => serializer.serialize_str(&value.to_string()),
             Value::Time(value) => serializer.serialize_str(&value.to_string()),
             Value::DateTime(value) => serializer.serialize_str(&value.to_string()),
@@ -359,6 +365,12 @@ impl From<&str> for Value {
 impl From<String> for Value {
     fn from(value: String) -> Self {
         Value::String(value)
+    }
+}
+
+impl From<rust_decimal::Decimal> for Value {
+    fn from(value: rust_decimal::Decimal) -> Self {
+        Value::Decimal(value)
     }
 }
 
@@ -679,6 +691,22 @@ mod tests {
     }
 
     #[test]
+    fn test_decimal() {
+        let decimal = rust_decimal::Decimal::from_str("12345.6789").expect("Invalid decimal");
+        assert!(!Value::Decimal(decimal).is_null());
+        assert!(Value::Decimal(decimal).is_numeric());
+        assert_eq!(
+            Value::Decimal(decimal).to_formatted_string(&Locale::en),
+            "12345.6789"
+        );
+        assert_eq!(Value::Decimal(decimal).to_string(), "12345.6789");
+        assert_eq!(
+            json!(Value::Decimal(decimal)),
+            json!("12345.6789".to_string())
+        );
+    }
+
+    #[test]
     fn test_date() {
         let date = NaiveDate::from_ymd_opt(2000, 12, 31).expect("Invalid date");
         assert!(!Value::Date(date).is_null());
@@ -891,6 +919,12 @@ mod tests {
             Value::from("foo".to_string()),
             Value::String("foo".to_string())
         );
+    }
+
+    #[test]
+    fn test_from_decimal() {
+        let decimal = rust_decimal::Decimal::from_str("42.1").expect("Invalid decimal");
+        assert_eq!(Value::from(decimal), Value::Decimal(decimal));
     }
 
     #[test]

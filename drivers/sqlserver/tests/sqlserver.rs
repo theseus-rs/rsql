@@ -5,6 +5,8 @@ use indoc::indoc;
 #[cfg(target_os = "linux")]
 use rsql_driver::{Connection, Driver, Value};
 #[cfg(target_os = "linux")]
+use std::str::FromStr;
+#[cfg(target_os = "linux")]
 use testcontainers::ContainerRequest;
 #[cfg(target_os = "linux")]
 use testcontainers::runners::AsyncRunner;
@@ -138,7 +140,7 @@ async fn test_data_types(connection: &mut dyn Connection) -> anyhow::Result<()> 
             Value::F32(123.45),
             Value::F64(123.0),
             Value::Bool(true),
-            Value::String("123.00".to_string()),
+            Value::Decimal(rust_decimal::Decimal::from_str("123.00").expect("invalid decimal")),
             Value::Date(NaiveDate::from_ymd_opt(2022, 1, 1).expect("invalid date")),
             Value::Time(NaiveTime::from_hms_opt(14, 30, 00).expect("invalid time")),
             Value::DateTime(NaiveDateTime::parse_from_str(

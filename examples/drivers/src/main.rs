@@ -29,10 +29,7 @@ async fn main() -> Result<()> {
     println!("{column_names}");
 
     while let Some(row) = query_result.next().await {
-        let values = row
-            .iter()
-            .map(|value| value.to_string())
-            .collect::<Vec<String>>();
+        let values = row.iter().map(ToString::to_string).collect::<Vec<String>>();
         let row_data = values.join(", ");
         println!("{row_data}");
     }

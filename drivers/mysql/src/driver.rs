@@ -154,7 +154,7 @@ impl Connection {
             }
         } else if let Ok(value) = row.try_get::<Option<rust_decimal::Decimal>, &str>(column_name) {
             match value {
-                Some(v) => Ok(Value::String(v.to_string())),
+                Some(v) => Ok(Value::Decimal(v)),
                 None => Ok(Value::Null),
             }
         } else if let Ok(value) = row.try_get::<Option<bool>, &str>(column_name) {
