@@ -5642,9 +5642,9 @@ dependencies = [
 
 [[package]]
 name = "postgresql_archive"
-version = "0.18.0"
+version = "0.18.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4f6e4e3c52cb10442baf8cb38f2608300a45b833b45a5541ae7abf11f2aff8e4"
+checksum = "c40e1d7c4e82dbd0e5be54d363f9819a3c08b2f16afa70ec8e9a42651f2985ca"
 dependencies = [
  "async-trait",
  "flate2",
@@ -5672,9 +5672,9 @@ dependencies = [
 
 [[package]]
 name = "postgresql_commands"
-version = "0.18.0"
+version = "0.18.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c6f998b09c7d079f341188a0b78424530e355f2bbdeb81e37953379a6ab474d6"
+checksum = "72be76d517870a0a82ba7ae9967c7362cbb7e28929c4e52ece39cc8fcc2c8acb"
 dependencies = [
  "thiserror 2.0.11",
  "tracing",
@@ -5682,9 +5682,9 @@ dependencies = [
 
 [[package]]
 name = "postgresql_embedded"
-version = "0.18.0"
+version = "0.18.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a3ce9cc15a75bd605868daa9a113435eeda243a526fac68714555eb10487e114"
+checksum = "2bcebb7e7954423a4a7a2120b58cf616f83d97dfd446487964b891c6c03191d4"
 dependencies = [
  "anyhow",
  "postgresql_archive",
