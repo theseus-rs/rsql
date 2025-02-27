@@ -18,6 +18,7 @@ use std::str::FromStr;
 use std::string::ToString;
 use tracing::debug;
 use url::Url;
+use uuid::Uuid;
 
 const POSTGRESQL_EMBEDDED_VERSION: &str = "=17.3.0";
 
@@ -336,8 +337,8 @@ impl Connection {
             }
             // Some(&"Record"Some(& => Value::Null,
             // Some(&"RecordArray") => Value::Null,
-            "Uuid" => Self::get_value(row, column_name, |v: uuid::Uuid| Value::Uuid(v))?,
-            "UuidArray" => Self::get_value(row, column_name, |v: Vec<uuid::Uuid>| {
+            "Uuid" => Self::get_value(row, column_name, |v: Uuid| Value::Uuid(v))?,
+            "UuidArray" => Self::get_value(row, column_name, |v: Vec<Uuid>| {
                 Value::Array(v.into_iter().map(Value::Uuid).collect())
             })?,
             // "Int4Range" => Value::Null,

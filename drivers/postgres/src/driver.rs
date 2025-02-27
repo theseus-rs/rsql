@@ -16,6 +16,7 @@ use tokio_postgres::types::{FromSql, Type};
 use tokio_postgres::{Client, Column, NoTls, Row};
 use tracing::debug;
 use url::Url;
+use uuid::Uuid;
 
 const POSTGRESQL_EMBEDDED_VERSION: &str = "=17.3.0";
 
@@ -274,6 +275,8 @@ impl Connection {
             }
             Type::OID => Self::get_single(row, column_index, |v: u32| Value::U32(v))?,
             Type::OID_ARRAY => Self::get_array(row, column_index, |v: u32| Value::U32(v))?,
+            Type::UUID => Self::get_single(row, column_index, |v: Uuid| Value::Uuid(v))?,
+            Type::UUID_ARRAY => Self::get_array(row, column_index, |v: Uuid| Value::Uuid(v))?,
             Type::VOID => Value::Null, // pg_sleep() returns void
             _ => {
                 return Err(UnsupportedColumnType {

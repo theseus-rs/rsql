@@ -6746,6 +6746,7 @@ dependencies = [
  "tokio-postgres",
  "tracing",
  "url",
+ "uuid",
 ]
 
 [[package]]
