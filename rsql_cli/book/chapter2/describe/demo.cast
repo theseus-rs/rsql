@@ -1,0 +1,11 @@
+{"version": 2, "width": 120, "height": 30, "timestamp": 1740088986, "env": {"SHELL": "/bin/zsh", "TERM": "xterm-256color"}}
+[0.025605, "o", "\u001b]11;?\u001b\\"]
+[0.058034, "o", "⠁ connect [00:00:00] [                                                                             ] 0 B/0 B (0 B/s, 0s)"]
+[0.05814, "o", "\r\u001b[2K"]
+[0.068488, "o", "rsql> \u001b[38;2;133;153;0mCREATE\u001b[38;2;131;148;150m \u001b[38;2;133;153;0mTABLE\u001b[38;2;131;148;150m \u001b[38;2;181;137;0musers\u001b[38;2;131;148;150m\r\n(\r\n    id \u001b[38;2;38;139;210mINTEGER\u001b[38;2;131;148;150m \u001b[38;2;147;161;161mPRIMARY KEY\u001b[38;2;131;148;150m,\r\n    first_name \u001b[38;2;38;139;210mTEXT\u001b[38;2;131;148;150m \u001b[38;2;133;153;0mNOT NULL\u001b[38;2;131;148;150m,\r\n    last_name \u001b[38;2;38;139;210mTEXT\u001b[38;2;131;148;150m \u001b[38;2;133;153;0mNOT NULL\u001b[38;2;131;148;150m,\r\n    email \u001b[38;2;38;139;210mTEXT\u001b[38;2;131;148;150m \u001b[38;2;133;153;0mNOT NULL\u001b[38;2;131;148;150m UNIQUE\r\n);\u001b[0m\r\n"]
+[0.06853, "o", "⠁                                                                                                                       "]
+[0.068695, "o", "\r\u001b[2K"]
+[0.068778, "o", "0 rows \u001b[2m(225.375µs)\u001b[0m\r\n"]
+[1.104037, "o", "rsql> \u001b[38;2;131;148;150m.describe users\u001b[0m\r\n"]
+[1.10506, "o", "   Column   |  Type   | Not null | Default \r\n------------+---------+----------+---------\r\n id         | INTEGER | Yes      |         \r\n first_name | TEXT    | No       |         \r\n last_name  | TEXT    | No       |         \r\n"]
+[1.105166, "o", " email      | TEXT    | No       |         \r\n\r\nIndexes\r\n          Index           | Columns | Unique \r\n--------------------------+---------+--------\r\n sqlite_autoindex_users_1 | email   | Yes    \r\n"]
