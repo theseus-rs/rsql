@@ -1,0 +1,40 @@
+[package]
+authors.workspace = true
+categories.workspace = true
+description = "rsql sqlserver driver"
+edition.workspace = true
+keywords.workspace = true
+license.workspace = true
+name = "rsql_driver_sqlserver"
+repository.workspace = true
+rust-version.workspace = true
+version.workspace = true
+
+[dependencies]
+async-trait = { workspace = true }
+chrono = { workspace = true }
+file_type = { workspace = true }
+futures-util = { workspace = true }
+indoc = { workspace = true }
+rsql_driver = { path = "../../rsql_driver", version = "0.17.0" }
+rust_decimal = { workspace = true }
+sqlparser = { workspace = true }
+tokio = { workspace = true, features = ["net"] }
+tokio-util = { workspace = true, features = ["compat"] }
+url = { workspace = true }
+
+[target.'cfg(target_os = "macos")'.dependencies.tiberius]
+default-features = false
+features = ["bigdecimal", "chrono", "rust_decimal", "tds73", "time"]
+workspace = true
+
+[target.'cfg(not(target_os = "macos"))'.dependencies.tiberius]
+default-features = false
+features = ["bigdecimal", "chrono", "rust_decimal", "tds73", "time", "vendored-openssl"]
+workspace = true
+
+[dev-dependencies]
+anyhow = { workspace = true }
+testcontainers = { workspace = true }
+testcontainers-modules = { workspace = true, features = ["mssql_server"] }
+tokio = { workspace = true, features = ["macros", "rt"] }

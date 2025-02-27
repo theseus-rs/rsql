@@ -28,5 +28,5 @@ assignees: ''
 ### Information about your environment
 
 * rsql version: [REQUIRED] (e.g. output of `rsql --version` preferred: "rsql/0.5.1 Mac-OS/14.3.1/arm64")
-* Database and version: [REQUIRED] (MySQL / Postgres / SQLite <x.y.z>)
+* Data source and version: [REQUIRED] (MySQL / Postgres / SQLite <x.y.z> / CSV / JSON)
 * Operating system: [REQUIRED]

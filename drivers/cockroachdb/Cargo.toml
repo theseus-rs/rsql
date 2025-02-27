@@ -1,0 +1,28 @@
+[package]
+authors.workspace = true
+categories.workspace = true
+description = "rsql cockroachdb driver"
+edition.workspace = true
+keywords.workspace = true
+license.workspace = true
+name = "rsql_driver_cockroachdb"
+repository.workspace = true
+rust-version.workspace = true
+version.workspace = true
+
+[dependencies]
+async-trait = { workspace = true }
+file_type = { workspace = true }
+rsql_driver = { path = "../../rsql_driver", version = "0.17.0" }
+rsql_driver_postgresql = { path = "../../drivers/postgresql", version = "0.17.0" }
+
+[dev-dependencies]
+anyhow = { workspace = true }
+testcontainers = { workspace = true }
+testcontainers-modules = { workspace = true, features = ["cockroach_db"] }
+tokio = { workspace = true, features = ["macros", "rt"] }
+
+[features]
+default = ["native-tls"]
+native-tls = ["rsql_driver_postgresql/native-tls"]
+rustls = ["rsql_driver_postgresql/rustls"]

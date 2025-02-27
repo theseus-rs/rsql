@@ -1,10 +1,10 @@
+use crate::Results;
+use crate::Results::{Execute, Query};
 use crate::error::Result;
 use crate::footer::write_footer;
 use crate::formatter::FormatterOptions;
 use crate::highlighter::Highlighter;
 use crate::writers::Output;
-use crate::Results;
-use crate::Results::{Execute, Query};
 use async_trait::async_trait;
 use indexmap::IndexMap;
 use rsql_drivers::Value;
@@ -70,10 +70,10 @@ pub(crate) async fn format_yaml(
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::formatter::FormatterOptions;
-    use crate::writers::Output;
     use crate::Formatter;
     use crate::Results::{Execute, Query};
+    use crate::formatter::FormatterOptions;
+    use crate::writers::Output;
     use indoc::indoc;
     use rsql_drivers::MemoryQueryResult;
     use rsql_drivers::Value;

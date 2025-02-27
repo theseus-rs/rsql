@@ -35,7 +35,7 @@ colored = { workspace = true }
 dotenvy = { workspace = true }
 inquire = { workspace = true }
 os_info = { workspace = true }
-rsql_core = { path = "../rsql_core", version = "0.15.3", features = ["all"] }
+rsql_core = { path = "../rsql_core", version = "0.17.0", features = ["all"] }
 rust-i18n = { workspace = true }
 serde = { workspace = true }
 supports-color = { workspace = true }
@@ -45,6 +45,11 @@ tracing = { workspace = true }
 [dev-dependencies]
 tempfile = { workspace = true }
 tokio = { workspace = true }
+
+[features]
+default = ["native-tls"]
+native-tls = ["rsql_core/native-tls"]
+rustls = ["rsql_core/rustls"]
 
 [[bin]]
 name = "rsql"

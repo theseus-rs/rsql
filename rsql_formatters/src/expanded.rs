@@ -1,9 +1,9 @@
+use crate::Results;
+use crate::Results::Query;
 use crate::error::Result;
 use crate::footer::write_footer;
 use crate::formatter::FormatterOptions;
 use crate::writers::Output;
-use crate::Results;
-use crate::Results::Query;
 use async_trait::async_trait;
 use num_format::{Locale, ToFormattedString};
 use rsql_drivers::{QueryResult, Value};
@@ -80,8 +80,8 @@ async fn process_data(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::writers::Output;
     use crate::Formatter;
+    use crate::writers::Output;
     use indoc::indoc;
     use rsql_drivers::{MemoryQueryResult, Value};
     use std::time::Duration;

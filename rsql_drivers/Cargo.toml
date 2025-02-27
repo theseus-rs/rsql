@@ -11,65 +11,48 @@ rust-version.workspace = true
 version.workspace = true
 
 [dependencies]
-anyhow = { workspace = true }
-async-trait = { workspace = true }
-base64 = { workspace = true }
-bit-vec = { workspace = true, optional = true }
-calamine = { workspace = true, optional = true }
-chrono = { workspace = true, features = ["serde"] }
-duckdb = { workspace = true, features = ["bundled"], optional = true }
+async-trait = { workspace = true, optional = true }
 file_type = { workspace = true }
-form_urlencoded = { workspace = true, optional = true }
 futures-util = { workspace = true, optional = true }
-indexmap = { workspace = true, features = ["serde"] }
-indoc = { workspace = true }
-jwt-simple = { workspace = true, optional = true, default-features = false, features = ["pure-rust"] }
-libsql = { workspace = true, optional = true }
-mockall = { workspace = true }
-num-format = { workspace = true }
-polars = { workspace = true, optional = true, features = ["avro", "ipc", "lazy", "json", "parquet", "polars-sql"] }
-polars-sql = { workspace = true, optional = true }
-postgresql_embedded = { workspace = true, optional = true }
-quick-xml = { workspace = true, optional = true, features = ["serde"] }
-regex = { workspace = true }
-reqwest = { workspace = true, optional = true, features = ["json", "gzip"] }
-rusqlite = { workspace = true, features = ["bundled-full"], optional = true }
-rust_decimal = { workspace = true }
-rust-i18n = { workspace = true }
-serde = { workspace = true, features = ["derive"] }
-serde_json = { workspace = true, features = ["preserve_order"] }
-serde_yaml = { workspace = true, optional = true }
-sha2 = { workspace = true, optional = true }
-sqlparser = { workspace = true }
-sqlx = { workspace = true, features = ["bit-vec", "chrono", "json", "macros", "runtime-tokio", "rust_decimal", "time", "uuid"], optional = true }
+reqwest = { workspace = true, features = ["json", "gzip"], optional = true }
+rsql_driver = { path = "../rsql_driver", version = "0.17.0" }
+rsql_driver_arrow = { path = "../drivers/arrow", optional = true, version = "0.17.0" }
+rsql_driver_avro = { path = "../drivers/avro", optional = true, version = "0.17.0" }
+rsql_driver_cockroachdb = { path = "../drivers/cockroachdb", optional = true, version = "0.17.0" }
+rsql_driver_csv = { path = "../drivers/csv", optional = true, version = "0.17.0" }
+rsql_driver_delimited = { path = "../drivers/delimited", optional = true, version = "0.17.0" }
+rsql_driver_duckdb = { path = "../drivers/duckdb", optional = true, version = "0.17.0" }
+rsql_driver_excel = { path = "../drivers/excel", optional = true, version = "0.17.0" }
+rsql_driver_json = { path = "../drivers/json", optional = true, version = "0.17.0" }
+rsql_driver_jsonl = { path = "../drivers/jsonl", optional = true, version = "0.17.0" }
+rsql_driver_libsql = { path = "../drivers/libsql", optional = true, version = "0.17.0" }
+rsql_driver_mariadb = { path = "../drivers/mariadb", optional = true, version = "0.17.0" }
+rsql_driver_mysql = { path = "../drivers/mysql", optional = true, version = "0.17.0" }
+rsql_driver_ods = { path = "../drivers/ods", optional = true, version = "0.17.0" }
+rsql_driver_parquet = { path = "../drivers/parquet", optional = true, version = "0.17.0" }
+rsql_driver_postgres = { path = "../drivers/postgres", optional = true, version = "0.17.0" }
+rsql_driver_postgresql = { path = "../drivers/postgresql", optional = true, version = "0.17.0" }
+rsql_driver_redshift = { path = "../drivers/redshift", optional = true, version = "0.17.0" }
+rsql_driver_rusqlite = { path = "../drivers/rusqlite", optional = true, version = "0.17.0" }
+rsql_driver_snowflake = { path = "../drivers/snowflake", optional = true, version = "0.17.0" }
+rsql_driver_sqlite = { path = "../drivers/sqlite", optional = true, version = "0.17.0" }
+rsql_driver_sqlserver = { path = "../drivers/sqlserver", optional = true, version = "0.17.0" }
+rsql_driver_tsv = { path = "../drivers/tsv", optional = true, version = "0.17.0" }
+rsql_driver_xml = { path = "../drivers/xml", optional = true, version = "0.17.0" }
+rsql_driver_yaml = { path = "../drivers/yaml", optional = true, version = "0.17.0" }
+tempfile = { workspace = true, optional = true }
 thiserror = { workspace = true }
-tokio = { workspace = true, features = ["rt", "macros"] }
-tokio-postgres = { workspace = true, features = ["array-impls", "with-bit-vec-0_6", "with-chrono-0_4", "with-serde_json-1", "with-uuid-1"], optional = true }
-tokio-util = { workspace = true, features = ["compat"], optional = true }
+tokio = { workspace = true, features = ["fs"], optional = true }
 tracing = { workspace = true }
 url = { workspace = true }
-uuid = { workspace = true, features = ["serde", "v4"] }
-
-[target.'cfg(target_os = "macos")'.dependencies.tiberius]
-default-features = false
-features = ["bigdecimal", "chrono", "rust_decimal", "tds73", "time"]
-optional = true
-workspace = true
-
-[target.'cfg(not(target_os = "macos"))'.dependencies.tiberius]
-default-features = false
-features = ["bigdecimal", "chrono", "rust_decimal", "tds73", "time", "vendored-openssl"]
-optional = true
-workspace = true
 
 [target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dependencies]
 getrandom = { workspace = true, features = ["js"] }
 
 [dev-dependencies]
-testcontainers = { workspace = true }
-testcontainers-modules = { workspace = true, features = ["cockroach_db", "mariadb", "mssql_server", "mysql", "postgres"] }
-tokio = { workspace = true }
-wiremock = { workspace = true }
+indoc = { workspace = true }
+rsql_driver_test_utils = { path = "../drivers/test_utils", version = "0.17.0" }
+tokio = { workspace = true, features = ["macros", "rt"] }
 
 [features]
 all = [
@@ -81,6 +64,8 @@ all = [
     "duckdb",
     "excel",
     "file",
+    "http",
+    "https",
     "json",
     "jsonl",
     "mariadb",
@@ -99,105 +84,64 @@ all = [
     "yaml",
 ]
 default = []
-arrow = [
-    "dep:polars",
-    "dep:polars-sql",
-]
-avro = [
-    "dep:polars",
-    "dep:polars-sql",
-]
-cockroachdb = [
-    "postgresql",
-]
-csv = [
-    "dep:polars",
-    "dep:polars-sql",
-]
-delimited = [
-    "dep:polars",
-    "dep:polars-sql",
-]
-duckdb = [
-    "dep:duckdb",
-]
-excel = [
-    "dep:polars",
-    "dep:polars-sql",
-    "dep:calamine",
-]
+arrow = ["dep:rsql_driver_arrow"]
+avro = ["dep:rsql_driver_avro"]
+cockroachdb = ["dep:rsql_driver_cockroachdb"]
+csv = ["dep:rsql_driver_csv"]
+delimited = ["dep:rsql_driver_delimited"]
+duckdb = ["dep:rsql_driver_duckdb"]
+excel = ["dep:rsql_driver_excel"]
 file = [
+    "dep:async-trait",
 ]
-json = [
-    "dep:polars",
-    "dep:polars-sql",
+http = [
+    "https",
+    "dep:async-trait",
 ]
-jsonl = [
-    "dep:polars",
-    "dep:polars-sql",
-]
-libsql = [
-    "dep:libsql"
-]
-mariadb = [
-    "mysql",
-]
-mysql = [
-    "dep:sqlx",
-    "sqlx/mysql",
-]
-ods = [
-    "excel",
-]
-parquet = [
-    "dep:polars",
-    "dep:polars-sql",
-]
-postgres = [
-    "dep:postgresql_embedded",
-    "dep:tokio-postgres",
-]
-postgresql = [
-    "dep:bit-vec",
-    "dep:postgresql_embedded",
-    "dep:sqlx",
-    "sqlx/postgres",
-]
-redshift = [
-    "postgresql",
-]
-rusqlite = [
-    "dep:rusqlite",
-]
-snowflake = [
-    "dep:jwt-simple",
-    "dep:reqwest",
-    "dep:sha2",
-]
-sqlite = [
-    "dep:form_urlencoded",
-    "dep:sqlx",
-    "sqlx/sqlite",
-]
-sqlserver = [
+https = [
+    "file",
     "dep:futures-util",
-    "dep:tiberius",
-    "dep:tokio-util",
+    "dep:reqwest",
+    "dep:tempfile",
+    "dep:tokio",
 ]
-tsv = [
-    "dep:polars",
-    "dep:polars-sql",
+json = ["dep:rsql_driver_json"]
+jsonl = ["dep:rsql_driver_jsonl"]
+libsql = ["dep:rsql_driver_libsql"]
+mariadb = ["dep:rsql_driver_mariadb"]
+mysql = ["dep:rsql_driver_mysql"]
+native-tls = [
+    "reqwest/native-tls",
+    "rsql_driver_cockroachdb/native-tls",
+    "rsql_driver_mariadb/native-tls",
+    "rsql_driver_mysql/native-tls",
+    "rsql_driver_postgres/native-tls",
+    "rsql_driver_postgresql/native-tls",
+    "rsql_driver_redshift/native-tls",
+    "rsql_driver_sqlite/native-tls",
 ]
-xml = [
-    "dep:polars",
-    "dep:polars-sql",
-    "dep:quick-xml",
+ods = ["dep:rsql_driver_ods"]
+parquet = ["dep:rsql_driver_parquet"]
+postgres = ["dep:rsql_driver_postgres"]
+postgresql = ["dep:rsql_driver_postgresql"]
+redshift = ["dep:rsql_driver_redshift"]
+rusqlite = ["dep:rsql_driver_rusqlite"]
+rustls = [
+    "reqwest/rustls-tls-native-roots",
+    "rsql_driver_cockroachdb/rustls",
+    "rsql_driver_mariadb/rustls",
+    "rsql_driver_mysql/rustls",
+    "rsql_driver_postgres/rustls",
+    "rsql_driver_postgresql/rustls",
+    "rsql_driver_redshift/rustls",
+    "rsql_driver_sqlite/rustls",
 ]
-yaml = [
-    "dep:polars",
-    "dep:polars-sql",
-    "dep:serde_yaml",
-]
+snowflake = ["dep:rsql_driver_snowflake"]
+sqlite = ["dep:rsql_driver_sqlite"]
+sqlserver = ["dep:rsql_driver_sqlserver"]
+tsv = ["dep:rsql_driver_tsv"]
+xml = ["dep:rsql_driver_xml"]
+yaml = ["dep:rsql_driver_yaml"]
 
 [lints.clippy]
 unwrap_used = "deny"

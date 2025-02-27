@@ -95,6 +95,10 @@ mod tests {
             "excel",
             #[cfg(feature = "driver-file")]
             "file",
+            #[cfg(feature = "driver-http")]
+            "http",
+            #[cfg(feature = "driver-https")]
+            "https",
             #[cfg(feature = "driver-json")]
             "json",
             #[cfg(feature = "driver-jsonl")]

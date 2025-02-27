@@ -1,0 +1,24 @@
+[package]
+authors.workspace = true
+categories.workspace = true
+description = "rsql jsonl driver"
+edition.workspace = true
+keywords.workspace = true
+license.workspace = true
+name = "rsql_driver_jsonl"
+repository.workspace = true
+rust-version.workspace = true
+version.workspace = true
+
+[dependencies]
+async-trait = { workspace = true }
+file_type = { workspace = true }
+polars = { workspace = true, features = ["json", "lazy"] }
+polars-sql = { workspace = true }
+rsql_driver = { path = "../../rsql_driver", version = "0.17.0" }
+rsql_driver_polars = { path = "../../drivers/polars", version = "0.17.0" }
+url = { workspace = true }
+
+[dev-dependencies]
+rsql_driver_test_utils = { path = "../../drivers/test_utils", version = "0.17.0" }
+tokio = { workspace = true, features = ["macros", "rt"] }

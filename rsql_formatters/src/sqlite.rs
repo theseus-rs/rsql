@@ -1,8 +1,8 @@
+use crate::Results;
 use crate::delimited::format;
 use crate::error::Result;
 use crate::formatter::FormatterOptions;
 use crate::writers::Output;
-use crate::Results;
 use async_trait::async_trait;
 use csv::QuoteStyle;
 
@@ -29,10 +29,10 @@ impl crate::Formatter for Formatter {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::formatter::FormatterOptions;
-    use crate::writers::Output;
     use crate::Formatter;
     use crate::Results::Query;
+    use crate::formatter::FormatterOptions;
+    use crate::writers::Output;
     use indoc::indoc;
     use rsql_drivers::{MemoryQueryResult, Value};
     use std::time::Duration;

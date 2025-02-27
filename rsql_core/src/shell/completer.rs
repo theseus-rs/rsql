@@ -1,6 +1,6 @@
 use rsql_drivers::{Metadata, Table};
-use rustyline::completion::{Candidate, Completer, Pair};
 use rustyline::Context;
+use rustyline::completion::{Candidate, Completer, Pair};
 use sqlparser::keywords::Keyword;
 use sqlparser::tokenizer::{Token, TokenWithLocation, Tokenizer};
 use std::matches;

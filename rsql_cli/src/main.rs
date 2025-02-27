@@ -11,7 +11,7 @@ use crate::update::check_for_newer_version;
 use anyhow::Result;
 use clap::{Parser, ValueEnum};
 use colored::Colorize;
-use rsql_core::commands::{help, quit, ShellCommand};
+use rsql_core::commands::{ShellCommand, help, quit};
 use rsql_core::configuration::{Configuration, ConfigurationBuilder};
 use rsql_core::shell::{ShellArgs, ShellBuilder};
 use rsql_core::writers::{Output, StdoutWriter};
@@ -59,14 +59,37 @@ async fn main() -> Result<()> {
 
     let program_name = "rsql";
     let version = env!("CARGO_PKG_VERSION");
-    let configuration = ConfigurationBuilder::new(program_name, version)
+    let mut configuration_builder = ConfigurationBuilder::new(program_name, version)
         .with_config()
         .with_color(match args.color {
             Color::Auto => supports_color::on(Stream::Stdout).is_some(),
             Color::Always => true,
             Color::Never => false,
-        })
-        .build();
+        });
+
+    if let Some(format) = &args.shell_args.format {
+        configuration_builder = configuration_builder.with_results_format(format);
+    }
+    if let Some(header) = &args.shell_args.header {
+        configuration_builder = configuration_builder.with_results_header(*header);
+    }
+    if let Some(footer) = &args.shell_args.footer {
+        configuration_builder = configuration_builder.with_results_footer(*footer);
+    }
+    if let Some(timer) = &args.shell_args.timer {
+        configuration_builder = configuration_builder.with_results_timer(*timer);
+    }
+    if let Some(rows) = &args.shell_args.rows {
+        configuration_builder = configuration_builder.with_results_rows(*rows);
+    }
+    if let Some(changes) = &args.shell_args.changes {
+        configuration_builder = configuration_builder.with_results_changes(*changes);
+    }
+    if let Some(limit) = &args.shell_args.limit {
+        configuration_builder = configuration_builder.with_results_limit(*limit);
+    }
+
+    let configuration = configuration_builder.build();
     let output = Output::new(Box::<StdoutWriter>::default());
 
     let exit_code = execute(args, configuration, output).await?;

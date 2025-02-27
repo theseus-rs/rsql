@@ -8,7 +8,7 @@
 
 ### Description
 
-The describe command provides information about the specified database table.
+The describe command provides information about the specified data table.
 
 ### Examples
 

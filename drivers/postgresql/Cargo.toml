@@ -1,0 +1,41 @@
+[package]
+authors.workspace = true
+categories.workspace = true
+description = "rsql postgresql driver"
+edition.workspace = true
+keywords.workspace = true
+license.workspace = true
+name = "rsql_driver_postgresql"
+repository.workspace = true
+rust-version.workspace = true
+version.workspace = true
+
+[dependencies]
+async-trait = { workspace = true }
+bit-vec = { workspace = true }
+chrono = { workspace = true }
+file_type = { workspace = true }
+indoc = { workspace = true }
+postgresql_embedded = { workspace = true }
+rsql_driver = { path = "../../rsql_driver", version = "0.17.0", features = ["json"] }
+rust_decimal = { workspace = true }
+serde_json = { workspace = true, features = ["preserve_order"] }
+sqlparser = { workspace = true }
+sqlx = { workspace = true, features = ["bit-vec", "chrono", "json", "macros", "postgres", "runtime-tokio", "rust_decimal", "time", "uuid"] }
+tracing = { workspace = true }
+url = { workspace = true }
+uuid = { workspace = true, features = ["serde", "v4"] }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["macros", "rt"] }
+
+[features]
+default = ["native-tls"]
+native-tls = [
+    "postgresql_embedded/native-tls",
+    "sqlx/tls-native-tls",
+]
+rustls = [
+    "postgresql_embedded/rustls",
+    "sqlx/tls-rustls",
+]

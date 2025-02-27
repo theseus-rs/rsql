@@ -1,23 +1,12 @@
-use crate::connection::CachedMetadataConnection;
-use crate::error::Result;
-use crate::Connection;
 use crate::Error::DriverNotFound;
-use async_trait::async_trait;
+use crate::error::Result;
 use file_type::FileType;
-use mockall::automock;
-use mockall::predicate::str;
+use rsql_driver::Error::InvalidUrl;
+use rsql_driver::{CachedMetadataConnection, Connection, Driver};
 use std::collections::BTreeMap;
 use std::fmt::Debug;
 use tracing::instrument;
 use url::Url;
-
-#[automock]
-#[async_trait]
-pub trait Driver: Debug + Send + Sync {
-    fn identifier(&self) -> &'static str;
-    async fn connect(&self, url: String, password: Option<String>) -> Result<Box<dyn Connection>>;
-    fn supports_file_type(&self, file_type: &FileType) -> bool;
-}
 
 /// Manages available drivers
 #[derive(Debug)]
@@ -63,14 +52,13 @@ impl DriverManager {
     /// Connect to a database
     #[instrument(name = "connect", level = "info", skip(url))]
     pub async fn connect(&self, url: &str) -> Result<Box<dyn Connection>> {
-        let parsed_url = Url::parse(url)?;
+        let parsed_url = Url::parse(url).map_err(|error| InvalidUrl(error.to_string()))?;
         let scheme = parsed_url.scheme();
-        let password = parsed_url.password().map(ToString::to_string);
         let url = url.to_string();
 
         match &self.get(scheme) {
             Some(driver) => {
-                let connection = driver.connect(url, password).await?;
+                let connection = driver.connect(&url).await?;
                 let connection = Box::new(CachedMetadataConnection::new(connection));
                 Ok(connection)
             }
@@ -84,59 +72,60 @@ impl Default for DriverManager {
     fn default() -> Self {
         let mut drivers = DriverManager::new();
 
-        #[cfg(any(feature = "mysql", feature = "postgresql", feature = "sqlite"))]
-        sqlx::any::install_default_drivers();
-
         #[cfg(feature = "arrow")]
-        drivers.add(Box::new(crate::arrow::Driver));
+        drivers.add(Box::new(rsql_driver_arrow::Driver));
         #[cfg(feature = "avro")]
-        drivers.add(Box::new(crate::avro::Driver));
+        drivers.add(Box::new(rsql_driver_avro::Driver));
         #[cfg(feature = "cockroachdb")]
-        drivers.add(Box::new(crate::cockroachdb::Driver));
+        drivers.add(Box::new(rsql_driver_cockroachdb::Driver));
         #[cfg(feature = "csv")]
-        drivers.add(Box::new(crate::csv::Driver));
+        drivers.add(Box::new(rsql_driver_csv::Driver));
         #[cfg(feature = "delimited")]
-        drivers.add(Box::new(crate::delimited::Driver));
+        drivers.add(Box::new(rsql_driver_delimited::Driver));
         #[cfg(feature = "duckdb")]
-        drivers.add(Box::new(crate::duckdb::Driver));
+        drivers.add(Box::new(rsql_driver_duckdb::Driver));
         #[cfg(feature = "excel")]
-        drivers.add(Box::new(crate::excel::Driver));
+        drivers.add(Box::new(rsql_driver_excel::Driver));
         #[cfg(feature = "file")]
         drivers.add(Box::new(crate::file::Driver));
+        #[cfg(feature = "http")]
+        drivers.add(Box::new(crate::http::Driver));
+        #[cfg(feature = "https")]
+        drivers.add(Box::new(crate::https::Driver));
         #[cfg(feature = "json")]
-        drivers.add(Box::new(crate::json::Driver));
+        drivers.add(Box::new(rsql_driver_json::Driver));
         #[cfg(feature = "jsonl")]
-        drivers.add(Box::new(crate::jsonl::Driver));
+        drivers.add(Box::new(rsql_driver_jsonl::Driver));
         #[cfg(feature = "libsql")]
-        drivers.add(Box::new(crate::libsql::Driver));
+        drivers.add(Box::new(rsql_driver_libsql::Driver));
         #[cfg(feature = "mariadb")]
-        drivers.add(Box::new(crate::mariadb::Driver));
+        drivers.add(Box::new(rsql_driver_mariadb::Driver));
         #[cfg(feature = "mysql")]
-        drivers.add(Box::new(crate::mysql::Driver));
+        drivers.add(Box::new(rsql_driver_mysql::Driver));
         #[cfg(feature = "ods")]
-        drivers.add(Box::new(crate::ods::Driver));
+        drivers.add(Box::new(rsql_driver_ods::Driver));
         #[cfg(feature = "parquet")]
-        drivers.add(Box::new(crate::parquet::Driver));
+        drivers.add(Box::new(rsql_driver_parquet::Driver));
         #[cfg(feature = "postgres")]
-        drivers.add(Box::new(crate::postgres::Driver));
+        drivers.add(Box::new(rsql_driver_postgres::Driver));
         #[cfg(feature = "postgresql")]
-        drivers.add(Box::new(crate::postgresql::Driver));
+        drivers.add(Box::new(rsql_driver_postgresql::Driver));
         #[cfg(feature = "redshift")]
-        drivers.add(Box::new(crate::redshift::Driver));
+        drivers.add(Box::new(rsql_driver_redshift::Driver));
         #[cfg(feature = "rusqlite")]
-        drivers.add(Box::new(crate::rusqlite::Driver));
+        drivers.add(Box::new(rsql_driver_rusqlite::Driver));
         #[cfg(feature = "snowflake")]
-        drivers.add(Box::new(crate::snowflake::Driver));
+        drivers.add(Box::new(rsql_driver_snowflake::Driver));
         #[cfg(feature = "sqlite")]
-        drivers.add(Box::new(crate::sqlite::Driver));
+        drivers.add(Box::new(rsql_driver_sqlite::Driver));
         #[cfg(feature = "sqlserver")]
-        drivers.add(Box::new(crate::sqlserver::Driver));
+        drivers.add(Box::new(rsql_driver_sqlserver::Driver));
         #[cfg(feature = "tsv")]
-        drivers.add(Box::new(crate::tsv::Driver));
+        drivers.add(Box::new(rsql_driver_tsv::Driver));
         #[cfg(feature = "xml")]
-        drivers.add(Box::new(crate::xml::Driver));
+        drivers.add(Box::new(rsql_driver_xml::Driver));
         #[cfg(feature = "yaml")]
-        drivers.add(Box::new(crate::yaml::Driver));
+        drivers.add(Box::new(rsql_driver_yaml::Driver));
 
         drivers
     }
@@ -145,7 +134,8 @@ impl Default for DriverManager {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::MockConnection;
+    use rsql_driver::MockConnection;
+    use rsql_driver::MockDriver;
 
     #[test]
     fn test_driver_manager() {
@@ -191,6 +181,10 @@ mod tests {
         let driver_count = driver_count + 1;
         #[cfg(feature = "file")]
         let driver_count = driver_count + 1;
+        #[cfg(feature = "http")]
+        let driver_count = driver_count + 1;
+        #[cfg(feature = "https")]
+        let driver_count = driver_count + 1;
         #[cfg(feature = "json")]
         let driver_count = driver_count + 1;
         #[cfg(feature = "jsonl")]
@@ -230,14 +224,14 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_driver_manager_connect_with_colon() -> anyhow::Result<()> {
+    async fn test_driver_manager_connect_with_colon() -> Result<()> {
         let identifier = "test";
         let mut mock_driver = MockDriver::new();
         mock_driver.expect_identifier().returning(|| identifier);
         mock_driver.expect_supports_file_type().returning(|_| false);
         mock_driver
             .expect_connect()
-            .returning(|_, _| Ok(Box::new(MockConnection::new())));
+            .returning(|_| Ok(Box::new(MockConnection::new())));
 
         let mut driver_manager = DriverManager::new();
         driver_manager.add(Box::new(mock_driver));

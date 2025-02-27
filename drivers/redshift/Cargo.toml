@@ -1,0 +1,30 @@
+[package]
+authors.workspace = true
+categories.workspace = true
+description = "rsql redshift driver"
+edition.workspace = true
+keywords.workspace = true
+license.workspace = true
+name = "rsql_driver_redshift"
+repository.workspace = true
+rust-version.workspace = true
+version.workspace = true
+
+[dependencies]
+async-trait = { workspace = true }
+file_type = { workspace = true }
+rsql_driver = { path = "../../rsql_driver", version = "0.17.0" }
+rsql_driver_postgresql = { path = "../../drivers/postgresql", version = "0.17.0" }
+sqlparser = { workspace = true }
+url = { workspace = true }
+
+[dev-dependencies]
+anyhow = { workspace = true }
+testcontainers = { workspace = true }
+testcontainers-modules = { workspace = true, features = ["postgres"] }
+tokio = { workspace = true, features = ["macros", "rt"] }
+
+[features]
+default = ["native-tls"]
+native-tls = ["rsql_driver_postgresql/native-tls"]
+rustls = ["rsql_driver_postgresql/rustls"]

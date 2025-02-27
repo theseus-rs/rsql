@@ -24,8 +24,9 @@ indicatif = { workspace = true }
 indoc = { workspace = true }
 num-format = { workspace = true }
 regex = { workspace = true }
-rsql_drivers = { path = "../rsql_drivers", version = "0.15.3" }
-rsql_formatters = { path = "../rsql_formatters", version = "0.15.3" }
+rsql_driver = { path = "../rsql_driver", version = "0.17.0" }
+rsql_drivers = { path = "../rsql_drivers", version = "0.17.0" }
+rsql_formatters = { path = "../rsql_formatters", version = "0.17.0" }
 rust-i18n = { workspace = true }
 rustyline = { workspace = true }
 sqlparser = { workspace = true }
@@ -56,7 +57,7 @@ tokio = { workspace = true }
 
 [features]
 all = ["all-drivers", "all-formats"]
-default = []
+default = ["native-tls"]
 all-drivers = [
     "driver-arrow",
     "driver-avro",
@@ -66,6 +67,8 @@ all-drivers = [
     "driver-duckdb",
     "driver-excel",
     "driver-file",
+    "driver-http",
+    "driver-https",
     "driver-json",
     "driver-jsonl",
     "driver-mariadb",
@@ -91,6 +94,8 @@ driver-delimited = ["rsql_drivers/delimited"]
 driver-duckdb = ["rsql_drivers/duckdb"]
 driver-excel = ["rsql_drivers/excel"]
 driver-file = ["rsql_drivers/file"]
+driver-http = ["rsql_drivers/http"]
+driver-https = ["rsql_drivers/https"]
 driver-json = ["rsql_drivers/json"]
 driver-jsonl = ["rsql_drivers/jsonl"]
 driver-libsql = ["rsql_drivers/libsql"]
@@ -138,6 +143,8 @@ format-tsv = ["rsql_formatters/tsv"]
 format-unicode = ["rsql_formatters/unicode"]
 format-xml = ["rsql_formatters/xml"]
 format-yaml = ["rsql_formatters/yaml"]
+native-tls = ["rsql_drivers/native-tls"]
+rustls = ["rsql_drivers/rustls"]
 
 [lints.clippy]
 unwrap_used = "deny"

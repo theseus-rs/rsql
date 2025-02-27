@@ -1,6 +1,6 @@
 use crate::configuration::Configuration;
-use crate::shell::completer::ReplCompleter;
 use crate::shell::Result;
+use crate::shell::completer::ReplCompleter;
 use rsql_drivers::{Connection, Metadata};
 use rsql_formatters::Highlighter;
 use rustyline::completion::Completer;

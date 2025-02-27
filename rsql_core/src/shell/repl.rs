@@ -1,14 +1,14 @@
-use crate::commands::{help, CommandManager, LoopCondition, ShellCommand};
+use crate::commands::{CommandManager, LoopCondition, ShellCommand, help};
 use crate::configuration::Configuration;
 use crate::executors;
 use crate::executors::Executor;
-use crate::shell::helper::ReplHelper;
 use crate::shell::Result;
 use crate::shell::ShellArgs;
+use crate::shell::helper::ReplHelper;
 use colored::Colorize;
 use rsql_drivers::{Connection, DriverManager};
-use rsql_formatters::writers::Output;
 use rsql_formatters::FormatterManager;
+use rsql_formatters::writers::Output;
 use rustyline::config::Configurer;
 use rustyline::error::ReadlineError;
 use rustyline::history::{DefaultHistory, FileHistory};
@@ -351,7 +351,7 @@ mod test {
             .expect_identifier()
             .returning(|| driver_identifier);
         mock_driver.expect_supports_file_type().returning(|_| false);
-        mock_driver.expect_connect().returning(|_, _| {
+        mock_driver.expect_connect().returning(|_| {
             let mut mock_connection = MockConnection::new();
             mock_connection.expect_close().returning(|| Ok(()));
             Ok(Box::new(mock_connection))

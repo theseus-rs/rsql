@@ -7,7 +7,7 @@ pub enum Error {
     CommandError(#[from] crate::commands::Error),
     /// Driver error
     #[error(transparent)]
-    DriverError(#[from] rsql_drivers::Error),
+    DriverError(#[from] rsql_driver::Error),
     /// Format error
     #[error(transparent)]
     FormatError(#[from] rsql_formatters::Error),

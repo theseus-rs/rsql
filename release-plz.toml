@@ -1,4 +1,5 @@
 [workspace]
+changelog_path = "./CHANGELOG.md"
 git_release_enable = false
 git_tag_enable = false
 pr_name = "rsql-v{{ version }}"
@@ -9,6 +10,33 @@ name = "rsql_cli"
 changelog_update = true
 changelog_include = [
     "rsql_core",
+    "rsql_driver",
+    "rsql_driver_arrow",
+    "rsql_driver_avro",
+    "rsql_driver_cockroachdb",
+    "rsql_driver_csv",
+    "rsql_driver_delimited",
+    "rsql_driver_duckdb",
+    "rsql_driver_excel",
+    "rsql_driver_json",
+    "rsql_driver_jsonl",
+    "rsql_driver_libsql",
+    "rsql_driver_mariadb",
+    "rsql_driver_mysql",
+    "rsql_driver_ods",
+    "rsql_driver_parquet",
+    "rsql_driver_polars",
+    "rsql_driver_postgres",
+    "rsql_driver_postgresql",
+    "rsql_driver_redshift",
+    "rsql_driver_rusqlite",
+    "rsql_driver_snowflake",
+    "rsql_driver_sqlite",
+    "rsql_driver_sqlserver",
+    "rsql_driver_test_utils",
+    "rsql_driver_tsv",
+    "rsql_driver_xml",
+    "rsql_driver_yaml",
     "rsql_drivers",
     "rsql_formatters",
 ]

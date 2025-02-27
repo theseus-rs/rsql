@@ -9,7 +9,7 @@
 ### Description
 
 The sleep command pauses the CLI for the specified number of seconds. This command is can be used in scripts
-to simulate delayed user interaction with a database.
+to simulate delayed user interaction with a data source.
 
 ### Examples
 

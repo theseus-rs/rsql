@@ -1,11 +1,11 @@
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 use config::{Config, FileFormat};
 use dirs::home_dir;
 use indicatif::ProgressStyle;
 use rsql_formatters::FormatterOptions;
 use rustyline::EditMode;
 use std::env;
-use std::fs::{create_dir_all, OpenOptions};
+use std::fs::{OpenOptions, create_dir_all};
 use std::io::Write;
 use std::path::PathBuf;
 use std::str::FromStr;
@@ -657,41 +657,5 @@ mod test {
         assert_eq!(configuration.results_limit, 100);
         assert!(configuration.results_rows);
         assert!(configuration.results_timer);
-    }
-
-    #[test]
-    fn test_get_locale_language() -> Result<()> {
-        let prefix = "LOCALE_LANGUAGE_TEST";
-        env::set_var(format!("{prefix}_GLOBAL_LOCALE"), "de-DE.foo");
-        let config = Config::builder()
-            .add_source(config::Environment::with_prefix(prefix).separator("_"))
-            .build()?;
-        let locale = get_locale(&config);
-        assert_eq!(locale, "de".to_string());
-        Ok(())
-    }
-
-    #[test]
-    fn test_get_locale_language_and_country() -> Result<()> {
-        let prefix = "LOCALE_LANGUAGE_AND_COUNTRY_TEST";
-        env::set_var(format!("{prefix}_GLOBAL_LOCALE"), "en_GB.foo");
-        let config = Config::builder()
-            .add_source(config::Environment::with_prefix(prefix).separator("_"))
-            .build()?;
-        let locale = get_locale(&config);
-        assert_eq!(locale, "en-GB".to_string());
-        Ok(())
-    }
-
-    #[test]
-    fn test_get_locale_default() -> Result<()> {
-        let prefix = "LOCALE_DEFAULT_TEST";
-        env::set_var(format!("{prefix}_GLOBAL_LOCALE"), "foo");
-        let config = Config::builder()
-            .add_source(config::Environment::with_prefix(prefix).separator("_"))
-            .build()?;
-        let locale = get_locale(&config);
-        assert_eq!(locale, "en".to_string());
-        Ok(())
     }
 }

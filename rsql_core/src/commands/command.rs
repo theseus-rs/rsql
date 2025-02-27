@@ -1,10 +1,10 @@
-use crate::commands::error::Result;
 use crate::commands::Error::InvalidOption;
+use crate::commands::error::Result;
 use crate::configuration::Configuration;
 use async_trait::async_trait;
 use rsql_drivers::{Connection, DriverManager};
-use rsql_formatters::writers::Output;
 use rsql_formatters::FormatterManager;
+use rsql_formatters::writers::Output;
 use rustyline::history::DefaultHistory;
 use std::fmt::Debug;
 

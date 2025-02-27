@@ -1,0 +1,28 @@
+[package]
+authors.workspace = true
+categories.workspace = true
+description = "rsql mariadb driver"
+edition.workspace = true
+keywords.workspace = true
+license.workspace = true
+name = "rsql_driver_mariadb"
+repository.workspace = true
+rust-version.workspace = true
+version.workspace = true
+
+[dependencies]
+async-trait = { workspace = true }
+file_type = { workspace = true }
+rsql_driver = { path = "../../rsql_driver", version = "0.17.0" }
+rsql_driver_mysql = { path = "../../drivers/mysql", version = "0.17.0" }
+testcontainers = { workspace = true }
+testcontainers-modules = { workspace = true, features = ["mariadb"] }
+
+[dev-dependencies]
+anyhow = { workspace = true }
+tokio = { workspace = true, features = ["macros", "rt"] }
+
+[features]
+default = ["native-tls"]
+native-tls = ["rsql_driver_mysql/native-tls"]
+rustls = ["rsql_driver_mysql/rustls"]

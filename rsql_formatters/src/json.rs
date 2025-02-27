@@ -1,8 +1,8 @@
+use crate::Results::{Execute, Query};
 use crate::error::Result;
 use crate::footer::write_footer;
 use crate::formatter::FormatterOptions;
 use crate::writers::Output;
-use crate::Results::{Execute, Query};
 use crate::{Highlighter, Results};
 use async_trait::async_trait;
 use indexmap::IndexMap;
@@ -82,10 +82,10 @@ pub(crate) async fn format_json(
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::formatter::FormatterOptions;
-    use crate::writers::Output;
     use crate::Formatter;
     use crate::Results::{Execute, Query};
+    use crate::formatter::FormatterOptions;
+    use crate::writers::Output;
     use indoc::indoc;
     use rsql_drivers::{MemoryQueryResult, Value};
     use std::time::Duration;

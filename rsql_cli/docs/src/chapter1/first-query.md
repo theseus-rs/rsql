@@ -1,6 +1,6 @@
 ## First Query
 
-The following examples show how to run a simple query using the `rsql` CLI tool for different database engines.
+The following examples show how to run a simple query using the `rsql` CLI tool for different data sources.
 
 ### CockroachDB
 
