@@ -19,6 +19,7 @@ file_type = { workspace = true }
 indexmap = { workspace = true, features = ["serde"] }
 mockall = { workspace = true }
 num-format = { workspace = true }
+rust_decimal = { workspace = true, features = ["serde-with-str"] }
 rust-i18n = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true, optional = true, features = ["preserve_order"] }

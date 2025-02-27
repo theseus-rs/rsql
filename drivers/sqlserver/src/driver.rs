@@ -222,7 +222,7 @@ fn convert_to_value(row: &Row, column: &Column, index: usize) -> Result<Value> {
     } else if let Ok(value) = row.try_get(column_name) {
         let value: Option<rust_decimal::Decimal> = value;
         match value {
-            Some(v) => Ok(Value::String(v.to_string())),
+            Some(v) => Ok(Value::Decimal(v)),
             None => Ok(Value::Null),
         }
     } else if let Ok(value) = row.try_get(column_name) {

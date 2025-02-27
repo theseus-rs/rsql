@@ -6494,6 +6494,7 @@ dependencies = [
  "num-format",
  "rsql_driver_test_utils",
  "rust-i18n",
+ "rust_decimal",
  "serde",
  "serde_json",
  "sqlparser 0.52.0",

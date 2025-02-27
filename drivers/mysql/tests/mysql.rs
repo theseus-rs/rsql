@@ -7,6 +7,8 @@ use rsql_driver::{Connection, Driver, Value};
 #[cfg(target_os = "linux")]
 use serde_json::json;
 #[cfg(target_os = "linux")]
+use std::str::FromStr;
+#[cfg(target_os = "linux")]
 use testcontainers::runners::AsyncRunner;
 
 #[cfg(target_os = "linux")]
@@ -123,7 +125,7 @@ async fn test_data_types(connection: &mut dyn Connection) -> anyhow::Result<()> 
             Value::I32(8_388_607),
             Value::I32(2_147_483_647),
             Value::I64(9_223_372_036_854_775_807),
-            Value::String("123.45".to_string()),
+            Value::Decimal(rust_decimal::Decimal::from_str("123.45").expect("invalid decimal")),
             Value::F32(123.0),
             Value::F32(123.0),
             Value::Date(NaiveDate::from_ymd_opt(2022, 1, 1).expect("invalid date")),
