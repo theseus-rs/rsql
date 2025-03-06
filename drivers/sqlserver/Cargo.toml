@@ -16,7 +16,7 @@ chrono = { workspace = true }
 file_type = { workspace = true }
 futures-util = { workspace = true }
 indoc = { workspace = true }
-rsql_driver = { path = "../../rsql_driver", version = "0.17.0" }
+rsql_driver = { path = "../../rsql_driver", version = "0.17.1" }
 rust_decimal = { workspace = true }
 sqlparser = { workspace = true }
 tokio = { workspace = true, features = ["net"] }
