@@ -7,8 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-##
-`rsql_drivers` - [0.17.1](https://github.com/theseus-rs/rsql/compare/rsql_drivers-v0.17.0...rsql_drivers-v0.17.1) - 2025-03-06
+## `rsql_drivers` - [0.17.1](https://github.com/theseus-rs/rsql/compare/rsql_drivers-v0.17.0...rsql_drivers-v0.17.1) - 2025-03-06
 
 ### Added
 
