@@ -1,4 +1,5 @@
 [workspace]
+changelog_path = "./CHANGELOG.md"
 git_release_enable = false
 git_tag_enable = false
 pr_name = "rsql-v{{ version }}"
@@ -6,7 +7,6 @@ release_always = false
 
 [[package]]
 name = "rsql_cli"
-changelog_path = "../CHANGELOG.md"
 changelog_update = true
 changelog_include = [
     "rsql_core",
