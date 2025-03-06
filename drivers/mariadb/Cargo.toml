@@ -15,11 +15,11 @@ async-trait = { workspace = true }
 file_type = { workspace = true }
 rsql_driver = { path = "../../rsql_driver", version = "0.17.1" }
 rsql_driver_mysql = { path = "../../drivers/mysql", version = "0.17.1" }
-testcontainers = { workspace = true }
-testcontainers-modules = { workspace = true, features = ["mariadb"] }
 
 [dev-dependencies]
 anyhow = { workspace = true }
+testcontainers = { workspace = true }
+testcontainers-modules = { workspace = true, features = ["mariadb"] }
 tokio = { workspace = true, features = ["macros", "rt"] }
 
 [features]
