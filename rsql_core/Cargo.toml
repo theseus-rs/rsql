@@ -67,6 +67,7 @@ all-drivers = [
     "driver-duckdb",
     "driver-excel",
     "driver-file",
+    "driver-fwf",
     "driver-http",
     "driver-https",
     "driver-json",
@@ -95,6 +96,7 @@ driver-delimited = ["rsql_drivers/delimited"]
 driver-duckdb = ["rsql_drivers/duckdb"]
 driver-excel = ["rsql_drivers/excel"]
 driver-file = ["rsql_drivers/file"]
+driver-fwf = ["rsql_drivers/fwf"]
 driver-http = ["rsql_drivers/http"]
 driver-https = ["rsql_drivers/https"]
 driver-json = ["rsql_drivers/json"]

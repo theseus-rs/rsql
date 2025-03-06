@@ -88,6 +88,8 @@ impl Default for DriverManager {
         drivers.add(Box::new(rsql_driver_excel::Driver));
         #[cfg(feature = "file")]
         drivers.add(Box::new(crate::file::Driver));
+        #[cfg(feature = "fwf")]
+        drivers.add(Box::new(rsql_driver_fwf::Driver));
         #[cfg(feature = "http")]
         drivers.add(Box::new(crate::http::Driver));
         #[cfg(feature = "https")]
@@ -182,6 +184,8 @@ mod tests {
         #[cfg(feature = "excel")]
         let driver_count = driver_count + 1;
         #[cfg(feature = "file")]
+        let driver_count = driver_count + 1;
+        #[cfg(feature = "fwf")]
         let driver_count = driver_count + 1;
         #[cfg(feature = "http")]
         let driver_count = driver_count + 1;
