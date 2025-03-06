@@ -37,18 +37,18 @@ visit the [rsql](https://theseus-rs.github.io/rsql/rsql_cli/) site.
 
 ## Features
 
-| Feature               |                                                                                                                                                                                          |
-|-----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Data Sources          | Arrow, Avro, CockroachDB, CSV, Delimited, DuckDB, Excel, JSON, JSONL, LibSQL (Turso), MariaDB, MySQL, ODS, Parquet, PostgreSQL, Redshift, Snowflake, SQLite3, SQL Server, TSV, XML, YAML |
-| Syntax Highlighting   | ✅                                                                                                                                                                                        |
-| Result Highlighting   | ✅                                                                                                                                                                                        |
-| Query Auto-completion | ✅                                                                                                                                                                                        |
-| History               | ✅                                                                                                                                                                                        |
-| SQL File Execution    | ✅                                                                                                                                                                                        |
-| Embedded PostgreSQL   | ✅                                                                                                                                                                                        |
-| Output Formats        | ascii, csv, expanded, html, json, jsonl, markdown, plain, psql, sqlite, tsv, unicode, xml, yaml                                                                                          |
-| Localized Interface   | 40+ languages¹                                                                                                                                                                           |
-| Key Bindings          | emacs, vi                                                                                                                                                                                |
+| Feature               |                                                                                                                                                                                               |
+|-----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Data Sources          | Arrow, Avro, CockroachDB, CSV, Delimited, DuckDB, Excel, FWF, JSON, JSONL, LibSQL (Turso), MariaDB, MySQL, ODS, Parquet, PostgreSQL, Redshift, Snowflake, SQLite3, SQL Server, TSV, XML, YAML |
+| Syntax Highlighting   | ✅                                                                                                                                                                                             |
+| Result Highlighting   | ✅                                                                                                                                                                                             |
+| Query Auto-completion | ✅                                                                                                                                                                                             |
+| History               | ✅                                                                                                                                                                                             |
+| SQL File Execution    | ✅                                                                                                                                                                                             |
+| Embedded PostgreSQL   | ✅                                                                                                                                                                                             |
+| Output Formats        | ascii, csv, expanded, html, json, jsonl, markdown, plain, psql, sqlite, tsv, unicode, xml, yaml                                                                                               |
+| Localized Interface   | 40+ languages¹                                                                                                                                                                                |
+| Key Bindings          | emacs, vi                                                                                                                                                                                     |
 
 ¹ Computer translations; human translations welcome
 
@@ -76,6 +76,7 @@ rsql --url "<url>" -- "<query>"
 | duckdb             | `duckdb://[<file>]`                                                                                                       |
 | excel              | `excel://<file>[?has_header=<true\|false>][&skip_rows=<n>]`                                                               |
 | file¹              | `file://<file>`                                                                                                           |
+| fwf                | `fwf://<file>?widths=<widths>[&headers=<headers>]`                                                                        |
 | http¹              | `http://<path>[?_headers=<headers>]`                                                                                      |
 | https¹             | `https://<path>[?_headers=<headers>]`                                                                                     |
 | json (polars)      | `json://<file>`                                                                                                           |

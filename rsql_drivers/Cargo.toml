@@ -26,6 +26,7 @@ rsql_driver_csv = { path = "../drivers/csv", optional = true, version = "0.17.1"
 rsql_driver_delimited = { path = "../drivers/delimited", optional = true, version = "0.17.1" }
 rsql_driver_duckdb = { path = "../drivers/duckdb", optional = true, version = "0.17.1" }
 rsql_driver_excel = { path = "../drivers/excel", optional = true, version = "0.17.1" }
+rsql_driver_fwf = { path = "../drivers/fwf", optional = true, version = "0.17.1" }
 rsql_driver_json = { path = "../drivers/json", optional = true, version = "0.17.1" }
 rsql_driver_jsonl = { path = "../drivers/jsonl", optional = true, version = "0.17.1" }
 rsql_driver_libsql = { path = "../drivers/libsql", optional = true, version = "0.17.1" }
@@ -68,6 +69,7 @@ all = [
     "delimited",
     "duckdb",
     "excel",
+    "fwf",
     "file",
     "http",
     "https",
@@ -97,6 +99,7 @@ csv = ["dep:rsql_driver_csv"]
 delimited = ["dep:rsql_driver_delimited"]
 duckdb = ["dep:rsql_driver_duckdb"]
 excel = ["dep:rsql_driver_excel"]
+fwf = ["dep:rsql_driver_fwf"]
 file = [
     "dep:async-trait",
 ]

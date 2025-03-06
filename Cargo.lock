@@ -7169,6 +7169,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "rsql_driver_fwf"
+version = "0.17.1"
+dependencies = [
+ "async-trait",
+ "file_type",
+ "polars",
+ "polars-sql",
+ "rsql_driver",
+ "rsql_driver_polars",
+ "rsql_driver_test_utils",
+ "serde_json",
+ "tokio",
+ "url",
+]
+
+[[package]]
 name = "rsql_driver_json"
 version = "0.17.1"
 dependencies = [
@@ -7489,6 +7505,7 @@ dependencies = [
  "rsql_driver_delimited",
  "rsql_driver_duckdb",
  "rsql_driver_excel",
+ "rsql_driver_fwf",
  "rsql_driver_json",
  "rsql_driver_jsonl",
  "rsql_driver_libsql",

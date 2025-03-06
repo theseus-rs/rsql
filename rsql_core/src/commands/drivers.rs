@@ -95,6 +95,8 @@ mod tests {
             "excel",
             #[cfg(feature = "driver-file")]
             "file",
+            #[cfg(feature = "driver-fwf")]
+            "fwf",
             #[cfg(feature = "driver-http")]
             "http",
             #[cfg(feature = "driver-https")]
