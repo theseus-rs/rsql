@@ -12,6 +12,9 @@ version.workspace = true
 
 [dependencies]
 async-trait = { workspace = true, optional = true }
+aws-credential-types = { workspace = true, optional = true }
+aws-config = { workspace = true, optional = true }
+aws-sdk-s3 = { workspace = true, optional = true }
 file_type = { workspace = true }
 futures-util = { workspace = true, optional = true }
 reqwest = { workspace = true, features = ["json", "gzip"], optional = true }
@@ -52,7 +55,9 @@ getrandom = { workspace = true, features = ["js"] }
 [dev-dependencies]
 indoc = { workspace = true }
 rsql_driver_test_utils = { path = "../drivers/test_utils", version = "0.17.0" }
+testcontainers-modules = { workspace = true, features = ["localstack"] }
 tokio = { workspace = true, features = ["macros", "rt"] }
+tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
 
 [features]
 all = [
@@ -76,6 +81,7 @@ all = [
     "postgresql",
     "redshift",
     "rusqlite",
+    "s3",
     "snowflake",
     "sqlite",
     "sqlserver",
@@ -135,6 +141,11 @@ rustls = [
     "rsql_driver_postgresql/rustls",
     "rsql_driver_redshift/rustls",
     "rsql_driver_sqlite/rustls",
+]
+s3 = [
+    "dep:aws-credential-types",
+    "dep:aws-config",
+    "dep:aws-sdk-s3",
 ]
 snowflake = ["dep:rsql_driver_snowflake"]
 sqlite = ["dep:rsql_driver_sqlite"]

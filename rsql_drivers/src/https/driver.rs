@@ -201,7 +201,7 @@ mod test {
     use rsql_driver::{Driver, Value};
 
     #[tokio::test]
-    async fn test_drivers() -> Result<()> {
+    async fn test_driver() -> Result<()> {
         let database_url =
             "https://raw.githubusercontent.com/theseus-rs/rsql/refs/heads/main/datasets/users.csv";
         let driver = crate::https::Driver;

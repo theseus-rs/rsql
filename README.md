@@ -89,6 +89,7 @@ rsql --url "<url>" -- "<query>"
 | postgresql (sqlx)  | `postgresql://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`                                             |
 | redshift (sqlx)    | `redshift://<user[:password>]@<host>[:<port>]/<database>`                                                                 |
 | rusqlite           | `rusqlite://[<file>]`                                                                                                     |
+| s3¹                | `s3://[<access_key_id>:<secret_access_key>@][<host>:<port>/]<bucket>/<object>[?region=<region>][&session_token=<token>]`  |
 | snowflake          | `snowflake://<user>[:<token>]@<account>.snowflakecomputing.com/[?private_key_file=pkey_file&public_key_file=pubkey_file]` |
 | sqlite (sqlx)      | `sqlite://[<file>]`                                                                                                       |
 | sqlserver          | `sqlserver://<user>[:<password>]@<host>[:<port>]/<database>`                                                              |

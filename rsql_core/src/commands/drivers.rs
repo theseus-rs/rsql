@@ -121,6 +121,8 @@ mod tests {
             "redshift",
             #[cfg(feature = "driver-rusqlite")]
             "rusqlite",
+            #[cfg(feature = "driver-s3")]
+            "s3",
             #[cfg(feature = "driver-snowflake")]
             "snowflake",
             #[cfg(feature = "driver-sqlite")]

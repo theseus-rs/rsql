@@ -114,6 +114,8 @@ impl Default for DriverManager {
         drivers.add(Box::new(rsql_driver_redshift::Driver));
         #[cfg(feature = "rusqlite")]
         drivers.add(Box::new(rsql_driver_rusqlite::Driver));
+        #[cfg(feature = "s3")]
+        drivers.add(Box::new(crate::s3::Driver));
         #[cfg(feature = "snowflake")]
         drivers.add(Box::new(rsql_driver_snowflake::Driver));
         #[cfg(feature = "sqlite")]
@@ -206,6 +208,8 @@ mod tests {
         #[cfg(feature = "redshift")]
         let driver_count = driver_count + 1;
         #[cfg(feature = "rusqlite")]
+        let driver_count = driver_count + 1;
+        #[cfg(feature = "s3")]
         let driver_count = driver_count + 1;
         #[cfg(feature = "snowflake")]
         let driver_count = driver_count + 1;

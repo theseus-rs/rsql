@@ -79,6 +79,7 @@ all-drivers = [
     "driver-postgresql",
     "driver-redshift",
     "driver-rusqlite",
+    "driver-s3",
     "driver-snowflake",
     "driver-sqlite",
     "driver-sqlserver",
@@ -107,6 +108,7 @@ driver-postgres = ["rsql_drivers/postgres"]
 driver-postgresql = ["rsql_drivers/postgresql"]
 driver-redshift = ["rsql_drivers/redshift"]
 driver-rusqlite = ["rsql_drivers/rusqlite"]
+driver-s3 = ["rsql_drivers/s3"]
 driver-snowflake = ["rsql_drivers/snowflake"]
 driver-sqlite = ["rsql_drivers/sqlite"]
 driver-sqlserver = ["rsql_drivers/sqlserver"]
