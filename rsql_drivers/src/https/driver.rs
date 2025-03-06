@@ -36,7 +36,8 @@ impl rsql_driver::Driver for Driver {
         let driver = driver_manager.get_by_file_type(file_type);
         match driver {
             Some(driver) => {
-                let url = format!("{}://{file_path}", driver.identifier());
+                let (_url, parameters) = url.split_once('?').unwrap_or((url, ""));
+                let url = format!("{}://{file_path}?{parameters}", driver.identifier());
                 let mut connection = driver.connect(url.as_str()).await?;
                 create_header_tables(&mut connection, &request_headers, &response_headers).await?;
                 Ok(connection)

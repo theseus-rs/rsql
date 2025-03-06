@@ -143,6 +143,7 @@ rustls = [
     "rsql_driver_sqlite/rustls",
 ]
 s3 = [
+    "file",
     "dep:aws-credential-types",
     "dep:aws-config",
     "dep:aws-sdk-s3",
