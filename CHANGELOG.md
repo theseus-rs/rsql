@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## `rsql_cli` - [0.17.1](https://github.com/theseus-rs/rsql/compare/v0.17.0...v0.17.1) - 2025-03-06
+
+### Added
+- add s3 driver
+- pass parameters to file driver from http, https and s3 drivers
+
 ## `rsql_cli` - [0.17.0](https://github.com/theseus-rs/rsql/compare/v0.16.0...v0.17.0) - 2025-02-27
 
 ### Added
