@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## `rsql_cli` - [0.17.2](https://github.com/theseus-rs/rsql/compare/v0.17.1...v0.17.2) - 2025-03-07
+
+### Added
+- add fixed width format (fwf) driver
+
+### Fixed
+- update l10n translations for bail command
+
+### Other
+- correct mariadb dependencies
+
+## `rsql_core` - [0.17.2](https://github.com/theseus-rs/rsql/compare/rsql_core-v0.17.1...rsql_core-v0.17.2) - 2025-03-07
+
+### Added
+- add fixed width format (fwf) driver
+
+### Fixed
+- update l10n translations for bail command
+
+## `rsql_drivers` - [0.17.2](https://github.com/theseus-rs/rsql/compare/rsql_drivers-v0.17.1...rsql_drivers-v0.17.2) - 2025-03-07
+
+### Added
+- add fixed width format (fwf) driver
+
+## `rsql_driver_mariadb` - [0.17.2](https://github.com/theseus-rs/rsql/compare/rsql_driver_mariadb-v0.17.1...rsql_driver_mariadb-v0.17.2) - 2025-03-07
+
+### Other
+- correct mariadb dependencies
+
+## `rsql_driver_fwf` - [0.17.2](https://github.com/theseus-rs/rsql/compare/rsql_driver_fwf-v0.17.1...rsql_driver_fwf-v0.17.2) - 2025-03-07
+
+### Added
+- add fixed width format (fwf) driver
+
 ## `rsql_drivers` - [0.17.1](https://github.com/theseus-rs/rsql/compare/rsql_drivers-v0.17.0...rsql_drivers-v0.17.1) - 2025-03-06
 
 ### Added
