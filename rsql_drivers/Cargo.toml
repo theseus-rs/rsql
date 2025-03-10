@@ -33,6 +33,7 @@ rsql_driver_libsql = { path = "../drivers/libsql", optional = true, version = "0
 rsql_driver_mariadb = { path = "../drivers/mariadb", optional = true, version = "0.17.1" }
 rsql_driver_mysql = { path = "../drivers/mysql", optional = true, version = "0.17.1" }
 rsql_driver_ods = { path = "../drivers/ods", optional = true, version = "0.17.1" }
+rsql_driver_orc = { path = "../drivers/orc", optional = true, version = "0.17.1" }
 rsql_driver_parquet = { path = "../drivers/parquet", optional = true, version = "0.17.1" }
 rsql_driver_postgres = { path = "../drivers/postgres", optional = true, version = "0.17.1" }
 rsql_driver_postgresql = { path = "../drivers/postgresql", optional = true, version = "0.17.1" }
@@ -78,6 +79,7 @@ all = [
     "mariadb",
     "mysql",
     "ods",
+    "orc",
     "parquet",
     "postgres",
     "postgresql",
@@ -130,6 +132,7 @@ native-tls = [
     "rsql_driver_sqlite/native-tls",
 ]
 ods = ["dep:rsql_driver_ods"]
+orc = ["dep:rsql_driver_orc"]
 parquet = ["dep:rsql_driver_parquet"]
 postgres = ["dep:rsql_driver_postgres"]
 postgresql = ["dep:rsql_driver_postgresql"]

@@ -72,6 +72,8 @@ mod test {
             (dataset_url("file", "users.jsonl"), None),
             #[cfg(feature = "ods")]
             (dataset_url("file", "users.ods"), None),
+            #[cfg(feature = "orc")]
+            (dataset_url("file", "users.orc"), None),
             #[cfg(feature = "parquet")]
             (dataset_url("file", "users.parquet"), None),
             #[cfg(feature = "sqlite")]

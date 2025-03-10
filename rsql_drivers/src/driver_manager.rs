@@ -106,6 +106,8 @@ impl Default for DriverManager {
         drivers.add(Box::new(rsql_driver_mysql::Driver));
         #[cfg(feature = "ods")]
         drivers.add(Box::new(rsql_driver_ods::Driver));
+        #[cfg(feature = "orc")]
+        drivers.add(Box::new(rsql_driver_orc::Driver));
         #[cfg(feature = "parquet")]
         drivers.add(Box::new(rsql_driver_parquet::Driver));
         #[cfg(feature = "postgres")]
@@ -202,6 +204,8 @@ mod tests {
         #[cfg(feature = "mysql")]
         let driver_count = driver_count + 1;
         #[cfg(feature = "ods")]
+        let driver_count = driver_count + 1;
+        #[cfg(feature = "orc")]
         let driver_count = driver_count + 1;
         #[cfg(feature = "parquet")]
         let driver_count = driver_count + 1;
