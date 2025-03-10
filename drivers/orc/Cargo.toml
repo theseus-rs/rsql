@@ -1,18 +1,20 @@
 [package]
 authors.workspace = true
 categories.workspace = true
-description = "rsql fixed width format driver"
+description = "rsql optimized row columnar driver"
 edition.workspace = true
 keywords.workspace = true
 license.workspace = true
-name = "rsql_driver_fwf"
+name = "rsql_driver_orc"
 repository.workspace = true
 rust-version.workspace = true
 version.workspace = true
 
 [dependencies]
+arrow-array = { workspace = true }
 async-trait = { workspace = true }
 file_type = { workspace = true }
+orc-rust = { workspace = true }
 polars = { workspace = true, features = ["json", "lazy"] }
 polars-sql = { workspace = true }
 rsql_driver = { path = "../../rsql_driver", version = "0.17.1" }

@@ -113,6 +113,8 @@ mod tests {
             "mysql",
             #[cfg(feature = "driver-ods")]
             "ods",
+            #[cfg(feature = "driver-orc")]
+            "orc",
             #[cfg(feature = "driver-parquet")]
             "parquet",
             #[cfg(feature = "driver-postgresql")]

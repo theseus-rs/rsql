@@ -75,6 +75,7 @@ all-drivers = [
     "driver-mariadb",
     "driver-mysql",
     "driver-ods",
+    "driver-orc",
     "driver-parquet",
     "driver-postgres",
     "driver-postgresql",
@@ -105,6 +106,7 @@ driver-libsql = ["rsql_drivers/libsql"]
 driver-mariadb = ["rsql_drivers/mariadb"]
 driver-mysql = ["rsql_drivers/mysql"]
 driver-ods = ["rsql_drivers/ods"]
+driver-orc = ["rsql_drivers/orc"]
 driver-parquet = ["rsql_drivers/parquet"]
 driver-postgres = ["rsql_drivers/postgres"]
 driver-postgresql = ["rsql_drivers/postgresql"]

@@ -37,18 +37,18 @@ visit the [rsql](https://theseus-rs.github.io/rsql/rsql_cli/) site.
 
 ## Features
 
-| Feature               |                                                                                                                                                                                               |
-|-----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Data Sources          | Arrow, Avro, CockroachDB, CSV, Delimited, DuckDB, Excel, FWF, JSON, JSONL, LibSQL (Turso), MariaDB, MySQL, ODS, Parquet, PostgreSQL, Redshift, Snowflake, SQLite3, SQL Server, TSV, XML, YAML |
-| Syntax Highlighting   | ✅                                                                                                                                                                                             |
-| Result Highlighting   | ✅                                                                                                                                                                                             |
-| Query Auto-completion | ✅                                                                                                                                                                                             |
-| History               | ✅                                                                                                                                                                                             |
-| SQL File Execution    | ✅                                                                                                                                                                                             |
-| Embedded PostgreSQL   | ✅                                                                                                                                                                                             |
-| Output Formats        | ascii, csv, expanded, html, json, jsonl, markdown, plain, psql, sqlite, tsv, unicode, xml, yaml                                                                                               |
-| Localized Interface   | 40+ languages¹                                                                                                                                                                                |
-| Key Bindings          | emacs, vi                                                                                                                                                                                     |
+| Feature               |                                                                                                                                                                                                    |
+|-----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Data Sources          | Arrow, Avro, CockroachDB, CSV, Delimited, DuckDB, Excel, FWF, JSON, JSONL, LibSQL (Turso), MariaDB, MySQL, ODS, ORC, Parquet, PostgreSQL, Redshift, Snowflake, SQLite3, SQL Server, TSV, XML, YAML |
+| Syntax Highlighting   | ✅                                                                                                                                                                                                  |
+| Result Highlighting   | ✅                                                                                                                                                                                                  |
+| Query Auto-completion | ✅                                                                                                                                                                                                  |
+| History               | ✅                                                                                                                                                                                                  |
+| SQL File Execution    | ✅                                                                                                                                                                                                  |
+| Embedded PostgreSQL   | ✅                                                                                                                                                                                                  |
+| Output Formats        | ascii, csv, expanded, html, json, jsonl, markdown, plain, psql, sqlite, tsv, unicode, xml, yaml                                                                                                    |
+| Localized Interface   | 40+ languages¹                                                                                                                                                                                     |
+| Key Bindings          | emacs, vi                                                                                                                                                                                          |
 
 ¹ Computer translations; human translations welcome
 
@@ -85,6 +85,7 @@ rsql --url "<url>" -- "<query>"
 | mariadb (sqlx)     | `mariadb://<user>[:<password>]@<host>[:<port>]/<database>`                                                                |
 | mysql (sqlx)       | `mysql://<user>[:<password>]@<host>[:<port>]/<database>`                                                                  |
 | ods                | `ods://<file>[?has_header=<true\|false>][&skip_rows=<n>]`                                                                 |
+| orc                | `orc://<file>`                                                                                                            |
 | parquet (polars)   | `parquet://<file>`                                                                                                        |
 | postgres           | `postgres://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`                                               |
 | postgresql (sqlx)  | `postgresql://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`                                             |
