@@ -2748,7 +2748,7 @@ checksum = "1435fa1053d8b2fbbe9be7e97eca7f33d37b28409959813daefc1446a14247f1"
 
 [[package]]
 name = "drivers"
-version = "0.17.1"
+version = "0.17.2"
 dependencies = [
  "rsql_drivers",
  "tokio",
@@ -7334,7 +7334,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_cli"
-version = "0.17.1"
+version = "0.17.2"
 dependencies = [
  "anyhow",
  "axoupdater",
@@ -7357,7 +7357,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_core"
-version = "0.17.1"
+version = "0.17.2"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -7395,7 +7395,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver"
-version = "0.17.1"
+version = "0.17.2"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -7420,7 +7420,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_arrow"
-version = "0.17.1"
+version = "0.17.2"
 dependencies = [
  "async-trait",
  "file_type",
@@ -7435,7 +7435,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_avro"
-version = "0.17.1"
+version = "0.17.2"
 dependencies = [
  "async-trait",
  "file_type",
@@ -7450,7 +7450,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_cockroachdb"
-version = "0.17.1"
+version = "0.17.2"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -7464,7 +7464,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_csv"
-version = "0.17.1"
+version = "0.17.2"
 dependencies = [
  "async-trait",
  "file_type",
@@ -7477,7 +7477,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_delimited"
-version = "0.17.1"
+version = "0.17.2"
 dependencies = [
  "async-trait",
  "file_type",
@@ -7492,7 +7492,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_duckdb"
-version = "0.17.1"
+version = "0.17.2"
 dependencies = [
  "async-trait",
  "chrono",
@@ -7509,7 +7509,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_excel"
-version = "0.17.1"
+version = "0.17.2"
 dependencies = [
  "async-trait",
  "calamine",
@@ -7527,7 +7527,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_fwf"
-version = "0.17.1"
+version = "0.17.2"
 dependencies = [
  "async-trait",
  "file_type",
@@ -7542,7 +7542,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_json"
-version = "0.17.1"
+version = "0.17.2"
 dependencies = [
  "async-trait",
  "file_type",
@@ -7557,7 +7557,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_jsonl"
-version = "0.17.1"
+version = "0.17.2"
 dependencies = [
  "async-trait",
  "file_type",
@@ -7572,7 +7572,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_libsql"
-version = "0.17.1"
+version = "0.17.2"
 dependencies = [
  "async-trait",
  "file_type",
@@ -7585,7 +7585,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_mariadb"
-version = "0.17.1"
+version = "0.17.2"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -7599,7 +7599,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_mysql"
-version = "0.17.1"
+version = "0.17.2"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -7619,7 +7619,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_ods"
-version = "0.17.1"
+version = "0.17.2"
 dependencies = [
  "async-trait",
  "file_type",
@@ -7631,7 +7631,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_orc"
-version = "0.17.1"
+version = "0.17.2"
 dependencies = [
  "arrow-array 53.4.1",
  "async-trait",
@@ -7648,7 +7648,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_parquet"
-version = "0.17.1"
+version = "0.17.2"
 dependencies = [
  "async-trait",
  "file_type",
@@ -7663,7 +7663,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_polars"
-version = "0.17.1"
+version = "0.17.2"
 dependencies = [
  "async-trait",
  "chrono",
@@ -7676,7 +7676,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_postgres"
-version = "0.17.1"
+version = "0.17.2"
 dependencies = [
  "async-trait",
  "bit-vec",
@@ -7697,7 +7697,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_postgresql"
-version = "0.17.1"
+version = "0.17.2"
 dependencies = [
  "async-trait",
  "bit-vec",
@@ -7718,7 +7718,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_redshift"
-version = "0.17.1"
+version = "0.17.2"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -7734,7 +7734,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_rusqlite"
-version = "0.17.1"
+version = "0.17.2"
 dependencies = [
  "async-trait",
  "file_type",
@@ -7749,7 +7749,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_snowflake"
-version = "0.17.1"
+version = "0.17.2"
 dependencies = [
  "async-trait",
  "base64 0.22.1",
@@ -7769,7 +7769,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_sqlite"
-version = "0.17.1"
+version = "0.17.2"
 dependencies = [
  "async-trait",
  "file_type",
@@ -7785,7 +7785,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_sqlserver"
-version = "0.17.1"
+version = "0.17.2"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -7806,11 +7806,11 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_test_utils"
-version = "0.17.1"
+version = "0.17.2"
 
 [[package]]
 name = "rsql_driver_tsv"
-version = "0.17.1"
+version = "0.17.2"
 dependencies = [
  "async-trait",
  "file_type",
@@ -7823,7 +7823,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_xml"
-version = "0.17.1"
+version = "0.17.2"
 dependencies = [
  "async-trait",
  "file_type",
@@ -7842,7 +7842,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_yaml"
-version = "0.17.1"
+version = "0.17.2"
 dependencies = [
  "async-trait",
  "file_type",
@@ -7859,7 +7859,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_drivers"
-version = "0.17.1"
+version = "0.17.2"
 dependencies = [
  "async-trait",
  "aws-config",
@@ -7909,7 +7909,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_formatters"
-version = "0.17.1"
+version = "0.17.2"
 dependencies = [
  "ansi_colours",
  "anyhow",
