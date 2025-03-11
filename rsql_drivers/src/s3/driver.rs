@@ -1,7 +1,6 @@
 use crate::DriverManager;
 use async_trait::async_trait;
 use aws_config::Region;
-use aws_config::meta::region::RegionProviderChain;
 use aws_credential_types::Credentials;
 use aws_sdk_s3::Client;
 use file_type::FileType;
@@ -59,26 +58,12 @@ impl Driver {
         let parsed_url = Url::parse(url)?;
         let parameters: HashMap<String, String> = parsed_url.query_pairs().into_owned().collect();
         let path = parsed_url.path().trim_start_matches('/');
-        let Some((bucket, key)) = path.split_once('/') else {
-            return Err(IoError("Invalid S3 URL".to_string()));
-        };
-        let Some(file_name) = key.split('/').last() else {
+        let Some(file_name) = path.split('/').last() else {
             return Err(IoError("Invalid S3 URL; no file".to_string()));
         };
 
-        let region = if let Some(region) = parameters.get("region") {
-            Region::new(region.clone())
-        } else {
-            RegionProviderChain::default_provider()
-                .region()
-                .await
-                .unwrap_or(Region::new("us-east-1"))
-        };
-
         let sdk_config = aws_config::from_env().load().await;
-        let mut config_builder = aws_sdk_s3::config::Builder::from(&sdk_config)
-            .region(region)
-            .force_path_style(true);
+        let mut config_builder = aws_sdk_s3::config::Builder::from(&sdk_config);
 
         let username = parsed_url.username();
         if !username.is_empty() {
@@ -87,11 +72,30 @@ impl Driver {
             let credentials = Credentials::from_keys(username, password, session_token);
             config_builder = config_builder.credentials_provider(credentials);
         }
-        if let Some(host) = parsed_url.host_str() {
-            let port = parsed_url.port().unwrap_or(443);
-            let endpoint_url = format!("http://{host}:{port}");
-            config_builder = config_builder.endpoint_url(endpoint_url.as_str());
-        }
+        let Some(host) = parsed_url.host_str() else {
+            return Err(IoError("Invalid S3 URL; no host".to_string()));
+        };
+        let Some((bucket, host)) = host.split_once('.') else {
+            return Err(IoError(
+                "Invalid S3 URL; unable to determine bucket from host".to_string(),
+            ));
+        };
+        let Some((region, host)) = host.split_once('.') else {
+            return Err(IoError(
+                "Invalid S3 URL; unable to determine region from host".to_string(),
+            ));
+        };
+        config_builder = config_builder.region(Region::new(region.to_string()));
+        let port = parsed_url.port().unwrap_or(443);
+        let scheme = if let Some(scheme) = parameters.get("scheme") {
+            scheme
+        } else if port == 80 {
+            "http"
+        } else {
+            "https"
+        };
+        let endpoint_url = format!("{scheme}://{host}:{port}");
+        config_builder = config_builder.endpoint_url(endpoint_url.as_str());
 
         let config = config_builder.build();
         let client = Client::from_conf(config);
@@ -99,7 +103,7 @@ impl Driver {
         let mut object = client
             .get_object()
             .bucket(bucket)
-            .key(key)
+            .key(path)
             .send()
             .await
             .map_err(|error| IoError(format!("Error getting object from S3: {error:?}")))?;
@@ -147,13 +151,17 @@ mod test {
     use super::*;
     use aws_sdk_s3::primitives::ByteStream;
     use rsql_driver::{Driver, Value};
+    use std::net::{IpAddr, Ipv4Addr};
     use testcontainers_modules::testcontainers::ContainerAsync;
+    use testcontainers_modules::testcontainers::core::Host;
     use testcontainers_modules::testcontainers::core::logs::LogFrame;
     use testcontainers_modules::testcontainers::runners::AsyncRunner;
     use testcontainers_modules::{localstack::LocalStackPro, testcontainers::ImageExt};
     use tracing::info;
     use tracing_subscriber::EnvFilter;
 
+    static HOST: &str = "s3.localhost.localstack.cloud";
+    static BUCKET: &str = "test-bucket";
     static ACCESS_KEY_ID: &str = "test";
     static SECRET_ACCESS_KEY: &str = "test";
     static REGION: &str = "us-east-1";
@@ -171,8 +179,10 @@ mod test {
             .finish();
         let _guard = tracing::subscriber::set_default(subscriber);
 
+        let host = Host::Addr(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)));
         let container = LocalStackPro::with_auth_token(Option::<&str>::None)
             .with_env_var("SERVICES", "s3")
+            .with_host(HOST, host)
             .with_log_consumer(|frame: &LogFrame| {
                 let mut msg =
                     std::str::from_utf8(frame.bytes()).expect("Failed to parse log message");
@@ -209,30 +219,24 @@ mod test {
     }
 
     async fn upload_test_file(container: &ContainerAsync<LocalStackPro>) -> Result<String> {
-        let host = container
-            .get_host()
-            .await
-            .map_err(|error| IoError(error.to_string()))?;
         let port = container
             .get_host_port_ipv4(4566)
             .await
             .map_err(|error| IoError(error.to_string()))?;
-        let bucket = "test-bucket";
         let file_name = "users.csv";
-        let endpoint_url = format!("http://{host}:{port}");
+        let endpoint_url = format!("http://{HOST}:{port}");
         let credentials = Credentials::from_keys(ACCESS_KEY_ID, SECRET_ACCESS_KEY, None);
 
         let config = aws_sdk_s3::config::Builder::default()
             .region(Region::new(REGION))
             .credentials_provider(credentials)
             .endpoint_url(&endpoint_url)
-            .force_path_style(true)
             .build();
         let client = Client::from_conf(config);
 
         client
             .create_bucket()
-            .bucket(bucket)
+            .bucket(BUCKET)
             .send()
             .await
             .map_err(|error| IoError(error.to_string()))?;
@@ -248,7 +252,7 @@ mod test {
 
         client
             .put_object()
-            .bucket(bucket)
+            .bucket(BUCKET)
             .key(file_name)
             .body(byte_stream)
             .send()
@@ -256,7 +260,7 @@ mod test {
             .map_err(|error| IoError(error.to_string()))?;
 
         let database_url = format!(
-            "s3://{ACCESS_KEY_ID}:{SECRET_ACCESS_KEY}@{host}:{port}/{bucket}/{file_name}?region={REGION}"
+            "s3://{ACCESS_KEY_ID}:{SECRET_ACCESS_KEY}@{BUCKET}.{REGION}.{HOST}:{port}/{file_name}?scheme=http",
         );
         Ok(database_url)
     }
