@@ -88,7 +88,7 @@ impl Driver {
             config_builder = config_builder.credentials_provider(credentials);
         }
         if let Some(host) = parsed_url.host_str() {
-            let port = parsed_url.port().unwrap_or(80);
+            let port = parsed_url.port().unwrap_or(443);
             let endpoint_url = format!("http://{host}:{port}");
             config_builder = config_builder.endpoint_url(endpoint_url.as_str());
         }
