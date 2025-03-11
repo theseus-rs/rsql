@@ -104,47 +104,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - add driver documentation
 - [**breaking**] refactor drivers connect interface
 
-##
-`rsql_formatters` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_formatters-v0.16.0...rsql_formatters-v0.17.0) - 2025-02-27
+## `rsql_formatters` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_formatters-v0.16.0...rsql_formatters-v0.17.0) - 2025-02-27
 
 ### Other
 
 - add driver documentation
 
-##
-`rsql_drivers` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_drivers-v0.16.0...rsql_drivers-v0.17.0) - 2025-02-27
-
-### Other
-
-- add driver documentation
-- [**breaking**] refactor drivers connect interface
-
-##
-`rsql_driver_yaml` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_yaml-v0.16.0...rsql_driver_yaml-v0.17.0) - 2025-02-27
+## `rsql_drivers` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_drivers-v0.16.0...rsql_drivers-v0.17.0) - 2025-02-27
 
 ### Other
 
 - add driver documentation
 - [**breaking**] refactor drivers connect interface
 
-##
-`rsql_driver_xml` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_xml-v0.16.0...rsql_driver_xml-v0.17.0) - 2025-02-27
+## `rsql_driver_yaml` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_yaml-v0.16.0...rsql_driver_yaml-v0.17.0) - 2025-02-27
 
 ### Other
 
 - add driver documentation
 - [**breaking**] refactor drivers connect interface
 
-##
-`rsql_driver_tsv` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_tsv-v0.16.0...rsql_driver_tsv-v0.17.0) - 2025-02-27
+## `rsql_driver_xml` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_xml-v0.16.0...rsql_driver_xml-v0.17.0) - 2025-02-27
 
 ### Other
 
 - add driver documentation
 - [**breaking**] refactor drivers connect interface
 
-##
-`rsql_driver_sqlserver` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_sqlserver-v0.16.0...rsql_driver_sqlserver-v0.17.0) - 2025-02-27
+## `rsql_driver_tsv` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_tsv-v0.16.0...rsql_driver_tsv-v0.17.0) - 2025-02-27
+
+### Other
+
+- add driver documentation
+- [**breaking**] refactor drivers connect interface
+
+## `rsql_driver_sqlserver` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_sqlserver-v0.16.0...rsql_driver_sqlserver-v0.17.0) - 2025-02-27
 
 ### Added
 
@@ -154,29 +148,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [**breaking**] refactor drivers connect interface
 
-##
-`rsql_driver_snowflake` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_snowflake-v0.16.0...rsql_driver_snowflake-v0.17.0) - 2025-02-27
+## `rsql_driver_snowflake` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_snowflake-v0.16.0...rsql_driver_snowflake-v0.17.0) - 2025-02-27
 
 ### Other
 
 - [**breaking**] refactor drivers connect interface
 
-##
-`rsql_driver_rusqlite` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_rusqlite-v0.16.0...rsql_driver_rusqlite-v0.17.0) - 2025-02-27
+## `rsql_driver_rusqlite` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_rusqlite-v0.16.0...rsql_driver_rusqlite-v0.17.0) - 2025-02-27
 
 ### Other
 
 - [**breaking**] refactor drivers connect interface
 
-##
-`rsql_driver_sqlite` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_sqlite-v0.16.0...rsql_driver_sqlite-v0.17.0) - 2025-02-27
+## `rsql_driver_sqlite` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_sqlite-v0.16.0...rsql_driver_sqlite-v0.17.0) - 2025-02-27
 
 ### Other
 
 - [**breaking**] refactor drivers connect interface
 
-##
-`rsql_driver_redshift` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_redshift-v0.16.0...rsql_driver_redshift-v0.17.0) - 2025-02-27
+## `rsql_driver_redshift` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_redshift-v0.16.0...rsql_driver_redshift-v0.17.0) - 2025-02-27
 
 ### Fixed
 
@@ -186,8 +176,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [**breaking**] refactor drivers connect interface
 
-##
-`rsql_driver_postgres` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_postgres-v0.16.0...rsql_driver_postgres-v0.17.0) - 2025-02-27
+## `rsql_driver_postgres` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_postgres-v0.16.0...rsql_driver_postgres-v0.17.0) - 2025-02-27
 
 ### Added
 
@@ -203,24 +192,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [**breaking**] remove Value::Json and replace it with Value::Map/Value::Array
 - [**breaking**] refactor drivers connect interface
 
-##
-`rsql_driver_parquet` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_parquet-v0.16.0...rsql_driver_parquet-v0.17.0) - 2025-02-27
+## `rsql_driver_parquet` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_parquet-v0.16.0...rsql_driver_parquet-v0.17.0) - 2025-02-27
 
 ### Other
 
 - add driver documentation
 - [**breaking**] refactor drivers connect interface
 
-##
-`rsql_driver_ods` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_ods-v0.16.0...rsql_driver_ods-v0.17.0) - 2025-02-27
+## `rsql_driver_ods` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_ods-v0.16.0...rsql_driver_ods-v0.17.0) - 2025-02-27
 
 ### Other
 
 - add driver documentation
 - [**breaking**] refactor drivers connect interface
 
-##
-`rsql_driver_mariadb` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_mariadb-v0.16.0...rsql_driver_mariadb-v0.17.0) - 2025-02-27
+## `rsql_driver_mariadb` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_mariadb-v0.16.0...rsql_driver_mariadb-v0.17.0) - 2025-02-27
 
 ### Fixed
 
@@ -230,8 +216,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [**breaking**] refactor drivers connect interface
 
-##
-`rsql_driver_mysql` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_mysql-v0.16.0...rsql_driver_mysql-v0.17.0) - 2025-02-27
+## `rsql_driver_mysql` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_mysql-v0.16.0...rsql_driver_mysql-v0.17.0) - 2025-02-27
 
 ### Added
 
@@ -246,69 +231,60 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [**breaking**] remove Value::Json and replace it with Value::Map/Value::Array
 - [**breaking**] refactor drivers connect interface
 
-##
-`rsql_driver_libsql` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_libsql-v0.16.0...rsql_driver_libsql-v0.17.0) - 2025-02-27
+## `rsql_driver_libsql` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_libsql-v0.16.0...rsql_driver_libsql-v0.17.0) - 2025-02-27
 
 ### Other
 
 - [**breaking**] refactor drivers connect interface
 
-##
-`rsql_driver_jsonl` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_jsonl-v0.16.0...rsql_driver_jsonl-v0.17.0) - 2025-02-27
-
-### Other
-
-- add driver documentation
-- [**breaking**] refactor drivers connect interface
-
-##
-`rsql_driver_json` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_json-v0.16.0...rsql_driver_json-v0.17.0) - 2025-02-27
+## `rsql_driver_jsonl` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_jsonl-v0.16.0...rsql_driver_jsonl-v0.17.0) - 2025-02-27
 
 ### Other
 
 - add driver documentation
 - [**breaking**] refactor drivers connect interface
 
-##
-`rsql_driver_excel` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_excel-v0.16.0...rsql_driver_excel-v0.17.0) - 2025-02-27
+## `rsql_driver_json` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_json-v0.16.0...rsql_driver_json-v0.17.0) - 2025-02-27
 
 ### Other
 
 - add driver documentation
 - [**breaking**] refactor drivers connect interface
 
-##
-`rsql_driver_duckdb` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_duckdb-v0.16.0...rsql_driver_duckdb-v0.17.0) - 2025-02-27
-
-### Other
-
-- [**breaking**] refactor drivers connect interface
-
-##
-`rsql_driver_csv` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_csv-v0.16.0...rsql_driver_csv-v0.17.0) - 2025-02-27
+## `rsql_driver_excel` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_excel-v0.16.0...rsql_driver_excel-v0.17.0) - 2025-02-27
 
 ### Other
 
 - add driver documentation
 - [**breaking**] refactor drivers connect interface
 
-##
-`rsql_driver_delimited` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_delimited-v0.16.0...rsql_driver_delimited-v0.17.0) - 2025-02-27
+## `rsql_driver_duckdb` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_duckdb-v0.16.0...rsql_driver_duckdb-v0.17.0) - 2025-02-27
+
+### Other
+
+- [**breaking**] refactor drivers connect interface
+
+## `rsql_driver_csv` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_csv-v0.16.0...rsql_driver_csv-v0.17.0) - 2025-02-27
 
 ### Other
 
 - add driver documentation
 - [**breaking**] refactor drivers connect interface
 
-##
-`rsql_driver_cockroachdb` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_cockroachdb-v0.16.0...rsql_driver_cockroachdb-v0.17.0) - 2025-02-27
+## `rsql_driver_delimited` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_delimited-v0.16.0...rsql_driver_delimited-v0.17.0) - 2025-02-27
+
+### Other
+
+- add driver documentation
+- [**breaking**] refactor drivers connect interface
+
+## `rsql_driver_cockroachdb` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_cockroachdb-v0.16.0...rsql_driver_cockroachdb-v0.17.0) - 2025-02-27
 
 ### Other
 
 - [**breaking**] refactor drivers connect interface
 
-##
-`rsql_driver_postgresql` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_postgresql-v0.16.0...rsql_driver_postgresql-v0.17.0) - 2025-02-27
+## `rsql_driver_postgresql` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_postgresql-v0.16.0...rsql_driver_postgresql-v0.17.0) - 2025-02-27
 
 ### Added
 
@@ -323,38 +299,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [**breaking**] remove Value::Json and replace it with Value::Map/Value::Array
 - [**breaking**] refactor drivers connect interface
 
-##
-`rsql_driver_avro` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_avro-v0.16.0...rsql_driver_avro-v0.17.0) - 2025-02-27
+## `rsql_driver_avro` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_avro-v0.16.0...rsql_driver_avro-v0.17.0) - 2025-02-27
 
 ### Other
 
 - add driver documentation
 - [**breaking**] refactor drivers connect interface
 
-##
-`rsql_driver_test_utils` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_test_utils-v0.16.0...rsql_driver_test_utils-v0.17.0) - 2025-02-27
+## `rsql_driver_test_utils` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_test_utils-v0.16.0...rsql_driver_test_utils-v0.17.0) - 2025-02-27
 
 ### Other
 
 - add driver documentation
 
-##
-`rsql_driver_arrow` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_arrow-v0.16.0...rsql_driver_arrow-v0.17.0) - 2025-02-27
+## `rsql_driver_arrow` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_arrow-v0.16.0...rsql_driver_arrow-v0.17.0) - 2025-02-27
 
 ### Other
 
 - add driver documentation
 - [**breaking**] refactor drivers connect interface
 
-##
-`rsql_driver_polars` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_polars-v0.16.0...rsql_driver_polars-v0.17.0) - 2025-02-27
+## `rsql_driver_polars` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_polars-v0.16.0...rsql_driver_polars-v0.17.0) - 2025-02-27
 
 ### Other
 
 - add driver documentation
 
-##
-`rsql_driver` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver-v0.16.0...rsql_driver-v0.17.0) - 2025-02-27
+## `rsql_driver` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver-v0.16.0...rsql_driver-v0.17.0) - 2025-02-27
 
 ### Added
 
