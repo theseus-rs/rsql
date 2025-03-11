@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## `rsql_driver_orc` - [0.17.2](https://github.com/theseus-rs/rsql/releases/tag/rsql_driver_orc-v0.17.2) - 2025-03-11
+
+### Added
+- add Apache ORC driver
+
+### Other
+- rsql-v0.17.2
+
+## `rsql_driver_fwf` - [0.17.2](https://github.com/theseus-rs/rsql/releases/tag/rsql_driver_fwf-v0.17.2) - 2025-03-11
+
+### Added
+- add Apache ORC driver
+- add fixed width format (fwf) driver
+
+### Other
+- rsql-v0.17.2
+
 ## `rsql_cli` - [0.17.2](https://github.com/theseus-rs/rsql/compare/v0.17.1...v0.17.2) - 2025-03-11
 
 ### Added
