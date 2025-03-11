@@ -7,6 +7,66 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## `rsql_cli` - [0.17.2](https://github.com/theseus-rs/rsql/compare/v0.17.1...v0.17.2) - 2025-03-11
+
+### Added
+- add Apache ORC driver
+- add fixed width format (fwf) driver
+- update embedded postgresql version to 17.4.0
+
+### Fixed
+- remove use of s3 client force_path_style(true)
+- update l10n translations for bail command
+- change default s3 port from 80 to 443
+
+### Other
+- correct mariadb dependencies
+
+## `rsql_core` - [0.17.2](https://github.com/theseus-rs/rsql/compare/rsql_core-v0.17.1...rsql_core-v0.17.2) - 2025-03-11
+
+### Added
+- add Apache ORC driver
+- add fixed width format (fwf) driver
+
+### Fixed
+- update l10n translations for bail command
+
+## `rsql_drivers` - [0.17.2](https://github.com/theseus-rs/rsql/compare/rsql_drivers-v0.17.1...rsql_drivers-v0.17.2) - 2025-03-11
+
+### Added
+- add Apache ORC driver
+- add fixed width format (fwf) driver
+
+### Fixed
+- remove use of s3 client force_path_style(true)
+- change default s3 port from 80 to 443
+
+## `rsql_driver_postgres` - [0.17.2](https://github.com/theseus-rs/rsql/compare/rsql_driver_postgres-v0.17.1...rsql_driver_postgres-v0.17.2) - 2025-03-11
+
+### Added
+- update embedded postgresql version to 17.4.0
+
+## `rsql_driver_orc` - [0.17.2](https://github.com/theseus-rs/rsql/compare/rsql_driver_orc-v0.17.1...rsql_driver_orc-v0.17.2) - 2025-03-11
+
+### Added
+- add Apache ORC driver
+
+## `rsql_driver_mariadb` - [0.17.2](https://github.com/theseus-rs/rsql/compare/rsql_driver_mariadb-v0.17.1...rsql_driver_mariadb-v0.17.2) - 2025-03-11
+
+### Other
+- correct mariadb dependencies
+
+## `rsql_driver_fwf` - [0.17.2](https://github.com/theseus-rs/rsql/compare/rsql_driver_fwf-v0.17.1...rsql_driver_fwf-v0.17.2) - 2025-03-11
+
+### Added
+- add Apache ORC driver
+- add fixed width format (fwf) driver
+
+## `rsql_driver_postgresql` - [0.17.2](https://github.com/theseus-rs/rsql/compare/rsql_driver_postgresql-v0.17.1...rsql_driver_postgresql-v0.17.2) - 2025-03-11
+
+### Added
+- update embedded postgresql version to 17.4.0
+
 ## `rsql_drivers` - [0.17.1](https://github.com/theseus-rs/rsql/compare/rsql_drivers-v0.17.0...rsql_drivers-v0.17.1) - 2025-03-06
 
 ### Added

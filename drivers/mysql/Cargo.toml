@@ -15,7 +15,7 @@ async-trait = { workspace = true }
 chrono = { workspace = true }
 file_type = { workspace = true }
 indoc = { workspace = true }
-rsql_driver = { path = "../../rsql_driver", version = "0.17.1", features = ["json"] }
+rsql_driver = { path = "../../rsql_driver", version = "0.17.2", features = ["json"] }
 rust_decimal = { workspace = true }
 serde_json = { workspace = true, features = ["preserve_order"] }
 sqlparser = { workspace = true }
