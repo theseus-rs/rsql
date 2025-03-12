@@ -1,0 +1,6 @@
+{"version": 2, "width": 120, "height": 30, "timestamp": 1740088997, "env": {"SHELL": "/bin/zsh", "TERM": "xterm-256color"}}
+[0.025088, "o", "\u001b]11;?\u001b\\"]
+[0.051805, "o", "⠁ connect [00:00:00] [                                                                             ] 0 B/0 B (0 B/s, 0s)"]
+[0.051897, "o", "\r\u001b[2K"]
+[0.061645, "o", "rsql> \u001b[38;2;131;148;150m.system echo \u001b[38;2;131;148;150m\"\u001b[38;2;42;161;152mhello, world!\u001b[38;2;131;148;150m\"\u001b[0m\r\n"]
+[0.063586, "o", "hello, world!\r\n"]

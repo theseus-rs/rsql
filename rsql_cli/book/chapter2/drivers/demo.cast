@@ -1,0 +1,6 @@
+{"version": 2, "width": 120, "height": 30, "timestamp": 1740088899, "env": {"SHELL": "/bin/zsh", "TERM": "xterm-256color"}}
+[0.025724, "o", "\u001b]11;?\u001b\\"]
+[0.055227, "o", "⠁ connect [00:00:00] [                                                                             ] 0 B/0 B (0 B/s, 0s)"]
+[0.05531, "o", "\r\u001b[2K"]
+[0.065053, "o", "rsql> \u001b[38;2;131;148;150m.drivers\u001b[0m\r\n"]
+[0.065226, "o", "Drivers: arrow, avro, cockroachdb, csv, delimited, duckdb, excel, file, http, https, json, jsonl, mariadb, mysql, ods, parquet, postgres, postgresql, redshift, rusqlite, snowflake, sqlite, sqlserver, tsv, xml, yaml\r\n"]
