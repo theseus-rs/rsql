@@ -15,7 +15,7 @@ async-trait = { workspace = true }
 file_type = { workspace = true }
 indoc = { workspace = true }
 libsql = { workspace = true }
-rsql_driver = { path = "../../rsql_driver", version = "0.17.2" }
+rsql_driver = { path = "../../rsql_driver", version = "0.17.3" }
 url = { workspace = true }
 
 [dev-dependencies]

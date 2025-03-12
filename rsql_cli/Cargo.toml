@@ -35,7 +35,7 @@ colored = { workspace = true }
 dotenvy = { workspace = true }
 inquire = { workspace = true }
 os_info = { workspace = true }
-rsql_core = { path = "../rsql_core", version = "0.17.2", features = ["all"] }
+rsql_core = { path = "../rsql_core", version = "0.17.3", features = ["all"] }
 rust-i18n = { workspace = true }
 serde = { workspace = true }
 supports-color = { workspace = true }

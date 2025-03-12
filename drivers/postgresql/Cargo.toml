@@ -18,7 +18,7 @@ file_type = { workspace = true }
 indoc = { workspace = true }
 jiff = { workspace = true }
 postgresql_embedded = { workspace = true }
-rsql_driver = { path = "../../rsql_driver", version = "0.17.2", features = ["json"] }
+rsql_driver = { path = "../../rsql_driver", version = "0.17.3", features = ["json"] }
 rust_decimal = { workspace = true }
 serde_json = { workspace = true, features = ["preserve_order"] }
 sqlparser = { workspace = true }

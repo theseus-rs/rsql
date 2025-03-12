@@ -7,6 +7,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## `rsql_cli` - [0.17.3](https://github.com/theseus-rs/rsql/compare/v0.17.2...v0.17.3) - 2025-03-12
+
+### Other
+- update Cargo.lock dependencies
+- replace chrono with jiff
+
+## `rsql_driver_sqlserver` - [0.17.3](https://github.com/theseus-rs/rsql/compare/rsql_driver_sqlserver-v0.17.2...rsql_driver_sqlserver-v0.17.3) - 2025-03-12
+
+### Other
+- replace chrono with jiff
+
+## `rsql_driver_snowflake` - [0.17.3](https://github.com/theseus-rs/rsql/compare/rsql_driver_snowflake-v0.17.2...rsql_driver_snowflake-v0.17.3) - 2025-03-12
+
+### Other
+- replace chrono with jiff
+
+## `rsql_driver_postgres` - [0.17.3](https://github.com/theseus-rs/rsql/compare/rsql_driver_postgres-v0.17.2...rsql_driver_postgres-v0.17.3) - 2025-03-12
+
+### Other
+- replace chrono with jiff
+
+## `rsql_driver_mysql` - [0.17.3](https://github.com/theseus-rs/rsql/compare/rsql_driver_mysql-v0.17.2...rsql_driver_mysql-v0.17.3) - 2025-03-12
+
+### Other
+- replace chrono with jiff
+
+## `rsql_driver_duckdb` - [0.17.3](https://github.com/theseus-rs/rsql/compare/rsql_driver_duckdb-v0.17.2...rsql_driver_duckdb-v0.17.3) - 2025-03-12
+
+### Other
+- replace chrono with jiff
+
+## `rsql_driver_postgresql` - [0.17.3](https://github.com/theseus-rs/rsql/compare/rsql_driver_postgresql-v0.17.2...rsql_driver_postgresql-v0.17.3) - 2025-03-12
+
+### Other
+- replace chrono with jiff
+
+## `rsql_driver_polars` - [0.17.3](https://github.com/theseus-rs/rsql/compare/rsql_driver_polars-v0.17.2...rsql_driver_polars-v0.17.3) - 2025-03-12
+
+### Other
+- replace chrono with jiff
+
+## `rsql_driver` - [0.17.3](https://github.com/theseus-rs/rsql/compare/rsql_driver-v0.17.2...rsql_driver-v0.17.3) - 2025-03-12
+
+### Other
+- replace chrono with jiff
+
 ## `rsql_cli` - [0.17.2](https://github.com/theseus-rs/rsql/compare/v0.17.1...v0.17.2) - 2025-03-11
 
 ### Added
