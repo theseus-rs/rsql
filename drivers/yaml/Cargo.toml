@@ -15,14 +15,14 @@ async-trait = { workspace = true }
 file_type = { workspace = true }
 polars = { workspace = true, features = ["json", "lazy"] }
 polars-sql = { workspace = true }
-rsql_driver = { path = "../../rsql_driver", version = "0.17.2" }
-rsql_driver_polars = { path = "../../drivers/polars", version = "0.17.2" }
+rsql_driver = { path = "../../rsql_driver", version = "0.17.3" }
+rsql_driver_polars = { path = "../../drivers/polars", version = "0.17.3" }
 serde_json = { workspace = true, features = ["preserve_order"] }
 serde_yaml = { workspace = true }
 tokio = { workspace = true, features = ["fs"] }
 url = { workspace = true }
 
 [dev-dependencies]
-rsql_driver_test_utils = { path = "../../drivers/test_utils", version = "0.17.2" }
+rsql_driver_test_utils = { path = "../../drivers/test_utils", version = "0.17.3" }
 tokio = { workspace = true, features = ["macros", "rt"] }
 

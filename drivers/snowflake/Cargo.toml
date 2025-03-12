@@ -17,7 +17,7 @@ file_type = { workspace = true }
 jiff = { workspace = true }
 jwt-simple = { workspace = true, default-features = false, features = ["pure-rust"] }
 reqwest = { workspace = true, features = ["json", "gzip"] }
-rsql_driver = { path = "../../rsql_driver", version = "0.17.2" }
+rsql_driver = { path = "../../rsql_driver", version = "0.17.3" }
 serde_json = { workspace = true, features = ["preserve_order"] }
 sha2 = { workspace = true }
 sqlparser = { workspace = true }

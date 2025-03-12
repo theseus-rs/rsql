@@ -17,8 +17,8 @@ chrono = { workspace = true }
 file_type = { workspace = true }
 jiff = { workspace = true }
 postgresql_embedded = { workspace = true }
-rsql_driver = { path = "../../rsql_driver", version = "0.17.2", features = ["json"] }
-rsql_driver_postgresql = { path = "../../drivers/postgresql", version = "0.17.2" }
+rsql_driver = { path = "../../rsql_driver", version = "0.17.3", features = ["json"] }
+rsql_driver_postgresql = { path = "../../drivers/postgresql", version = "0.17.3" }
 rust_decimal = { workspace = true, features = ["db-tokio-postgres"] }
 serde_json = { workspace = true, features = ["preserve_order"] }
 sqlparser = { workspace = true }

@@ -80,7 +80,7 @@ keywords = ["database", "mysql", "postgresql", "sql", "sqlite"]
 license = "Apache-2.0 OR MIT"
 repository = "https://github.com/theseus-rs/rsql"
 rust-version = "1.85.0"
-version = "0.17.2"
+version = "0.17.3"
 
 [workspace.dependencies]
 ansi_colours = "1.2.3"
