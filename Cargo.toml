@@ -115,6 +115,7 @@ indexmap = "2.7.0"
 indicatif = "0.17.9"
 indoc = "2.0.5"
 inquire = "0.7.5"
+jiff = "0.2.4"
 jwt-simple = { version = "0.12.11", default-features = false }
 libsql = "0.6.0"
 mockall = "0.13.1"

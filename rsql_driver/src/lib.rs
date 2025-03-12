@@ -1,7 +1,7 @@
 //! # RSQL Driver
 //!
-//! The RSQL driver is a library that provides a common interface for connecting to different data
-//! sources.
+//! The RSQL driver library provides interfaces for connecting to different data
+//! sources and executing SQL queries.
 
 #![forbid(unsafe_code)]
 #![forbid(clippy::allow_attributes)]

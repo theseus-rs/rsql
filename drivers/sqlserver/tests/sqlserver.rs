@@ -1,7 +1,7 @@
 #[cfg(target_os = "linux")]
-use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
-#[cfg(target_os = "linux")]
 use indoc::indoc;
+#[cfg(target_os = "linux")]
+use jiff::civil;
 #[cfg(target_os = "linux")]
 use rsql_driver::{Connection, Driver, Value};
 #[cfg(target_os = "linux")]
@@ -141,12 +141,9 @@ async fn test_data_types(connection: &mut dyn Connection) -> anyhow::Result<()> 
             Value::F64(123.0),
             Value::Bool(true),
             Value::Decimal(rust_decimal::Decimal::from_str("123.00").expect("invalid decimal")),
-            Value::Date(NaiveDate::from_ymd_opt(2022, 1, 1).expect("invalid date")),
-            Value::Time(NaiveTime::from_hms_opt(14, 30, 00).expect("invalid time")),
-            Value::DateTime(NaiveDateTime::parse_from_str(
-                "2022-01-01 14:30:00",
-                "%Y-%m-%d %H:%M:%S"
-            )?)
+            Value::Date(civil::date(2022, 1, 1)),
+            Value::Time(civil::time(14, 30, 0, 0)),
+            Value::DateTime(civil::datetime(2022, 1, 1, 14, 30, 0, 0))
         ])
     );
     assert!(query_result.next().await.is_none());

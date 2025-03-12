@@ -12,10 +12,10 @@ version.workspace = true
 
 [dependencies]
 async-trait = { workspace = true }
-chrono = { workspace = true }
 duckdb = { workspace = true, features = ["bundled"] }
 file_type = { workspace = true }
 indoc = { workspace = true }
+jiff = { workspace = true }
 regex = { workspace = true }
 rsql_driver = { path = "../../rsql_driver", version = "0.17.2" }
 sqlparser = { workspace = true }

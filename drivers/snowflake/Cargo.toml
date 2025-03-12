@@ -13,8 +13,8 @@ version.workspace = true
 [dependencies]
 async-trait = { workspace = true }
 base64 = { workspace = true }
-chrono = { workspace = true }
 file_type = { workspace = true }
+jiff = { workspace = true }
 jwt-simple = { workspace = true, default-features = false, features = ["pure-rust"] }
 reqwest = { workspace = true, features = ["json", "gzip"] }
 rsql_driver = { path = "../../rsql_driver", version = "0.17.2" }

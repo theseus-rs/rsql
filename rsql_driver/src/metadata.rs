@@ -4,6 +4,7 @@ use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
 use sqlparser::dialect::{self, Dialect};
 
+/// Metadata contains the schema, table, column, and index definitions for a data source.
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct Metadata {
     schemas: IndexMap<String, Schema>,
@@ -11,6 +12,7 @@ pub struct Metadata {
 }
 
 impl Metadata {
+    /// Creates a new Metadata instance.
     #[must_use]
     pub fn new() -> Self {
         Self {
@@ -19,6 +21,7 @@ impl Metadata {
         }
     }
 
+    /// Creates a new Metadata instance with the specified dialect.
     #[must_use]
     pub fn with_dialect(dialect: Box<dyn Dialect>) -> Self {
         Self {
@@ -27,37 +30,44 @@ impl Metadata {
         }
     }
 
+    /// Adds a schema to the metadata.
     pub fn add(&mut self, schema: Schema) {
         self.schemas.insert(schema.name.clone(), schema);
     }
 
+    /// Returns the schema with the specified name.
     pub fn get<S: Into<String>>(&self, name: S) -> Option<&Schema> {
         let name = name.into();
         self.schemas.get(&name)
     }
 
+    /// Returns the mutable schema with the specified name.
     pub fn get_mut<S: Into<String>>(&mut self, name: S) -> Option<&mut Schema> {
         let name = name.into();
         self.schemas.get_mut(&name)
     }
 
+    /// Returns the current schema.
     #[must_use]
     pub fn current_schema(&self) -> Option<&Schema> {
         self.schemas.values().find(|schema| schema.current)
     }
 
+    /// Returns the schemas in the metadata.
     #[must_use]
     pub fn schemas(&self) -> Vec<&Schema> {
         let values: Vec<&Schema> = self.schemas.values().collect();
         values
     }
 
+    /// Returns the dialect for the metadata.
     #[must_use]
     pub fn dialect(&self) -> Box<dyn Dialect> {
         self.dialect.into()
     }
 }
 
+/// Schema contains the table, column, and index definitions for a schema in a data source.
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct Schema {
     name: String,
@@ -66,6 +76,7 @@ pub struct Schema {
 }
 
 impl Schema {
+    /// Creates a new Schema instance.
     pub fn new<S: Into<String>>(name: S, current: bool) -> Self {
         Self {
             name: name.into(),
@@ -74,30 +85,36 @@ impl Schema {
         }
     }
 
+    /// Returns the name of the schema.
     #[must_use]
     pub fn name(&self) -> &str {
         &self.name
     }
 
+    /// Returns whether the schema is the current schema.
     #[must_use]
     pub fn current(&self) -> bool {
         self.current
     }
 
+    /// Adds a table to the schema.
     pub fn add(&mut self, table: Table) {
         self.tables.insert(table.name.clone(), table);
     }
 
+    /// Returns the table with the specified name.
     pub fn get<S: Into<String>>(&self, name: S) -> Option<&Table> {
         let name = name.into();
         self.tables.get(&name)
     }
 
+    /// Returns the mutable table with the specified name.
     pub fn get_mut<S: Into<String>>(&mut self, name: S) -> Option<&mut Table> {
         let name = name.into();
         self.tables.get_mut(&name)
     }
 
+    /// Returns the tables in the schema.
     #[must_use]
     pub fn tables(&self) -> Vec<&Table> {
         let values: Vec<&Table> = self.tables.values().collect();
@@ -105,6 +122,7 @@ impl Schema {
     }
 }
 
+/// Table contains the column and index definitions for a table in a schema.
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct Table {
     name: String,
@@ -113,6 +131,7 @@ pub struct Table {
 }
 
 impl Table {
+    /// Creates a new Table instance.
     pub fn new<S: Into<String>>(name: S) -> Self {
         Self {
             name: name.into(),
@@ -121,45 +140,54 @@ impl Table {
         }
     }
 
+    /// Returns the name of the table.
     #[must_use]
     pub fn name(&self) -> &str {
         &self.name
     }
 
+    /// Adds a column to the table.
     pub fn add_column(&mut self, column: Column) {
         self.columns.insert(column.name.clone(), column);
     }
 
+    /// Returns the column with the specified name.
     #[must_use]
     pub fn columns(&self) -> Vec<&Column> {
         let values: Vec<&Column> = self.columns.values().collect();
         values
     }
 
+    /// Returns the mutable column with the specified name.
     pub fn get_column<S: Into<String>>(&self, name: S) -> Option<&Column> {
         let name = name.into();
         self.columns.get(&name)
     }
 
+    /// Returns the mutable column with the specified name.
     pub fn get_column_mut<S: Into<String>>(&mut self, name: S) -> Option<&mut Column> {
         let name = name.into();
         self.columns.get_mut(&name)
     }
 
+    /// Adds an index to the table.
     pub fn add_index(&mut self, index: Index) {
         self.indexes.insert(index.name.clone(), index);
     }
 
+    /// Returns the indexes in the table.
     pub fn get_index<S: Into<String>>(&self, name: S) -> Option<&Index> {
         let name = name.into();
         self.indexes.get(&name)
     }
 
+    /// Returns the mutable index with the specified name.
     pub fn get_index_mut<S: Into<String>>(&mut self, name: S) -> Option<&mut Index> {
         let name = name.into();
         self.indexes.get_mut(&name)
     }
 
+    /// Returns the indexes in the table.
     #[must_use]
     pub fn indexes(&self) -> Vec<&Index> {
         let values: Vec<&Index> = self.indexes.values().collect();
@@ -167,6 +195,7 @@ impl Table {
     }
 }
 
+/// Column contains the definition for a column in a table.
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct Column {
     name: String,
@@ -176,6 +205,7 @@ pub struct Column {
 }
 
 impl Column {
+    /// Creates a new Column instance.
     pub fn new<S: Into<String>>(name: S, data_type: S, not_null: bool, default: Option<S>) -> Self {
         Self {
             name: name.into(),
@@ -185,27 +215,32 @@ impl Column {
         }
     }
 
+    /// Returns the name of the column.
     #[must_use]
     pub fn name(&self) -> &str {
         &self.name
     }
 
+    /// Returns the data type of the column.
     #[must_use]
     pub fn data_type(&self) -> &str {
         &self.data_type
     }
 
+    /// Returns whether the column is not null.
     #[must_use]
     pub fn not_null(&self) -> bool {
         self.not_null
     }
 
+    /// Returns the default value of the column.
     #[must_use]
     pub fn default(&self) -> Option<&str> {
         self.default.as_deref()
     }
 }
 
+/// Index contains the definition for an index on a table.
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct Index {
     name: String,
@@ -214,6 +249,7 @@ pub struct Index {
 }
 
 impl Index {
+    /// Creates a new Index instance.
     pub fn new<S: Into<String>>(name: S, columns: Vec<S>, unique: bool) -> Self {
         Self {
             name: name.into(),
@@ -222,26 +258,31 @@ impl Index {
         }
     }
 
+    /// Returns the name of the index.
     #[must_use]
     pub fn name(&self) -> &str {
         &self.name
     }
 
+    /// Adds a column to the index.
     pub fn add_column<S: Into<String>>(&mut self, column: S) {
         self.columns.push(column.into());
     }
 
+    /// The columns in the index.
     #[must_use]
     pub fn columns(&self) -> &[String] {
         &self.columns
     }
 
+    /// Returns whether the index is unique.
     #[must_use]
     pub fn unique(&self) -> bool {
         self.unique
     }
 }
 
+/// The SQL dialect for the metadata.
 #[derive(Debug, Clone, Copy, Default, Serialize, Deserialize)]
 pub enum MetadataDialect {
     #[default]

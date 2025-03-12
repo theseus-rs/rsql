@@ -1,7 +1,8 @@
 use async_trait::async_trait;
 use bit_vec::BitVec;
-use chrono::{DateTime, NaiveDate, NaiveDateTime, NaiveTime, Utc};
+use chrono::{Datelike, NaiveDate, NaiveDateTime, NaiveTime, Timelike, Utc};
 use file_type::FileType;
+use jiff::civil::{Date, DateTime, Time};
 use postgresql_embedded::{PostgreSQL, Settings, Status, VersionReq};
 use rsql_driver::Error::{InvalidUrl, IoError, UnsupportedColumnType};
 use rsql_driver::{MemoryQueryResult, Metadata, QueryResult, Result, StatementMetadata, Value};
@@ -254,21 +255,23 @@ impl Connection {
                     None => Value::Null,
                 }
             }
-            Type::DATE => Self::get_single(row, column_index, |v: NaiveDate| Value::Date(v))?,
+            Type::DATE => {
+                Self::get_single(row, column_index, |v: NaiveDate| naive_date_to_value(v))?
+            }
             Type::TIME | Type::TIMETZ => {
-                Self::get_single(row, column_index, |v: NaiveTime| Value::Time(v))?
+                Self::get_single(row, column_index, |v: NaiveTime| naive_time_to_value(v))?
             }
-            Type::TIMESTAMP => {
-                Self::get_single(row, column_index, |v: NaiveDateTime| Value::DateTime(v))?
-            }
+            Type::TIMESTAMP => Self::get_single(row, column_index, |v: NaiveDateTime| {
+                naive_date_time_to_value(v)
+            })?,
             Type::TIMESTAMPTZ => {
                 let system_time: Option<SystemTime> = row
                     .try_get(column_index)
                     .map_err(|error| IoError(error.to_string()))?;
                 match system_time {
                     Some(value) => {
-                        let date_time: DateTime<Utc> = value.into();
-                        Value::DateTime(date_time.naive_utc())
+                        let date_time: chrono::DateTime<Utc> = value.into();
+                        naive_date_time_to_value(date_time.naive_utc())
                     }
                     None => Value::Null,
                 }
@@ -334,10 +337,77 @@ impl Connection {
     }
 }
 
+fn naive_date_to_value(date: NaiveDate) -> Value {
+    let Ok(year) = i16::try_from(date.year()) else {
+        return Value::Null;
+    };
+    let Ok(month) = i8::try_from(date.month()) else {
+        return Value::Null;
+    };
+    let Ok(day) = i8::try_from(date.day()) else {
+        return Value::Null;
+    };
+    let Ok(date) = Date::new(year, month, day) else {
+        return Value::Null;
+    };
+    Value::Date(date)
+}
+
+fn naive_time_to_value(time: NaiveTime) -> Value {
+    let Ok(hour) = i8::try_from(time.hour()) else {
+        return Value::Null;
+    };
+    let Ok(minute) = i8::try_from(time.minute()) else {
+        return Value::Null;
+    };
+    let Ok(second) = i8::try_from(time.second()) else {
+        return Value::Null;
+    };
+    let Ok(nanosecond) = i32::try_from(time.nanosecond()) else {
+        return Value::Null;
+    };
+    let Ok(time) = Time::new(hour, minute, second, nanosecond) else {
+        return Value::Null;
+    };
+    Value::Time(time)
+}
+
+fn naive_date_time_to_value(date_time: NaiveDateTime) -> Value {
+    let Ok(year) = i16::try_from(date_time.year()) else {
+        return Value::Null;
+    };
+    let Ok(month) = i8::try_from(date_time.month()) else {
+        return Value::Null;
+    };
+    let Ok(day) = i8::try_from(date_time.day()) else {
+        return Value::Null;
+    };
+    let Ok(date) = Date::new(year, month, day) else {
+        return Value::Null;
+    };
+    let Ok(hour) = i8::try_from(date_time.hour()) else {
+        return Value::Null;
+    };
+    let Ok(minute) = i8::try_from(date_time.minute()) else {
+        return Value::Null;
+    };
+    let Ok(second) = i8::try_from(date_time.second()) else {
+        return Value::Null;
+    };
+    let Ok(nanosecond) = i32::try_from(date_time.nanosecond()) else {
+        return Value::Null;
+    };
+    let Ok(time) = Time::new(hour, minute, second, nanosecond) else {
+        return Value::Null;
+    };
+    let date_time = DateTime::from_parts(date, time);
+    Value::DateTime(date_time)
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
-    use chrono::{NaiveDate, NaiveDateTime, NaiveTime, Utc};
+    use jiff::Timestamp;
     use rsql_driver::{Driver, Value};
     use serde_json::json;
 
@@ -575,7 +645,7 @@ mod test {
     async fn test_data_type_date() -> Result<()> {
         let result = test_data_type("SELECT CAST('1983-01-01' as date)").await?;
         let value = result.expect("value is None");
-        let date = NaiveDate::from_ymd_opt(1983, 1, 1).expect("invalid date");
+        let date = Date::new(1983, 1, 1)?;
         assert_eq!(value, Value::Date(date));
         Ok(())
     }
@@ -584,7 +654,7 @@ mod test {
     async fn test_data_type_time() -> Result<()> {
         let result = test_data_type("SELECT CAST('1:23:45' as time)").await?;
         let value = result.expect("value is None");
-        let time = NaiveTime::from_hms_opt(1, 23, 45).expect("invalid time");
+        let time = Time::new(1, 23, 45, 0)?;
         assert_eq!(value, Value::Time(time));
         Ok(())
     }
@@ -593,11 +663,12 @@ mod test {
     async fn test_data_type_date_time() -> Result<()> {
         let result = test_data_type("SELECT CAST('1983-01-01 1:23:45' as timestamp)").await?;
         let value = result.expect("value is None");
-        let date_time = NaiveDateTime::parse_from_str("1983-01-01 01:23:45", "%Y-%m-%d %H:%M:%S")
-            .map_err(|error| IoError(error.to_string()))?;
+        let date = Date::new(1983, 1, 1)?;
+        let time = Time::new(1, 23, 45, 0)?;
+        let date_time = DateTime::from_parts(date, time);
         assert_eq!(value, Value::DateTime(date_time));
 
-        let now = Utc::now().naive_utc();
+        let now = jiff::tz::Offset::UTC.to_datetime(Timestamp::now());
         let result = test_data_type("SELECT now()").await?;
         let value = result.expect("value is None");
         if let Value::DateTime(value) = value {

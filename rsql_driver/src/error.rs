@@ -22,6 +22,13 @@ pub enum Error {
     },
 }
 
+/// Converts a [`jiff::Error`] into an [`ConversionError`](Error::ConversionError)
+impl From<jiff::Error> for Error {
+    fn from(error: jiff::Error) -> Self {
+        Error::ConversionError(error.to_string())
+    }
+}
+
 /// Converts a [`std::io::Error`] into an [`IoError`](Error::IoError)
 impl From<std::io::Error> for Error {
     fn from(error: std::io::Error) -> Self {
@@ -46,6 +53,17 @@ impl From<url::ParseError> for Error {
 #[cfg(test)]
 mod test {
     use super::*;
+
+    #[test]
+    fn test_jiff_error() {
+        let error = jiff::civil::Time::new(42, 0, 0, 0).expect_err("conversion error");
+        let conversion_error = Error::from(error);
+
+        assert_eq!(
+            conversion_error.to_string(),
+            "parameter 'hour' with value 42 is not in the required range of 0..=23"
+        );
+    }
 
     #[test]
     fn test_from_std_io_error() {
