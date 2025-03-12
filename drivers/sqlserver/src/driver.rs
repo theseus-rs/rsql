@@ -1,5 +1,6 @@
 use crate::metadata;
 use async_trait::async_trait;
+use chrono::{Datelike, Timelike};
 use file_type::FileType;
 use futures_util::stream::TryStreamExt;
 use rsql_driver::Error::{InvalidUrl, IoError, UnsupportedColumnType};
@@ -162,6 +163,7 @@ impl rsql_driver::Connection for Connection {
 }
 
 #[expect(clippy::same_functions_in_if_condition)]
+#[expect(clippy::too_many_lines)]
 fn convert_to_value(row: &Row, column: &Column, index: usize) -> Result<Value> {
     let column_name = column.name();
 
@@ -228,19 +230,43 @@ fn convert_to_value(row: &Row, column: &Column, index: usize) -> Result<Value> {
     } else if let Ok(value) = row.try_get(column_name) {
         let value: Option<chrono::NaiveDate> = value;
         match value {
-            Some(v) => Ok(Value::Date(v)),
+            Some(v) => {
+                let year = i16::try_from(v.year())?;
+                let month = i8::try_from(v.month())?;
+                let day = i8::try_from(v.day())?;
+                let date = jiff::civil::date(year, month, day);
+                Ok(Value::Date(date))
+            }
             None => Ok(Value::Null),
         }
     } else if let Ok(value) = row.try_get(column_name) {
         let value: Option<chrono::NaiveTime> = value;
         match value {
-            Some(v) => Ok(Value::Time(v)),
+            Some(v) => {
+                let hour = i8::try_from(v.hour())?;
+                let minute = i8::try_from(v.minute())?;
+                let second = i8::try_from(v.second())?;
+                let nanosecond = i32::try_from(v.nanosecond())?;
+                let time = jiff::civil::time(hour, minute, second, nanosecond);
+                Ok(Value::Time(time))
+            }
             None => Ok(Value::Null),
         }
     } else if let Ok(value) = row.try_get(column_name) {
         let value: Option<chrono::NaiveDateTime> = value;
         match value {
-            Some(v) => Ok(Value::DateTime(v)),
+            Some(v) => {
+                let year = i16::try_from(v.year())?;
+                let month = i8::try_from(v.month())?;
+                let day = i8::try_from(v.day())?;
+                let hour = i8::try_from(v.hour())?;
+                let minute = i8::try_from(v.minute())?;
+                let second = i8::try_from(v.second())?;
+                let nanosecond = i32::try_from(v.nanosecond())?;
+                let date_time =
+                    jiff::civil::datetime(year, month, day, hour, minute, second, nanosecond);
+                Ok(Value::DateTime(date_time))
+            }
             None => Ok(Value::Null),
         }
     } else {

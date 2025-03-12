@@ -12,8 +12,8 @@ version.workspace = true
 
 [dependencies]
 async-trait = { workspace = true }
-chrono = { workspace = true }
 indexmap = { workspace = true }
+jiff = { workspace = true }
 polars = { workspace = true, features = ["polars-sql"] }
 polars-sql = { workspace = true }
 rsql_driver = { path = "../../rsql_driver", version = "0.17.2" }

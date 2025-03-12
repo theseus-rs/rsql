@@ -7,7 +7,9 @@ use sqlparser::ast::Statement;
 use sqlparser::dialect::{Dialect, GenericDialect};
 use sqlparser::parser::Parser;
 
-use chrono::{NaiveTime, TimeDelta};
+use jiff::civil::DateTime;
+use jiff::tz::Offset;
+use jiff::{Timestamp, ToSpan};
 use std::fmt::Debug;
 
 /// A single row of a query result
@@ -155,17 +157,17 @@ pub trait Connection: Debug + Send + Sync {
 pub struct CachedMetadataConnection {
     connection: Box<dyn Connection>,
     metadata: Option<Metadata>,
-    timestamp: NaiveTime,
+    timestamp: DateTime,
 }
 
 impl CachedMetadataConnection {
     #[must_use]
     pub fn new(connection: Box<dyn Connection>) -> Self {
-        let timestamp = chrono::Local::now().time();
+        let now = Offset::UTC.to_datetime(Timestamp::now());
         Self {
             connection,
             metadata: None,
-            timestamp,
+            timestamp: now,
         }
     }
 }
@@ -185,10 +187,10 @@ impl Connection for CachedMetadataConnection {
     }
 
     async fn metadata(&mut self) -> Result<Metadata> {
-        let now = chrono::Local::now().time();
-        let one_minute = TimeDelta::try_minutes(1).unwrap_or_default();
+        let now = Offset::UTC.to_datetime(Timestamp::now());
+        let timestamp = self.timestamp.checked_add(1.minute())?;
 
-        if self.timestamp + one_minute < now {
+        if timestamp < now {
             self.metadata = None;
         }
 

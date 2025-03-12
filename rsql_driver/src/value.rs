@@ -1,10 +1,13 @@
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
 use indexmap::IndexMap;
+use jiff::civil::{Date, DateTime, Time};
 use num_format::{Locale, ToFormattedString};
+use rust_decimal::Decimal;
 use serde::{Serialize, Serializer};
 use std::fmt;
 use std::hash::{Hash, Hasher};
+use uuid::Uuid;
 
 #[derive(Clone, Debug)]
 pub enum Value {
@@ -24,11 +27,11 @@ pub enum Value {
     F32(f32),
     F64(f64),
     String(String),
-    Decimal(rust_decimal::Decimal),
-    Date(chrono::NaiveDate),
-    Time(chrono::NaiveTime),
-    DateTime(chrono::NaiveDateTime),
-    Uuid(uuid::Uuid),
+    Decimal(Decimal),
+    Date(Date),
+    Time(Time),
+    DateTime(DateTime),
+    Uuid(Uuid),
     Array(Vec<Value>),
     Map(IndexMap<Value, Value>),
 }
@@ -374,20 +377,20 @@ impl From<rust_decimal::Decimal> for Value {
     }
 }
 
-impl From<chrono::NaiveDate> for Value {
-    fn from(value: chrono::NaiveDate) -> Self {
+impl From<jiff::civil::Date> for Value {
+    fn from(value: jiff::civil::Date) -> Self {
         Value::Date(value)
     }
 }
 
-impl From<chrono::NaiveTime> for Value {
-    fn from(value: chrono::NaiveTime) -> Self {
+impl From<jiff::civil::Time> for Value {
+    fn from(value: jiff::civil::Time) -> Self {
         Value::Time(value)
     }
 }
 
-impl From<chrono::NaiveDateTime> for Value {
-    fn from(value: chrono::NaiveDateTime) -> Self {
+impl From<jiff::civil::DateTime> for Value {
+    fn from(value: jiff::civil::DateTime) -> Self {
         Value::DateTime(value)
     }
 }
@@ -447,7 +450,8 @@ impl From<IndexMap<Value, Value>> for Value {
 mod tests {
     use super::*;
     use anyhow::Result;
-    use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
+    use jiff::civil;
+    use jiff::civil::DateTime;
     use serde_json::json;
     use std::str::FromStr;
     use uuid::Uuid;
@@ -708,7 +712,7 @@ mod tests {
 
     #[test]
     fn test_date() {
-        let date = NaiveDate::from_ymd_opt(2000, 12, 31).expect("Invalid date");
+        let date = jiff::civil::date(2000, 12, 31);
         assert!(!Value::Date(date).is_null());
         assert!(!Value::Date(date).is_numeric());
         assert_eq!(
@@ -721,35 +725,35 @@ mod tests {
 
     #[test]
     fn test_time() {
-        let time = NaiveTime::from_hms_milli_opt(12, 13, 14, 15).expect("Invalid time");
+        let time = jiff::civil::time(12, 13, 14, 15);
         assert!(!Value::Time(time).is_null());
         assert!(!Value::Time(time).is_numeric());
         assert_eq!(
             Value::Time(time).to_formatted_string(&Locale::en),
-            "12:13:14.015"
+            "12:13:14.000000015"
         );
-        assert_eq!(Value::Time(time).to_string(), "12:13:14.015");
-        assert_eq!(json!(Value::Time(time)), json!("12:13:14.015"));
+        assert_eq!(Value::Time(time).to_string(), "12:13:14.000000015");
+        assert_eq!(json!(Value::Time(time)), json!("12:13:14.000000015"));
     }
 
     #[test]
     fn test_datetime() {
-        let date = NaiveDate::from_ymd_opt(2000, 12, 31).expect("Invalid date");
-        let time = NaiveTime::from_hms_milli_opt(12, 13, 14, 15).expect("Invalid time");
-        let datetime = NaiveDateTime::new(date, time);
-        assert!(!Value::DateTime(datetime).is_null());
-        assert!(!Value::DateTime(datetime).is_numeric());
+        let date = civil::date(2000, 12, 31);
+        let time = civil::time(12, 13, 14, 15);
+        let date_time = DateTime::from_parts(date, time);
+        assert!(!Value::DateTime(date_time).is_null());
+        assert!(!Value::DateTime(date_time).is_numeric());
         assert_eq!(
-            Value::DateTime(datetime).to_formatted_string(&Locale::en),
-            "2000-12-31 12:13:14.015"
+            Value::DateTime(date_time).to_formatted_string(&Locale::en),
+            "2000-12-31T12:13:14.000000015"
         );
         assert_eq!(
-            Value::DateTime(datetime).to_string(),
-            "2000-12-31 12:13:14.015"
+            Value::DateTime(date_time).to_string(),
+            "2000-12-31T12:13:14.000000015"
         );
         assert_eq!(
-            json!(Value::DateTime(datetime)),
-            json!("2000-12-31 12:13:14.015")
+            json!(Value::DateTime(date_time)),
+            json!("2000-12-31T12:13:14.000000015")
         );
     }
 
@@ -785,21 +789,18 @@ mod tests {
             Value::F32(9.1),
             Value::F64(10.42),
             Value::String("foo".to_string()),
-            Value::Date(NaiveDate::from_ymd_opt(2000, 12, 31).expect("Invalid date")),
-            Value::Time(NaiveTime::from_hms_milli_opt(12, 13, 14, 15).expect("Invalid time")),
-            Value::DateTime(NaiveDateTime::new(
-                NaiveDate::from_ymd_opt(2000, 12, 31).expect("Invalid date"),
-                NaiveTime::from_hms_milli_opt(12, 13, 14, 15).expect("Invalid time"),
-            )),
+            Value::Date(jiff::civil::date(2000, 12, 31)),
+            Value::Time(jiff::civil::time(12, 13, 14, 15)),
+            Value::DateTime(jiff::civil::datetime(2000, 12, 31, 12, 13, 14, 15)),
             Value::Uuid(Uuid::from_str("acf5b3e3-4099-4f34-81c7-5803cbc87a2d")?),
         ];
         assert_eq!(
             Value::Array(array.clone()).to_formatted_string(&Locale::en),
-            "null, true, 1, 2, 3, 12,345, 128, 5, 6, 7, 8, 128, 9.1, 10.42, foo, 2000-12-31, 12:13:14.015, 2000-12-31 12:13:14.015, acf5b3e3-4099-4f34-81c7-5803cbc87a2d"
+            "null, true, 1, 2, 3, 12,345, 128, 5, 6, 7, 8, 128, 9.1, 10.42, foo, 2000-12-31, 12:13:14.000000015, 2000-12-31T12:13:14.000000015, acf5b3e3-4099-4f34-81c7-5803cbc87a2d"
         );
         assert_eq!(
             Value::Array(array.clone()).to_string(),
-            "null, true, 1, 2, 3, 12345, 128, 5, 6, 7, 8, 128, 9.1, 10.42, foo, 2000-12-31, 12:13:14.015, 2000-12-31 12:13:14.015, acf5b3e3-4099-4f34-81c7-5803cbc87a2d"
+            "null, true, 1, 2, 3, 12345, 128, 5, 6, 7, 8, 128, 9.1, 10.42, foo, 2000-12-31, 12:13:14.000000015, 2000-12-31T12:13:14.000000015, acf5b3e3-4099-4f34-81c7-5803cbc87a2d"
         );
         assert_eq!(json!(Value::Array(array.clone())), json!(array.clone()));
         Ok(())
@@ -928,23 +929,21 @@ mod tests {
     }
 
     #[test]
-    fn test_from_naive_date() {
-        let date = NaiveDate::from_ymd_opt(2000, 12, 31).expect("Invalid date");
+    fn test_from_date() {
+        let date = jiff::civil::date(2000, 12, 31);
         assert_eq!(Value::from(date), Value::Date(date));
     }
 
     #[test]
-    fn test_from_naive_time() {
-        let time = NaiveTime::from_hms_milli_opt(12, 13, 14, 15).expect("Invalid time");
+    fn test_from_time() {
+        let time = jiff::civil::time(12, 13, 14, 15);
         assert_eq!(Value::from(time), Value::Time(time));
     }
 
     #[test]
-    fn test_from_naive_date_time() {
-        let date = NaiveDate::from_ymd_opt(2000, 12, 31).expect("Invalid date");
-        let time = NaiveTime::from_hms_milli_opt(12, 13, 14, 15).expect("Invalid time");
-        let datetime = NaiveDateTime::new(date, time);
-        assert_eq!(Value::from(datetime), Value::DateTime(datetime));
+    fn test_from_date_time() {
+        let date_time = jiff::civil::datetime(2000, 12, 31, 12, 13, 14, 15);
+        assert_eq!(Value::from(date_time), Value::DateTime(date_time));
     }
 
     #[test]
