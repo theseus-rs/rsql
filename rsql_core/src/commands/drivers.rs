@@ -1,5 +1,6 @@
 use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use async_trait::async_trait;
+use rsql_driver::DriverManager;
 use rust_i18n::t;
 
 /// Command to display the available drivers
@@ -18,12 +19,10 @@ impl ShellCommand for Command {
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
         let locale = options.configuration.locale.as_str();
-        let driver_manager = options.driver_manager;
-
         let list_delimiter = t!("list_delimiter", locale = locale).to_string();
-        let drivers: String = driver_manager
+        let drivers: String = DriverManager::drivers()?
             .iter()
-            .map(rsql_drivers::Driver::identifier)
+            .map(|driver| driver.identifier().to_string())
             .collect::<Vec<_>>()
             .join(list_delimiter.as_str());
         let drivers_options = t!("drivers_options", locale = locale, drivers = drivers).to_string();
@@ -40,7 +39,7 @@ mod tests {
     use crate::commands::{CommandManager, CommandOptions};
     use crate::configuration::Configuration;
     use crate::writers::Output;
-    use rsql_drivers::{DriverManager, MockConnection};
+    use rsql_drivers::MockConnection;
     use rsql_formatters::FormatterManager;
     use rustyline::history::DefaultHistory;
 
@@ -58,6 +57,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_execute() -> anyhow::Result<()> {
+        rsql_drivers::DriverManager::initialize()?;
         let mut output = Output::default();
         let configuration = &mut Configuration {
             locale: "en".to_string(),
@@ -66,7 +66,6 @@ mod tests {
         let options = CommandOptions {
             configuration,
             command_manager: &CommandManager::default(),
-            driver_manager: &DriverManager::default(),
             formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),

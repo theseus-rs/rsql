@@ -11,7 +11,7 @@ use std::fmt::Debug;
 #[automock]
 #[async_trait]
 pub trait Driver: Debug + Send + Sync {
-    /// Returns the identifier of the driver.  The idenfitier is used as the scheme in the URL to
+    /// Returns the identifier of the driver.  The identifier is used as the scheme in the URL to
     /// identify the driver.
     fn identifier(&self) -> &'static str;
 

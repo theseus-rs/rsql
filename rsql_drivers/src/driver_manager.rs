@@ -1,176 +1,181 @@
-use crate::Error::DriverNotFound;
-use crate::error::Result;
 use file_type::FileType;
-use rsql_driver::Error::InvalidUrl;
-use rsql_driver::{CachedMetadataConnection, Connection, Driver};
-use std::collections::BTreeMap;
+use rsql_driver::{Connection, Driver, Result};
 use std::fmt::Debug;
+use std::sync::Arc;
 use tracing::instrument;
-use url::Url;
 
 /// Manages available drivers
 #[derive(Debug)]
-pub struct DriverManager {
-    drivers: BTreeMap<&'static str, Box<dyn Driver>>,
-}
+pub struct DriverManager {}
 
 impl DriverManager {
-    /// Create a new instance of the `DriverManager`
-    #[must_use]
-    pub fn new() -> Self {
-        DriverManager {
-            drivers: BTreeMap::new(),
-        }
-    }
-
     /// Add a new driver to the list of available drivers
-    pub fn add(&mut self, driver: Box<dyn Driver>) {
-        let identifier = driver.identifier();
-        let _ = &self.drivers.insert(identifier, driver);
+    ///
+    /// # Errors
+    /// * If a lock for drivers cannot be acquired
+    pub fn add(driver: Arc<dyn Driver>) -> Result<()> {
+        rsql_driver::DriverManager::add(driver)
     }
 
     /// Get a drivers by name
-    #[must_use]
-    pub fn get(&self, identifier: &str) -> Option<&dyn Driver> {
-        self.drivers.get(identifier).map(AsRef::as_ref)
+    ///
+    /// # Errors
+    /// * If a lock for drivers cannot be acquired
+    pub fn get<S: AsRef<str>>(identifier: S) -> Result<Option<Arc<dyn Driver>>> {
+        rsql_driver::DriverManager::get(identifier)
     }
 
     /// Get a drivers by name
-    #[must_use]
-    pub fn get_by_file_type(&self, file_type: &FileType) -> Option<&dyn Driver> {
-        self.drivers
-            .iter()
-            .find(|(_, driver)| driver.supports_file_type(file_type))
-            .map(|(_, driver)| driver.as_ref())
+    ///
+    /// # Errors
+    /// * If a lock for drivers cannot be acquired
+    pub fn get_by_file_type(file_type: &FileType) -> Result<Option<Arc<dyn Driver>>> {
+        rsql_driver::DriverManager::get_by_file_type(file_type)
     }
 
-    /// Get an iterator over the available drivers
-    pub fn iter(&self) -> impl Iterator<Item = &dyn Driver> {
-        self.drivers.values().map(AsRef::as_ref)
+    /// Get all drivers
+    ///
+    /// # Errors
+    /// * If a lock for drivers cannot be acquired
+    pub fn drivers() -> Result<Vec<Arc<dyn Driver>>> {
+        rsql_driver::DriverManager::drivers()
     }
 
     /// Connect to a database
+    ///
+    /// # Errors
+    /// * If a lock for drivers cannot be acquired
     #[instrument(name = "connect", level = "info", skip(url))]
-    pub async fn connect(&self, url: &str) -> Result<Box<dyn Connection>> {
-        let parsed_url = Url::parse(url).map_err(|error| InvalidUrl(error.to_string()))?;
-        let scheme = parsed_url.scheme();
-        let url = url.to_string();
-
-        match &self.get(scheme) {
-            Some(driver) => {
-                let connection = driver.connect(&url).await?;
-                let connection = Box::new(CachedMetadataConnection::new(connection));
-                Ok(connection)
-            }
-            None => Err(DriverNotFound(scheme.to_string())),
-        }
+    pub async fn connect<S: AsRef<str>>(url: S) -> Result<Box<dyn Connection>> {
+        rsql_driver::DriverManager::connect(url).await
     }
-}
 
-/// Default implementation for the `DriverManager`
-impl Default for DriverManager {
-    fn default() -> Self {
-        let mut drivers = DriverManager::new();
-
+    /// Initialize known drivers based on enabled features
+    ///
+    /// # Errors
+    /// * If a lock for drivers cannot be acquired
+    pub fn initialize() -> Result<()> {
         #[cfg(feature = "arrow")]
-        drivers.add(Box::new(rsql_driver_arrow::Driver));
+        Self::add(Arc::new(rsql_driver_arrow::Driver))?;
         #[cfg(feature = "avro")]
-        drivers.add(Box::new(rsql_driver_avro::Driver));
+        Self::add(Arc::new(rsql_driver_avro::Driver))?;
         #[cfg(feature = "cockroachdb")]
-        drivers.add(Box::new(rsql_driver_cockroachdb::Driver));
+        Self::add(Arc::new(rsql_driver_cockroachdb::Driver))?;
         #[cfg(feature = "csv")]
-        drivers.add(Box::new(rsql_driver_csv::Driver));
+        Self::add(Arc::new(rsql_driver_csv::Driver))?;
         #[cfg(feature = "delimited")]
-        drivers.add(Box::new(rsql_driver_delimited::Driver));
+        Self::add(Arc::new(rsql_driver_delimited::Driver))?;
         #[cfg(feature = "duckdb")]
-        drivers.add(Box::new(rsql_driver_duckdb::Driver));
+        Self::add(Arc::new(rsql_driver_duckdb::Driver))?;
         #[cfg(feature = "excel")]
-        drivers.add(Box::new(rsql_driver_excel::Driver));
+        Self::add(Arc::new(rsql_driver_excel::Driver))?;
         #[cfg(feature = "file")]
-        drivers.add(Box::new(crate::file::Driver));
+        Self::add(Arc::new(rsql_driver_file::Driver))?;
         #[cfg(feature = "fwf")]
-        drivers.add(Box::new(rsql_driver_fwf::Driver));
+        Self::add(Arc::new(rsql_driver_fwf::Driver))?;
         #[cfg(feature = "http")]
-        drivers.add(Box::new(crate::http::Driver));
+        Self::add(Arc::new(rsql_driver_http::Driver))?;
         #[cfg(feature = "https")]
-        drivers.add(Box::new(crate::https::Driver));
+        Self::add(Arc::new(rsql_driver_https::Driver))?;
         #[cfg(feature = "json")]
-        drivers.add(Box::new(rsql_driver_json::Driver));
+        Self::add(Arc::new(rsql_driver_json::Driver))?;
         #[cfg(feature = "jsonl")]
-        drivers.add(Box::new(rsql_driver_jsonl::Driver));
+        Self::add(Arc::new(rsql_driver_jsonl::Driver))?;
         #[cfg(feature = "libsql")]
-        drivers.add(Box::new(rsql_driver_libsql::Driver));
+        Self::add(Arc::new(rsql_driver_libsql::Driver))?;
         #[cfg(feature = "mariadb")]
-        drivers.add(Box::new(rsql_driver_mariadb::Driver));
+        Self::add(Arc::new(rsql_driver_mariadb::Driver))?;
         #[cfg(feature = "mysql")]
-        drivers.add(Box::new(rsql_driver_mysql::Driver));
+        Self::add(Arc::new(rsql_driver_mysql::Driver))?;
         #[cfg(feature = "ods")]
-        drivers.add(Box::new(rsql_driver_ods::Driver));
+        Self::add(Arc::new(rsql_driver_ods::Driver))?;
         #[cfg(feature = "orc")]
-        drivers.add(Box::new(rsql_driver_orc::Driver));
+        Self::add(Arc::new(rsql_driver_orc::Driver))?;
         #[cfg(feature = "parquet")]
-        drivers.add(Box::new(rsql_driver_parquet::Driver));
+        Self::add(Arc::new(rsql_driver_parquet::Driver))?;
         #[cfg(feature = "postgres")]
-        drivers.add(Box::new(rsql_driver_postgres::Driver));
+        Self::add(Arc::new(rsql_driver_postgres::Driver))?;
         #[cfg(feature = "postgresql")]
-        drivers.add(Box::new(rsql_driver_postgresql::Driver));
+        Self::add(Arc::new(rsql_driver_postgresql::Driver))?;
         #[cfg(feature = "redshift")]
-        drivers.add(Box::new(rsql_driver_redshift::Driver));
+        Self::add(Arc::new(rsql_driver_redshift::Driver))?;
         #[cfg(feature = "rusqlite")]
-        drivers.add(Box::new(rsql_driver_rusqlite::Driver));
+        Self::add(Arc::new(rsql_driver_rusqlite::Driver))?;
         #[cfg(feature = "s3")]
-        drivers.add(Box::new(crate::s3::Driver));
+        Self::add(Arc::new(rsql_driver_s3::Driver))?;
         #[cfg(feature = "snowflake")]
-        drivers.add(Box::new(rsql_driver_snowflake::Driver));
+        Self::add(Arc::new(rsql_driver_snowflake::Driver))?;
         #[cfg(feature = "sqlite")]
-        drivers.add(Box::new(rsql_driver_sqlite::Driver));
+        Self::add(Arc::new(rsql_driver_sqlite::Driver))?;
         #[cfg(feature = "sqlserver")]
-        drivers.add(Box::new(rsql_driver_sqlserver::Driver));
+        Self::add(Arc::new(rsql_driver_sqlserver::Driver))?;
         #[cfg(feature = "tsv")]
-        drivers.add(Box::new(rsql_driver_tsv::Driver));
+        Self::add(Arc::new(rsql_driver_tsv::Driver))?;
         #[cfg(feature = "xml")]
-        drivers.add(Box::new(rsql_driver_xml::Driver));
+        Self::add(Arc::new(rsql_driver_xml::Driver))?;
         #[cfg(feature = "yaml")]
-        drivers.add(Box::new(rsql_driver_yaml::Driver));
-
-        drivers
+        Self::add(Arc::new(rsql_driver_yaml::Driver))?;
+        Ok(())
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use rsql_driver::MockConnection;
-    use rsql_driver::MockDriver;
+    use crate::{MockConnection, MockDriver};
 
-    #[test]
-    fn test_driver_manager() {
-        let identifier = "test";
+    const IDENTIFIER: &str = "test";
+
+    fn add_mock_driver() -> Result<()> {
         let mut mock_driver = MockDriver::new();
-        mock_driver.expect_identifier().returning(|| identifier);
+        mock_driver.expect_identifier().returning(|| IDENTIFIER);
         mock_driver.expect_supports_file_type().returning(|_| false);
-
-        let mut driver_manager = DriverManager::new();
-        assert_eq!(driver_manager.drivers.len(), 0);
-
-        driver_manager.add(Box::new(mock_driver));
-
-        assert_eq!(driver_manager.drivers.len(), 1);
-        let result = driver_manager.get(identifier);
-        assert!(result.is_some());
-
-        let mut driver_count = 0;
-        driver_manager.iter().for_each(|_command| {
-            driver_count += 1;
-        });
-        assert_eq!(driver_count, 1);
+        mock_driver
+            .expect_connect()
+            .returning(|_| Ok(Box::new(MockConnection::new())));
+        DriverManager::add(Arc::new(mock_driver))?;
+        Ok(())
     }
 
     #[test]
-    fn test_driver_manager_default() {
-        let driver_manager = DriverManager::default();
-        let driver_count = 0;
+    fn test_add() -> Result<()> {
+        let drivers = DriverManager::drivers()?;
+        assert!(drivers.is_empty());
 
+        add_mock_driver()?;
+
+        let drivers = DriverManager::drivers()?;
+        assert_eq!(drivers.len(), 1);
+        let result = DriverManager::get(IDENTIFIER)?;
+        assert!(result.is_some());
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_connect_with_colon() -> Result<()> {
+        add_mock_driver()?;
+        let _ = DriverManager::connect(format!("{IDENTIFIER}:").as_str()).await?;
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_connect_without_colon() -> Result<()> {
+        add_mock_driver()?;
+        let result = DriverManager::connect(IDENTIFIER).await;
+        assert!(result.is_err());
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_connect_error() {
+        let result = DriverManager::connect("foo").await;
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_initialize() -> Result<()> {
+        DriverManager::initialize()?;
+        let driver_count = 0;
         #[cfg(feature = "arrow")]
         let driver_count = driver_count + 1;
         #[cfg(feature = "avro")]
@@ -232,36 +237,10 @@ mod tests {
         #[cfg(feature = "yaml")]
         let driver_count = driver_count + 1;
 
-        assert_eq!(driver_manager.drivers.len(), driver_count);
-    }
-
-    #[tokio::test]
-    async fn test_driver_manager_connect_with_colon() -> Result<()> {
-        let identifier = "test";
-        let mut mock_driver = MockDriver::new();
-        mock_driver.expect_identifier().returning(|| identifier);
-        mock_driver.expect_supports_file_type().returning(|_| false);
-        mock_driver
-            .expect_connect()
-            .returning(|_| Ok(Box::new(MockConnection::new())));
-
-        let mut driver_manager = DriverManager::new();
-        driver_manager.add(Box::new(mock_driver));
-
-        let _ = driver_manager.connect("test:").await?;
+        let drivers = DriverManager::drivers()?;
+        // The number of drivers should be at least the number of features enabled.  This value may
+        // be higher if additional drivers are added during testing.
+        assert!(drivers.len() >= driver_count);
         Ok(())
-    }
-
-    #[tokio::test]
-    async fn test_driver_manager_connect_without_colon() {
-        let driver_manager = DriverManager::new();
-        assert!(driver_manager.connect("test").await.is_err());
-    }
-
-    #[tokio::test]
-    async fn test_driver_manager_connect_error() {
-        let driver_manager = DriverManager::default();
-        let result = driver_manager.connect("foo").await;
-        assert!(result.is_err());
     }
 }

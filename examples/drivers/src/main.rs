@@ -5,9 +5,10 @@ use rsql_drivers::{DriverManager, Result};
 /// Example of using the DriverManager to connect to a database.
 #[tokio::main]
 async fn main() -> Result<()> {
+    DriverManager::initialize()?;
+
     let database_url = "sqlite://";
-    let driver_manager = DriverManager::default();
-    let mut connection = driver_manager.connect(database_url).await?;
+    let mut connection = DriverManager::connect(database_url).await?;
 
     let _ = connection
         .execute("CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT NOT NULL)")

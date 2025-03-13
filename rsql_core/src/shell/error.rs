@@ -5,9 +5,6 @@ pub enum Error {
     /// Driver error
     #[error(transparent)]
     DriverError(#[from] rsql_driver::Error),
-    /// Drivers error
-    #[error(transparent)]
-    DriversError(#[from] rsql_drivers::Error),
     /// Executor error
     #[error(transparent)]
     ExecutorError(#[from] crate::executors::Error),

@@ -2,7 +2,7 @@ use crate::commands::Error::InvalidOption;
 use crate::commands::error::Result;
 use crate::configuration::Configuration;
 use async_trait::async_trait;
-use rsql_drivers::{Connection, DriverManager};
+use rsql_drivers::Connection;
 use rsql_formatters::FormatterManager;
 use rsql_formatters::writers::Output;
 use rustyline::history::DefaultHistory;
@@ -22,7 +22,6 @@ pub enum LoopCondition {
 pub struct CommandOptions<'a> {
     pub configuration: &'a mut Configuration,
     pub command_manager: &'a CommandManager,
-    pub driver_manager: &'a DriverManager,
     pub formatter_manager: &'a FormatterManager,
     pub history: &'a DefaultHistory,
     pub connection: &'a mut dyn Connection,
@@ -35,7 +34,6 @@ impl Debug for CommandOptions<'_> {
         f.debug_struct("CommandOptions")
             .field("configuration", &self.configuration)
             .field("command_manager", &self.command_manager)
-            .field("driver_manager", &self.driver_manager)
             .field("formatter_manager", &self.formatter_manager)
             .field("connection", &self.connection)
             .field("output", &self.output)
@@ -219,7 +217,6 @@ mod tests {
         let options = CommandOptions {
             configuration: &mut Configuration::default(),
             command_manager: &CommandManager::default(),
-            driver_manager: &DriverManager::default(),
             formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &FileHistory::default(),
@@ -231,7 +228,6 @@ mod tests {
         assert!(debug.contains("CommandOptions"));
         assert!(debug.contains("configuration"));
         assert!(debug.contains("command_manager"));
-        assert!(debug.contains("driver_manager"));
         assert!(debug.contains("formatter_manager"));
         assert!(debug.contains("connection"));
         assert!(debug.contains("input"));

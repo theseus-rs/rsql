@@ -1,10 +1,9 @@
-use crate::DriverManager;
 use async_trait::async_trait;
 use file_type::FileType;
 use futures_util::StreamExt;
 use reqwest::header::HeaderMap;
 use rsql_driver::Error::{ConversionError, IoError};
-use rsql_driver::Result;
+use rsql_driver::{DriverManager, Result};
 use std::collections::HashMap;
 use std::fs::create_dir_all;
 use std::path::{Path, PathBuf};
@@ -32,8 +31,7 @@ impl rsql_driver::Driver for Driver {
         let file_path = file_path.replace(':', "%3A").replace('\\', "/");
 
         debug!("temp_dir: {temp_dir:?}; file_path: {file_path}");
-        let driver_manager = DriverManager::default();
-        let driver = driver_manager.get_by_file_type(file_type);
+        let driver = DriverManager::get_by_file_type(file_type)?;
         match driver {
             Some(driver) => {
                 let (_url, parameters) = url.split_once('?').unwrap_or((url, ""));
@@ -200,12 +198,14 @@ fn create_table_sql(table_name: &str, headers: &HashMap<String, String>) -> Stri
 mod test {
     use super::*;
     use rsql_driver::{Driver, Value};
+    use std::sync::Arc;
 
     #[tokio::test]
     async fn test_driver() -> Result<()> {
+        DriverManager::add(Arc::new(rsql_driver_csv::Driver))?;
         let database_url =
             "https://raw.githubusercontent.com/theseus-rs/rsql/refs/heads/main/datasets/users.csv";
-        let driver = crate::https::Driver;
+        let driver = Driver;
         let mut connection = driver.connect(database_url).await?;
 
         let mut query_result = connection
