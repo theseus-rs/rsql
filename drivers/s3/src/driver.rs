@@ -1,11 +1,10 @@
-use crate::DriverManager;
 use async_trait::async_trait;
 use aws_config::Region;
 use aws_credential_types::Credentials;
 use aws_sdk_s3::Client;
 use file_type::FileType;
 use rsql_driver::Error::IoError;
-use rsql_driver::Result;
+use rsql_driver::{DriverManager, Result};
 use std::collections::HashMap;
 use std::fs::create_dir_all;
 use std::path::{Path, PathBuf};
@@ -32,8 +31,7 @@ impl rsql_driver::Driver for Driver {
         let file_path = file_path.replace(':', "%3A").replace('\\', "/");
 
         debug!("temp_dir: {temp_dir:?}; file_path: {file_path}");
-        let driver_manager = DriverManager::default();
-        let driver = driver_manager.get_by_file_type(file_type);
+        let driver = DriverManager::get_by_file_type(file_type)?;
         match driver {
             Some(driver) => {
                 let (_url, parameters) = url.split_once('?').unwrap_or((url, ""));
@@ -196,7 +194,7 @@ mod test {
             .map_err(|error| IoError(error.to_string()))?;
         let database_url = upload_test_file(&container).await?;
 
-        let driver = crate::s3::Driver;
+        let driver = Driver;
         let mut connection = driver.connect(database_url.as_str()).await?;
 
         let mut query_result = connection

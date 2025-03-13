@@ -31,13 +31,6 @@ impl ShellBuilder {
         self
     }
 
-    /// Set the driver manager for the shell.
-    #[must_use]
-    pub fn with_driver_manager(mut self, driver_manager: DriverManager) -> Self {
-        self.shell.driver_manager = driver_manager;
-        self
-    }
-
     /// Set the command manager for the shell.
     #[must_use]
     pub fn with_command_manager(mut self, command_manager: CommandManager) -> Self {
@@ -70,7 +63,6 @@ impl ShellBuilder {
 #[derive(Debug, Default)]
 pub struct Shell {
     pub configuration: Configuration,
-    pub driver_manager: DriverManager,
     pub command_manager: CommandManager,
     pub formatter_manager: FormatterManager,
     pub output: Output,
@@ -84,7 +76,8 @@ impl Shell {
     ///
     /// Returns an error if the shell fails to execute.
     pub async fn execute(&mut self, args: &ShellArgs) -> Result<i32> {
-        let mut binding = self.driver_manager.connect(args.url.as_str()).await?;
+        DriverManager::initialize()?;
+        let mut binding = DriverManager::connect(args.url.as_str()).await?;
         let connection = binding.as_mut();
         let input = if let Some(file) = &args.file {
             Some(file.clone().contents()?)
@@ -209,7 +202,6 @@ impl Shell {
         let mut executor = Executor::new(
             &mut self.configuration,
             &self.command_manager,
-            &self.driver_manager,
             &self.formatter_manager,
             history,
             connection,
@@ -303,6 +295,7 @@ mod test {
     use super::*;
     use rsql_drivers::{Metadata, MockConnection, MockDriver};
     use rustyline::history::DefaultHistory;
+    use std::sync::Arc;
 
     #[test]
     fn test_shell_builder() {
@@ -310,20 +303,17 @@ mod test {
             bail_on_error: true,
             ..Default::default()
         };
-        let driver_manager = DriverManager::new();
         let command_manager = CommandManager::new();
         let formatter_manager = FormatterManager::new();
         let output = Output::default();
         let shell = ShellBuilder::default()
             .with_configuration(configuration)
-            .with_driver_manager(driver_manager)
             .with_command_manager(command_manager)
             .with_formatter_manager(formatter_manager)
             .with_output(output)
             .build();
 
         assert!(shell.configuration.bail_on_error);
-        assert!(shell.driver_manager.iter().next().is_none());
         assert!(shell.command_manager.iter().next().is_none());
         assert!(shell.formatter_manager.iter().next().is_none());
     }
@@ -334,7 +324,6 @@ mod test {
         let debug = format!("{shell:?}");
         assert!(debug.contains("Shell"));
         assert!(debug.contains("configuration"));
-        assert!(debug.contains("driver_manager"));
         assert!(debug.contains("command_manager"));
         assert!(debug.contains("formatter_manager"));
     }
@@ -356,11 +345,9 @@ mod test {
             mock_connection.expect_close().returning(|| Ok(()));
             Ok(Box::new(mock_connection))
         });
-        let mut driver_manager = DriverManager::new();
-        driver_manager.add(Box::new(mock_driver));
+        DriverManager::add(Arc::new(mock_driver))?;
         let mut shell = ShellBuilder::default()
             .with_configuration(configuration)
-            .with_driver_manager(driver_manager)
             .build();
         let args = ShellArgs {
             url: format!("{driver_identifier}://"),

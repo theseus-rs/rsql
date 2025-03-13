@@ -6,6 +6,7 @@ delimited = "run --manifest-path ./rsql_cli/Cargo.toml -- --url delimited://data
 duckdb = "run --manifest-path ./rsql_cli/Cargo.toml -- --url duckdb://datasets/users.duckdb"
 excel = "run --manifest-path ./rsql_cli/Cargo.toml -- --url excel://datasets/users.xlsx"
 file = "run --manifest-path ./rsql_cli/Cargo.toml -- --url file://datasets/users.csv"
+fwf = "run --manifest-path ./rsql_cli/Cargo.toml -- --url fwf://datasets/users.fwf?widths=4,15&headers=id,name"
 http = "run --manifest-path ./rsql_cli/Cargo.toml -- --url http://raw.githubusercontent.com/theseus-rs/rsql/refs/heads/main/datasets/users.csv"
 https = "run --manifest-path ./rsql_cli/Cargo.toml -- --url https://raw.githubusercontent.com/theseus-rs/rsql/refs/heads/main/datasets/users.csv"
 # libsql currently conflicts with the rusqlite crate; hopefully the limbo rewrite in Rust will resolve this
@@ -13,6 +14,7 @@ libsql = "run --manifest-path ./rsql_cli/Cargo.toml -- --url libsql://?memory=tr
 json = "run --manifest-path ./rsql_cli/Cargo.toml -- --url json://datasets/users.json"
 jsonl = "run --manifest-path ./rsql_cli/Cargo.toml -- --url jsonl://datasets/users.jsonl"
 ods = "run --manifest-path ./rsql_cli/Cargo.toml -- --url ods://datasets/users.ods"
+orc = "run --manifest-path ./rsql_cli/Cargo.toml -- --url orc://datasets/users.orc"
 parquet = "run --manifest-path ./rsql_cli/Cargo.toml -- --url parquet://datasets/users.parquet"
 postgres = "run --manifest-path ./rsql_cli/Cargo.toml -- --url postgres://?embedded=true"
 postgresql = "run --manifest-path ./rsql_cli/Cargo.toml -- --url postgresql://?embedded=true"

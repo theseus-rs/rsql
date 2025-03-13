@@ -4,7 +4,7 @@ use crate::executors::Result;
 use crate::executors::command::CommandExecutor;
 use crate::executors::sql::SqlExecutor;
 use regex::Regex;
-use rsql_drivers::{Connection, DriverManager};
+use rsql_drivers::Connection;
 use rsql_formatters::writers::Output;
 use rsql_formatters::{FormatterManager, FormatterOptions, Highlighter};
 use rustyline::history::DefaultHistory;
@@ -14,7 +14,6 @@ use std::fmt::Debug;
 pub struct Executor<'a> {
     configuration: &'a mut Configuration,
     command_manager: &'a CommandManager,
-    driver_manager: &'a DriverManager,
     formatter_manager: &'a FormatterManager,
     history: &'a DefaultHistory,
     connection: &'a mut dyn Connection,
@@ -25,7 +24,6 @@ impl<'a> Executor<'a> {
     pub(crate) fn new(
         configuration: &'a mut Configuration,
         command_manager: &'a CommandManager,
-        driver_manager: &'a DriverManager,
         formatter_manager: &'a FormatterManager,
         history: &'a DefaultHistory,
         connection: &'a mut dyn Connection,
@@ -34,7 +32,6 @@ impl<'a> Executor<'a> {
         Self {
             configuration,
             command_manager,
-            driver_manager,
             formatter_manager,
             history,
             connection,
@@ -107,7 +104,6 @@ impl<'a> Executor<'a> {
             let mut executor = CommandExecutor::new(
                 self.configuration,
                 self.command_manager,
-                self.driver_manager,
                 self.formatter_manager,
                 self.history,
                 self.connection,
@@ -134,7 +130,6 @@ impl Debug for Executor<'_> {
         f.debug_struct("Executor")
             .field("configuration", &self.configuration)
             .field("command_manager", &self.command_manager)
-            .field("driver_manager", &self.driver_manager)
             .field("formatter_manager", &self.formatter_manager)
             .field("connection", &self.connection)
             .finish()
@@ -152,7 +147,6 @@ mod tests {
     async fn test_debug() {
         let mut configuration = Configuration::default();
         let command_manager = CommandManager::default();
-        let driver_manager = DriverManager::default();
         let formatter_manager = FormatterManager::default();
         let history = DefaultHistory::new();
         let mut connection = MockConnection::new();
@@ -161,7 +155,6 @@ mod tests {
         let executor = Executor::new(
             &mut configuration,
             &command_manager,
-            &driver_manager,
             &formatter_manager,
             &history,
             &mut connection,
@@ -171,7 +164,6 @@ mod tests {
         assert!(debug.contains("Executor"));
         assert!(debug.contains("configuration"));
         assert!(debug.contains("command_manager"));
-        assert!(debug.contains("driver_manager"));
         assert!(debug.contains("formatter_manager"));
         assert!(debug.contains("connection"));
     }
@@ -180,7 +172,6 @@ mod tests {
     async fn test_parse_commands_default_command_identifier() -> anyhow::Result<()> {
         let mut configuration = Configuration::default();
         let command_manager = CommandManager::default();
-        let driver_manager = DriverManager::default();
         let formatter_manager = FormatterManager::default();
         let history = DefaultHistory::new();
         let mut connection = MockConnection::new();
@@ -189,7 +180,6 @@ mod tests {
         let executor = Executor::new(
             &mut configuration,
             &command_manager,
-            &driver_manager,
             &formatter_manager,
             &history,
             &mut connection,
@@ -222,7 +212,6 @@ mod tests {
             ..Default::default()
         };
         let command_manager = CommandManager::default();
-        let driver_manager = DriverManager::default();
         let formatter_manager = FormatterManager::default();
         let history = DefaultHistory::new();
         let mut connection = MockConnection::new();
@@ -231,7 +220,6 @@ mod tests {
         let executor = Executor::new(
             &mut configuration,
             &command_manager,
-            &driver_manager,
             &formatter_manager,
             &history,
             &mut connection,
@@ -265,7 +253,6 @@ mod tests {
             ..Default::default()
         };
         let command_manager = CommandManager::default();
-        let driver_manager = DriverManager::default();
         let formatter_manager = FormatterManager::default();
         let history = DefaultHistory::new();
         let mut connection = MockConnection::new();
@@ -274,7 +261,6 @@ mod tests {
         let mut executor = Executor::new(
             &mut configuration,
             &command_manager,
-            &driver_manager,
             &formatter_manager,
             &history,
             &mut connection,
@@ -295,7 +281,6 @@ mod tests {
     async fn test_execute_empty_input() -> anyhow::Result<()> {
         let mut configuration = Configuration::default();
         let command_manager = CommandManager::default();
-        let driver_manager = DriverManager::default();
         let formatter_manager = FormatterManager::default();
         let history = DefaultHistory::new();
         let mut connection = MockConnection::new();
@@ -304,7 +289,6 @@ mod tests {
         let mut executor = Executor::new(
             &mut configuration,
             &command_manager,
-            &driver_manager,
             &formatter_manager,
             &history,
             &mut connection,
@@ -320,7 +304,6 @@ mod tests {
     async fn test_execute_loop_exit() -> anyhow::Result<()> {
         let mut configuration = Configuration::default();
         let command_manager = CommandManager::default();
-        let driver_manager = DriverManager::default();
         let formatter_manager = FormatterManager::default();
         let history = DefaultHistory::new();
         let mut connection = MockConnection::new();
@@ -330,7 +313,6 @@ mod tests {
         let mut executor = Executor::new(
             &mut configuration,
             &command_manager,
-            &driver_manager,
             &formatter_manager,
             &history,
             &mut connection,
@@ -351,7 +333,6 @@ mod tests {
             ..Default::default()
         };
         let command_manager = CommandManager::default();
-        let driver_manager = DriverManager::default();
         let formatter_manager = FormatterManager::default();
         let history = DefaultHistory::new();
         let mut connection = MockConnection::new();
@@ -360,7 +341,6 @@ mod tests {
         let mut executor = Executor::new(
             &mut configuration,
             &command_manager,
-            &driver_manager,
             &formatter_manager,
             &history,
             &mut connection,
@@ -411,7 +391,6 @@ mod tests {
             ..Default::default()
         };
         let command_manager = CommandManager::default();
-        let driver_manager = DriverManager::default();
         let formatter_manager = FormatterManager::default();
         let history = DefaultHistory::new();
         let mut connection = MockConnection::new();
@@ -429,7 +408,6 @@ mod tests {
         let mut executor = Executor::new(
             &mut configuration,
             &command_manager,
-            &driver_manager,
             &formatter_manager,
             &history,
             &mut connection,

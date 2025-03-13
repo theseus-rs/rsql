@@ -12,6 +12,7 @@ extern crate rust_i18n;
 
 mod connection;
 mod driver;
+mod driver_manager;
 mod error;
 mod metadata;
 mod url;
@@ -22,6 +23,7 @@ pub use connection::{
     QueryResult, Row, StatementMetadata,
 };
 pub use driver::{Driver, MockDriver};
+pub use driver_manager::DriverManager;
 pub use error::{Error, Result};
 pub use metadata::{Column, Index, Metadata, Schema, Table};
 pub use url::UrlExtension;
