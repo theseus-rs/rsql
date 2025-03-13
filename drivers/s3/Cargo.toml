@@ -1,0 +1,30 @@
+[package]
+authors.workspace = true
+categories.workspace = true
+description = "rsql s3 driver"
+edition.workspace = true
+keywords.workspace = true
+license.workspace = true
+name = "rsql_driver_s3"
+repository.workspace = true
+rust-version.workspace = true
+version.workspace = true
+
+[dependencies]
+async-trait = { workspace = true }
+aws-credential-types = { workspace = true }
+aws-config = { workspace = true }
+aws-sdk-s3 = { workspace = true }
+file_type = { workspace = true }
+rsql_driver = { path = "../../rsql_driver", version = "0.17.2" }
+tempfile = { workspace = true }
+tokio = { workspace = true, features = ["fs"] }
+tracing = { workspace = true }
+url = { workspace = true }
+
+[dev-dependencies]
+rsql_driver_csv = { path = "../csv", version = "0.17.2" }
+testcontainers-modules = { workspace = true, features = ["localstack"] }
+tokio = { workspace = true, features = ["macros", "rt"] }
+tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
+
