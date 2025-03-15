@@ -65,6 +65,9 @@ impl rsql_driver::Driver for Driver {
             .unwrap_or(&"0".to_string())
             .parse::<usize>()
             .map_err(|error| ConversionError(error.to_string()))?;
+        let truncate_ragged_lines = query_parameters
+            .get("truncate_ragged_lines")
+            .is_some_and(|value| value == "true");
 
         // Parse Options
         let eol = match query_parameters.get("eol") {
@@ -90,7 +93,8 @@ impl rsql_driver::Driver for Driver {
                 CsvParseOptions::default()
                     .with_eol_char(eol)
                     .with_quote_char(quote)
-                    .with_separator(separator),
+                    .with_separator(separator)
+                    .with_truncate_ragged_lines(truncate_ragged_lines),
             )
             .with_rechunk(true)
             .into_reader_with_file_handle(file)
