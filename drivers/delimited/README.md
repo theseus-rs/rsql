@@ -16,6 +16,20 @@ Driver url format: `delimited://<file>[?separator=<char>][&has_header=<true|fals
 
 The driver is implemented using [Polars SQL](https://docs.pola.rs/user-guide/sql).
 
+### Driver Configuration
+
+| Parameter                | Description                                                                                                   | Default |
+|--------------------------|---------------------------------------------------------------------------------------------------------------|---------|
+| `has_header`             | Whether the file has a header row.                                                                            | `true`  |
+| `separator`              | The character used to separate fields in the file.                                                            | `,`     |
+| `quote`                  | The character used to quote fields in the file.                                                               | `"`     |
+| `eol`                    | The character used to separate lines in the file.                                                             | `\n`    |
+| `skip_rows`              | The number of rows to skip before reading the data.                                                           | `0`     |
+| `skip_rows_after_header` | The number of rows to skip after the header.                                                                  | `0`     |
+| `truncate_ragged_lines`  | Whether to truncate lines that are longer than the schema.                                                    | `false` |
+| `infer_schema_length`    | The number of rows to use when inferring the schema.                                                          | `100`   |
+| `ignore_errors`          | Whether to ignore errors. If `true`, errors will be ignored. If `false`, errors will cause the query to fail. | `false` |
+
 ## Safety
 
 These crates use `#![forbid(unsafe_code)]` to ensure everything is implemented in 100% safe Rust.
