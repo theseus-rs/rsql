@@ -30,6 +30,7 @@ uuid = { workspace = true, features = ["serde", "v4"] }
 
 [target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dependencies]
 getrandom = { workspace = true, features = ["js"] }
+uuid = { workspace = true, features = ["js"] }
 
 [dev-dependencies]
 rsql_driver_test_utils = { path = "../drivers/test_utils", version = "0.17.2" }

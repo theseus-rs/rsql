@@ -20,7 +20,7 @@ impl rsql_driver::Driver for Driver {
     }
 
     fn supports_file_type(&self, file_type: &FileType) -> bool {
-        file_type.media_types().contains(&"text/csv")
+        file_type.extensions().contains(&"csv")
     }
 }
 
