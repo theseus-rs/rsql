@@ -81,6 +81,7 @@ jobs:
           rustup target install ${{ matrix.target }}
           cargo build --package rsql_driver --target ${{ matrix.target }}
           cargo build --package rsql_drivers --target ${{ matrix.target }}
+          cargo build --package rsql_formatters --target ${{ matrix.target }}
 
       - name: Test
         if: ${{ !startsWith(matrix.platform, 'linux-') && !startsWith(matrix.platform, 'wasm32-') }}
