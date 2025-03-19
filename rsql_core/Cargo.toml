@@ -49,6 +49,9 @@ tracing-subscriber = { workspace = true, features = [
 ] }
 unicode-width = { workspace = true }
 
+[target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dependencies]
+getrandom = { workspace = true, features = ["js"] }
+
 [dev-dependencies]
 criterion = { workspace = true, features = ["async_tokio"] }
 mockall = { workspace = true }
@@ -57,7 +60,6 @@ tokio = { workspace = true }
 
 [features]
 all = ["all-drivers", "all-formats"]
-default = ["native-tls"]
 all-drivers = [
     "driver-arrow",
     "driver-avro",
@@ -151,6 +153,12 @@ format-xml = ["rsql_formatters/xml"]
 format-yaml = ["rsql_formatters/yaml"]
 native-tls = ["rsql_drivers/native-tls"]
 rustls = ["rsql_drivers/rustls"]
+
+[target.'cfg(target_family = "wasm")'.features]
+default = ["restls"]
+
+[target.'cfg(not(target_family = "wasm"))'.features]
+default = ["native-tls"]
 
 [lints.clippy]
 unwrap_used = "deny"

@@ -13,9 +13,7 @@ version.workspace = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-ansi_colours = { workspace = true }
 anyhow = { workspace = true }
-arboard = { workspace = true }
 async-trait = { workspace = true }
 colored = { workspace = true }
 csv = { workspace = true, optional = true }
@@ -27,11 +25,15 @@ rsql_drivers = { path = "../rsql_drivers", version = "0.17.2" }
 rust-i18n = { workspace = true }
 serde_json = { workspace = true, features = ["preserve_order"], optional = true }
 serde_yaml = { workspace = true, optional = true }
-supports-color = { workspace = true }
-syntect = { workspace = true }
 tabled = { workspace = true, features = ["ansi"], optional = true }
 tempfile = { workspace = true }
 thiserror = { workspace = true }
+
+[target.'cfg(not(target_family = "wasm"))'.dependencies]
+ansi_colours = { workspace = true }
+arboard = { workspace = true }
+supports-color = { workspace = true }
+syntect = { workspace = true }
 
 [dev-dependencies]
 test-log = { workspace = true }
