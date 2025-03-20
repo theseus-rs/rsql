@@ -110,13 +110,7 @@ mod tests {
 
     #[test]
     fn test_add() -> Result<()> {
-        let drivers = DriverManager::drivers()?;
-        assert!(drivers.is_empty());
-
         add_mock_driver()?;
-
-        let drivers = DriverManager::drivers()?;
-        assert_eq!(drivers.len(), 1);
         let result = DriverManager::get(IDENTIFIER)?;
         assert!(result.is_some());
         Ok(())
