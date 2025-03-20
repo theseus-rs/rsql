@@ -91,6 +91,7 @@ all-drivers = [
     "driver-xml",
     "driver-yaml",
 ]
+default = ["native-tls"]
 driver-arrow = ["rsql_drivers/arrow"]
 driver-avro = ["rsql_drivers/avro"]
 driver-cockroachdb = ["rsql_drivers/cockroachdb"]
@@ -153,12 +154,6 @@ format-xml = ["rsql_formatters/xml"]
 format-yaml = ["rsql_formatters/yaml"]
 native-tls = ["rsql_drivers/native-tls"]
 rustls = ["rsql_drivers/rustls"]
-
-[target.'cfg(target_family = "wasm")'.features]
-default = ["restls"]
-
-[target.'cfg(not(target_family = "wasm"))'.features]
-default = ["native-tls"]
 
 [lints.clippy]
 unwrap_used = "deny"

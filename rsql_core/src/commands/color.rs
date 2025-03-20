@@ -34,7 +34,7 @@ mod tests {
     use crate::commands::{CommandManager, CommandOptions, LoopCondition, ShellCommand};
     use crate::configuration::Configuration;
     use crate::writers::Output;
-    use rsql_drivers::{DriverManager, MockConnection};
+    use rsql_drivers::MockConnection;
     use rsql_formatters::FormatterManager;
     use rustyline::history::DefaultHistory;
     use std::default;
@@ -66,7 +66,6 @@ mod tests {
         let options = CommandOptions {
             configuration,
             command_manager: &CommandManager::default(),
-            driver_manager: &DriverManager::default(),
             formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
@@ -106,7 +105,6 @@ mod tests {
         let options = CommandOptions {
             configuration,
             command_manager: &CommandManager::default(),
-            driver_manager: &DriverManager::default(),
             formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
@@ -130,7 +128,6 @@ mod tests {
         let options = CommandOptions {
             configuration,
             command_manager: &CommandManager::default(),
-            driver_manager: &DriverManager::default(),
             formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
@@ -150,7 +147,6 @@ mod tests {
         let options = CommandOptions {
             configuration: &mut Configuration::default(),
             command_manager: &CommandManager::default(),
-            driver_manager: &DriverManager::default(),
             formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),

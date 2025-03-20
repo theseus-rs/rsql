@@ -67,7 +67,7 @@ mod tests {
     use crate::commands::{CommandManager, CommandOptions};
     use crate::configuration::Configuration;
     use crate::writers::Output;
-    use rsql_drivers::{DriverManager, Metadata, MockConnection, Schema};
+    use rsql_drivers::{Metadata, MockConnection, Schema};
     use rsql_formatters::FormatterManager;
     use rustyline::history::DefaultHistory;
 
@@ -98,7 +98,6 @@ mod tests {
         let options = CommandOptions {
             configuration: &mut Configuration::default(),
             command_manager: &CommandManager::default(),
-            driver_manager: &DriverManager::default(),
             formatter_manager: &FormatterManager::default(),
             connection: mock_connection,
             history: &DefaultHistory::new(),

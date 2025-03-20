@@ -7560,6 +7560,8 @@ dependencies = [
  "sqlparser 0.52.0",
  "thiserror 2.0.12",
  "tokio",
+ "tracing",
+ "tracing-subscriber",
  "url",
  "uuid",
 ]
@@ -7672,6 +7674,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "rsql_driver_file"
+version = "0.17.2"
+dependencies = [
+ "async-trait",
+ "file_type",
+ "rsql_driver",
+ "url",
+]
+
+[[package]]
 name = "rsql_driver_fwf"
 version = "0.17.2"
 dependencies = [
@@ -7683,6 +7695,34 @@ dependencies = [
  "rsql_driver_polars",
  "rsql_driver_test_utils",
  "tokio",
+ "url",
+]
+
+[[package]]
+name = "rsql_driver_http"
+version = "0.17.2"
+dependencies = [
+ "async-trait",
+ "file_type",
+ "rsql_driver",
+ "rsql_driver_csv",
+ "rsql_driver_https",
+ "tokio",
+]
+
+[[package]]
+name = "rsql_driver_https"
+version = "0.17.2"
+dependencies = [
+ "async-trait",
+ "file_type",
+ "futures-util",
+ "reqwest",
+ "rsql_driver",
+ "rsql_driver_csv",
+ "tempfile",
+ "tokio",
+ "tracing",
  "url",
 ]
 
@@ -7897,6 +7937,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "rsql_driver_s3"
+version = "0.17.2"
+dependencies = [
+ "async-trait",
+ "aws-config",
+ "aws-credential-types",
+ "aws-sdk-s3",
+ "file_type",
+ "rsql_driver",
+ "rsql_driver_csv",
+ "tempfile",
+ "testcontainers-modules",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+ "url",
+]
+
+[[package]]
 name = "rsql_driver_snowflake"
 version = "0.17.2"
 dependencies = [
@@ -8011,15 +8070,9 @@ dependencies = [
 name = "rsql_drivers"
 version = "0.17.2"
 dependencies = [
- "async-trait",
- "aws-config",
- "aws-credential-types",
- "aws-sdk-s3",
  "file_type",
- "futures-util",
  "getrandom 0.2.15",
  "indoc",
- "reqwest",
  "rsql_driver",
  "rsql_driver_arrow",
  "rsql_driver_avro",
@@ -8028,7 +8081,10 @@ dependencies = [
  "rsql_driver_delimited",
  "rsql_driver_duckdb",
  "rsql_driver_excel",
+ "rsql_driver_file",
  "rsql_driver_fwf",
+ "rsql_driver_http",
+ "rsql_driver_https",
  "rsql_driver_json",
  "rsql_driver_jsonl",
  "rsql_driver_libsql",
@@ -8041,6 +8097,7 @@ dependencies = [
  "rsql_driver_postgresql",
  "rsql_driver_redshift",
  "rsql_driver_rusqlite",
+ "rsql_driver_s3",
  "rsql_driver_snowflake",
  "rsql_driver_sqlite",
  "rsql_driver_sqlserver",
@@ -8048,13 +8105,8 @@ dependencies = [
  "rsql_driver_tsv",
  "rsql_driver_xml",
  "rsql_driver_yaml",
- "tempfile",
- "testcontainers-modules",
- "thiserror 2.0.12",
  "tokio",
  "tracing",
- "tracing-subscriber",
- "url",
 ]
 
 [[package]]
