@@ -59,6 +59,10 @@ impl DriverManager {
         Self::add(Arc::new(rsql_driver_arrow::Driver))?;
         #[cfg(feature = "avro")]
         Self::add(Arc::new(rsql_driver_avro::Driver))?;
+        #[cfg(feature = "brotli")]
+        Self::add(Arc::new(rsql_driver_brotli::Driver))?;
+        #[cfg(feature = "bzip2")]
+        Self::add(Arc::new(rsql_driver_bzip2::Driver))?;
         #[cfg(feature = "cockroachdb")]
         Self::add(Arc::new(rsql_driver_cockroachdb::Driver))?;
         #[cfg(feature = "csv")]
@@ -73,6 +77,8 @@ impl DriverManager {
         Self::add(Arc::new(rsql_driver_file::Driver))?;
         #[cfg(feature = "fwf")]
         Self::add(Arc::new(rsql_driver_fwf::Driver))?;
+        #[cfg(feature = "gzip")]
+        Self::add(Arc::new(rsql_driver_gzip::Driver))?;
         #[cfg(feature = "http")]
         Self::add(Arc::new(rsql_driver_http::Driver))?;
         #[cfg(feature = "https")]
@@ -83,6 +89,8 @@ impl DriverManager {
         Self::add(Arc::new(rsql_driver_jsonl::Driver))?;
         #[cfg(feature = "libsql")]
         Self::add(Arc::new(rsql_driver_libsql::Driver))?;
+        #[cfg(feature = "lz4")]
+        Self::add(Arc::new(rsql_driver_lz4::Driver))?;
         #[cfg(feature = "mariadb")]
         Self::add(Arc::new(rsql_driver_mariadb::Driver))?;
         #[cfg(feature = "mysql")]
@@ -113,8 +121,12 @@ impl DriverManager {
         Self::add(Arc::new(rsql_driver_tsv::Driver))?;
         #[cfg(feature = "xml")]
         Self::add(Arc::new(rsql_driver_xml::Driver))?;
+        #[cfg(feature = "xz")]
+        Self::add(Arc::new(rsql_driver_xz::Driver))?;
         #[cfg(feature = "yaml")]
         Self::add(Arc::new(rsql_driver_yaml::Driver))?;
+        #[cfg(feature = "zstd")]
+        Self::add(Arc::new(rsql_driver_zstd::Driver))?;
         Ok(())
     }
 }
@@ -174,6 +186,10 @@ mod tests {
         let driver_count = driver_count + 1;
         #[cfg(feature = "avro")]
         let driver_count = driver_count + 1;
+        #[cfg(feature = "brotli")]
+        let driver_count = driver_count + 1;
+        #[cfg(feature = "bzip2")]
+        let driver_count = driver_count + 1;
         #[cfg(feature = "cockroachdb")]
         let driver_count = driver_count + 1;
         #[cfg(feature = "csv")]
@@ -188,6 +204,8 @@ mod tests {
         let driver_count = driver_count + 1;
         #[cfg(feature = "fwf")]
         let driver_count = driver_count + 1;
+        #[cfg(feature = "gzip")]
+        let driver_count = driver_count + 1;
         #[cfg(feature = "http")]
         let driver_count = driver_count + 1;
         #[cfg(feature = "https")]
@@ -197,6 +215,8 @@ mod tests {
         #[cfg(feature = "jsonl")]
         let driver_count = driver_count + 1;
         #[cfg(feature = "libsql")]
+        let driver_count = driver_count + 1;
+        #[cfg(feature = "lz4")]
         let driver_count = driver_count + 1;
         #[cfg(feature = "mariadb")]
         let driver_count = driver_count + 1;
@@ -228,7 +248,11 @@ mod tests {
         let driver_count = driver_count + 1;
         #[cfg(feature = "xml")]
         let driver_count = driver_count + 1;
+        #[cfg(feature = "xz")]
+        let driver_count = driver_count + 1;
         #[cfg(feature = "yaml")]
+        let driver_count = driver_count + 1;
+        #[cfg(feature = "zstd")]
         let driver_count = driver_count + 1;
 
         let drivers = DriverManager::drivers()?;

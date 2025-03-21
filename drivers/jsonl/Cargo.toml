@@ -16,9 +16,9 @@ file_type = { workspace = true }
 polars = { workspace = true, features = ["json", "lazy"] }
 polars-sql = { workspace = true }
 rsql_driver = { path = "../../rsql_driver", version = "0.17.2" }
-rsql_driver_polars = { path = "../../drivers/polars", version = "0.17.2" }
+rsql_driver_polars = { path = "../polars", version = "0.17.2" }
 url = { workspace = true }
 
 [dev-dependencies]
-rsql_driver_test_utils = { path = "../../drivers/test_utils", version = "0.17.2" }
+rsql_driver_test_utils = { path = "../test_utils", version = "0.17.2" }
 tokio = { workspace = true, features = ["macros", "rt"] }

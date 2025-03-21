@@ -82,6 +82,10 @@ mod tests {
             "arrow",
             #[cfg(feature = "driver-avro")]
             "avro",
+            #[cfg(feature = "driver-brotli")]
+            "brotli",
+            #[cfg(feature = "driver-bzip2")]
+            "bzip2",
             #[cfg(feature = "driver-cockroachdb")]
             "cockroachdb",
             #[cfg(feature = "driver-csv")]
@@ -96,6 +100,8 @@ mod tests {
             "file",
             #[cfg(feature = "driver-fwf")]
             "fwf",
+            #[cfg(feature = "driver-gzip")]
+            "gzip",
             #[cfg(feature = "driver-http")]
             "http",
             #[cfg(feature = "driver-https")]
@@ -106,6 +112,8 @@ mod tests {
             "jsonl",
             #[cfg(feature = "driver-libsql")]
             "libsql",
+            #[cfg(feature = "driver-lz4")]
+            "lz4",
             #[cfg(feature = "driver-mariadb")]
             "mariadb",
             #[cfg(feature = "driver-mysql")]
@@ -136,8 +144,12 @@ mod tests {
             "tsv",
             #[cfg(feature = "driver-xml")]
             "xml",
+            #[cfg(feature = "driver-xz")]
+            "xz",
             #[cfg(feature = "driver-yaml")]
             "yaml",
+            #[cfg(feature = "driver-zstd")]
+            "zstd",
         ];
 
         let available_drivers = drivers.join(", ");

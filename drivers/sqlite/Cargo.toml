@@ -21,7 +21,7 @@ sqlx = { workspace = true, features = ["bit-vec", "chrono", "json", "macros", "r
 url = { workspace = true }
 
 [dev-dependencies]
-rsql_driver_test_utils = { path = "../../drivers/test_utils", version = "0.17.2" }
+rsql_driver_test_utils = { path = "../test_utils", version = "0.17.2" }
 tokio = { workspace = true, features = ["macros", "rt"] }
 
 [features]

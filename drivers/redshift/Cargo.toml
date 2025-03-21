@@ -14,7 +14,7 @@ version.workspace = true
 async-trait = { workspace = true }
 file_type = { workspace = true }
 rsql_driver = { path = "../../rsql_driver", version = "0.17.2" }
-rsql_driver_postgresql = { path = "../../drivers/postgresql", version = "0.17.2" }
+rsql_driver_postgresql = { path = "../postgresql", version = "0.17.2" }
 sqlparser = { workspace = true }
 url = { workspace = true }
 
