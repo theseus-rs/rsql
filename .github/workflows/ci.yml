@@ -71,13 +71,16 @@ jobs:
           tool: cargo-llvm-cov
 
       - name: Build
-        if: ${{ startsWith(matrix.platform, 'wasm32-') }}
+        if: ${{ startsWith(matrix.platform, 'wasm') }}
         env:
           CARGO_TERM_COLOR: always
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
           RUST_BACKTRACE: 1
           RUST_LOG: info
         run: |
+          if [[ "${{ matrix.target }}" == *"unknown"* ]]; then
+            export RUSTFLAGS='--cfg getrandom_backend="wasm_js"'
+          fi
           rustup target install ${{ matrix.target }}
           cargo build --package rsql_driver --target ${{ matrix.target }}
           cargo build --package rsql_drivers --target ${{ matrix.target }}

@@ -30,7 +30,7 @@ url = { workspace = true }
 uuid = { workspace = true, features = ["serde", "v4"] }
 
 [target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dependencies]
-getrandom = { workspace = true, features = ["js"] }
+getrandom = { workspace = true, features = ["wasm_js"] }
 uuid = { workspace = true, features = ["js"] }
 
 [dev-dependencies]
