@@ -141,7 +141,7 @@ inquire = "0.7.5"
 jiff = "0.2.4"
 jwt-simple = { version = "0.12.12", default-features = false }
 liblzma = "0.3.6"
-libsql = "0.6.0"
+libsql = "0.9.1"
 lz4 = "1.28.1"
 mockall = "0.13.1"
 num-format = "0.4.4"
