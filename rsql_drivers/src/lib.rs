@@ -3,18 +3,10 @@
 #![deny(clippy::pedantic)]
 #![allow(clippy::module_name_repetitions)]
 
-mod driver;
-mod error;
-#[cfg(feature = "file")]
-mod file;
-#[cfg(feature = "http")]
-mod http;
-#[cfg(feature = "https")]
-mod https;
+mod driver_manager;
 
-pub use driver::DriverManager;
-pub use error::{Error, Result};
+pub use driver_manager::DriverManager;
 pub use rsql_driver::{
-    Column, Connection, Driver, Index, LimitQueryResult, MemoryQueryResult, Metadata,
-    MockConnection, MockDriver, QueryResult, Row, Schema, StatementMetadata, Table, Value,
+    Column, Connection, Driver, Error, Index, LimitQueryResult, MemoryQueryResult, Metadata,
+    MockConnection, MockDriver, QueryResult, Result, Row, Schema, StatementMetadata, Table, Value,
 };

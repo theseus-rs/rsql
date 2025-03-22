@@ -1,3 +1,4 @@
+#[cfg(not(target_family = "wasm"))]
 mod clipboard;
 mod fanout;
 mod file;
@@ -6,6 +7,7 @@ mod stderr;
 mod stdout;
 mod writer;
 
+#[cfg(not(target_family = "wasm"))]
 pub use clipboard::ClipboardWriter;
 pub use fanout::FanoutWriter;
 pub use file::FileWriter;

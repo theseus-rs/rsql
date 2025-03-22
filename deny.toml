@@ -17,12 +17,12 @@ allow = [
     "BSD-2-Clause",
     "BSD-3-Clause",
     "BSL-1.0",
+    "bzip2-1.0.6",
     "CC0-1.0",
     "ISC",
     "LGPL-3.0",
     "MIT",
     "MPL-2.0",
-    "OpenSSL",
     "PostgreSQL",
     "Unicode-3.0",
     "WTFPL",
@@ -35,7 +35,7 @@ ignore = [
     "RUSTSEC-2023-0086",
     "RUSTSEC-2024-0320",
     "RUSTSEC-2024-0363",
-    "RUSTSEC-2025-0007",
+    "RUSTSEC-2024-0436",
 ]
 
 # https://embarkstudios.github.io/cargo-deny/checks/bans/cfg.html

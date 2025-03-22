@@ -1,16 +1,16 @@
 use crate::metadata;
 use async_trait::async_trait;
-use chrono::{NaiveDate, NaiveDateTime, NaiveTime, TimeDelta};
 use duckdb::Row;
 use duckdb::types::{TimeUnit, ValueRef};
 use file_type::FileType;
+use jiff::ToSpan;
+use jiff::civil::{Date, DateTime, Time};
 use rsql_driver::Error::{IoError, UnsupportedColumnType};
 use rsql_driver::{
     MemoryQueryResult, Metadata, QueryResult, Result, StatementMetadata, UrlExtension, Value,
 };
 use sqlparser::ast::Statement;
 use sqlparser::dialect::{Dialect, DuckDbDialect};
-use std::ops::Add;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 use url::Url;
@@ -30,9 +30,7 @@ impl rsql_driver::Driver for Driver {
     }
 
     fn supports_file_type(&self, file_type: &FileType) -> bool {
-        file_type
-            .media_types()
-            .contains(&"application/vnd.duckdb.file")
+        file_type.extensions().contains(&"duckdb")
     }
 }
 
@@ -162,33 +160,32 @@ impl Connection {
             }
             ValueRef::Blob(value) => Value::Bytes(value.to_vec()),
             ValueRef::Date32(value) => {
-                let start_date = NaiveDate::from_ymd_opt(1970, 1, 1).expect("invalid date");
-                let delta = TimeDelta::days(i64::from(value));
-                let date = start_date.add(delta);
-                Value::Date(date)
+                let days = i64::from(value).days();
+                let start_date = Date::new(1970, 1, 1)?.checked_add(days)?;
+                Value::Date(start_date)
             }
             ValueRef::Time64(unit, value) => {
-                let start_time = NaiveTime::from_hms_opt(0, 0, 0).expect("invalid time");
+                let start_time = Time::new(0, 0, 0, 0)?;
                 let duration = match unit {
                     TimeUnit::Second => Duration::from_secs(u64::try_from(value)?),
                     TimeUnit::Millisecond => Duration::from_millis(u64::try_from(value)?),
                     TimeUnit::Microsecond => Duration::from_micros(u64::try_from(value)?),
                     TimeUnit::Nanosecond => Duration::from_nanos(u64::try_from(value)?),
                 };
-                let time = start_time.add(duration);
+                let time = start_time.checked_add(duration)?;
                 Value::Time(time)
             }
             ValueRef::Timestamp(unit, value) => {
-                let start_date = NaiveDate::from_ymd_opt(1970, 1, 1).expect("invalid date");
-                let start_time = NaiveTime::from_hms_opt(0, 0, 0).expect("invalid time");
-                let start_date_time = NaiveDateTime::new(start_date, start_time);
+                let start_date = Date::new(1970, 1, 1)?;
+                let start_time = Time::new(0, 0, 0, 0)?;
+                let start_date_time = DateTime::from_parts(start_date, start_time);
                 let duration = match unit {
                     TimeUnit::Second => Duration::from_secs(u64::try_from(value)?),
                     TimeUnit::Millisecond => Duration::from_millis(u64::try_from(value)?),
                     TimeUnit::Microsecond => Duration::from_micros(u64::try_from(value)?),
                     TimeUnit::Nanosecond => Duration::from_nanos(u64::try_from(value)?),
                 };
-                let date_time = start_date_time.add(duration);
+                let date_time = start_date_time.checked_add(duration)?;
                 Value::DateTime(date_time)
             }
             _ => {
@@ -207,7 +204,6 @@ impl Connection {
 #[cfg(test)]
 mod test {
     use super::*;
-    use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
     use indoc::indoc;
     use rsql_driver::Driver;
     use rsql_driver_test_utils::dataset_url;
@@ -335,13 +331,11 @@ mod test {
                 row.get(14).cloned(),
                 Some(Value::String("123.00".to_string()))
             );
-            let date = NaiveDate::from_ymd_opt(2022, 1, 1).expect("invalid date");
+            let date = jiff::civil::date(2022, 1, 1);
             assert_eq!(row.get(15).cloned(), Some(Value::Date(date)));
-            let time = NaiveTime::from_hms_opt(14, 30, 00).expect("invalid time");
+            let time = jiff::civil::time(14, 30, 0, 0);
             assert_eq!(row.get(16).cloned(), Some(Value::Time(time)));
-            let date_time =
-                NaiveDateTime::parse_from_str("2022-01-01 14:30:00", "%Y-%m-%d %H:%M:%S")
-                    .map_err(|error| IoError(error.to_string()))?;
+            let date_time = DateTime::from_parts(date, time);
             assert_eq!(row.get(17).cloned(), Some(Value::DateTime(date_time)));
         }
 

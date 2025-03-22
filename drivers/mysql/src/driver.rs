@@ -1,6 +1,6 @@
 use crate::metadata;
 use async_trait::async_trait;
-use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
+use chrono::{Datelike, NaiveDate, NaiveDateTime, NaiveTime, Timelike};
 use file_type::FileType;
 use rsql_driver::Error::{InvalidUrl, IoError, UnsupportedColumnType};
 use rsql_driver::{MemoryQueryResult, Metadata, QueryResult, Result, Value};
@@ -114,6 +114,7 @@ impl rsql_driver::Connection for Connection {
 }
 
 impl Connection {
+    #[expect(clippy::too_many_lines)]
     fn convert_to_value(row: &MySqlRow, column: &MySqlColumn) -> Result<Value> {
         let column_name = column.name();
 
@@ -164,17 +165,41 @@ impl Connection {
             }
         } else if let Ok(value) = row.try_get::<Option<NaiveDate>, &str>(column_name) {
             match value {
-                Some(v) => Ok(Value::Date(v)),
+                Some(v) => {
+                    let year = i16::try_from(v.year())?;
+                    let month = i8::try_from(v.month())?;
+                    let day = i8::try_from(v.day())?;
+                    let date = jiff::civil::date(year, month, day);
+                    Ok(Value::Date(date))
+                }
                 None => Ok(Value::Null),
             }
         } else if let Ok(value) = row.try_get::<Option<NaiveTime>, &str>(column_name) {
             match value {
-                Some(v) => Ok(Value::Time(v)),
+                Some(v) => {
+                    let hour = i8::try_from(v.hour())?;
+                    let minute = i8::try_from(v.minute())?;
+                    let second = i8::try_from(v.second())?;
+                    let nanosecond = i32::try_from(v.nanosecond())?;
+                    let time = jiff::civil::time(hour, minute, second, nanosecond);
+                    Ok(Value::Time(time))
+                }
                 None => Ok(Value::Null),
             }
         } else if let Ok(value) = row.try_get::<Option<NaiveDateTime>, &str>(column_name) {
             match value {
-                Some(v) => Ok(Value::DateTime(v)),
+                Some(v) => {
+                    let year = i16::try_from(v.year())?;
+                    let month = i8::try_from(v.month())?;
+                    let day = i8::try_from(v.day())?;
+                    let hour = i8::try_from(v.hour())?;
+                    let minute = i8::try_from(v.minute())?;
+                    let second = i8::try_from(v.second())?;
+                    let nanosecond = i32::try_from(v.nanosecond())?;
+                    let date_time =
+                        jiff::civil::datetime(year, month, day, hour, minute, second, nanosecond);
+                    Ok(Value::DateTime(date_time))
+                }
                 None => Ok(Value::Null),
             }
         } else if let Ok(value) = row.try_get::<Option<OffsetDateTime>, &str>(column_name) {
@@ -182,10 +207,16 @@ impl Connection {
                 Some(v) => {
                     let date = v.date();
                     let time = v.time();
-                    let date_time_string = format!("{date} {time}");
+                    let year = i16::try_from(date.year())?;
+                    let month: u8 = date.month().into();
+                    let month = i8::try_from(month)?;
+                    let day = i8::try_from(date.day())?;
+                    let hour = i8::try_from(time.hour())?;
+                    let minute = i8::try_from(time.minute())?;
+                    let second = i8::try_from(time.second())?;
+                    let nanosecond = i32::try_from(time.nanosecond())?;
                     let date_time =
-                        NaiveDateTime::parse_from_str(&date_time_string, "%Y-%m-%d %H:%M:%S%.f")
-                            .expect("invalid date");
+                        jiff::civil::datetime(year, month, day, hour, minute, second, nanosecond);
                     Ok(Value::DateTime(date_time))
                 }
                 None => Ok(Value::Null),

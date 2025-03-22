@@ -12,15 +12,15 @@ version.workspace = true
 
 [dependencies]
 async-trait = { workspace = true }
-chrono = { workspace = true }
 duckdb = { workspace = true, features = ["bundled"] }
 file_type = { workspace = true }
 indoc = { workspace = true }
+jiff = { workspace = true }
 regex = { workspace = true }
-rsql_driver = { path = "../../rsql_driver", version = "0.17.0" }
+rsql_driver = { path = "../../rsql_driver", version = "0.17.2" }
 sqlparser = { workspace = true }
 url = { workspace = true }
 
 [dev-dependencies]
-rsql_driver_test_utils = { path = "../../drivers/test_utils", version = "0.17.0" }
+rsql_driver_test_utils = { path = "../test_utils", version = "0.17.2" }
 tokio = { workspace = true, features = ["macros", "rt"] }

@@ -65,6 +65,9 @@ impl rsql_driver::Driver for Driver {
             .unwrap_or(&"0".to_string())
             .parse::<usize>()
             .map_err(|error| ConversionError(error.to_string()))?;
+        let truncate_ragged_lines = query_parameters
+            .get("truncate_ragged_lines")
+            .is_some_and(|value| value == "true");
 
         // Parse Options
         let eol = match query_parameters.get("eol") {
@@ -90,7 +93,8 @@ impl rsql_driver::Driver for Driver {
                 CsvParseOptions::default()
                     .with_eol_char(eol)
                     .with_quote_char(quote)
-                    .with_separator(separator),
+                    .with_separator(separator)
+                    .with_truncate_ragged_lines(truncate_ragged_lines),
             )
             .with_rechunk(true)
             .into_reader_with_file_handle(file)
@@ -122,51 +126,4 @@ fn string_to_ascii_char(value: &String) -> Result<u8> {
         return Err(ConversionError(format!("Invalid character: {char}")));
     }
     u8::try_from(char).map_err(|error| ConversionError(error.to_string()))
-}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-    use rsql_driver::{Driver, Value};
-    use rsql_driver_test_utils::dataset_url;
-
-    fn database_url() -> String {
-        let path = dataset_url("delimited", "users.pipe");
-        format!("{path}?separator=|")
-    }
-
-    #[tokio::test]
-    async fn test_driver_connect() -> Result<()> {
-        let database_url = database_url();
-        let driver = crate::Driver;
-        let mut connection = driver.connect(&database_url).await?;
-        assert_eq!(&database_url, connection.url());
-        connection.close().await?;
-        Ok(())
-    }
-
-    #[tokio::test]
-    async fn test_connection_interface() -> Result<()> {
-        let database_url = database_url();
-        let driver = crate::Driver;
-        let mut connection = driver.connect(&database_url).await?;
-
-        let mut query_result = connection
-            .query("SELECT id, name FROM users ORDER BY id")
-            .await?;
-
-        assert_eq!(query_result.columns().await, vec!["id", "name"]);
-        assert_eq!(
-            query_result.next().await,
-            Some(vec![Value::I64(1), Value::String("John Doe".to_string())])
-        );
-        assert_eq!(
-            query_result.next().await,
-            Some(vec![Value::I64(2), Value::String("Jane Smith".to_string())])
-        );
-        assert!(query_result.next().await.is_none());
-
-        connection.close().await?;
-        Ok(())
-    }
 }

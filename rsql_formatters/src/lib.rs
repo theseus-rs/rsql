@@ -17,6 +17,7 @@ mod error;
 mod expanded;
 mod footer;
 mod formatter;
+#[cfg(not(target_family = "wasm"))]
 mod highlighter;
 #[cfg(feature = "html")]
 mod html;
@@ -52,6 +53,7 @@ mod yaml;
 
 pub use error::{Error, Result};
 pub use formatter::{Formatter, FormatterManager, FormatterOptions, Results};
+#[cfg(not(target_family = "wasm"))]
 pub use highlighter::Highlighter;
 
 use rust_i18n::i18n;

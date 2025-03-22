@@ -1,8 +1,10 @@
 use crate::SnowflakeError;
 use async_trait::async_trait;
 use base64::{Engine, engine::general_purpose::STANDARD};
-use chrono::{DateTime, NaiveDate, NaiveDateTime, NaiveTime, Utc};
 use file_type::FileType;
+use jiff::civil::{Date, DateTime, Time};
+use jiff::tz::Offset;
+use jiff::{Timestamp, ToSpan};
 use jwt_simple::prelude::{Claims, Duration, RS256KeyPair, RS256PublicKey, RSAKeyPairLike};
 use reqwest::header::HeaderMap;
 use rsql_driver::Error::{InvalidUrl, IoError};
@@ -12,6 +14,7 @@ use sha2::{Digest, Sha256};
 use sqlparser::dialect::{Dialect, SnowflakeDialect};
 use std::collections::HashMap;
 use std::fmt::Display;
+use std::str::FromStr;
 use tokio::sync::Mutex;
 use url::Url;
 
@@ -48,7 +51,7 @@ pub struct SnowflakeConnection {
     issuer: Option<String>,
     subject: Option<String>,
     key_pair: Option<RS256KeyPair>,
-    jwt_expires_at: Option<DateTime<Utc>>,
+    jwt_expires_at: Option<DateTime>,
     client: Mutex<reqwest::Client>,
 }
 
@@ -108,7 +111,9 @@ impl SnowflakeConnection {
                 .map_err(|error| IoError(error.to_string()))?;
 
             let (issuer, subject) = get_issuer_and_subject(&public_key, account, user)?;
-            let jwt_expires_at = chrono::Utc::now() + chrono::Duration::hours(1);
+            let jwt_expires_at = Offset::UTC
+                .to_datetime(Timestamp::now())
+                .checked_add(1.hour())?;
 
             let client = Mutex::new(Self::new_client_keypair(&issuer, &subject, &key_pair)?);
             Ok(Self {
@@ -215,7 +220,8 @@ impl SnowflakeConnection {
             &self.subject,
             &self.key_pair,
         ) {
-            if *jwt_expires_at < chrono::Utc::now() {
+            let now = Offset::UTC.to_datetime(Timestamp::now());
+            if *jwt_expires_at < now {
                 let new_client = Self::new_client_keypair(issuer, subject, key_pair)?;
                 let mut client = self.client.lock().await;
                 *client = new_client;
@@ -489,26 +495,11 @@ impl ColumnDefinition {
                     .map_err(|e| Self::translate_error(value, e))
                     .map_err(|error| IoError(error.to_string()))?,
             ),
-            "date" => Value::Date(
-                NaiveDate::parse_from_str(value, DATE_FORMATS.1)
-                    .map_err(|e| Self::translate_error(value, e))
-                    .map_err(|error| IoError(error.to_string()))?,
-            ),
-            "time" => Value::Time(
-                NaiveTime::parse_from_str(value, TIME_FORMATS.1)
-                    .map_err(|e| Self::translate_error(value, e))
-                    .map_err(|error| IoError(error.to_string()))?,
-            ),
-            "timestamp_ntz" | "timestamp_ltz" => Value::DateTime(
-                NaiveDateTime::parse_from_str(value, DATETIME_NO_TZ_FORMATS.1)
-                    .map_err(|e| Self::translate_error(value, e))
-                    .map_err(|error| IoError(error.to_string()))?,
-            ),
-            "timestamp_tz" => Value::DateTime(
-                NaiveDateTime::parse_from_str(value, DATETIME_TZ_FORMATS.1)
-                    .map_err(|e| Self::translate_error(value, e))
-                    .map_err(|error| IoError(error.to_string()))?,
-            ),
+            "date" => Value::Date(Date::from_str(value)?),
+            "time" => Value::Time(Time::from_str(value)?),
+            "timestamp_ntz" | "timestamp_ltz" | "timestamp_tz" => {
+                Value::DateTime(DateTime::from_str(value)?)
+            }
             // includes "text" field for VARCHARs
             _ => Value::String(value.to_string()),
         })
@@ -538,6 +529,7 @@ impl ColumnDefinition {
 #[cfg(test)]
 mod test {
     use super::*;
+    use jiff::civil;
     use rsql_driver::Connection;
     use serde_json::json;
     use wiremock::matchers::{method, path};
@@ -726,17 +718,16 @@ mod test {
                 Value::I64(1),
                 Value::F64(2.1),
                 Value::Bool(false),
-                Value::Time(NaiveTime::from_hms_nano_opt(19, 57, 48, 0).expect("invalid time")),
-                Value::Date(NaiveDate::from_ymd_opt(2024, 8, 14).expect("invalid date")),
-                Value::DateTime(NaiveDateTime::new(
-                    NaiveDate::from_ymd_opt(2024, 8, 14).expect("invalid date"),
-                    NaiveTime::from_hms_opt(19, 57, 48).expect("invalid time")
+                Value::Time(Time::new(19, 57, 48, 0)?),
+                Value::Date(Date::new(2024, 8, 14)?),
+                Value::DateTime(DateTime::from_parts(
+                    Date::new(2024, 8, 14)?,
+                    Time::new(19, 57, 48, 0)?,
                 )),
-                Value::DateTime(
-                    DateTime::parse_from_rfc3339("2024-08-14T19:57:48.000000000+00:00")
-                        .expect("invalid datetime")
-                        .naive_utc()
-                )
+                Value::DateTime(DateTime::from_parts(
+                    Date::new(2024, 8, 14)?,
+                    Time::new(19, 57, 48, 0)?,
+                )),
             ])
         );
         assert_eq!(
@@ -745,19 +736,16 @@ mod test {
                 Value::I64(2),
                 Value::F64(3.1),
                 Value::Bool(true),
-                Value::Time(
-                    NaiveTime::from_hms_nano_opt(23, 59, 59, 123_456_789).expect("invalid time")
-                ),
-                Value::Date(NaiveDate::from_ymd_opt(2000, 1, 1).expect("invalid date")),
-                Value::DateTime(NaiveDateTime::new(
-                    NaiveDate::from_ymd_opt(2000, 1, 1).expect("invalid date"),
-                    NaiveTime::from_hms_nano_opt(23, 59, 59, 123_456_789).expect("invalid time")
+                Value::Time(Time::new(23, 59, 59, 123_456_789)?),
+                Value::Date(Date::new(2000, 1, 1)?),
+                Value::DateTime(DateTime::from_parts(
+                    Date::new(2000, 1, 1)?,
+                    Time::new(23, 59, 59, 123_456_789)?
                 )),
-                Value::DateTime(
-                    DateTime::parse_from_rfc3339("2000-01-01T23:59:59.123456789-00:00")
-                        .expect("invalid datetime")
-                        .naive_utc()
-                )
+                Value::DateTime(DateTime::from_parts(
+                    Date::new(2000, 1, 1)?,
+                    Time::new(23, 59, 59, 123_456_789)?
+                )),
             ])
         );
         Ok(())
@@ -886,13 +874,13 @@ mod test {
             column
                 .convert_to_value(&json!("2024-08-24"))
                 .expect("failed to convert to value"),
-            Value::Date(NaiveDate::from_ymd_opt(2024, 8, 24).expect("invalid date"))
+            Value::Date(civil::date(2024, 8, 24))
         );
         assert_eq!(
             column
                 .convert_to_value(&json!("1993-05-07"))
                 .expect("failed to convert to value"),
-            Value::Date(NaiveDate::from_ymd_opt(1993, 5, 7).expect("invalid date"))
+            Value::Date(civil::date(1993, 5, 7))
         );
         assert!(column.convert_to_value(&json!("not_a_date")).is_err());
     }
@@ -904,13 +892,13 @@ mod test {
             column
                 .convert_to_value(&json!("12:00:00.000000000"))
                 .expect("failed to convert to value"),
-            Value::Time(NaiveTime::from_hms_opt(12, 0, 0).expect("invalid time"))
+            Value::Time(civil::time(12, 0, 0, 0))
         );
         assert_eq!(
             column
                 .convert_to_value(&json!("00:00:00.123456789"))
                 .expect("failed to convert to value"),
-            Value::Time(NaiveTime::from_hms_nano_opt(0, 0, 0, 123_456_789).expect("invalid time"))
+            Value::Time(civil::time(0, 0, 0, 123_456_789))
         );
         assert!(column.convert_to_value(&json!("not_a_time")).is_err());
     }
@@ -926,18 +914,18 @@ mod test {
             column
                 .convert_to_value(&json!("2025-01-01T23:59:59.000000000"))
                 .expect("failed to convert to value"),
-            Value::DateTime(NaiveDateTime::new(
-                NaiveDate::from_ymd_opt(2025, 1, 1).expect("invalid date"),
-                NaiveTime::from_hms_nano_opt(23, 59, 59, 0).expect("invalid time")
+            Value::DateTime(DateTime::from_parts(
+                civil::date(2025, 1, 1),
+                civil::time(23, 59, 59, 0),
             ))
         );
         assert_eq!(
             column
                 .convert_to_value(&json!("2001-01-01T23:59:59.123456789"))
                 .expect("failed to convert to value"),
-            Value::DateTime(NaiveDateTime::new(
-                NaiveDate::from_ymd_opt(2001, 1, 1).expect("invalid date"),
-                NaiveTime::from_hms_nano_opt(23, 59, 59, 123_456_789).expect("invalid time")
+            Value::DateTime(DateTime::from_parts(
+                civil::date(2001, 1, 1),
+                civil::time(23, 59, 59, 123_456_789),
             ))
         );
         assert!(column.convert_to_value(&json!("not_a_datetime")).is_err());
@@ -954,18 +942,18 @@ mod test {
             column
                 .convert_to_value(&json!("2025-01-01T23:59:59.000000000"))
                 .expect("failed to convert to value"),
-            Value::DateTime(NaiveDateTime::new(
-                NaiveDate::from_ymd_opt(2025, 1, 1).expect("invalid date"),
-                NaiveTime::from_hms_nano_opt(23, 59, 59, 0).expect("invalid time")
+            Value::DateTime(DateTime::from_parts(
+                civil::date(2025, 1, 1),
+                civil::time(23, 59, 59, 0),
             ))
         );
         assert_eq!(
             column
                 .convert_to_value(&json!("2001-01-01T23:59:59.123456789"))
                 .expect("failed to convert to value"),
-            Value::DateTime(NaiveDateTime::new(
-                NaiveDate::from_ymd_opt(2001, 1, 1).expect("invalid date"),
-                NaiveTime::from_hms_nano_opt(23, 59, 59, 123_456_789).expect("invalid value")
+            Value::DateTime(DateTime::from_parts(
+                civil::date(2001, 1, 1),
+                civil::time(23, 59, 59, 123_456_789),
             ))
         );
         assert!(column.convert_to_value(&json!("not_a_datetime")).is_err());
@@ -979,18 +967,18 @@ mod test {
             column
                 .convert_to_value(&json!("2025-01-01T23:59:59.000000000-0700"))
                 .expect("failed to convert to value"),
-            Value::DateTime(NaiveDateTime::new(
-                NaiveDate::from_ymd_opt(2025, 1, 1).expect("invalid date"),
-                NaiveTime::from_hms_nano_opt(23, 59, 59, 0).expect("invalid time")
+            Value::DateTime(DateTime::from_parts(
+                civil::date(2025, 1, 1),
+                civil::time(23, 59, 59, 0),
             ))
         );
         assert_eq!(
             column
                 .convert_to_value(&json!("2001-01-01T23:59:59.123456789+0000"))
                 .expect("failed to convert to value"),
-            Value::DateTime(NaiveDateTime::new(
-                NaiveDate::from_ymd_opt(2001, 1, 1).expect("invalid date"),
-                NaiveTime::from_hms_nano_opt(23, 59, 59, 123_456_789).expect("invalid time")
+            Value::DateTime(DateTime::from_parts(
+                civil::date(2001, 1, 1),
+                civil::time(23, 59, 59, 123_456_789),
             ))
         );
         assert!(column.convert_to_value(&json!("not_a_datetime")).is_err());

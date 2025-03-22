@@ -7,18 +7,88 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## `rsql_cli` - [0.17.2](https://github.com/theseus-rs/rsql/compare/v0.17.1...v0.17.2) - 2025-03-11
+
+### Added
+- add Apache ORC driver
+- add fixed width format (fwf) driver
+- update embedded postgresql version to 17.4.0
+
+### Fixed
+- remove use of s3 client force_path_style(true)
+- update l10n translations for bail command
+- change default s3 port from 80 to 443
+
+### Other
+- correct mariadb dependencies
+
+## `rsql_core` - [0.17.2](https://github.com/theseus-rs/rsql/compare/rsql_core-v0.17.1...rsql_core-v0.17.2) - 2025-03-11
+
+### Added
+- add Apache ORC driver
+- add fixed width format (fwf) driver
+
+### Fixed
+- update l10n translations for bail command
+
+## `rsql_drivers` - [0.17.2](https://github.com/theseus-rs/rsql/compare/rsql_drivers-v0.17.1...rsql_drivers-v0.17.2) - 2025-03-11
+
+### Added
+- add Apache ORC driver
+- add fixed width format (fwf) driver
+
+### Fixed
+- remove use of s3 client force_path_style(true)
+- change default s3 port from 80 to 443
+
+## `rsql_driver_postgres` - [0.17.2](https://github.com/theseus-rs/rsql/compare/rsql_driver_postgres-v0.17.1...rsql_driver_postgres-v0.17.2) - 2025-03-11
+
+### Added
+- update embedded postgresql version to 17.4.0
+
+## `rsql_driver_orc` - [0.17.2](https://github.com/theseus-rs/rsql/compare/rsql_driver_orc-v0.17.1...rsql_driver_orc-v0.17.2) - 2025-03-11
+
+### Added
+- add Apache ORC driver
+
+## `rsql_driver_mariadb` - [0.17.2](https://github.com/theseus-rs/rsql/compare/rsql_driver_mariadb-v0.17.1...rsql_driver_mariadb-v0.17.2) - 2025-03-11
+
+### Other
+- correct mariadb dependencies
+
+## `rsql_driver_fwf` - [0.17.2](https://github.com/theseus-rs/rsql/compare/rsql_driver_fwf-v0.17.1...rsql_driver_fwf-v0.17.2) - 2025-03-11
+
+### Added
+- add Apache ORC driver
+- add fixed width format (fwf) driver
+
+## `rsql_driver_postgresql` - [0.17.2](https://github.com/theseus-rs/rsql/compare/rsql_driver_postgresql-v0.17.1...rsql_driver_postgresql-v0.17.2) - 2025-03-11
+
+### Added
+- update embedded postgresql version to 17.4.0
+
+## `rsql_drivers` - [0.17.1](https://github.com/theseus-rs/rsql/compare/rsql_drivers-v0.17.0...rsql_drivers-v0.17.1) - 2025-03-06
+
+### Added
+
+- pass parameters to file driver from http, https and s3 drivers
+- add s3 driver
+
 ## `rsql_cli` - [0.17.0](https://github.com/theseus-rs/rsql/compare/v0.16.0...v0.17.0) - 2025-02-27
 
 ### Added
+
 - add CLI options for configuring result output
 - add Value::Decimal
 
 ### Fixed
+
 - correct integration test failures on linux
 - add postgres driver uuid support
 - correct postgres driver decimal support
 
 ### Other
+
 - add driver documentation
 - [**breaking**] refactor drivers connect interface
 - [**breaking**] remove Value::Json and replace it with Value::Map/Value::Array
@@ -26,202 +96,243 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## `rsql_core` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_core-v0.16.0...rsql_core-v0.17.0) - 2025-02-27
 
 ### Added
+
 - add CLI options for configuring result output
 
 ### Other
+
 - add driver documentation
 - [**breaking**] refactor drivers connect interface
 
 ## `rsql_formatters` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_formatters-v0.16.0...rsql_formatters-v0.17.0) - 2025-02-27
 
 ### Other
+
 - add driver documentation
 
 ## `rsql_drivers` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_drivers-v0.16.0...rsql_drivers-v0.17.0) - 2025-02-27
 
 ### Other
+
 - add driver documentation
 - [**breaking**] refactor drivers connect interface
 
 ## `rsql_driver_yaml` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_yaml-v0.16.0...rsql_driver_yaml-v0.17.0) - 2025-02-27
 
 ### Other
+
 - add driver documentation
 - [**breaking**] refactor drivers connect interface
 
 ## `rsql_driver_xml` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_xml-v0.16.0...rsql_driver_xml-v0.17.0) - 2025-02-27
 
 ### Other
+
 - add driver documentation
 - [**breaking**] refactor drivers connect interface
 
 ## `rsql_driver_tsv` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_tsv-v0.16.0...rsql_driver_tsv-v0.17.0) - 2025-02-27
 
 ### Other
+
 - add driver documentation
 - [**breaking**] refactor drivers connect interface
 
 ## `rsql_driver_sqlserver` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_sqlserver-v0.16.0...rsql_driver_sqlserver-v0.17.0) - 2025-02-27
 
 ### Added
+
 - add Value::Decimal
 
 ### Other
+
 - [**breaking**] refactor drivers connect interface
 
 ## `rsql_driver_snowflake` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_snowflake-v0.16.0...rsql_driver_snowflake-v0.17.0) - 2025-02-27
 
 ### Other
+
 - [**breaking**] refactor drivers connect interface
 
 ## `rsql_driver_rusqlite` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_rusqlite-v0.16.0...rsql_driver_rusqlite-v0.17.0) - 2025-02-27
 
 ### Other
+
 - [**breaking**] refactor drivers connect interface
 
 ## `rsql_driver_sqlite` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_sqlite-v0.16.0...rsql_driver_sqlite-v0.17.0) - 2025-02-27
 
 ### Other
+
 - [**breaking**] refactor drivers connect interface
 
 ## `rsql_driver_redshift` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_redshift-v0.16.0...rsql_driver_redshift-v0.17.0) - 2025-02-27
 
 ### Fixed
+
 - correct integration test failures on linux
 
 ### Other
+
 - [**breaking**] refactor drivers connect interface
 
 ## `rsql_driver_postgres` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_postgres-v0.16.0...rsql_driver_postgres-v0.17.0) - 2025-02-27
 
 ### Added
+
 - add Value::Decimal
 
 ### Fixed
+
 - add postgres driver uuid support
 - correct postgres driver decimal support
 
 ### Other
+
 - [**breaking**] remove Value::Json and replace it with Value::Map/Value::Array
 - [**breaking**] refactor drivers connect interface
 
 ## `rsql_driver_parquet` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_parquet-v0.16.0...rsql_driver_parquet-v0.17.0) - 2025-02-27
 
 ### Other
+
 - add driver documentation
 - [**breaking**] refactor drivers connect interface
 
 ## `rsql_driver_ods` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_ods-v0.16.0...rsql_driver_ods-v0.17.0) - 2025-02-27
 
 ### Other
+
 - add driver documentation
 - [**breaking**] refactor drivers connect interface
 
 ## `rsql_driver_mariadb` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_mariadb-v0.16.0...rsql_driver_mariadb-v0.17.0) - 2025-02-27
 
 ### Fixed
+
 - correct integration test failures on linux
 
 ### Other
+
 - [**breaking**] refactor drivers connect interface
 
 ## `rsql_driver_mysql` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_mysql-v0.16.0...rsql_driver_mysql-v0.17.0) - 2025-02-27
 
 ### Added
+
 - add Value::Decimal
 
 ### Fixed
+
 - correct integration test failures on linux
 
 ### Other
+
 - [**breaking**] remove Value::Json and replace it with Value::Map/Value::Array
 - [**breaking**] refactor drivers connect interface
 
 ## `rsql_driver_libsql` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_libsql-v0.16.0...rsql_driver_libsql-v0.17.0) - 2025-02-27
 
 ### Other
+
 - [**breaking**] refactor drivers connect interface
 
 ## `rsql_driver_jsonl` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_jsonl-v0.16.0...rsql_driver_jsonl-v0.17.0) - 2025-02-27
 
 ### Other
+
 - add driver documentation
 - [**breaking**] refactor drivers connect interface
 
 ## `rsql_driver_json` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_json-v0.16.0...rsql_driver_json-v0.17.0) - 2025-02-27
 
 ### Other
+
 - add driver documentation
 - [**breaking**] refactor drivers connect interface
 
 ## `rsql_driver_excel` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_excel-v0.16.0...rsql_driver_excel-v0.17.0) - 2025-02-27
 
 ### Other
+
 - add driver documentation
 - [**breaking**] refactor drivers connect interface
 
 ## `rsql_driver_duckdb` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_duckdb-v0.16.0...rsql_driver_duckdb-v0.17.0) - 2025-02-27
 
 ### Other
+
 - [**breaking**] refactor drivers connect interface
 
 ## `rsql_driver_csv` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_csv-v0.16.0...rsql_driver_csv-v0.17.0) - 2025-02-27
 
 ### Other
+
 - add driver documentation
 - [**breaking**] refactor drivers connect interface
 
 ## `rsql_driver_delimited` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_delimited-v0.16.0...rsql_driver_delimited-v0.17.0) - 2025-02-27
 
 ### Other
+
 - add driver documentation
 - [**breaking**] refactor drivers connect interface
 
 ## `rsql_driver_cockroachdb` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_cockroachdb-v0.16.0...rsql_driver_cockroachdb-v0.17.0) - 2025-02-27
 
 ### Other
+
 - [**breaking**] refactor drivers connect interface
 
 ## `rsql_driver_postgresql` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_postgresql-v0.16.0...rsql_driver_postgresql-v0.17.0) - 2025-02-27
 
 ### Added
+
 - add Value::Decimal
 
 ### Fixed
+
 - add postgres driver uuid support
 
 ### Other
+
 - [**breaking**] remove Value::Json and replace it with Value::Map/Value::Array
 - [**breaking**] refactor drivers connect interface
 
 ## `rsql_driver_avro` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_avro-v0.16.0...rsql_driver_avro-v0.17.0) - 2025-02-27
 
 ### Other
+
 - add driver documentation
 - [**breaking**] refactor drivers connect interface
 
 ## `rsql_driver_test_utils` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_test_utils-v0.16.0...rsql_driver_test_utils-v0.17.0) - 2025-02-27
 
 ### Other
+
 - add driver documentation
 
 ## `rsql_driver_arrow` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_arrow-v0.16.0...rsql_driver_arrow-v0.17.0) - 2025-02-27
 
 ### Other
+
 - add driver documentation
 - [**breaking**] refactor drivers connect interface
 
 ## `rsql_driver_polars` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_polars-v0.16.0...rsql_driver_polars-v0.17.0) - 2025-02-27
 
 ### Other
+
 - add driver documentation
 
 ## `rsql_driver` - [0.17.0](https://github.com/theseus-rs/rsql/compare/rsql_driver-v0.16.0...rsql_driver-v0.17.0) - 2025-02-27
 
 ### Added
+
 - add Value::Decimal
 
 ### Other
+
 - add driver documentation
 - [**breaking**] remove Value::Json and replace it with Value::Map/Value::Array
 - [**breaking**] refactor drivers connect interface

@@ -1,7 +1,7 @@
 //! # RSQL Driver
 //!
-//! The RSQL driver is a library that provides a common interface for connecting to different data
-//! sources.
+//! The RSQL driver library provides interfaces for connecting to different data
+//! sources and executing SQL queries.
 
 #![forbid(unsafe_code)]
 #![forbid(clippy::allow_attributes)]
@@ -12,6 +12,7 @@ extern crate rust_i18n;
 
 mod connection;
 mod driver;
+mod driver_manager;
 mod error;
 mod metadata;
 mod url;
@@ -22,6 +23,7 @@ pub use connection::{
     QueryResult, Row, StatementMetadata,
 };
 pub use driver::{Driver, MockDriver};
+pub use driver_manager::DriverManager;
 pub use error::{Error, Result};
 pub use metadata::{Column, Index, Metadata, Schema, Table};
 pub use url::UrlExtension;

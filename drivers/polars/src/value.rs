@@ -1,8 +1,8 @@
-use chrono::{NaiveDate, NaiveTime, TimeDelta};
 use indexmap::IndexMap;
+use jiff::civil::{Date, Time};
+use jiff::{SignedDuration, ToSpan};
 use polars::datatypes::AnyValue;
 use rsql_driver::Value;
-use std::ops::Add;
 
 pub trait ToValue {
     fn to_value(&self) -> Value;
@@ -16,8 +16,13 @@ impl ToValue for AnyValue<'_> {
             AnyValue::Binary(v) => Value::Bytes(v.to_vec()),
             AnyValue::BinaryOwned(v) => Value::Bytes(v.clone()),
             AnyValue::Date(days) => {
-                let default_date = NaiveDate::default();
-                let date = default_date.add(TimeDelta::days(i64::from(*days)));
+                let days = i64::from(*days).days();
+                let Ok(date) = Date::new(1970, 1, 1) else {
+                    return Value::Null;
+                };
+                let Ok(date) = date.checked_add(days) else {
+                    return Value::Null;
+                };
                 Value::Date(date)
             }
             AnyValue::Float32(v) => Value::F32(*v),
@@ -57,15 +62,18 @@ impl ToValue for AnyValue<'_> {
                 Value::Map(map)
             }
             AnyValue::Time(nanos) => {
-                let seconds = u32::try_from(nanos / 1_000_000_000).unwrap_or(0);
-                let nanoseconds = u32::try_from(nanos % 1_000_000_000).unwrap_or(0);
-                if let Some(time) =
-                    NaiveTime::from_num_seconds_from_midnight_opt(seconds, nanoseconds)
-                {
-                    Value::Time(time)
-                } else {
-                    Value::Null
-                }
+                let seconds = nanos / 1_000_000_000;
+                let nanoseconds = nanos % 1_000_000_000;
+                let Ok(time) = Time::new(0, 0, 0, 0) else {
+                    return Value::Null;
+                };
+                let Ok(time) = time.checked_add(SignedDuration::from_secs(seconds)) else {
+                    return Value::Null;
+                };
+                let Ok(time) = time.checked_add(SignedDuration::from_nanos(nanoseconds)) else {
+                    return Value::Null;
+                };
+                Value::Time(time)
             }
             AnyValue::UInt8(v) => Value::U8(*v),
             AnyValue::UInt16(v) => Value::U16(*v),
@@ -79,6 +87,7 @@ impl ToValue for AnyValue<'_> {
 #[cfg(test)]
 mod test {
     use super::*;
+    use jiff::civil;
     use polars::datatypes::{DataType, Field, PlSmallStr};
     use polars::prelude::NamedFrom;
     use polars::series::Series;
@@ -115,7 +124,7 @@ mod test {
     fn test_date() {
         let any_value = AnyValue::Date(18628);
         let value = any_value.to_value();
-        let expected = NaiveDate::from_ymd_opt(2021, 1, 1).expect("Invalid date");
+        let expected = civil::date(2021, 1, 1);
         assert_eq!(Value::Date(expected), value);
     }
 
@@ -206,7 +215,7 @@ mod test {
         let nanoseconds = ((hours * 3600 + minutes * 60 + seconds) * 1_000_000_000) + nanos;
         let any_value = AnyValue::Time(nanoseconds);
         let value = any_value.to_value();
-        let expected = NaiveTime::from_hms_nano_opt(3, 25, 45, 678_901).expect("Invalid time");
+        let expected = civil::time(3, 25, 45, 678_901);
         assert_eq!(Value::Time(expected), value);
     }
 

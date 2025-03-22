@@ -1,7 +1,7 @@
 [package]
 authors.workspace = true
 categories.workspace = true
-description = "rsql drivers library for accessing databases"
+description = "rsql drivers library"
 edition.workspace = true
 keywords.workspace = true
 license.workspace = true
@@ -11,108 +11,117 @@ rust-version.workspace = true
 version.workspace = true
 
 [dependencies]
-async-trait = { workspace = true, optional = true }
 file_type = { workspace = true }
-futures-util = { workspace = true, optional = true }
-reqwest = { workspace = true, features = ["json", "gzip"], optional = true }
-rsql_driver = { path = "../rsql_driver", version = "0.17.0" }
-rsql_driver_arrow = { path = "../drivers/arrow", optional = true, version = "0.17.0" }
-rsql_driver_avro = { path = "../drivers/avro", optional = true, version = "0.17.0" }
-rsql_driver_cockroachdb = { path = "../drivers/cockroachdb", optional = true, version = "0.17.0" }
-rsql_driver_csv = { path = "../drivers/csv", optional = true, version = "0.17.0" }
-rsql_driver_delimited = { path = "../drivers/delimited", optional = true, version = "0.17.0" }
-rsql_driver_duckdb = { path = "../drivers/duckdb", optional = true, version = "0.17.0" }
-rsql_driver_excel = { path = "../drivers/excel", optional = true, version = "0.17.0" }
-rsql_driver_json = { path = "../drivers/json", optional = true, version = "0.17.0" }
-rsql_driver_jsonl = { path = "../drivers/jsonl", optional = true, version = "0.17.0" }
-rsql_driver_libsql = { path = "../drivers/libsql", optional = true, version = "0.17.0" }
-rsql_driver_mariadb = { path = "../drivers/mariadb", optional = true, version = "0.17.0" }
-rsql_driver_mysql = { path = "../drivers/mysql", optional = true, version = "0.17.0" }
-rsql_driver_ods = { path = "../drivers/ods", optional = true, version = "0.17.0" }
-rsql_driver_parquet = { path = "../drivers/parquet", optional = true, version = "0.17.0" }
-rsql_driver_postgres = { path = "../drivers/postgres", optional = true, version = "0.17.0" }
-rsql_driver_postgresql = { path = "../drivers/postgresql", optional = true, version = "0.17.0" }
-rsql_driver_redshift = { path = "../drivers/redshift", optional = true, version = "0.17.0" }
-rsql_driver_rusqlite = { path = "../drivers/rusqlite", optional = true, version = "0.17.0" }
-rsql_driver_snowflake = { path = "../drivers/snowflake", optional = true, version = "0.17.0" }
-rsql_driver_sqlite = { path = "../drivers/sqlite", optional = true, version = "0.17.0" }
-rsql_driver_sqlserver = { path = "../drivers/sqlserver", optional = true, version = "0.17.0" }
-rsql_driver_tsv = { path = "../drivers/tsv", optional = true, version = "0.17.0" }
-rsql_driver_xml = { path = "../drivers/xml", optional = true, version = "0.17.0" }
-rsql_driver_yaml = { path = "../drivers/yaml", optional = true, version = "0.17.0" }
-tempfile = { workspace = true, optional = true }
-thiserror = { workspace = true }
+rsql_driver = { path = "../rsql_driver", version = "0.17.2" }
+rsql_driver_arrow = { path = "../drivers/arrow", optional = true, version = "0.17.2" }
+rsql_driver_avro = { path = "../drivers/avro", optional = true, version = "0.17.2" }
+rsql_driver_brotli = { path = "../drivers/brotli", optional = true, version = "0.17.2" }
+rsql_driver_bzip2 = { path = "../drivers/bzip2", optional = true, version = "0.17.2" }
+rsql_driver_cockroachdb = { path = "../drivers/cockroachdb", optional = true, version = "0.17.2" }
+rsql_driver_csv = { path = "../drivers/csv", optional = true, version = "0.17.2" }
+rsql_driver_delimited = { path = "../drivers/delimited", optional = true, version = "0.17.2" }
+rsql_driver_duckdb = { path = "../drivers/duckdb", optional = true, version = "0.17.2" }
+rsql_driver_excel = { path = "../drivers/excel", optional = true, version = "0.17.2" }
+rsql_driver_file = { path = "../drivers/file", optional = true, version = "0.17.2" }
+rsql_driver_fwf = { path = "../drivers/fwf", optional = true, version = "0.17.2" }
+rsql_driver_gzip = { path = "../drivers/gzip", optional = true, version = "0.17.2" }
+rsql_driver_http = { path = "../drivers/http", optional = true, version = "0.17.2" }
+rsql_driver_https = { path = "../drivers/https", optional = true, version = "0.17.2" }
+rsql_driver_json = { path = "../drivers/json", optional = true, version = "0.17.2" }
+rsql_driver_jsonl = { path = "../drivers/jsonl", optional = true, version = "0.17.2" }
+rsql_driver_libsql = { path = "../drivers/libsql", optional = true, version = "0.17.2" }
+rsql_driver_lz4 = { path = "../drivers/lz4", optional = true, version = "0.17.2" }
+rsql_driver_mariadb = { path = "../drivers/mariadb", optional = true, version = "0.17.2" }
+rsql_driver_mysql = { path = "../drivers/mysql", optional = true, version = "0.17.2" }
+rsql_driver_ods = { path = "../drivers/ods", optional = true, version = "0.17.2" }
+rsql_driver_orc = { path = "../drivers/orc", optional = true, version = "0.17.2" }
+rsql_driver_parquet = { path = "../drivers/parquet", optional = true, version = "0.17.2" }
+rsql_driver_postgres = { path = "../drivers/postgres", optional = true, version = "0.17.2" }
+rsql_driver_postgresql = { path = "../drivers/postgresql", optional = true, version = "0.17.2" }
+rsql_driver_redshift = { path = "../drivers/redshift", optional = true, version = "0.17.2" }
+rsql_driver_rusqlite = { path = "../drivers/rusqlite", optional = true, version = "0.17.2" }
+rsql_driver_s3 = { path = "../drivers/s3", optional = true, version = "0.17.2" }
+rsql_driver_snowflake = { path = "../drivers/snowflake", optional = true, version = "0.17.2" }
+rsql_driver_sqlite = { path = "../drivers/sqlite", optional = true, version = "0.17.2" }
+rsql_driver_sqlserver = { path = "../drivers/sqlserver", optional = true, version = "0.17.2" }
+rsql_driver_tsv = { path = "../drivers/tsv", optional = true, version = "0.17.2" }
+rsql_driver_xml = { path = "../drivers/xml", optional = true, version = "0.17.2" }
+rsql_driver_xz = { path = "../drivers/xz", optional = true, version = "0.17.2" }
+rsql_driver_yaml = { path = "../drivers/yaml", optional = true, version = "0.17.2" }
+rsql_driver_zstd = { path = "../drivers/zstd", optional = true, version = "0.17.2" }
 tokio = { workspace = true, features = ["fs"], optional = true }
 tracing = { workspace = true }
-url = { workspace = true }
 
-[target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dependencies]
+[target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dependencies]
 getrandom = { workspace = true, features = ["js"] }
 
 [dev-dependencies]
 indoc = { workspace = true }
-rsql_driver_test_utils = { path = "../drivers/test_utils", version = "0.17.0" }
+rsql_driver_test_utils = { path = "../drivers/test_utils", version = "0.17.2" }
 tokio = { workspace = true, features = ["macros", "rt"] }
 
 [features]
 all = [
     "arrow",
     "avro",
+    "brotli",
+    "bzip2",
     "cockroachdb",
     "csv",
     "delimited",
     "duckdb",
     "excel",
+    "fwf",
     "file",
+    "gzip",
     "http",
     "https",
     "json",
     "jsonl",
+    "lz4",
     "mariadb",
     "mysql",
     "ods",
+    "orc",
     "parquet",
     "postgres",
     "postgresql",
     "redshift",
     "rusqlite",
+    "s3",
     "snowflake",
     "sqlite",
     "sqlserver",
     "tsv",
     "xml",
+    "xz",
     "yaml",
+    "zstd",
 ]
 default = []
 arrow = ["dep:rsql_driver_arrow"]
 avro = ["dep:rsql_driver_avro"]
+brotli = ["dep:rsql_driver_brotli"]
+bzip2 = ["dep:rsql_driver_bzip2"]
 cockroachdb = ["dep:rsql_driver_cockroachdb"]
 csv = ["dep:rsql_driver_csv"]
 delimited = ["dep:rsql_driver_delimited"]
 duckdb = ["dep:rsql_driver_duckdb"]
 excel = ["dep:rsql_driver_excel"]
-file = [
-    "dep:async-trait",
-]
-http = [
-    "https",
-    "dep:async-trait",
-]
-https = [
-    "file",
-    "dep:futures-util",
-    "dep:reqwest",
-    "dep:tempfile",
-    "dep:tokio",
-]
+fwf = ["dep:rsql_driver_fwf"]
+file = ["dep:rsql_driver_file"]
+gzip = ["dep:rsql_driver_gzip"]
+http = ["dep:rsql_driver_http"]
+https = ["dep:rsql_driver_https"]
 json = ["dep:rsql_driver_json"]
 jsonl = ["dep:rsql_driver_jsonl"]
 libsql = ["dep:rsql_driver_libsql"]
+lz4 = ["dep:rsql_driver_lz4"]
 mariadb = ["dep:rsql_driver_mariadb"]
 mysql = ["dep:rsql_driver_mysql"]
 native-tls = [
-    "reqwest/native-tls",
     "rsql_driver_cockroachdb/native-tls",
+    "rsql_driver_https/native-tls",
     "rsql_driver_mariadb/native-tls",
     "rsql_driver_mysql/native-tls",
     "rsql_driver_postgres/native-tls",
@@ -121,14 +130,15 @@ native-tls = [
     "rsql_driver_sqlite/native-tls",
 ]
 ods = ["dep:rsql_driver_ods"]
+orc = ["dep:rsql_driver_orc"]
 parquet = ["dep:rsql_driver_parquet"]
 postgres = ["dep:rsql_driver_postgres"]
 postgresql = ["dep:rsql_driver_postgresql"]
 redshift = ["dep:rsql_driver_redshift"]
 rusqlite = ["dep:rsql_driver_rusqlite"]
 rustls = [
-    "reqwest/rustls-tls-native-roots",
     "rsql_driver_cockroachdb/rustls",
+    "rsql_driver_https/rustls",
     "rsql_driver_mariadb/rustls",
     "rsql_driver_mysql/rustls",
     "rsql_driver_postgres/rustls",
@@ -136,12 +146,15 @@ rustls = [
     "rsql_driver_redshift/rustls",
     "rsql_driver_sqlite/rustls",
 ]
+s3 = ["dep:rsql_driver_s3"]
 snowflake = ["dep:rsql_driver_snowflake"]
 sqlite = ["dep:rsql_driver_sqlite"]
 sqlserver = ["dep:rsql_driver_sqlserver"]
 tsv = ["dep:rsql_driver_tsv"]
 xml = ["dep:rsql_driver_xml"]
+xz = ["dep:rsql_driver_xz"]
 yaml = ["dep:rsql_driver_yaml"]
+zstd = ["dep:rsql_driver_zstd"]
 
 [lints.clippy]
 unwrap_used = "deny"

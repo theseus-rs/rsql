@@ -24,9 +24,9 @@ indicatif = { workspace = true }
 indoc = { workspace = true }
 num-format = { workspace = true }
 regex = { workspace = true }
-rsql_driver = { path = "../rsql_driver", version = "0.17.0" }
-rsql_drivers = { path = "../rsql_drivers", version = "0.17.0" }
-rsql_formatters = { path = "../rsql_formatters", version = "0.17.0" }
+rsql_driver = { path = "../rsql_driver", version = "0.17.2" }
+rsql_drivers = { path = "../rsql_drivers", version = "0.17.2" }
+rsql_formatters = { path = "../rsql_formatters", version = "0.17.2" }
 rust-i18n = { workspace = true }
 rustyline = { workspace = true }
 sqlparser = { workspace = true }
@@ -49,6 +49,9 @@ tracing-subscriber = { workspace = true, features = [
 ] }
 unicode-width = { workspace = true }
 
+[target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dependencies]
+getrandom = { workspace = true, features = ["js"] }
+
 [dev-dependencies]
 criterion = { workspace = true, features = ["async_tokio"] }
 mockall = { workspace = true }
@@ -57,62 +60,80 @@ tokio = { workspace = true }
 
 [features]
 all = ["all-drivers", "all-formats"]
-default = ["native-tls"]
 all-drivers = [
     "driver-arrow",
     "driver-avro",
+    "driver-brotli",
+    "driver-bzip2",
     "driver-cockroachdb",
     "driver-csv",
     "driver-delimited",
     "driver-duckdb",
     "driver-excel",
     "driver-file",
+    "driver-fwf",
+    "driver-gzip",
     "driver-http",
     "driver-https",
     "driver-json",
     "driver-jsonl",
+    "driver-lz4",
     "driver-mariadb",
     "driver-mysql",
     "driver-ods",
+    "driver-orc",
     "driver-parquet",
     "driver-postgres",
     "driver-postgresql",
     "driver-redshift",
     "driver-rusqlite",
+    "driver-s3",
     "driver-snowflake",
     "driver-sqlite",
     "driver-sqlserver",
     "driver-tsv",
     "driver-xml",
+    "driver-xz",
     "driver-yaml",
+    "driver-zstd",
 ]
+default = ["native-tls"]
 driver-arrow = ["rsql_drivers/arrow"]
 driver-avro = ["rsql_drivers/avro"]
+driver-brotli = ["rsql_drivers/brotli"]
+driver-bzip2 = ["rsql_drivers/bzip2"]
 driver-cockroachdb = ["rsql_drivers/cockroachdb"]
 driver-csv = ["rsql_drivers/csv"]
 driver-delimited = ["rsql_drivers/delimited"]
 driver-duckdb = ["rsql_drivers/duckdb"]
 driver-excel = ["rsql_drivers/excel"]
 driver-file = ["rsql_drivers/file"]
+driver-fwf = ["rsql_drivers/fwf"]
+driver-gzip = ["rsql_drivers/gzip"]
 driver-http = ["rsql_drivers/http"]
 driver-https = ["rsql_drivers/https"]
 driver-json = ["rsql_drivers/json"]
 driver-jsonl = ["rsql_drivers/jsonl"]
 driver-libsql = ["rsql_drivers/libsql"]
+driver-lz4 = ["rsql_drivers/lz4"]
 driver-mariadb = ["rsql_drivers/mariadb"]
 driver-mysql = ["rsql_drivers/mysql"]
 driver-ods = ["rsql_drivers/ods"]
+driver-orc = ["rsql_drivers/orc"]
 driver-parquet = ["rsql_drivers/parquet"]
 driver-postgres = ["rsql_drivers/postgres"]
 driver-postgresql = ["rsql_drivers/postgresql"]
 driver-redshift = ["rsql_drivers/redshift"]
 driver-rusqlite = ["rsql_drivers/rusqlite"]
+driver-s3 = ["rsql_drivers/s3"]
 driver-snowflake = ["rsql_drivers/snowflake"]
 driver-sqlite = ["rsql_drivers/sqlite"]
 driver-sqlserver = ["rsql_drivers/sqlserver"]
 driver-tsv = ["rsql_drivers/tsv"]
 driver-xml = ["rsql_drivers/xml"]
+driver-xz = ["rsql_drivers/xz"]
 driver-yaml = ["rsql_drivers/yaml"]
+driver-zstd = ["rsql_drivers/zstd"]
 all-formats = [
     "format-ascii",
     "format-csv",

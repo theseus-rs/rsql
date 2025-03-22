@@ -37,18 +37,19 @@ visit the [rsql](https://theseus-rs.github.io/rsql/rsql_cli/) site.
 
 ## Features
 
-| Feature               |                                                                                                                                                                                          |
-|-----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Data Sources          | Arrow, Avro, CockroachDB, CSV, Delimited, DuckDB, Excel, JSON, JSONL, LibSQL (Turso), MariaDB, MySQL, ODS, Parquet, PostgreSQL, Redshift, Snowflake, SQLite3, SQL Server, TSV, XML, YAML |
-| Syntax Highlighting   | ✅                                                                                                                                                                                        |
-| Result Highlighting   | ✅                                                                                                                                                                                        |
-| Query Auto-completion | ✅                                                                                                                                                                                        |
-| History               | ✅                                                                                                                                                                                        |
-| SQL File Execution    | ✅                                                                                                                                                                                        |
-| Embedded PostgreSQL   | ✅                                                                                                                                                                                        |
-| Output Formats        | ascii, csv, expanded, html, json, jsonl, markdown, plain, psql, sqlite, tsv, unicode, xml, yaml                                                                                          |
-| Localized Interface   | 40+ languages¹                                                                                                                                                                           |
-| Key Bindings          | emacs, vi                                                                                                                                                                                |
+| Feature               |                                                                                                                                                                                                    |
+|-----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Data Sources          | Arrow, Avro, CockroachDB, CSV, Delimited, DuckDB, Excel, FWF, JSON, JSONL, LibSQL (Turso), MariaDB, MySQL, ODS, ORC, Parquet, PostgreSQL, Redshift, Snowflake, SQLite3, SQL Server, TSV, XML, YAML |
+| Compression           | Brotli, Bzip2, Gzip, LZ4, XZ, Zstd                                                                                                                                                                 |
+| Syntax Highlighting   | ✅                                                                                                                                                                                                  |
+| Result Highlighting   | ✅                                                                                                                                                                                                  |
+| Query Auto-completion | ✅                                                                                                                                                                                                  |
+| History               | ✅                                                                                                                                                                                                  |
+| SQL File Execution    | ✅                                                                                                                                                                                                  |
+| Embedded PostgreSQL   | ✅                                                                                                                                                                                                  |
+| Output Formats        | ascii, csv, expanded, html, json, jsonl, markdown, plain, psql, sqlite, tsv, unicode, xml, yaml                                                                                                    |
+| Localized Interface   | 40+ languages¹                                                                                                                                                                                     |
+| Key Bindings          | emacs, vi                                                                                                                                                                                          |
 
 ¹ Computer translations; human translations welcome
 
@@ -66,35 +67,44 @@ rsql --url "<url>"
 rsql --url "<url>" -- "<query>"
 ```
 
-| Driver             | URL                                                                                                                       |
-|--------------------|---------------------------------------------------------------------------------------------------------------------------|
-| arrow (polars)     | `arrow://<file>`                                                                                                          |
-| avro (polars)      | `avro://<file>`                                                                                                           |
-| cockroachdb (sqlx) | `cockroachdb://<user[:password>]@<host>[:<port>]/<database>`                                                              |
-| csv (polars)       | `csv://<file>[?has_header=<true\|false>][&quote=<char>][&skip_rows=<n>]`                                                  |
-| delimited (polars) | `delimited://<file>[?separator=<char>][&has_header=<true\|false>][&quote=<char>][&skip_rows=<n>]`                         |
-| duckdb             | `duckdb://[<file>]`                                                                                                       |
-| excel              | `excel://<file>[?has_header=<true\|false>][&skip_rows=<n>]`                                                               |
-| file¹              | `file://<file>`                                                                                                           |
-| http¹              | `http://<path>[?_headers=<headers>]`                                                                                      |
-| https¹             | `https://<path>[?_headers=<headers>]`                                                                                     |
-| json (polars)      | `json://<file>`                                                                                                           |
-| jsonl (polars)     | `jsonl://<file>`                                                                                                          |
-| libsql²            | `libsql://<host>?[<memory=true>][&file=<database_file>][&auth_token=<token>]`                                             |
-| mariadb (sqlx)     | `mariadb://<user>[:<password>]@<host>[:<port>]/<database>`                                                                |
-| mysql (sqlx)       | `mysql://<user>[:<password>]@<host>[:<port>]/<database>`                                                                  |
-| ods                | `ods://<file>[?has_header=<true\|false>][&skip_rows=<n>]`                                                                 |
-| parquet (polars)   | `parquet://<file>`                                                                                                        |
-| postgres           | `postgres://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`                                               |
-| postgresql (sqlx)  | `postgresql://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`                                             |
-| redshift (sqlx)    | `redshift://<user[:password>]@<host>[:<port>]/<database>`                                                                 |
-| rusqlite           | `rusqlite://[<file>]`                                                                                                     |
-| snowflake          | `snowflake://<user>[:<token>]@<account>.snowflakecomputing.com/[?private_key_file=pkey_file&public_key_file=pubkey_file]` |
-| sqlite (sqlx)      | `sqlite://[<file>]`                                                                                                       |
-| sqlserver          | `sqlserver://<user>[:<password>]@<host>[:<port>]/<database>`                                                              |
-| tsv (polars)       | `tsv://<file>[?has_header=<true\|false>][&quote=<char>][&skip_rows=<n>]`                                                  |
-| xml                | `xml://<file>`                                                                                                            |
-| yaml               | `yaml://<file>`                                                                                                           |
+| Driver             | URL                                                                                                                                    |
+|--------------------|----------------------------------------------------------------------------------------------------------------------------------------|
+| arrow (polars)     | `arrow://<file>`                                                                                                                       |
+| avro (polars)      | `avro://<file>`                                                                                                                        |
+| brotli¹            | `brotli://<file>`                                                                                                                      |
+| bzip2¹             | `bzip2://<file>`                                                                                                                       |
+| cockroachdb (sqlx) | `cockroachdb://<user[:password>]@<host>[:<port>]/<database>`                                                                           |
+| csv (polars)       | `csv://<file>[?has_header=<true\|false>][&quote=<char>][&skip_rows=<n>]`                                                               |
+| delimited (polars) | `delimited://<file>[?separator=<char>][&has_header=<true\|false>][&quote=<char>][&skip_rows=<n>]`                                      |
+| duckdb             | `duckdb://[<file>]`                                                                                                                    |
+| excel              | `excel://<file>[?has_header=<true\|false>][&skip_rows=<n>]`                                                                            |
+| file¹              | `file://<file>`                                                                                                                        |
+| fwf                | `fwf://<file>?widths=<widths>[&headers=<headers>]`                                                                                     |
+| gzip¹              | `gzip://<file>`                                                                                                                        |
+| http¹              | `http://<path>[?_headers=<headers>]`                                                                                                   |
+| https¹             | `https://<path>[?_headers=<headers>]`                                                                                                  |
+| json (polars)      | `json://<file>`                                                                                                                        |
+| jsonl (polars)     | `jsonl://<file>`                                                                                                                       |
+| libsql²            | `libsql://<host>?[<memory=true>][&file=<database_file>][&auth_token=<token>]`                                                          |
+| lz4¹               | `lz4://<file>`                                                                                                                         |
+| mariadb (sqlx)     | `mariadb://<user>[:<password>]@<host>[:<port>]/<database>`                                                                             |
+| mysql (sqlx)       | `mysql://<user>[:<password>]@<host>[:<port>]/<database>`                                                                               |
+| ods                | `ods://<file>[?has_header=<true\|false>][&skip_rows=<n>]`                                                                              |
+| orc                | `orc://<file>`                                                                                                                         |
+| parquet (polars)   | `parquet://<file>`                                                                                                                     |
+| postgres           | `postgres://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`                                                            |
+| postgresql (sqlx)  | `postgresql://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`                                                          |
+| redshift (sqlx)    | `redshift://<user[:password>]@<host>[:<port>]/<database>`                                                                              |
+| rusqlite           | `rusqlite://[<file>]`                                                                                                                  |
+| s3¹                | `s3://[<access_key_id>:<secret_access_key>@]<bucket>.<region>.<host>[:<port>]/<object>[?session_token=<token>][&scheme=<http\|https>]` |
+| snowflake          | `snowflake://<user>[:<token>]@<account>.snowflakecomputing.com/[?private_key_file=pkey_file&public_key_file=pubkey_file]`              |
+| sqlite (sqlx)      | `sqlite://[<file>]`                                                                                                                    |
+| sqlserver          | `sqlserver://<user>[:<password>]@<host>[:<port>]/<database>`                                                                           |
+| tsv (polars)       | `tsv://<file>[?has_header=<true\|false>][&quote=<char>][&skip_rows=<n>]`                                                               |
+| xml                | `xml://<file>`                                                                                                                         |
+| xz¹                | `xz://<file>`                                                                                                                          |
+| yaml               | `yaml://<file>`                                                                                                                        |
+| zstd¹              | `zstd://<file>`                                                                                                                        |
 
 ¹ the driver will attempt to detect the type of file and automatically use the appropriate driver.  
 ² `libsql` needs to be enabled with the `libsql` feature flag; it is disabled by default as it conflicts

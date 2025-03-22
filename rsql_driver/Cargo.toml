@@ -14,9 +14,9 @@ version.workspace = true
 anyhow = { workspace = true }
 async-trait = { workspace = true }
 base64 = { workspace = true }
-chrono = { workspace = true, features = ["serde"] }
 file_type = { workspace = true }
 indexmap = { workspace = true, features = ["serde"] }
+jiff = { workspace = true, features = ["serde"] }
 mockall = { workspace = true }
 num-format = { workspace = true }
 rust_decimal = { workspace = true, features = ["serde-with-str"] }
@@ -25,16 +25,19 @@ serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true, optional = true, features = ["preserve_order"] }
 sqlparser = { workspace = true }
 thiserror = { workspace = true }
+tracing = { workspace = true }
 url = { workspace = true }
 uuid = { workspace = true, features = ["serde", "v4"] }
 
-[target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dependencies]
+[target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dependencies]
 getrandom = { workspace = true, features = ["js"] }
+uuid = { workspace = true, features = ["js"] }
 
 [dev-dependencies]
-rsql_driver_test_utils = { path = "../drivers/test_utils", version = "0.17.0" }
+rsql_driver_test_utils = { path = "../drivers/test_utils", version = "0.17.2" }
 serde_json = { workspace = true, features = ["preserve_order"] }
 tokio = { workspace = true, features = ["macros", "rt"] }
+tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
 
 [features]
 default = []

@@ -1,0 +1,22 @@
+[package]
+authors.workspace = true
+categories.workspace = true
+description = "rsql file driver"
+edition.workspace = true
+keywords.workspace = true
+license.workspace = true
+name = "rsql_driver_file"
+repository.workspace = true
+rust-version.workspace = true
+version.workspace = true
+
+[dependencies]
+async-trait = { workspace = true }
+file_type = { workspace = true }
+rsql_driver = { path = "../../rsql_driver", version = "0.17.2" }
+url = { workspace = true }
+
+[dev-dependencies]
+rsql_driver_csv = { path = "../csv", version = "0.17.2" }
+rsql_driver_test_utils = { path = "../test_utils", version = "0.17.2" }
+tokio = { workspace = true, features = ["macros", "rt"] }
