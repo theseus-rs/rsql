@@ -1,0 +1,7 @@
+{"version": 2, "width": 120, "height": 30, "timestamp": 1740088988, "env": {"SHELL": "/bin/zsh", "TERM": "xterm-256color"}}
+[0.026734, "o", "\u001b]11;?\u001b\\"]
+[0.05074, "o", "⠁ connect [00:00:00] [                                                                             ] 0 B/0 B (0 B/s, 0s)"]
+[0.050869, "o", "\r\u001b[2K"]
+[1.095007, "o", "rsql> \u001b[38;2;131;148;150m.schemas\u001b[0m\r\n"]
+[1.096268, "o", " Schema | Current \r\n--------+---------\r\n main   | Yes     \r\n1 row \u001b[2m(599.958µs)\u001b[0m"]
+[1.096392, "o", "\r\n"]
