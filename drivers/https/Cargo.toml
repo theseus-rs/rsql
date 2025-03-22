@@ -15,14 +15,14 @@ async-trait = { workspace = true }
 file_type = { workspace = true }
 futures-util = { workspace = true }
 reqwest = { workspace = true, features = ["gzip", "json", "stream"] }
-rsql_driver = { path = "../../rsql_driver", version = "0.17.2" }
+rsql_driver = { path = "../../rsql_driver", version = "0.18.0" }
 tempfile = { workspace = true }
 tracing = { workspace = true }
 tokio = { workspace = true, features = ["fs"] }
 url = { workspace = true }
 
 [dev-dependencies]
-rsql_driver_csv = { path = "../csv", version = "0.17.2" }
+rsql_driver_csv = { path = "../csv", version = "0.18.0" }
 tokio = { workspace = true, features = ["macros", "rt"] }
 
 [features]
