@@ -15,6 +15,8 @@ file_type = { workspace = true }
 rsql_driver = { path = "../rsql_driver", version = "0.17.2" }
 rsql_driver_arrow = { path = "../drivers/arrow", optional = true, version = "0.17.2" }
 rsql_driver_avro = { path = "../drivers/avro", optional = true, version = "0.17.2" }
+rsql_driver_brotli = { path = "../drivers/brotli", optional = true, version = "0.17.2" }
+rsql_driver_bzip2 = { path = "../drivers/bzip2", optional = true, version = "0.17.2" }
 rsql_driver_cockroachdb = { path = "../drivers/cockroachdb", optional = true, version = "0.17.2" }
 rsql_driver_csv = { path = "../drivers/csv", optional = true, version = "0.17.2" }
 rsql_driver_delimited = { path = "../drivers/delimited", optional = true, version = "0.17.2" }
@@ -22,11 +24,13 @@ rsql_driver_duckdb = { path = "../drivers/duckdb", optional = true, version = "0
 rsql_driver_excel = { path = "../drivers/excel", optional = true, version = "0.17.2" }
 rsql_driver_file = { path = "../drivers/file", optional = true, version = "0.17.2" }
 rsql_driver_fwf = { path = "../drivers/fwf", optional = true, version = "0.17.2" }
+rsql_driver_gzip = { path = "../drivers/gzip", optional = true, version = "0.17.2" }
 rsql_driver_http = { path = "../drivers/http", optional = true, version = "0.17.2" }
 rsql_driver_https = { path = "../drivers/https", optional = true, version = "0.17.2" }
 rsql_driver_json = { path = "../drivers/json", optional = true, version = "0.17.2" }
 rsql_driver_jsonl = { path = "../drivers/jsonl", optional = true, version = "0.17.2" }
 rsql_driver_libsql = { path = "../drivers/libsql", optional = true, version = "0.17.2" }
+rsql_driver_lz4 = { path = "../drivers/lz4", optional = true, version = "0.17.2" }
 rsql_driver_mariadb = { path = "../drivers/mariadb", optional = true, version = "0.17.2" }
 rsql_driver_mysql = { path = "../drivers/mysql", optional = true, version = "0.17.2" }
 rsql_driver_ods = { path = "../drivers/ods", optional = true, version = "0.17.2" }
@@ -42,7 +46,9 @@ rsql_driver_sqlite = { path = "../drivers/sqlite", optional = true, version = "0
 rsql_driver_sqlserver = { path = "../drivers/sqlserver", optional = true, version = "0.17.2" }
 rsql_driver_tsv = { path = "../drivers/tsv", optional = true, version = "0.17.2" }
 rsql_driver_xml = { path = "../drivers/xml", optional = true, version = "0.17.2" }
+rsql_driver_xz = { path = "../drivers/xz", optional = true, version = "0.17.2" }
 rsql_driver_yaml = { path = "../drivers/yaml", optional = true, version = "0.17.2" }
+rsql_driver_zstd = { path = "../drivers/zstd", optional = true, version = "0.17.2" }
 tokio = { workspace = true, features = ["fs"], optional = true }
 tracing = { workspace = true }
 
@@ -58,6 +64,8 @@ tokio = { workspace = true, features = ["macros", "rt"] }
 all = [
     "arrow",
     "avro",
+    "brotli",
+    "bzip2",
     "cockroachdb",
     "csv",
     "delimited",
@@ -65,10 +73,12 @@ all = [
     "excel",
     "fwf",
     "file",
+    "gzip",
     "http",
     "https",
     "json",
     "jsonl",
+    "lz4",
     "mariadb",
     "mysql",
     "ods",
@@ -84,11 +94,15 @@ all = [
     "sqlserver",
     "tsv",
     "xml",
+    "xz",
     "yaml",
+    "zstd",
 ]
 default = []
 arrow = ["dep:rsql_driver_arrow"]
 avro = ["dep:rsql_driver_avro"]
+brotli = ["dep:rsql_driver_brotli"]
+bzip2 = ["dep:rsql_driver_bzip2"]
 cockroachdb = ["dep:rsql_driver_cockroachdb"]
 csv = ["dep:rsql_driver_csv"]
 delimited = ["dep:rsql_driver_delimited"]
@@ -96,11 +110,13 @@ duckdb = ["dep:rsql_driver_duckdb"]
 excel = ["dep:rsql_driver_excel"]
 fwf = ["dep:rsql_driver_fwf"]
 file = ["dep:rsql_driver_file"]
+gzip = ["dep:rsql_driver_gzip"]
 http = ["dep:rsql_driver_http"]
 https = ["dep:rsql_driver_https"]
 json = ["dep:rsql_driver_json"]
 jsonl = ["dep:rsql_driver_jsonl"]
 libsql = ["dep:rsql_driver_libsql"]
+lz4 = ["dep:rsql_driver_lz4"]
 mariadb = ["dep:rsql_driver_mariadb"]
 mysql = ["dep:rsql_driver_mysql"]
 native-tls = [
@@ -136,7 +152,9 @@ sqlite = ["dep:rsql_driver_sqlite"]
 sqlserver = ["dep:rsql_driver_sqlserver"]
 tsv = ["dep:rsql_driver_tsv"]
 xml = ["dep:rsql_driver_xml"]
+xz = ["dep:rsql_driver_xz"]
 yaml = ["dep:rsql_driver_yaml"]
+zstd = ["dep:rsql_driver_zstd"]
 
 [lints.clippy]
 unwrap_used = "deny"

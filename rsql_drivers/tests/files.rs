@@ -11,16 +11,24 @@ async fn test_file_drivers() -> Result<()> {
         (dataset_url("file", "users.arrow"), None),
         #[cfg(feature = "avro")]
         (dataset_url("file", "users.avro"), None),
+        #[cfg(feature = "brotli")]
+        (dataset_url("file", "users.csv.br"), None),
+        #[cfg(feature = "bzip2")]
+        (dataset_url("file", "users.csv.bz2"), None),
         #[cfg(feature = "csv")]
         (dataset_url("file", "users.csv"), None),
         #[cfg(feature = "duckdb")]
         (dataset_url("file", "users.duckdb"), None),
         #[cfg(feature = "excel")]
         (dataset_url("file", "users.xlsx"), None),
+        #[cfg(feature = "gzip")]
+        (dataset_url("file", "users.csv.gz"), None),
         #[cfg(feature = "json")]
         (dataset_url("file", "users.json"), None),
         #[cfg(feature = "jsonl")]
         (dataset_url("file", "users.jsonl"), None),
+        #[cfg(feature = "lz4")]
+        (dataset_url("file", "users.csv.lz4"), None),
         #[cfg(feature = "ods")]
         (dataset_url("file", "users.ods"), None),
         #[cfg(feature = "orc")]
@@ -41,8 +49,12 @@ async fn test_file_drivers() -> Result<()> {
                 SELECT user.* FROM cte_user
             "}),
         ),
+        #[cfg(feature = "xz")]
+        (dataset_url("file", "users.csv.xz"), None),
         #[cfg(feature = "yaml")]
         (dataset_url("file", "users.yaml"), None),
+        #[cfg(feature = "zstd")]
+        (dataset_url("file", "users.csv.zst"), None),
     ];
     for (database_url, sql) in database_urls {
         test_file_driver(database_url.as_str(), sql).await?;

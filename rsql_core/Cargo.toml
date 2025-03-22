@@ -63,6 +63,8 @@ all = ["all-drivers", "all-formats"]
 all-drivers = [
     "driver-arrow",
     "driver-avro",
+    "driver-brotli",
+    "driver-bzip2",
     "driver-cockroachdb",
     "driver-csv",
     "driver-delimited",
@@ -70,10 +72,12 @@ all-drivers = [
     "driver-excel",
     "driver-file",
     "driver-fwf",
+    "driver-gzip",
     "driver-http",
     "driver-https",
     "driver-json",
     "driver-jsonl",
+    "driver-lz4",
     "driver-mariadb",
     "driver-mysql",
     "driver-ods",
@@ -89,11 +93,15 @@ all-drivers = [
     "driver-sqlserver",
     "driver-tsv",
     "driver-xml",
+    "driver-xz",
     "driver-yaml",
+    "driver-zstd",
 ]
 default = ["native-tls"]
 driver-arrow = ["rsql_drivers/arrow"]
 driver-avro = ["rsql_drivers/avro"]
+driver-brotli = ["rsql_drivers/brotli"]
+driver-bzip2 = ["rsql_drivers/bzip2"]
 driver-cockroachdb = ["rsql_drivers/cockroachdb"]
 driver-csv = ["rsql_drivers/csv"]
 driver-delimited = ["rsql_drivers/delimited"]
@@ -101,11 +109,13 @@ driver-duckdb = ["rsql_drivers/duckdb"]
 driver-excel = ["rsql_drivers/excel"]
 driver-file = ["rsql_drivers/file"]
 driver-fwf = ["rsql_drivers/fwf"]
+driver-gzip = ["rsql_drivers/gzip"]
 driver-http = ["rsql_drivers/http"]
 driver-https = ["rsql_drivers/https"]
 driver-json = ["rsql_drivers/json"]
 driver-jsonl = ["rsql_drivers/jsonl"]
 driver-libsql = ["rsql_drivers/libsql"]
+driver-lz4 = ["rsql_drivers/lz4"]
 driver-mariadb = ["rsql_drivers/mariadb"]
 driver-mysql = ["rsql_drivers/mysql"]
 driver-ods = ["rsql_drivers/ods"]
@@ -121,7 +131,9 @@ driver-sqlite = ["rsql_drivers/sqlite"]
 driver-sqlserver = ["rsql_drivers/sqlserver"]
 driver-tsv = ["rsql_drivers/tsv"]
 driver-xml = ["rsql_drivers/xml"]
+driver-xz = ["rsql_drivers/xz"]
 driver-yaml = ["rsql_drivers/yaml"]
+driver-zstd = ["rsql_drivers/zstd"]
 all-formats = [
     "format-ascii",
     "format-csv",

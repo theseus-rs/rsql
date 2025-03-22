@@ -1918,22 +1918,21 @@ dependencies = [
 
 [[package]]
 name = "bzip2"
-version = "0.4.4"
+version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bdb116a6ef3f6c3698828873ad02c3014b3c85cadb88496095628e3ef1e347f8"
+checksum = "49ecfb22d906f800d4fe833b6282cf4dc1c298f5057ca0b5445e5c209735ca47"
 dependencies = [
  "bzip2-sys",
- "libc",
+ "libbz2-rs-sys",
 ]
 
 [[package]]
 name = "bzip2-sys"
-version = "0.1.12+1.0.8"
+version = "0.1.13+1.0.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "72ebc2f1a417f01e1da30ef264ee86ae31d2dcd2d603ea283d3c244a883ca2a9"
+checksum = "225bff33b2141874fe80d71e07d6eec4f85c5c216453dd96388240f96e1acc14"
 dependencies = [
  "cc",
- "libc",
  "pkg-config",
 ]
 
@@ -2525,9 +2524,9 @@ dependencies = [
 
 [[package]]
 name = "crossbeam-utils"
-version = "0.8.20"
+version = "0.8.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "22ec99545bb0ed0ea7bb9b8e1e9122ea386ff8a48c0922e43f36d45ab09e0e80"
+checksum = "d0a5c400df2834b80a4c3327b3aad3a4c4cd4de0629063962b03235697506a28"
 
 [[package]]
 name = "crossterm"
@@ -2703,12 +2702,6 @@ name = "deadpool-runtime"
 version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "092966b41edc516079bdf31ec78a2e0588d1d0c08f78b91d8307215928642b2b"
-
-[[package]]
-name = "deflate64"
-version = "0.1.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "da692b8d1080ea3045efaab14434d40468c3d8657e42abddfffca87b428f4c1b"
 
 [[package]]
 name = "der"
@@ -3177,9 +3170,9 @@ dependencies = [
 
 [[package]]
 name = "file_type"
-version = "0.8.0"
+version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a2f41d9c0ff84ee5335227a501bfa01284d5fec029f504dc48bea8238a16ca04"
+checksum = "e237c2e6ae6183998137b1157b9e0fddfa25ce480f99f40ec1a5c2d49747c6d1"
 dependencies = [
  "phf",
 ]
@@ -3208,9 +3201,9 @@ dependencies = [
 
 [[package]]
 name = "flate2"
-version = "1.0.35"
+version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c936bfdafb507ebbf50b8074c54fa31c5be9a1e7e5f467dd659697041407d07c"
+checksum = "11faaf5a5236997af9848be0bef4db95824b1d534ebc64d0f0c6cf3e67bd38dc"
 dependencies = [
  "crc32fast",
  "libz-rs-sys",
@@ -4275,9 +4268,9 @@ dependencies = [
 
 [[package]]
 name = "indoc"
-version = "2.0.5"
+version = "2.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b248f5224d1d606005e02c97f5aa4e88eeb230488bcc03bc9ca4d7991399f2b5"
+checksum = "f4c7245a08504955605670dbf141fceab975f15ca21570696aebe9d2e71576bd"
 
 [[package]]
 name = "inout"
@@ -4652,6 +4645,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "libbz2-rs-sys"
+version = "0.1.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0864a00c8d019e36216b69c2c4ce50b83b7bd966add3cf5ba554ec44f8bebcf5"
+
+[[package]]
 name = "libc"
 version = "0.2.168"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4895,9 +4894,9 @@ dependencies = [
 
 [[package]]
 name = "libz-rs-sys"
-version = "0.4.1"
+version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a90e19106f1b2c93f1fa6cdeec2e56facbf2e403559c1e1c0ddcc6d46e979cdf"
+checksum = "902bc563b5d65ad9bba616b490842ef0651066a1a1dc3ce1087113ffcb873c8d"
 dependencies = [
  "zlib-rs",
 ]
@@ -4962,9 +4961,9 @@ dependencies = [
 
 [[package]]
 name = "lz4"
-version = "1.28.0"
+version = "1.28.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4d1febb2b4a79ddd1980eede06a8f7902197960aa0383ffcfdd62fe723036725"
+checksum = "a20b523e860d03443e98350ceaac5e71c6ba89aea7d960769ec3ce37f4de5af4"
 dependencies = [
  "lz4-sys",
 ]
@@ -4986,16 +4985,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "75761162ae2b0e580d7e7c390558127e5f01b4194debd6221fd8c207fc80e3f5"
 dependencies = [
  "twox-hash",
-]
-
-[[package]]
-name = "lzma-rs"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "297e814c836ae64db86b36cf2a557ba54368d03f6afcd7d947c266692f71115e"
-dependencies = [
- "byteorder",
- "crc 3.2.1",
 ]
 
 [[package]]
@@ -5100,9 +5089,9 @@ checksum = "68354c5c6bd36d73ff3feceb05efa59b6acb7626617f4962be322a825e61f79a"
 
 [[package]]
 name = "miniz_oxide"
-version = "0.8.0"
+version = "0.8.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e2d80299ef12ff69b16a84bb182e3b9df68b5a91574d3d4fa6e41b65deec4df1"
+checksum = "8e3e04debbb59698c15bacbb6d93584a8c0ca9cc3213cb423d31f760d8843ce5"
 dependencies = [
  "adler2",
  "simd-adler32",
@@ -5817,16 +5806,6 @@ name = "pathdiff"
 version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "df94ce210e5bc13cb6651479fa48d14f601d9858cfe0467f43ae157023b938d3"
-
-[[package]]
-name = "pbkdf2"
-version = "0.12.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f8ed6a7761f76e3b9f92dfb0a60a6a6477c61024b775147ff0973a02653abaf2"
-dependencies = [
- "digest",
- "hmac",
-]
 
 [[package]]
 name = "peeking_take_while"
@@ -6668,9 +6647,9 @@ dependencies = [
 
 [[package]]
 name = "postgresql_archive"
-version = "0.18.1"
+version = "0.18.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c40e1d7c4e82dbd0e5be54d363f9819a3c08b2f16afa70ec8e9a42651f2985ca"
+checksum = "f799d21d3a7225f5efb33449b97046135244b46a3d963faa61a888816df2c85a"
 dependencies = [
  "async-trait",
  "flate2",
@@ -6698,9 +6677,9 @@ dependencies = [
 
 [[package]]
 name = "postgresql_commands"
-version = "0.18.1"
+version = "0.18.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "72be76d517870a0a82ba7ae9967c7362cbb7e28929c4e52ece39cc8fcc2c8acb"
+checksum = "44262b2d4a8e7d4da9a178ee9526997d8ee96f3acc619fdd986475aad9354a62"
 dependencies = [
  "thiserror 2.0.12",
  "tracing",
@@ -6708,9 +6687,9 @@ dependencies = [
 
 [[package]]
 name = "postgresql_embedded"
-version = "0.18.1"
+version = "0.18.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2bcebb7e7954423a4a7a2120b58cf616f83d97dfd446487964b891c6c03191d4"
+checksum = "a49030a517128776430b69490c9c4b9cd8c8a63b6ef1bc923835dea523e025c5"
 dependencies = [
  "anyhow",
  "postgresql_archive",
@@ -7252,9 +7231,9 @@ dependencies = [
 
 [[package]]
 name = "reqwest"
-version = "0.12.14"
+version = "0.12.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "989e327e510263980e231de548a33e63d34962d29ae61b467389a1a09627a254"
+checksum = "d19c46a6fdd48bc4dab94b6103fccc55d34c67cc0ad04653aad4ea2a07cd7bbb"
 dependencies = [
  "async-compression",
  "base64 0.22.1",
@@ -7305,9 +7284,9 @@ dependencies = [
 
 [[package]]
 name = "reqwest-middleware"
-version = "0.4.0"
+version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d1ccd3b55e711f91a9885a2fa6fbbb2e39db1776420b062efc058c6410f7e5e3"
+checksum = "64e8975513bd9a7a43aad01030e79b3498e05db14e9d945df6483e8cf9b8c4c4"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -7342,9 +7321,9 @@ dependencies = [
 
 [[package]]
 name = "reqwest-tracing"
-version = "0.5.5"
+version = "0.5.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "73e6153390585f6961341b50e5a1931d6be6dee4292283635903c26ef9d980d2"
+checksum = "d9c88a8d9cfe3319b5adc10f3ffc3db75c7346837a1f857f8269f6361f3b2744"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -7597,6 +7576,38 @@ dependencies = [
 ]
 
 [[package]]
+name = "rsql_driver_brotli"
+version = "0.17.2"
+dependencies = [
+ "async-trait",
+ "brotli",
+ "file_type",
+ "rsql_driver",
+ "rsql_driver_csv",
+ "rsql_driver_test_utils",
+ "tempfile",
+ "tokio",
+ "tracing",
+ "url",
+]
+
+[[package]]
+name = "rsql_driver_bzip2"
+version = "0.17.2"
+dependencies = [
+ "async-trait",
+ "bzip2",
+ "file_type",
+ "rsql_driver",
+ "rsql_driver_csv",
+ "rsql_driver_test_utils",
+ "tempfile",
+ "tokio",
+ "tracing",
+ "url",
+]
+
+[[package]]
 name = "rsql_driver_cockroachdb"
 version = "0.17.2"
 dependencies = [
@@ -7680,6 +7691,9 @@ dependencies = [
  "async-trait",
  "file_type",
  "rsql_driver",
+ "rsql_driver_csv",
+ "rsql_driver_test_utils",
+ "tokio",
  "url",
 ]
 
@@ -7695,6 +7709,22 @@ dependencies = [
  "rsql_driver_polars",
  "rsql_driver_test_utils",
  "tokio",
+ "url",
+]
+
+[[package]]
+name = "rsql_driver_gzip"
+version = "0.17.2"
+dependencies = [
+ "async-trait",
+ "file_type",
+ "flate2",
+ "rsql_driver",
+ "rsql_driver_csv",
+ "rsql_driver_test_utils",
+ "tempfile",
+ "tokio",
+ "tracing",
  "url",
 ]
 
@@ -7766,6 +7796,22 @@ dependencies = [
  "libsql",
  "rsql_driver",
  "tokio",
+ "url",
+]
+
+[[package]]
+name = "rsql_driver_lz4"
+version = "0.17.2"
+dependencies = [
+ "async-trait",
+ "file_type",
+ "lz4",
+ "rsql_driver",
+ "rsql_driver_csv",
+ "rsql_driver_test_utils",
+ "tempfile",
+ "tokio",
+ "tracing",
  "url",
 ]
 
@@ -8050,6 +8096,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "rsql_driver_xz"
+version = "0.17.2"
+dependencies = [
+ "async-trait",
+ "file_type",
+ "liblzma",
+ "rsql_driver",
+ "rsql_driver_csv",
+ "rsql_driver_test_utils",
+ "tempfile",
+ "tokio",
+ "tracing",
+ "url",
+]
+
+[[package]]
 name = "rsql_driver_yaml"
 version = "0.17.2"
 dependencies = [
@@ -8067,6 +8129,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "rsql_driver_zstd"
+version = "0.17.2"
+dependencies = [
+ "async-trait",
+ "file_type",
+ "rsql_driver",
+ "rsql_driver_csv",
+ "rsql_driver_test_utils",
+ "tempfile",
+ "tokio",
+ "tracing",
+ "url",
+ "zstd",
+]
+
+[[package]]
 name = "rsql_drivers"
 version = "0.17.2"
 dependencies = [
@@ -8076,6 +8154,8 @@ dependencies = [
  "rsql_driver",
  "rsql_driver_arrow",
  "rsql_driver_avro",
+ "rsql_driver_brotli",
+ "rsql_driver_bzip2",
  "rsql_driver_cockroachdb",
  "rsql_driver_csv",
  "rsql_driver_delimited",
@@ -8083,11 +8163,13 @@ dependencies = [
  "rsql_driver_excel",
  "rsql_driver_file",
  "rsql_driver_fwf",
+ "rsql_driver_gzip",
  "rsql_driver_http",
  "rsql_driver_https",
  "rsql_driver_json",
  "rsql_driver_jsonl",
  "rsql_driver_libsql",
+ "rsql_driver_lz4",
  "rsql_driver_mariadb",
  "rsql_driver_mysql",
  "rsql_driver_ods",
@@ -8104,7 +8186,9 @@ dependencies = [
  "rsql_driver_test_utils",
  "rsql_driver_tsv",
  "rsql_driver_xml",
+ "rsql_driver_xz",
  "rsql_driver_yaml",
+ "rsql_driver_zstd",
  "tokio",
  "tracing",
 ]
@@ -8593,9 +8677,9 @@ dependencies = [
 
 [[package]]
 name = "semver"
-version = "1.0.25"
+version = "1.0.26"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f79dfe2d285b0488816f30e700a7438c5a73d816b5b7d3ac72fbc48b0d185e03"
+checksum = "56e6fa9c48d24d85fb3de5ad847117517440f6beceb7798af16b4a87d616b8d0"
 
 [[package]]
 name = "serde"
@@ -9630,9 +9714,9 @@ checksum = "55937e1799185b12863d447f42597ed69d9928686b8d88a1df17376a097d8369"
 
 [[package]]
 name = "tar"
-version = "0.4.43"
+version = "0.4.44"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c65998313f8e17d0d553d28f91a0df93e4dbbbf770279c7bc21ca0f09ea1a1f6"
+checksum = "1d863878d212c87a19c1a610eb53bb01fe12951c0501cf5a0d65f724914a667a"
 dependencies = [
  "filetime",
  "libc",
@@ -9647,9 +9731,9 @@ checksum = "1ac9aa371f599d22256307c24a9d748c041e548cbf599f35d890f9d365361790"
 
 [[package]]
 name = "tempfile"
-version = "3.19.0"
+version = "3.19.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "488960f40a3fd53d72c2a29a58722561dee8afdd175bd88e3db4677d7b2ba600"
+checksum = "7437ac7763b9b123ccf33c338a5cc1bac6f69b45a136c19bdd8a65e3916435bf"
 dependencies = [
  "fastrand",
  "getrandom 0.3.1",
@@ -11476,20 +11560,6 @@ name = "zeroize"
 version = "1.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ced3678a2879b30306d323f4542626697a464a97c0a07c9aebf7ebca65cd4dde"
-dependencies = [
- "zeroize_derive",
-]
-
-[[package]]
-name = "zeroize_derive"
-version = "1.4.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ce36e65b0d2999d2aafac989fb249189a141aee1f53c612c1f37d72631959f69"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.100",
-]
 
 [[package]]
 name = "zerovec"
@@ -11515,38 +11585,26 @@ dependencies = [
 
 [[package]]
 name = "zip"
-version = "2.2.2"
+version = "2.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ae9c1ea7b3a5e1f4b922ff856a129881167511563dc219869afe3787fc0c1a45"
+checksum = "fabe6324e908f85a1c52063ce7aa26b68dcb7eb6dbc83a2d148403c9bc3eba50"
 dependencies = [
- "aes",
  "arbitrary",
- "bzip2",
- "constant_time_eq",
  "crc32fast",
  "crossbeam-utils",
- "deflate64",
  "displaydoc",
  "flate2",
- "hmac",
  "indexmap 2.8.0",
- "lzma-rs",
  "memchr",
- "pbkdf2",
- "rand 0.8.5",
- "sha1",
  "thiserror 2.0.12",
- "time",
- "zeroize",
  "zopfli",
- "zstd",
 ]
 
 [[package]]
 name = "zlib-rs"
-version = "0.4.1"
+version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aada01553a9312bad4b9569035a1f12b05e5ec9770a1a4b323757356928944f8"
+checksum = "8b20717f0917c908dc63de2e44e97f1e6b126ca58d0e391cee86d504eb8fbd05"
 
 [[package]]
 name = "zopfli"
@@ -11564,9 +11622,9 @@ dependencies = [
 
 [[package]]
 name = "zstd"
-version = "0.13.2"
+version = "0.13.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fcf2b778a664581e31e389454a7072dab1647606d44f7feea22cd5abb9c9f3f9"
+checksum = "e91ee311a569c327171651566e07972200e76fcfe2242a4fa446149a3881c08a"
 dependencies = [
  "zstd-safe",
 ]
