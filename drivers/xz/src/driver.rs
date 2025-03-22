@@ -30,6 +30,8 @@ impl rsql_driver::Driver for Driver {
             .to_string();
         let file_type =
             FileType::try_from_file(&file_path).map_err(|error| IoError(error.to_string()))?;
+        #[cfg(target_os = "windows")]
+        let file_path = file_path.replace(':', "%3A").replace('\\', "/");
 
         debug!("temp_dir: {temp_dir:?}; file_path: {file_path}");
         let driver = DriverManager::get_by_file_type(file_type)?;
