@@ -138,7 +138,7 @@ indexmap = "2.8.0"
 indicatif = "0.17.11"
 indoc = "2.0.6"
 inquire = "0.7.5"
-jiff = "0.2.4"
+jiff = "0.2.5"
 jwt-simple = { version = "0.12.12", default-features = false }
 liblzma = "0.3.6"
 libsql = "0.9.1"
