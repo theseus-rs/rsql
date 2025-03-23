@@ -50,7 +50,7 @@ tracing-subscriber = { workspace = true, features = [
 unicode-width = { workspace = true }
 
 [target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dependencies]
-getrandom = { workspace = true, features = ["js"] }
+getrandom = { workspace = true, features = ["wasm_js"] }
 
 [dev-dependencies]
 criterion = { workspace = true, features = ["async_tokio"] }
