@@ -4,6 +4,7 @@ use aws_sdk_s3::Client;
 use aws_sdk_s3::primitives::ByteStream;
 use rsql_driver::Error::IoError;
 use rsql_driver::{Driver, DriverManager, Result, Value};
+use std::env;
 use std::net::{IpAddr, Ipv4Addr};
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -23,8 +24,8 @@ static REGION: &str = "us-east-1";
 
 #[tokio::test]
 async fn test_driver() -> Result<()> {
-    if std::env::consts::OS != "linux" {
-        println!("Skipping test on non-Linux platform");
+    if env::var("CI").unwrap_or_default() == "true" && env::consts::OS != "linux" {
+        eprintln!("Skipping CI test on non-linux platform");
         return Ok(());
     }
 
@@ -121,7 +122,7 @@ async fn upload_test_file(container: &ContainerAsync<LocalStackPro>) -> Result<S
         .map_err(|error| IoError(error.to_string()))?;
 
     let database_url = format!(
-        "s3://{ACCESS_KEY_ID}:{SECRET_ACCESS_KEY}@{BUCKET}.{REGION}.{HOST}:{port}/{file_name}?scheme=http",
+        "s3://{ACCESS_KEY_ID}:{SECRET_ACCESS_KEY}@{HOST}:{port}/{BUCKET}/{file_name}?region={REGION}&scheme=http",
     );
     Ok(database_url)
 }

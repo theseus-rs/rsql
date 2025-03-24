@@ -13,7 +13,7 @@
 ## Usage
 
 Driver url format:
-`s3://[<access_key_id>:<secret_access_key>@]<bucket>.<region>.<host>[:<port>]/<object>[?session_token=<token>][&scheme=<http\|https>]`
+`s3://[<access_key_id>:<secret_access_key>@]<host>[:<port>]/<bucket>/<object>[?region=<region>][&session_token=<token>][&force_path_style=(true\|false)][&scheme=<http\|https>]`
 
 ## Safety
 
