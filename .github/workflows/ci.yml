@@ -72,6 +72,7 @@ jobs:
 
       - name: Build
         if: ${{ startsWith(matrix.platform, 'wasm') }}
+        timeout-minutes: 120
         env:
           CARGO_TERM_COLOR: always
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
@@ -88,6 +89,7 @@ jobs:
 
       - name: Test
         if: ${{ !startsWith(matrix.platform, 'linux-') && !startsWith(matrix.platform, 'wasm32-') }}
+        timeout-minutes: 120
         env:
           CARGO_TERM_COLOR: always
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
@@ -99,6 +101,7 @@ jobs:
 
       - name: Test
         if: ${{ startsWith(matrix.platform, 'linux-') }}
+        timeout-minutes: 120
         env:
           CARGO_TERM_COLOR: always
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
