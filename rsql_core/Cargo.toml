@@ -24,9 +24,9 @@ indicatif = { workspace = true }
 indoc = { workspace = true }
 num-format = { workspace = true }
 regex = { workspace = true }
-rsql_driver = { path = "../rsql_driver", version = "0.17.2" }
-rsql_drivers = { path = "../rsql_drivers", version = "0.17.2" }
-rsql_formatters = { path = "../rsql_formatters", version = "0.17.2" }
+rsql_driver = { path = "../rsql_driver", version = "0.18.0" }
+rsql_drivers = { path = "../rsql_drivers", version = "0.18.0" }
+rsql_formatters = { path = "../rsql_formatters", version = "0.18.0" }
 rust-i18n = { workspace = true }
 rustyline = { workspace = true }
 sqlparser = { workspace = true }
@@ -50,7 +50,7 @@ tracing-subscriber = { workspace = true, features = [
 unicode-width = { workspace = true }
 
 [target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dependencies]
-getrandom = { workspace = true, features = ["js"] }
+getrandom = { workspace = true, features = ["wasm_js"] }
 
 [dev-dependencies]
 criterion = { workspace = true, features = ["async_tokio"] }

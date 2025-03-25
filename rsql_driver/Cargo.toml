@@ -30,11 +30,11 @@ url = { workspace = true }
 uuid = { workspace = true, features = ["serde", "v4"] }
 
 [target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dependencies]
-getrandom = { workspace = true, features = ["js"] }
+getrandom = { workspace = true, features = ["wasm_js"] }
 uuid = { workspace = true, features = ["js"] }
 
 [dev-dependencies]
-rsql_driver_test_utils = { path = "../drivers/test_utils", version = "0.17.2" }
+rsql_driver_test_utils = { path = "../drivers/test_utils", version = "0.18.0" }
 serde_json = { workspace = true, features = ["preserve_order"] }
 tokio = { workspace = true, features = ["macros", "rt"] }
 tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }

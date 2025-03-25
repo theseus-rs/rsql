@@ -7,6 +7,378 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## `rsql_cli` - [0.18.0](https://github.com/theseus-rs/rsql/compare/v0.17.2...v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+- add truncate_ragged_lines parameter to csv, delimited and tsv drivers
+
+### Fixed
+- correct s3 driver usage to work with aws s3 uri format and cli configurations
+
+### Other
+- update getrandom=0.3.2
+- create standalone rsql_driver::DriverManager and refactor file, http, https and s3 drivers into separate crates
+- update formatters to support wasm
+- correct test failure for mac/arm
+- update dependencies
+- replace chrono with jiff
+- update Cargo.toml dependencies
+
+## `rsql_core` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_core-v0.17.2...rsql_core-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+### Other
+- update getrandom=0.3.2
+- create standalone rsql_driver::DriverManager and refactor file, http, https and s3 drivers into separate crates
+- update formatters to support wasm
+
+## `rsql_formatters` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_formatters-v0.17.2...rsql_formatters-v0.18.0) - 2025-03-25
+
+### Other
+- update formatters to support wasm
+
+## `rsql_drivers` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_drivers-v0.17.2...rsql_drivers-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+### Other
+- update getrandom=0.3.2
+- correct test failure for mac/arm
+- create standalone rsql_driver::DriverManager and refactor file, http, https and s3 drivers into separate crates
+- update formatters to support wasm
+
+## `rsql_driver_zstd` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_zstd-v0.17.2...rsql_driver_zstd-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+### Fixed
+- adjust file paths for windows
+
+## `rsql_driver_yaml` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_yaml-v0.17.2...rsql_driver_yaml-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+## `rsql_driver_xz` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_xz-v0.17.2...rsql_driver_xz-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+### Fixed
+- adjust file paths for windows
+
+## `rsql_driver_xml` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_xml-v0.17.2...rsql_driver_xml-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+## `rsql_driver_tsv` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_tsv-v0.17.2...rsql_driver_tsv-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+- add truncate_ragged_lines parameter to csv, delimited and tsv drivers
+
+## `rsql_driver_sqlserver` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_sqlserver-v0.17.2...rsql_driver_sqlserver-v0.18.0) - 2025-03-25
+
+### Other
+- replace chrono with jiff
+
+## `rsql_driver_snowflake` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_snowflake-v0.17.2...rsql_driver_snowflake-v0.18.0) - 2025-03-25
+
+### Other
+- replace chrono with jiff
+
+## `rsql_driver_s3` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_s3-v0.17.2...rsql_driver_s3-v0.18.0) - 2025-03-25
+
+### Fixed
+- correct s3 driver usage to work with aws s3 uri format and cli configurations
+
+### Other
+- create standalone rsql_driver::DriverManager and refactor file, http, https and s3 drivers into separate crates
+
+## `rsql_driver_rusqlite` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_rusqlite-v0.17.2...rsql_driver_rusqlite-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+## `rsql_driver_sqlite` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_sqlite-v0.17.2...rsql_driver_sqlite-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+## `rsql_driver_redshift` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_redshift-v0.17.2...rsql_driver_redshift-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+## `rsql_driver_postgres` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_postgres-v0.17.2...rsql_driver_postgres-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+### Other
+- replace chrono with jiff
+
+## `rsql_driver_parquet` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_parquet-v0.17.2...rsql_driver_parquet-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+## `rsql_driver_orc` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_orc-v0.17.2...rsql_driver_orc-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+## `rsql_driver_ods` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_ods-v0.17.2...rsql_driver_ods-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+## `rsql_driver_mariadb` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_mariadb-v0.17.2...rsql_driver_mariadb-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+## `rsql_driver_mysql` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_mysql-v0.17.2...rsql_driver_mysql-v0.18.0) - 2025-03-25
+
+### Other
+- replace chrono with jiff
+
+## `rsql_driver_lz4` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_lz4-v0.17.2...rsql_driver_lz4-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+### Fixed
+- adjust file paths for windows
+
+## `rsql_driver_libsql` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_libsql-v0.17.2...rsql_driver_libsql-v0.18.0) - 2025-03-25
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_jsonl` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_jsonl-v0.17.2...rsql_driver_jsonl-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+## `rsql_driver_json` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_json-v0.17.2...rsql_driver_json-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+## `rsql_driver_http` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_http-v0.17.2...rsql_driver_http-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+### Other
+- create standalone rsql_driver::DriverManager and refactor file, http, https and s3 drivers into separate crates
+
+## `rsql_driver_https` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_https-v0.17.2...rsql_driver_https-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+### Fixed
+- correct s3 driver usage to work with aws s3 uri format and cli configurations
+
+### Other
+- create standalone rsql_driver::DriverManager and refactor file, http, https and s3 drivers into separate crates
+
+## `rsql_driver_gzip` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_gzip-v0.17.2...rsql_driver_gzip-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+### Fixed
+- adjust file paths for windows
+
+## `rsql_driver_fwf` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_fwf-v0.17.2...rsql_driver_fwf-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+## `rsql_driver_file` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_file-v0.17.2...rsql_driver_file-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+### Other
+- create standalone rsql_driver::DriverManager and refactor file, http, https and s3 drivers into separate crates
+
+## `rsql_driver_excel` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_excel-v0.17.2...rsql_driver_excel-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+## `rsql_driver_duckdb` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_duckdb-v0.17.2...rsql_driver_duckdb-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+### Other
+- update dependencies
+- replace chrono with jiff
+
+## `rsql_driver_cockroachdb` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_cockroachdb-v0.17.2...rsql_driver_cockroachdb-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+## `rsql_driver_postgresql` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_postgresql-v0.17.2...rsql_driver_postgresql-v0.18.0) - 2025-03-25
+
+### Other
+- replace chrono with jiff
+
+## `rsql_driver_bzip2` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_bzip2-v0.17.2...rsql_driver_bzip2-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+### Fixed
+- adjust file paths for windows
+
+## `rsql_driver_csv` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_csv-v0.17.2...rsql_driver_csv-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+- add truncate_ragged_lines parameter to csv, delimited and tsv drivers
+
+### Other
+- update dependencies
+
+## `rsql_driver_delimited` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_delimited-v0.17.2...rsql_driver_delimited-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+- add truncate_ragged_lines parameter to csv, delimited and tsv drivers
+
+## `rsql_driver_brotli` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_brotli-v0.17.2...rsql_driver_brotli-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+### Fixed
+- adjust file paths for windows
+
+## `rsql_driver_avro` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_avro-v0.17.2...rsql_driver_avro-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+### Other
+- update dependencies
+
+## `rsql_driver_arrow` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_arrow-v0.17.2...rsql_driver_arrow-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+## `rsql_driver_polars` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_polars-v0.17.2...rsql_driver_polars-v0.18.0) - 2025-03-25
+
+### Other
+- replace chrono with jiff
+
+## `rsql_driver` - [0.18.0](https://github.com/theseus-rs/rsql/compare/rsql_driver-v0.17.2...rsql_driver-v0.18.0) - 2025-03-25
+
+### Other
+- update getrandom=0.3.2
+- correct test failure for mac/arm
+- create standalone rsql_driver::DriverManager and refactor file, http, https and s3 drivers into separate crates
+- update formatters to support wasm
+- update dependencies
+- replace chrono with jiff
+
+## `rsql_driver_zstd` - [0.18.0](https://github.com/theseus-rs/rsql/releases/tag/rsql_driver_zstd-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+### Fixed
+- adjust file paths for windows
+
+## `rsql_driver_xz` - [0.18.0](https://github.com/theseus-rs/rsql/releases/tag/rsql_driver_xz-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+### Fixed
+- adjust file paths for windows
+
+## `rsql_driver_s3` - [0.18.0](https://github.com/theseus-rs/rsql/releases/tag/rsql_driver_s3-v0.18.0) - 2025-03-25
+
+### Fixed
+- correct s3 driver usage to work with aws s3 uri format and cli configurations
+
+### Other
+- Merge branch 'main' into release-plz-2025-03-12T19-44-32Z
+- create standalone rsql_driver::DriverManager and refactor file, http, https and s3 drivers into separate crates
+
+## `rsql_driver_lz4` - [0.18.0](https://github.com/theseus-rs/rsql/releases/tag/rsql_driver_lz4-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+### Fixed
+- adjust file paths for windows
+
+## `rsql_driver_http` - [0.18.0](https://github.com/theseus-rs/rsql/releases/tag/rsql_driver_http-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+### Other
+- create standalone rsql_driver::DriverManager and refactor file, http, https and s3 drivers into separate crates
+
+## `rsql_driver_https` - [0.18.0](https://github.com/theseus-rs/rsql/releases/tag/rsql_driver_https-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+### Fixed
+- correct s3 driver usage to work with aws s3 uri format and cli configurations
+
+### Other
+- create standalone rsql_driver::DriverManager and refactor file, http, https and s3 drivers into separate crates
+
+## `rsql_driver_gzip` - [0.18.0](https://github.com/theseus-rs/rsql/releases/tag/rsql_driver_gzip-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+### Fixed
+- adjust file paths for windows
+
+## `rsql_driver_file` - [0.18.0](https://github.com/theseus-rs/rsql/releases/tag/rsql_driver_file-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+### Other
+- create standalone rsql_driver::DriverManager and refactor file, http, https and s3 drivers into separate crates
+
+## `rsql_driver_bzip2` - [0.18.0](https://github.com/theseus-rs/rsql/releases/tag/rsql_driver_bzip2-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+### Fixed
+- adjust file paths for windows
+
+## `rsql_driver_brotli` - [0.18.0](https://github.com/theseus-rs/rsql/releases/tag/rsql_driver_brotli-v0.18.0) - 2025-03-25
+
+### Added
+- add brotli, bzip2, gzip, lz4, xz, and zstd drivers
+
+### Fixed
+- adjust file paths for windows
+
 ## `rsql_cli` - [0.17.2](https://github.com/theseus-rs/rsql/compare/v0.17.1...v0.17.2) - 2025-03-11
 
 ### Added

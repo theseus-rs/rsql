@@ -99,10 +99,11 @@ impl Driver {
             .keys()
             .any(|key| key.eq_ignore_ascii_case("user-agent"))
         {
-            let version: &str = env!("CARGO_PKG_VERSION");
+            let package_name = env!("CARGO_PKG_NAME");
+            let version = env!("CARGO_PKG_VERSION");
             let os = std::env::consts::OS;
             let arch = std::env::consts::ARCH;
-            let user_agent = format!("rsql/{version} ({os}; {arch})");
+            let user_agent = format!("{package_name}/{version} ({os}; {arch})");
             request_headers.insert("User-Agent".to_string(), user_agent);
         }
 

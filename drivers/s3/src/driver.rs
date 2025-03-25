@@ -1,11 +1,12 @@
 use async_trait::async_trait;
-use aws_config::Region;
+use aws_config::{AppName, Region};
 use aws_credential_types::Credentials;
 use aws_sdk_s3::Client;
 use file_type::FileType;
 use rsql_driver::Error::IoError;
 use rsql_driver::{DriverManager, Result};
 use std::collections::HashMap;
+use std::env;
 use std::fs::create_dir_all;
 use std::path::{Path, PathBuf};
 use tempfile::TempDir;
@@ -14,6 +15,12 @@ use tokio::io::AsyncWriteExt;
 use tracing::debug;
 use url::Url;
 
+const PACKAGE_NAME: &str = env!("CARGO_PKG_NAME");
+
+/// Driver that connects to a Simple Storage Service (S3).
+///
+/// For a list of supported environment variables, see:
+/// <https://docs.aws.amazon.com/sdkref/latest/guide/settings-reference.html#EVarSettings>
 #[derive(Debug)]
 pub struct Driver;
 
@@ -52,56 +59,61 @@ impl rsql_driver::Driver for Driver {
 }
 
 impl Driver {
+    /// Retrieves a file from an S3 bucket and stores it in a temporary directory.
     async fn retrieve_file(&self, url: &str, temp_dir: &Path) -> Result<(PathBuf, &FileType)> {
         let parsed_url = Url::parse(url)?;
         let parameters: HashMap<String, String> = parsed_url.query_pairs().into_owned().collect();
+        let use_endpoint_url = parameters.contains_key("scheme");
         let path = parsed_url.path().trim_start_matches('/');
-        let Some(file_name) = path.split('/').last() else {
+        let (bucket, key) = if use_endpoint_url {
+            // If the URL is a path style, use the first part of the path as the bucket
+            // (e.g. s3://host:port/bucket/key)
+            let Some((bucket, key)) = path.split_once('/') else {
+                return Err(IoError("Invalid S3 URL; no bucket".to_string()));
+            };
+            (bucket, key)
+        } else {
+            // If the URL is a S3 URI, use the host as the bucket (e.g. s3://bucket/key)
+            let Some(host) = parsed_url.host_str() else {
+                return Err(IoError("Invalid S3 URL; no bucket (host) ".to_string()));
+            };
+            (host, path)
+        };
+        let Some(file_name) = key.split('/').last() else {
             return Err(IoError("Invalid S3 URL; no file".to_string()));
         };
 
         let sdk_config = aws_config::from_env().load().await;
         let mut config_builder = aws_sdk_s3::config::Builder::from(&sdk_config);
 
-        let username = parsed_url.username();
-        if !username.is_empty() {
-            let password = parsed_url.password().unwrap_or_default();
-            let session_token = parameters.get("session_token").cloned();
-            let credentials = Credentials::from_keys(username, password, session_token);
+        if let Ok(app_name) = AppName::new(PACKAGE_NAME) {
+            config_builder = config_builder.app_name(app_name);
+        }
+        if let Some(credentials) = Self::credentials(&parsed_url, &parameters) {
             config_builder = config_builder.credentials_provider(credentials);
         }
-        let Some(host) = parsed_url.host_str() else {
-            return Err(IoError("Invalid S3 URL; no host".to_string()));
-        };
-        let Some((bucket, host)) = host.split_once('.') else {
-            return Err(IoError(
-                "Invalid S3 URL; unable to determine bucket from host".to_string(),
-            ));
-        };
-        let Some((region, host)) = host.split_once('.') else {
-            return Err(IoError(
-                "Invalid S3 URL; unable to determine region from host".to_string(),
-            ));
-        };
-        config_builder = config_builder.region(Region::new(region.to_string()));
-        let port = parsed_url.port().unwrap_or(443);
-        let scheme = if let Some(scheme) = parameters.get("scheme") {
-            scheme
-        } else if port == 80 {
-            "http"
-        } else {
-            "https"
-        };
-        let endpoint_url = format!("{scheme}://{host}:{port}");
-        config_builder = config_builder.endpoint_url(endpoint_url.as_str());
+        if let Some(region) = Self::region(&parameters) {
+            config_builder = config_builder.region(region);
+        }
+        if use_endpoint_url {
+            let Some(endpoint_url) = Self::endpoint_url(&parsed_url, &parameters) else {
+                return Err(IoError(
+                    "Invalid S3 URL; no endpoint url defined".to_string(),
+                ));
+            };
+            config_builder = config_builder.endpoint_url(endpoint_url.as_str());
+        }
+        if let Some(force_path_style) = parameters.get("force_path_style") {
+            let force_path_style = force_path_style.parse::<bool>().unwrap_or(false);
+            config_builder = config_builder.force_path_style(force_path_style);
+        }
 
         let config = config_builder.build();
         let client = Client::from_conf(config);
-
         let mut object = client
             .get_object()
             .bucket(bucket)
-            .key(path)
+            .key(key)
             .send()
             .await
             .map_err(|error| IoError(format!("Error getting object from S3: {error:?}")))?;
@@ -140,5 +152,46 @@ impl Driver {
         let file_type =
             FileType::try_from_file(file_path).map_err(|error| IoError(error.to_string()))?;
         Ok(file_type)
+    }
+
+    /// Extracts the credentials from the URL and returns them as a `Credentials` object.
+    /// If the URL does not contain credentials, it will look for S3 specific environment variables.
+    fn credentials(parsed_url: &Url, parameters: &HashMap<String, String>) -> Option<Credentials> {
+        let username = parsed_url.username();
+        if username.is_empty() {
+            None
+        } else {
+            let access_key = username.to_string();
+            let secret_key = username.to_string();
+            let session_token = parameters.get("session_token").cloned();
+            Some(Credentials::from_keys(
+                access_key,
+                secret_key,
+                session_token,
+            ))
+        }
+    }
+
+    /// Extracts the region from the URL, or the `S3_REGION` environment variable and returns it as
+    /// a `Region` object.
+    fn region(parameters: &HashMap<String, String>) -> Option<Region> {
+        parameters
+            .get("region")
+            .map(|region| Region::new(region.to_string()))
+    }
+
+    /// Extracts the endpoint URL from the URL and returns it as a string.
+    fn endpoint_url(parsed_url: &Url, parameters: &HashMap<String, String>) -> Option<String> {
+        if let Some(host) = parsed_url.host_str() {
+            let port = parsed_url.port().unwrap_or(443);
+            let scheme = parameters
+                .get("scheme")
+                .cloned()
+                .unwrap_or("https".to_string());
+            let endpoint_url = format!("{scheme}://{host}:{port}");
+            Some(endpoint_url)
+        } else {
+            None
+        }
     }
 }

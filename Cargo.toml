@@ -100,7 +100,7 @@ keywords = ["database", "mysql", "postgresql", "sql", "sqlite"]
 license = "Apache-2.0 OR MIT"
 repository = "https://github.com/theseus-rs/rsql"
 rust-version = "1.85.0"
-version = "0.17.2"
+version = "0.18.0"
 
 [workspace.dependencies]
 ansi_colours = "1.2.3"
@@ -111,6 +111,8 @@ async-trait = "0.1.88"
 axoupdater = "0.9.0"
 aws-credential-types = { version = "1.2.2", features = ["hardcoded-credentials"] }
 aws-config = { version = "1.6.0", features = ["behavior-version-latest"] }
+# Required for cross builds: https://aws.github.io/aws-lc-rs/platform_support.html
+aws-lc-rs = { version = "1.12.6", features = ["bindgen"] }
 aws-sdk-s3 = { version = "1.79.0", features = ["behavior-version-latest"] }
 base64 = "0.22.1"
 bit-vec = "0.6.3"
@@ -133,15 +135,15 @@ file_type = "0.8.1"
 flate2 = "1.1.0"
 form_urlencoded = "1.2.1"
 futures-util = "0.3.31"
-getrandom = "0.2.15"
+getrandom = "0.3.2"
 indexmap = "2.8.0"
 indicatif = "0.17.11"
 indoc = "2.0.6"
 inquire = "0.7.5"
-jiff = "0.2.4"
+jiff = "0.2.5"
 jwt-simple = { version = "0.12.12", default-features = false }
 liblzma = "0.3.6"
-libsql = "0.6.0"
+libsql = "0.9.1"
 lz4 = "1.28.1"
 mockall = "0.13.1"
 num-format = "0.4.4"
