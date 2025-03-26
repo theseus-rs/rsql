@@ -54,7 +54,7 @@ async fn test_s3_driver_local_stack() -> Result<()> {
         })
         .start()
         .await
-        .map_err(|error| IoError(error.to_string()))?;
+        .map_err(|error| IoError(format!("{error:?}")))?;
     let database_url = upload_test_file(&container).await?;
 
     let driver = rsql_driver_s3::Driver;
@@ -83,7 +83,7 @@ async fn upload_test_file(container: &ContainerAsync<LocalStackPro>) -> Result<S
     let port = container
         .get_host_port_ipv4(4566)
         .await
-        .map_err(|error| IoError(error.to_string()))?;
+        .map_err(|error| IoError(format!("{error:?}")))?;
     let file_name = "users.csv";
     let endpoint_url = format!("http://{HOST}:{port}");
     let credentials = Credentials::from_keys(ACCESS_KEY_ID, SECRET_ACCESS_KEY, None);
@@ -100,7 +100,7 @@ async fn upload_test_file(container: &ContainerAsync<LocalStackPro>) -> Result<S
         .bucket(BUCKET)
         .send()
         .await
-        .map_err(|error| IoError(error.to_string()))?;
+        .map_err(|error| IoError(format!("{error:?}")))?;
 
     let crate_directory = env!("CARGO_MANIFEST_DIR");
     let file_path = PathBuf::from(crate_directory)
@@ -110,7 +110,7 @@ async fn upload_test_file(container: &ContainerAsync<LocalStackPro>) -> Result<S
         .join(file_name);
     let byte_stream = ByteStream::from_path(file_path)
         .await
-        .map_err(|error| IoError(error.to_string()))?;
+        .map_err(|error| IoError(format!("{error:?}")))?;
 
     client
         .put_object()
@@ -119,7 +119,7 @@ async fn upload_test_file(container: &ContainerAsync<LocalStackPro>) -> Result<S
         .body(byte_stream)
         .send()
         .await
-        .map_err(|error| IoError(error.to_string()))?;
+        .map_err(|error| IoError(format!("{error:?}")))?;
 
     let database_url = format!(
         "s3://{ACCESS_KEY_ID}:{SECRET_ACCESS_KEY}@{HOST}:{port}/{BUCKET}/{file_name}?region={REGION}&scheme=http",

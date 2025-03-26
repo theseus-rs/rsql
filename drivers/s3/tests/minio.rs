@@ -42,7 +42,7 @@ async fn test_s3_driver_minio() -> Result<()> {
     let container = minio
         .start()
         .await
-        .map_err(|error| IoError(error.to_string()))?;
+        .map_err(|error| IoError(format!("{error:?}")))?;
     let database_url = upload_test_file(&container).await?;
 
     let driver = rsql_driver_s3::Driver;
@@ -71,7 +71,7 @@ async fn upload_test_file(container: &ContainerAsync<MinIO>) -> Result<String> {
     let port = container
         .get_host_port_ipv4(9000)
         .await
-        .map_err(|error| IoError(error.to_string()))?;
+        .map_err(|error| IoError(format!("{error:?}")))?;
     let file_name = "users.csv";
     let endpoint_url = format!("http://{HOST}:{port}");
     let credentials = Credentials::from_keys(ACCESS_KEY_ID, SECRET_ACCESS_KEY, None);
@@ -89,7 +89,7 @@ async fn upload_test_file(container: &ContainerAsync<MinIO>) -> Result<String> {
         .bucket(BUCKET)
         .send()
         .await
-        .map_err(|error| IoError(error.to_string()))?;
+        .map_err(|error| IoError(format!("{error:?}")))?;
 
     let crate_directory = env!("CARGO_MANIFEST_DIR");
     let file_path = PathBuf::from(crate_directory)
@@ -108,7 +108,7 @@ async fn upload_test_file(container: &ContainerAsync<MinIO>) -> Result<String> {
         .body(buffer.into())
         .send()
         .await
-        .map_err(|error| IoError(error.to_string()))?;
+        .map_err(|error| IoError(format!("{error:?}")))?;
 
     let database_url = format!(
         "s3://{ACCESS_KEY_ID}:{SECRET_ACCESS_KEY}@{HOST}:{port}/{BUCKET}/{file_name}?region={REGION}&scheme=http&force_path_style=true",
