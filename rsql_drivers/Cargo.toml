@@ -21,6 +21,7 @@ rsql_driver_cockroachdb = { path = "../drivers/cockroachdb", optional = true, ve
 rsql_driver_csv = { path = "../drivers/csv", optional = true, version = "0.18.0" }
 rsql_driver_delimited = { path = "../drivers/delimited", optional = true, version = "0.18.0" }
 rsql_driver_duckdb = { path = "../drivers/duckdb", optional = true, version = "0.18.0" }
+rsql_driver_dynamodb = { path = "../drivers/dynamodb", optional = true, version = "0.18.0" }
 rsql_driver_excel = { path = "../drivers/excel", optional = true, version = "0.18.0" }
 rsql_driver_file = { path = "../drivers/file", optional = true, version = "0.18.0" }
 rsql_driver_fwf = { path = "../drivers/fwf", optional = true, version = "0.18.0" }
@@ -70,6 +71,7 @@ all = [
     "csv",
     "delimited",
     "duckdb",
+    "dynamodb",
     "excel",
     "fwf",
     "file",
@@ -107,6 +109,7 @@ cockroachdb = ["dep:rsql_driver_cockroachdb"]
 csv = ["dep:rsql_driver_csv"]
 delimited = ["dep:rsql_driver_delimited"]
 duckdb = ["dep:rsql_driver_duckdb"]
+dynamodb = ["dep:rsql_driver_dynamodb"]
 excel = ["dep:rsql_driver_excel"]
 fwf = ["dep:rsql_driver_fwf"]
 file = ["dep:rsql_driver_file"]

@@ -71,6 +71,8 @@ impl DriverManager {
         Self::add(Arc::new(rsql_driver_delimited::Driver))?;
         #[cfg(feature = "duckdb")]
         Self::add(Arc::new(rsql_driver_duckdb::Driver))?;
+        #[cfg(feature = "dynamodb")]
+        Self::add(Arc::new(rsql_driver_dynamodb::Driver))?;
         #[cfg(feature = "excel")]
         Self::add(Arc::new(rsql_driver_excel::Driver))?;
         #[cfg(feature = "file")]
@@ -197,6 +199,8 @@ mod tests {
         #[cfg(feature = "delimited")]
         let driver_count = driver_count + 1;
         #[cfg(feature = "duckdb")]
+        let driver_count = driver_count + 1;
+        #[cfg(feature = "dynamodb")]
         let driver_count = driver_count + 1;
         #[cfg(feature = "excel")]
         let driver_count = driver_count + 1;
