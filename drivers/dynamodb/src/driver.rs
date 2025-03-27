@@ -180,8 +180,11 @@ impl rsql_driver::Connection for Connection {
                     }
                 }
                 let mut row_data = Vec::new();
-                for (column_name, attribute) in item {
-                    let value = Self::convert_to_value(column_name, attribute)?;
+                for column_name in &columns {
+                    let value = match item.get(column_name) {
+                        Some(attribute) => Self::convert_to_value(column_name, attribute)?,
+                        None => Value::Null,
+                    };
                     row_data.push(value);
                 }
                 rows.push(row_data);
