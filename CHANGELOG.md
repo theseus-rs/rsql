@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## `rsql_driver_dynamodb` - [0.18.1](https://github.com/theseus-rs/rsql/releases/tag/rsql_driver_dynamodb-v0.18.1) - 2025-03-27
+
+### Added
+- add dynamodb driver
+
+### Other
+- rsql-v0.18.1
+
 ## `rsql_cli` - [0.18.1](https://github.com/theseus-rs/rsql/compare/v0.18.0...v0.18.1) - 2025-03-27
 
 ### Added
