@@ -7538,7 +7538,7 @@ dependencies = [
  "rsql_formatters",
  "rust-i18n",
  "rustyline",
- "sqlparser 0.52.0",
+ "sqlparser 0.55.0",
  "sys-locale",
  "tempfile",
  "termbg",
@@ -7570,7 +7570,7 @@ dependencies = [
  "rust_decimal",
  "serde",
  "serde_json",
- "sqlparser 0.52.0",
+ "sqlparser 0.55.0",
  "thiserror 2.0.12",
  "tokio",
  "tracing",
@@ -7695,7 +7695,7 @@ dependencies = [
  "regex",
  "rsql_driver",
  "rsql_driver_test_utils",
- "sqlparser 0.52.0",
+ "sqlparser 0.55.0",
  "tokio",
  "url",
 ]
@@ -7894,7 +7894,7 @@ dependencies = [
  "rsql_driver",
  "rust_decimal",
  "serde_json",
- "sqlparser 0.52.0",
+ "sqlparser 0.55.0",
  "sqlx 0.7.4",
  "testcontainers",
  "testcontainers-modules",
@@ -7973,7 +7973,7 @@ dependencies = [
  "rsql_driver_postgresql",
  "rust_decimal",
  "serde_json",
- "sqlparser 0.52.0",
+ "sqlparser 0.55.0",
  "tokio",
  "tokio-postgres",
  "tracing",
@@ -7995,7 +7995,7 @@ dependencies = [
  "rsql_driver",
  "rust_decimal",
  "serde_json",
- "sqlparser 0.52.0",
+ "sqlparser 0.55.0",
  "sqlx 0.7.4",
  "tokio",
  "tracing",
@@ -8012,7 +8012,7 @@ dependencies = [
  "file_type",
  "rsql_driver",
  "rsql_driver_postgresql",
- "sqlparser 0.52.0",
+ "sqlparser 0.55.0",
  "testcontainers",
  "testcontainers-modules",
  "tokio",
@@ -8029,7 +8029,7 @@ dependencies = [
  "rsql_driver_sqlite",
  "rsql_driver_test_utils",
  "rusqlite",
- "sqlparser 0.52.0",
+ "sqlparser 0.55.0",
  "tokio",
  "url",
 ]
@@ -8066,7 +8066,7 @@ dependencies = [
  "rsql_driver",
  "serde_json",
  "sha2",
- "sqlparser 0.52.0",
+ "sqlparser 0.55.0",
  "thiserror 2.0.12",
  "tokio",
  "url",
@@ -8083,7 +8083,7 @@ dependencies = [
  "indoc",
  "rsql_driver",
  "rsql_driver_test_utils",
- "sqlparser 0.52.0",
+ "sqlparser 0.55.0",
  "sqlx 0.7.4",
  "tokio",
  "url",
@@ -8102,7 +8102,7 @@ dependencies = [
  "jiff",
  "rsql_driver",
  "rust_decimal",
- "sqlparser 0.52.0",
+ "sqlparser 0.55.0",
  "testcontainers",
  "testcontainers-modules",
  "tiberius",
@@ -9107,20 +9107,21 @@ dependencies = [
 
 [[package]]
 name = "sqlparser"
-version = "0.52.0"
+version = "0.53.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9a875d8cd437cc8a97e9aeaeea352ec9a19aea99c23e9effb17757291de80b08"
+checksum = "05a528114c392209b3264855ad491fcce534b94a38771b0a0b97a79379275ce8"
 dependencies = [
  "log",
 ]
 
 [[package]]
 name = "sqlparser"
-version = "0.53.0"
+version = "0.55.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "05a528114c392209b3264855ad491fcce534b94a38771b0a0b97a79379275ce8"
+checksum = "c4521174166bac1ff04fe16ef4524c70144cd29682a45978978ca3d7f4e0be11"
 dependencies = [
  "log",
+ "recursive",
 ]
 
 [[package]]
