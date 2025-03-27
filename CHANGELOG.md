@@ -27,7 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - correct s3 driver password
 
-## `rsql_driver_dynamodb` - [0.18.1](https://github.com/theseus-rs/rsql/compare/rsql_driver_dynamodb-v0.18.0...rsql_driver_dynamodb-v0.18.1) - 2025-03-27
+## `rsql_driver_dynamodb` - [0.18.1](https://github.com/theseus-rs/rsql/releases/tag/rsql_driver_dynamodb-v0.18.1) - 2025-03-27
 
 ### Added
 - add dynamodb driver
