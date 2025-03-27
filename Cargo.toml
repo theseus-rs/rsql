@@ -8,6 +8,7 @@ default-members = [
     "drivers/csv",
     "drivers/delimited",
     "drivers/duckdb",
+    "drivers/dynamodb",
     "drivers/excel",
     "drivers/file",
     "drivers/fwf",
@@ -53,6 +54,7 @@ members = [
     "drivers/csv",
     "drivers/delimited",
     "drivers/duckdb",
+    "drivers/dynamodb",
     "drivers/excel",
     "drivers/file",
     "drivers/fwf",
@@ -113,6 +115,7 @@ aws-credential-types = { version = "1.2.2", features = ["hardcoded-credentials"]
 aws-config = { version = "1.6.0", features = ["behavior-version-latest"] }
 # Required for cross builds: https://aws.github.io/aws-lc-rs/platform_support.html
 aws-lc-rs = { version = "1.12.6", features = ["bindgen"] }
+aws-sdk-dynamodb = { version = "1.69.0", features = ["behavior-version-latest"] }
 aws-sdk-s3 = { version = "1.79.0", features = ["behavior-version-latest"] }
 base64 = "0.22.1"
 bit-vec = "0.6.3"

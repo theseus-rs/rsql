@@ -69,6 +69,7 @@ all-drivers = [
     "driver-csv",
     "driver-delimited",
     "driver-duckdb",
+    "driver-dynamodb",
     "driver-excel",
     "driver-file",
     "driver-fwf",
@@ -106,6 +107,7 @@ driver-cockroachdb = ["rsql_drivers/cockroachdb"]
 driver-csv = ["rsql_drivers/csv"]
 driver-delimited = ["rsql_drivers/delimited"]
 driver-duckdb = ["rsql_drivers/duckdb"]
+driver-dynamodb = ["rsql_drivers/dynamodb"]
 driver-excel = ["rsql_drivers/excel"]
 driver-file = ["rsql_drivers/file"]
 driver-fwf = ["rsql_drivers/fwf"]

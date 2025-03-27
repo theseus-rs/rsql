@@ -94,6 +94,8 @@ mod tests {
             "delimited",
             #[cfg(feature = "driver-duckdb")]
             "duckdb",
+            #[cfg(feature = "driver-dynamodb")]
+            "dynamodb",
             #[cfg(feature = "driver-excel")]
             "excel",
             #[cfg(feature = "driver-file")]

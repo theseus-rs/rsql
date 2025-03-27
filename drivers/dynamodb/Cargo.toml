@@ -1,0 +1,28 @@
+[package]
+authors.workspace = true
+categories.workspace = true
+description = "rsql dynamodb driver"
+edition.workspace = true
+keywords.workspace = true
+license.workspace = true
+name = "rsql_driver_dynamodb"
+repository.workspace = true
+rust-version.workspace = true
+version.workspace = true
+
+[dependencies]
+async-trait = { workspace = true }
+aws-credential-types = { workspace = true }
+aws-config = { workspace = true }
+aws-sdk-dynamodb = { workspace = true }
+file_type = { workspace = true }
+indexmap = { workspace = true }
+rsql_driver = { path = "../../rsql_driver", version = "0.18.0" }
+tokio = { workspace = true }
+tracing = { workspace = true }
+url = { workspace = true }
+
+[dev-dependencies]
+testcontainers-modules = { workspace = true, features = ["dynamodb"] }
+tokio = { workspace = true, features = ["macros", "rt"] }
+tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }

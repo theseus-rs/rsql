@@ -1059,6 +1059,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "aws-sdk-dynamodb"
+version = "1.69.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c42f454f50a050aaa3f3d200a3ac072e48c18c4bb5356c38be7eee1da1439a43"
+dependencies = [
+ "aws-credential-types",
+ "aws-runtime",
+ "aws-smithy-async",
+ "aws-smithy-http",
+ "aws-smithy-json",
+ "aws-smithy-runtime",
+ "aws-smithy-runtime-api",
+ "aws-smithy-types",
+ "aws-types",
+ "bytes",
+ "fastrand",
+ "http 0.2.12",
+ "once_cell",
+ "regex-lite",
+ "tracing",
+]
+
+[[package]]
 name = "aws-sdk-s3"
 version = "1.79.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7678,6 +7701,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "rsql_driver_dynamodb"
+version = "0.18.0"
+dependencies = [
+ "async-trait",
+ "aws-config",
+ "aws-credential-types",
+ "aws-sdk-dynamodb",
+ "file_type",
+ "indexmap 2.8.0",
+ "rsql_driver",
+ "testcontainers-modules",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+ "url",
+]
+
+[[package]]
 name = "rsql_driver_excel"
 version = "0.18.0"
 dependencies = [
@@ -8171,6 +8212,7 @@ dependencies = [
  "rsql_driver_csv",
  "rsql_driver_delimited",
  "rsql_driver_duckdb",
+ "rsql_driver_dynamodb",
  "rsql_driver_excel",
  "rsql_driver_file",
  "rsql_driver_fwf",
