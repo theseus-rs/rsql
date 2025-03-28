@@ -77,7 +77,7 @@ rsql --url "<url>" -- "<query>"
 | csv (polars)       | `csv://<file>[?has_header=<true\|false>][&quote=<char>][&skip_rows=<n>]`                                                                                                         |
 | delimited (polars) | `delimited://<file>[?separator=<char>][&has_header=<true\|false>][&quote=<char>][&skip_rows=<n>]`                                                                                |
 | duckdb             | `duckdb://[<file>]`                                                                                                                                                              |
-| dynamodb           | `dynamodb://[<access_key_id>:<secret_access_key>@]<host>[:<port>]>[?region=<region>][&session_token=<token>]`                                                                    |
+| dynamodb           | `dynamodb://[<access_key_id>:<secret_access_key>@]<host>[:<port>]>[?region=<region>][&session_token=<token>][&scheme=<http\|https>]`                                             |
 | excel              | `excel://<file>[?has_header=<true\|false>][&skip_rows=<n>]`                                                                                                                      |
 | file¹              | `file://<file>`                                                                                                                                                                  |
 | fwf                | `fwf://<file>?widths=<widths>[&headers=<headers>]`                                                                                                                               |
