@@ -1,0 +1,13 @@
+{"version": 2, "width": 120, "height": 30, "timestamp": 1740089030, "env": {"SHELL": "/bin/zsh", "TERM": "xterm-256color"}}
+[0.025778, "o", "\u001b]11;?\u001b\\"]
+[0.051076, "o", "⠁ connect [00:00:00] [                                                                             ] 0 B/0 B (0 B/s, 0s)"]
+[0.051173, "o", "\r\u001b[2K"]
+[0.061643, "o", "rsql> \u001b[38;2;133;153;0mCREATE\u001b[38;2;131;148;150m \u001b[38;2;133;153;0mTABLE\u001b[38;2;131;148;150m \u001b[38;2;181;137;0musers\u001b[38;2;131;148;150m\r\n(\r\n    id \u001b[38;2;38;139;210mINTEGER\u001b[38;2;131;148;150m \u001b[38;2;147;161;161mPRIMARY KEY\u001b[38;2;131;148;150m,\r\n    first_name \u001b[38;2;38;139;210mTEXT\u001b[38;2;131;148;150m \u001b[38;2;133;153;0mNOT NULL\u001b[38;2;131;148;150m,\r\n    last_name \u001b[38;2;38;139;210mTEXT\u001b[38;2;131;148;150m \u001b[38;2;133;153;0mNOT NULL\u001b[38;2;131;148;150m,\r\n    email \u001b[38;2;38;139;210mTEXT\u001b[38;2;131;148;150m \u001b[38;2;133;153;0mNOT NULL\u001b[38;2;131;148;150m UNIQUE\r\n);\u001b[0m\r\n"]
+[0.06169, "o", "⠁                                                                                                                       "]
+[0.06185, "o", "\r\u001b[2K"]
+[0.061936, "o", "0 rows \u001b[2m(225.875µs)\u001b[0m\r\n"]
+[1.103084, "o", "rsql> \u001b[38;2;131;148;150m.describe users\u001b[0m\r\n"]
+[1.104479, "o", "   Column   |  Type   | Not null | Default \r\n------------+---------+----------+---------\r\n id         | INTEGER | Yes      |         \r\n first_name | TEXT    | No       |         \r\n last_name  | TEXT    | No       |         \r\n email      | TEXT    | No       |         \r\n\r\nIndexes\r\n          Index           | Columns | Unique \r\n--------------------------+---------+--------\r\n sqlite_autoindex_users_1 | email   | Yes    \r\n"]
+[2.15033, "o", "rsql> \u001b[38;2;131;148;150m.\u001b[38;2;133;153;0mdesc\u001b[38;2;131;148;150m users\u001b[0m\r\n"]
+[2.150898, "o", "   Column   |  Type   | Not null | Default \r\n------------+---------+----------+---------\r\n id         | INTEGER | Yes      |         \r\n first_name | TEXT    | No       |         \r\n last_name  | TEXT    | No       |         \r\n email      | TEXT    | No       |         \r\n\r\nIndexes\r\n"]
+[2.150962, "o", "          Index           | Columns | Unique \r\n--------------------------+---------+--------\r\n sqlite_autoindex_users_1 | email   | Yes    \r\n"]

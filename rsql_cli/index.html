@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="en" id="oranda" class="dark">
+  <head>
+    <title>rsql</title>
+    
+      <meta property="og:url" content="https://theseus-rs.github.io/rsql/rsql_cli/" />
+    
+    
+      <link rel="icon" href="/rsql/rsql_cli/favicon.ico" />
+    
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+      <meta name="description" content="rsql is a CLI for CockroachDB, DuckDB, LibSQL, MariaDB, MySQL, PostgreSQL, Redshift, Snowflake, SQLite3 and SQL Server." />
+      <meta property="og:description" content="rsql is a CLI for CockroachDB, DuckDB, LibSQL, MariaDB, MySQL, PostgreSQL, Redshift, Snowflake, SQLite3 and SQL Server." />
+    
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="rsql" />
+    
+    
+    
+    <meta http-equiv="Permissions-Policy" content="interest-cohort=()" />
+    <link rel="stylesheet" href="/rsql/rsql_cli/oranda-v0.6.1.css" />
+    
+    
+  </head>
+  <body>
+    <div class="container">
+      <div class="page-body">
+        
+          <div class="repo_banner">
+            <a href="https://github.com/theseus-rs/rsql">
+              <div class="github-icon" aria-hidden="true"></div>
+              Check out our GitHub!
+            </a>
+          </div>
+        
+
+        <main>
+          <header>
+            
+              <img src="/rsql/rsql_cli/rsql.jpg" alt="rsql" class="logo" />
+            
+            <h1 class="title">rsql</h1>
+            
+  <nav class="nav">
+    <ul>
+      <li><a href="/rsql/rsql_cli/">Home</a></li>
+
+      
+
+      
+        <li><a href="/rsql/rsql_cli/artifacts/">Install</a></li>
+      
+
+      
+        <li><a href="/rsql/rsql_cli/book/">Docs</a></li>
+      
+
+      
+
+      
+        <li><a href="/rsql/rsql_cli/changelog/">Changelog</a></li>
+      
+    </ul>
+  </nav>
+
+          </header>
+
+          
+
+    
+
+
+
+<div class="artifacts" data-tag="v0.18.1">
+  <div class="artifact-header target">
+    <h4>Install v0.18.1</h4>
+    
+      <div><small class="published-date">Published on Mar 27 2025 at 05:12 UTC</small></div>
+    
+
+    <ul class="arches">
+      
+        <li class="arch hidden" data-arch="aarch64-apple-darwin">
+          
+            <ul class="tabs">
+              
+                
+                
+                <li class="install-tab" data-id="11" data-triple="aarch64-apple-darwin">
+                  shell
+
+                  
+                </li>
+              
+                
+                
+                <li class="install-tab" data-id="1" data-triple="aarch64-apple-darwin">
+                  binstall
+
+                  
+                </li>
+              
+                
+                
+                <li class="install-tab" data-id="0" data-triple="aarch64-apple-darwin">
+                  cargo
+
+                  
+                </li>
+              
+                
+                
+                <li class="install-tab" data-id="2" data-triple="aarch64-apple-darwin">
+                  tarball
+
+                  
+                </li>
+              
+                
+                
+                <li class="install-tab" data-id="9" data-triple="aarch64-apple-darwin">
+                  tarball
+
+                  
+                </li>
+              
+            </ul>
+          
+
+          <ul class="contents">
+            
+              
+              <li data-id="11" data-triple="aarch64-apple-darwin" class="install-content">
+                
+                  
+                  <div class="install-code-wrapper">
+  <pre style="background-color:#263238;">
+<span style="color:#82aaff;">curl</span><span style="color:#89ddff;"> --</span><span style="color:#f78c6c;">proto </span><span style="color:#89ddff;">&#39;</span><span style="color:#c3e88d;">=https</span><span style="color:#89ddff;">&#39; --</span><span style="color:#f78c6c;">tlsv1</span><span style="color:#82aaff;">.2</span><span style="color:#89ddff;"> -</span><span style="color:#f78c6c;">LsSf</span><span style="color:#82aaff;"> https://github.com/theseus-rs/rsql/releases/download/v0.18.1/rsql_cli-installer.sh </span><span style="color:#89ddff;">| </span><span style="color:#82aaff;">sh</span></pre>
+
+  <button class="button copy-clipboard-button primary" data-copy="curl --proto '=https' --tlsv1.2 -LsSf https://github.com/theseus-rs/rsql/releases/download/v0.18.1/rsql_cli-installer.sh | sh">
+    <svg stroke='currentColor' fill='currentColor' stroke-width='0' viewBox='0 0 20 20' height='1em' width='1em' xmlns='http://www.w3.org/2000/svg'><path d='M8 2a1 1 0 000 2h2a1 1 0 100-2H8z'></path><path d='M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2a1 1 0 110 2h-2v-2z'></path></svg>
+  </button>
+  
+  
+    
+    
+      
+    
+    <a class="button primary" href="/rsql/rsql_cli/rsql_cli-installer.sh.txt">Source</a>
+  
+</div>
+                
+
+                
+              </li>
+            
+              
+              <li data-id="1" data-triple="aarch64-apple-darwin" class="install-content hidden">
+                
+                  
+                  <div class="install-code-wrapper">
+  <pre style="background-color:#263238;">
+<span style="color:#82aaff;">cargo binstall rsql_cli</span></pre>
+
+  <button class="button copy-clipboard-button primary" data-copy="cargo binstall rsql_cli">
+    <svg stroke='currentColor' fill='currentColor' stroke-width='0' viewBox='0 0 20 20' height='1em' width='1em' xmlns='http://www.w3.org/2000/svg'><path d='M8 2a1 1 0 000 2h2a1 1 0 100-2H8z'></path><path d='M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2a1 1 0 110 2h-2v-2z'></path></svg>
+  </button>
+  
+  
+</div>
+                
+
+                
+              </li>
+            
+              
+              <li data-id="0" data-triple="aarch64-apple-darwin" class="install-content hidden">
+                
+                  
+                  <div class="install-code-wrapper">
+  <pre style="background-color:#263238;">
+<span style="color:#82aaff;">cargo install rsql_cli</span></pre>
+
+  <button class="button copy-clipboard-button primary" data-copy="cargo install rsql_cli">
+    <svg stroke='currentColor' fill='currentColor' stroke-width='0' viewBox='0 0 20 20' height='1em' width='1em' xmlns='http://www.w3.org/2000/svg'><path d='M8 2a1 1 0 000 2h2a1 1 0 100-2H8z'></path><path d='M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2a1 1 0 110 2h-2v-2z'></path></svg>
+  </button>
+  
+  
+</div>
+                
+
+                
+              </li>
+            
+              
+              <li data-id="2" data-triple="aarch64-apple-darwin" class="install-content hidden">
+                
+
+                
+                  
+                  <div class="download-wrapper">
+                    <a href="https://github.com/theseus-rs/rsql/releases/download/v0.18.1/rsql-aarch64-apple-darwin.tar.gz">
+                      <button class="button primary">
+                        <span>Download</span>
+                        <span class="button-subtitle">rsql-aarch64-apple-darwin.tar.gz</span>
+                      </button>
+                    </a>
+                  </div>
+                
+              </li>
+            
+              
+              <li data-id="9" data-triple="aarch64-apple-darwin" class="install-content hidden">
+                
+
+                
+                  
+                  <div class="download-wrapper">
+                    <a href="https://github.com/theseus-rs/rsql/releases/download/v0.18.1/rsql_cli-aarch64-apple-darwin.tar.xz">
+                      <button class="button primary">
+                        <span>Download</span>
+                        <span class="button-subtitle">rsql_cli-aarch64-apple-darwin.tar.xz</span>
+                      </button>
+                    </a>
+                  </div>
+                
+              </li>
+            
+          </ul>
+        </li>
+      
+        <li class="arch hidden" data-arch="aarch64-unknown-linux-gnu">
+          
+            <ul class="tabs">
+              
+                
+                
+                <li class="install-tab" data-id="11" data-triple="aarch64-unknown-linux-gnu">
+                  shell
+
+                  
+                </li>
+              
+                
+                
+                <li class="install-tab" data-id="1" data-triple="aarch64-unknown-linux-gnu">
+                  binstall
+
+                  
+                </li>
+              
+                
+                
+                <li class="install-tab" data-id="0" data-triple="aarch64-unknown-linux-gnu">
+                  cargo
+
+                  
+                </li>
+              
+                
+                
+                <li class="install-tab" data-id="3" data-triple="aarch64-unknown-linux-gnu">
+                  tarball
+
+                  
+                </li>
+              
+            </ul>
+          
+
+          <ul class="contents">
+            
+              
+              <li data-id="11" data-triple="aarch64-unknown-linux-gnu" class="install-content">
+                
+                  
+                  <div class="install-code-wrapper">
+  <pre style="background-color:#263238;">
+<span style="color:#82aaff;">curl</span><span style="color:#89ddff;"> --</span><span style="color:#f78c6c;">proto </span><span style="color:#89ddff;">&#39;</span><span style="color:#c3e88d;">=https</span><span style="color:#89ddff;">&#39; --</span><span style="color:#f78c6c;">tlsv1</span><span style="color:#82aaff;">.2</span><span style="color:#89ddff;"> -</span><span style="color:#f78c6c;">LsSf</span><span style="color:#82aaff;"> https://github.com/theseus-rs/rsql/releases/download/v0.18.1/rsql_cli-installer.sh </span><span style="color:#89ddff;">| </span><span style="color:#82aaff;">sh</span></pre>
+
+  <button class="button copy-clipboard-button primary" data-copy="curl --proto '=https' --tlsv1.2 -LsSf https://github.com/theseus-rs/rsql/releases/download/v0.18.1/rsql_cli-installer.sh | sh">
+    <svg stroke='currentColor' fill='currentColor' stroke-width='0' viewBox='0 0 20 20' height='1em' width='1em' xmlns='http://www.w3.org/2000/svg'><path d='M8 2a1 1 0 000 2h2a1 1 0 100-2H8z'></path><path d='M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2a1 1 0 110 2h-2v-2z'></path></svg>
+  </button>
+  
+  
+    
+    
+      
+    
+    <a class="button primary" href="/rsql/rsql_cli/rsql_cli-installer.sh.txt">Source</a>
+  
+</div>
+                
+
+                
+              </li>
+            
+              
+              <li data-id="1" data-triple="aarch64-unknown-linux-gnu" class="install-content hidden">
+                
+                  
+                  <div class="install-code-wrapper">
+  <pre style="background-color:#263238;">
+<span style="color:#82aaff;">cargo binstall rsql_cli</span></pre>
+
+  <button class="button copy-clipboard-button primary" data-copy="cargo binstall rsql_cli">
+    <svg stroke='currentColor' fill='currentColor' stroke-width='0' viewBox='0 0 20 20' height='1em' width='1em' xmlns='http://www.w3.org/2000/svg'><path d='M8 2a1 1 0 000 2h2a1 1 0 100-2H8z'></path><path d='M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2a1 1 0 110 2h-2v-2z'></path></svg>
+  </button>
+  
+  
+</div>
+                
+
+                
+              </li>
+            
+              
+              <li data-id="0" data-triple="aarch64-unknown-linux-gnu" class="install-content hidden">
+                
+                  
+                  <div class="install-code-wrapper">
+  <pre style="background-color:#263238;">
+<span style="color:#82aaff;">cargo install rsql_cli</span></pre>
+
+  <button class="button copy-clipboard-button primary" data-copy="cargo install rsql_cli">
+    <svg stroke='currentColor' fill='currentColor' stroke-width='0' viewBox='0 0 20 20' height='1em' width='1em' xmlns='http://www.w3.org/2000/svg'><path d='M8 2a1 1 0 000 2h2a1 1 0 100-2H8z'></path><path d='M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2a1 1 0 110 2h-2v-2z'></path></svg>
+  </button>
+  
+  
+</div>
+                
+
+                
+              </li>
+            
+              
+              <li data-id="3" data-triple="aarch64-unknown-linux-gnu" class="install-content hidden">
+                
+
+                
+                  
+                  <div class="download-wrapper">
+                    <a href="https://github.com/theseus-rs/rsql/releases/download/v0.18.1/rsql-aarch64-unknown-linux-gnu.tar.gz">
+                      <button class="button primary">
+                        <span>Download</span>
+                        <span class="button-subtitle">rsql-aarch64-unknown-linux-gnu.tar.gz</span>
+                      </button>
+                    </a>
+                  </div>
+                
+              </li>
+            
+          </ul>
+        </li>
+      
+        <li class="arch hidden" data-arch="aarch64-unknown-linux-musl">
+          
+            <ul class="tabs">
+              
+                
+                
+                <li class="install-tab" data-id="11" data-triple="aarch64-unknown-linux-musl">
+                  shell
+
+                  
+                </li>
+              
+                
+                
+                <li class="install-tab" data-id="1" data-triple="aarch64-unknown-linux-musl">
+                  binstall
+
+                  
+                </li>
+              
+                
+                
+                <li class="install-tab" data-id="0" data-triple="aarch64-unknown-linux-musl">
+                  cargo
+
+                  
+                </li>
+              
+                
+                
+                <li class="install-tab" data-id="4" data-triple="aarch64-unknown-linux-musl">
+                  tarball
+
+                  
+                </li>
+              
+            </ul>
+          
+
+          <ul class="contents">
+            
+              
+              <li data-id="11" data-triple="aarch64-unknown-linux-musl" class="install-content">
+                
+                  
+                  <div class="install-code-wrapper">
+  <pre style="background-color:#263238;">
+<span style="color:#82aaff;">curl</span><span style="color:#89ddff;"> --</span><span style="color:#f78c6c;">proto </span><span style="color:#89ddff;">&#39;</span><span style="color:#c3e88d;">=https</span><span style="color:#89ddff;">&#39; --</span><span style="color:#f78c6c;">tlsv1</span><span style="color:#82aaff;">.2</span><span style="color:#89ddff;"> -</span><span style="color:#f78c6c;">LsSf</span><span style="color:#82aaff;"> https://github.com/theseus-rs/rsql/releases/download/v0.18.1/rsql_cli-installer.sh </span><span style="color:#89ddff;">| </span><span style="color:#82aaff;">sh</span></pre>
+
+  <button class="button copy-clipboard-button primary" data-copy="curl --proto '=https' --tlsv1.2 -LsSf https://github.com/theseus-rs/rsql/releases/download/v0.18.1/rsql_cli-installer.sh | sh">
+    <svg stroke='currentColor' fill='currentColor' stroke-width='0' viewBox='0 0 20 20' height='1em' width='1em' xmlns='http://www.w3.org/2000/svg'><path d='M8 2a1 1 0 000 2h2a1 1 0 100-2H8z'></path><path d='M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2a1 1 0 110 2h-2v-2z'></path></svg>
+  </button>
+  
+  
+    
+    
+      
+    
+    <a class="button primary" href="/rsql/rsql_cli/rsql_cli-installer.sh.txt">Source</a>
+  
+</div>
+                
+
+                
+              </li>
+            
+              
+              <li data-id="1" data-triple="aarch64-unknown-linux-musl" class="install-content hidden">
+                
+                  
+                  <div class="install-code-wrapper">
+  <pre style="background-color:#263238;">
+<span style="color:#82aaff;">cargo binstall rsql_cli</span></pre>
+
+  <button class="button copy-clipboard-button primary" data-copy="cargo binstall rsql_cli">
+    <svg stroke='currentColor' fill='currentColor' stroke-width='0' viewBox='0 0 20 20' height='1em' width='1em' xmlns='http://www.w3.org/2000/svg'><path d='M8 2a1 1 0 000 2h2a1 1 0 100-2H8z'></path><path d='M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2a1 1 0 110 2h-2v-2z'></path></svg>
+  </button>
+  
+  
+</div>
+                
+
+                
+              </li>
+            
+              
+              <li data-id="0" data-triple="aarch64-unknown-linux-musl" class="install-content hidden">
+                
+                  
+                  <div class="install-code-wrapper">
+  <pre style="background-color:#263238;">
+<span style="color:#82aaff;">cargo install rsql_cli</span></pre>
+
+  <button class="button copy-clipboard-button primary" data-copy="cargo install rsql_cli">
+    <svg stroke='currentColor' fill='currentColor' stroke-width='0' viewBox='0 0 20 20' height='1em' width='1em' xmlns='http://www.w3.org/2000/svg'><path d='M8 2a1 1 0 000 2h2a1 1 0 100-2H8z'></path><path d='M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2a1 1 0 110 2h-2v-2z'></path></svg>
+  </button>
+  
+  
+</div>
+                
+
+                
+              </li>
+            
+              
+              <li data-id="4" data-triple="aarch64-unknown-linux-musl" class="install-content hidden">
+                
+
+                
+                  
+                  <div class="download-wrapper">
+                    <a href="https://github.com/theseus-rs/rsql/releases/download/v0.18.1/rsql-aarch64-unknown-linux-musl.tar.gz">
+                      <button class="button primary">
+                        <span>Download</span>
+                        <span class="button-subtitle">rsql-aarch64-unknown-linux-musl.tar.gz</span>
+                      </button>
+                    </a>
+                  </div>
+                
+              </li>
+            
+          </ul>
+        </li>
+      
+        <li class="arch hidden" data-arch="i686-unknown-linux-gnu">
+          
+            <ul class="tabs">
+              
+                
+                
+                <li class="install-tab" data-id="11" data-triple="i686-unknown-linux-gnu">
+                  shell
+
+                  
+                </li>
+              
+                
+                
+                <li class="install-tab" data-id="1" data-triple="i686-unknown-linux-gnu">
+                  binstall
+
+                  
+                </li>
+              
+                
+                
+                <li class="install-tab" data-id="0" data-triple="i686-unknown-linux-gnu">
+                  cargo
+
+                  
+                </li>
+              
+                
+                
+                <li class="install-tab" data-id="5" data-triple="i686-unknown-linux-gnu">
+                  tarball
+
+                  
+                </li>
+              
+            </ul>
+          
+
+          <ul class="contents">
+            
+              
+              <li data-id="11" data-triple="i686-unknown-linux-gnu" class="install-content">
+                
+                  
+                  <div class="install-code-wrapper">
+  <pre style="background-color:#263238;">
+<span style="color:#82aaff;">curl</span><span style="color:#89ddff;"> --</span><span style="color:#f78c6c;">proto </span><span style="color:#89ddff;">&#39;</span><span style="color:#c3e88d;">=https</span><span style="color:#89ddff;">&#39; --</span><span style="color:#f78c6c;">tlsv1</span><span style="color:#82aaff;">.2</span><span style="color:#89ddff;"> -</span><span style="color:#f78c6c;">LsSf</span><span style="color:#82aaff;"> https://github.com/theseus-rs/rsql/releases/download/v0.18.1/rsql_cli-installer.sh </span><span style="color:#89ddff;">| </span><span style="color:#82aaff;">sh</span></pre>
+
+  <button class="button copy-clipboard-button primary" data-copy="curl --proto '=https' --tlsv1.2 -LsSf https://github.com/theseus-rs/rsql/releases/download/v0.18.1/rsql_cli-installer.sh | sh">
+    <svg stroke='currentColor' fill='currentColor' stroke-width='0' viewBox='0 0 20 20' height='1em' width='1em' xmlns='http://www.w3.org/2000/svg'><path d='M8 2a1 1 0 000 2h2a1 1 0 100-2H8z'></path><path d='M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2a1 1 0 110 2h-2v-2z'></path></svg>
+  </button>
+  
+  
+    
+    
+      
+    
+    <a class="button primary" href="/rsql/rsql_cli/rsql_cli-installer.sh.txt">Source</a>
+  
+</div>
+                
+
+                
+              </li>
+            
+              
+              <li data-id="1" data-triple="i686-unknown-linux-gnu" class="install-content hidden">
+                
+                  
+                  <div class="install-code-wrapper">
+  <pre style="background-color:#263238;">
+<span style="color:#82aaff;">cargo binstall rsql_cli</span></pre>
+
+  <button class="button copy-clipboard-button primary" data-copy="cargo binstall rsql_cli">
+    <svg stroke='currentColor' fill='currentColor' stroke-width='0' viewBox='0 0 20 20' height='1em' width='1em' xmlns='http://www.w3.org/2000/svg'><path d='M8 2a1 1 0 000 2h2a1 1 0 100-2H8z'></path><path d='M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2a1 1 0 110 2h-2v-2z'></path></svg>
+  </button>
+  
+  
+</div>
+                
+
+                
+              </li>
+            
+              
+              <li data-id="0" data-triple="i686-unknown-linux-gnu" class="install-content hidden">
+                
+                  
+                  <div class="install-code-wrapper">
+  <pre style="background-color:#263238;">
+<span style="color:#82aaff;">cargo install rsql_cli</span></pre>
+
+  <button class="button copy-clipboard-button primary" data-copy="cargo install rsql_cli">
+    <svg stroke='currentColor' fill='currentColor' stroke-width='0' viewBox='0 0 20 20' height='1em' width='1em' xmlns='http://www.w3.org/2000/svg'><path d='M8 2a1 1 0 000 2h2a1 1 0 100-2H8z'></path><path d='M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2a1 1 0 110 2h-2v-2z'></path></svg>
+  </button>
+  
+  
+</div>
+                
+
+                
+              </li>
+            
+              
+              <li data-id="5" data-triple="i686-unknown-linux-gnu" class="install-content hidden">
+                
+
+                
+                  
+                  <div class="download-wrapper">
+                    <a href="https://github.com/theseus-rs/rsql/releases/download/v0.18.1/rsql-i686-unknown-linux-gnu.tar.gz">
+                      <button class="button primary">
+                        <span>Download</span>
+                        <span class="button-subtitle">rsql-i686-unknown-linux-gnu.tar.gz</span>
+                      </button>
+                    </a>
+                  </div>
+                
+              </li>
+            
+          </ul>
+        </li>
+      
+        <li class="arch hidden" data-arch="x86_64-apple-darwin">
+          
+            <ul class="tabs">
+              
+                
+                
+                <li class="install-tab" data-id="11" data-triple="x86_64-apple-darwin">
+                  shell
+
+                  
+                </li>
+              
+                
+                
+                <li class="install-tab" data-id="1" data-triple="x86_64-apple-darwin">
+                  binstall
+
+                  
+                </li>
+              
+                
+                
+                <li class="install-tab" data-id="0" data-triple="x86_64-apple-darwin">
+                  cargo
+
+                  
+                </li>
+              
+                
+                
+                <li class="install-tab" data-id="6" data-triple="x86_64-apple-darwin">
+                  tarball
+
+                  
+                </li>
+              
+                
+                
+                <li class="install-tab" data-id="12" data-triple="x86_64-apple-darwin">
+                  tarball
+
+                  
+                </li>
+              
+            </ul>
+          
+
+          <ul class="contents">
+            
+              
+              <li data-id="11" data-triple="x86_64-apple-darwin" class="install-content">
+                
+                  
+                  <div class="install-code-wrapper">
+  <pre style="background-color:#263238;">
+<span style="color:#82aaff;">curl</span><span style="color:#89ddff;"> --</span><span style="color:#f78c6c;">proto </span><span style="color:#89ddff;">&#39;</span><span style="color:#c3e88d;">=https</span><span style="color:#89ddff;">&#39; --</span><span style="color:#f78c6c;">tlsv1</span><span style="color:#82aaff;">.2</span><span style="color:#89ddff;"> -</span><span style="color:#f78c6c;">LsSf</span><span style="color:#82aaff;"> https://github.com/theseus-rs/rsql/releases/download/v0.18.1/rsql_cli-installer.sh </span><span style="color:#89ddff;">| </span><span style="color:#82aaff;">sh</span></pre>
+
+  <button class="button copy-clipboard-button primary" data-copy="curl --proto '=https' --tlsv1.2 -LsSf https://github.com/theseus-rs/rsql/releases/download/v0.18.1/rsql_cli-installer.sh | sh">
+    <svg stroke='currentColor' fill='currentColor' stroke-width='0' viewBox='0 0 20 20' height='1em' width='1em' xmlns='http://www.w3.org/2000/svg'><path d='M8 2a1 1 0 000 2h2a1 1 0 100-2H8z'></path><path d='M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2a1 1 0 110 2h-2v-2z'></path></svg>
+  </button>
+  
+  
+    
+    
+      
+    
+    <a class="button primary" href="/rsql/rsql_cli/rsql_cli-installer.sh.txt">Source</a>
+  
+</div>
+                
+
+                
+              </li>
+            
+              
+              <li data-id="1" data-triple="x86_64-apple-darwin" class="install-content hidden">
+                
+                  
+                  <div class="install-code-wrapper">
+  <pre style="background-color:#263238;">
+<span style="color:#82aaff;">cargo binstall rsql_cli</span></pre>
+
+  <button class="button copy-clipboard-button primary" data-copy="cargo binstall rsql_cli">
+    <svg stroke='currentColor' fill='currentColor' stroke-width='0' viewBox='0 0 20 20' height='1em' width='1em' xmlns='http://www.w3.org/2000/svg'><path d='M8 2a1 1 0 000 2h2a1 1 0 100-2H8z'></path><path d='M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2a1 1 0 110 2h-2v-2z'></path></svg>
+  </button>
+  
+  
+</div>
+                
+
+                
+              </li>
+            
+              
+              <li data-id="0" data-triple="x86_64-apple-darwin" class="install-content hidden">
+                
+                  
+                  <div class="install-code-wrapper">
+  <pre style="background-color:#263238;">
+<span style="color:#82aaff;">cargo install rsql_cli</span></pre>
+
+  <button class="button copy-clipboard-button primary" data-copy="cargo install rsql_cli">
+    <svg stroke='currentColor' fill='currentColor' stroke-width='0' viewBox='0 0 20 20' height='1em' width='1em' xmlns='http://www.w3.org/2000/svg'><path d='M8 2a1 1 0 000 2h2a1 1 0 100-2H8z'></path><path d='M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2a1 1 0 110 2h-2v-2z'></path></svg>
+  </button>
+  
+  
+</div>
+                
+
+                
+              </li>
+            
+              
+              <li data-id="6" data-triple="x86_64-apple-darwin" class="install-content hidden">
+                
+
+                
+                  
+                  <div class="download-wrapper">
+                    <a href="https://github.com/theseus-rs/rsql/releases/download/v0.18.1/rsql-x86_64-apple-darwin.tar.gz">
+                      <button class="button primary">
+                        <span>Download</span>
+                        <span class="button-subtitle">rsql-x86_64-apple-darwin.tar.gz</span>
+                      </button>
+                    </a>
+                  </div>
+                
+              </li>
+            
+              
+              <li data-id="12" data-triple="x86_64-apple-darwin" class="install-content hidden">
+                
+
+                
+                  
+                  <div class="download-wrapper">
+                    <a href="https://github.com/theseus-rs/rsql/releases/download/v0.18.1/rsql_cli-x86_64-apple-darwin.tar.xz">
+                      <button class="button primary">
+                        <span>Download</span>
+                        <span class="button-subtitle">rsql_cli-x86_64-apple-darwin.tar.xz</span>
+                      </button>
+                    </a>
+                  </div>
+                
+              </li>
+            
+          </ul>
+        </li>
+      
+        <li class="arch hidden" data-arch="x86_64-pc-windows-msvc">
+          
+            <ul class="tabs">
+              
+                
+                
+                <li class="install-tab" data-id="13" data-triple="x86_64-pc-windows-msvc">
+                  msi
+
+                  
+                </li>
+              
+                
+                
+                <li class="install-tab" data-id="10" data-triple="x86_64-pc-windows-msvc">
+                  powershell
+
+                  
+                </li>
+              
+                
+                
+                <li class="install-tab" data-id="1" data-triple="x86_64-pc-windows-msvc">
+                  binstall
+
+                  
+                </li>
+              
+                
+                
+                <li class="install-tab" data-id="0" data-triple="x86_64-pc-windows-msvc">
+                  cargo
+
+                  
+                </li>
+              
+                
+                
+                <li class="install-tab" data-id="14" data-triple="x86_64-pc-windows-msvc">
+                  zip
+
+                  
+                </li>
+              
+            </ul>
+          
+
+          <ul class="contents">
+            
+              
+              <li data-id="13" data-triple="x86_64-pc-windows-msvc" class="install-content">
+                
+
+                
+                  
+                  <div class="download-wrapper">
+                    <a href="https://github.com/theseus-rs/rsql/releases/download/v0.18.1/rsql_cli-x86_64-pc-windows-msvc.msi">
+                      <button class="button primary">
+                        <span>Download</span>
+                        <span class="button-subtitle">rsql_cli-x86_64-pc-windows-msvc.msi</span>
+                      </button>
+                    </a>
+                  </div>
+                
+              </li>
+            
+              
+              <li data-id="10" data-triple="x86_64-pc-windows-msvc" class="install-content hidden">
+                
+                  
+                  <div class="install-code-wrapper">
+  <pre style="background-color:#263238;">
+<span style="color:#82aaff;">irm https://github.com/theseus-rs/rsql/releases/download/v0.18.1/rsql_cli-installer.ps1 </span><span style="color:#89ddff;">| </span><span style="color:#82aaff;">iex</span></pre>
+
+  <button class="button copy-clipboard-button primary" data-copy="irm https://github.com/theseus-rs/rsql/releases/download/v0.18.1/rsql_cli-installer.ps1 | iex">
+    <svg stroke='currentColor' fill='currentColor' stroke-width='0' viewBox='0 0 20 20' height='1em' width='1em' xmlns='http://www.w3.org/2000/svg'><path d='M8 2a1 1 0 000 2h2a1 1 0 100-2H8z'></path><path d='M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2a1 1 0 110 2h-2v-2z'></path></svg>
+  </button>
+  
+  
+    
+    
+      
+    
+    <a class="button primary" href="/rsql/rsql_cli/rsql_cli-installer.ps1.txt">Source</a>
+  
+</div>
+                
+
+                
+              </li>
+            
+              
+              <li data-id="1" data-triple="x86_64-pc-windows-msvc" class="install-content hidden">
+                
+                  
+                  <div class="install-code-wrapper">
+  <pre style="background-color:#263238;">
+<span style="color:#82aaff;">cargo binstall rsql_cli</span></pre>
+
+  <button class="button copy-clipboard-button primary" data-copy="cargo binstall rsql_cli">
+    <svg stroke='currentColor' fill='currentColor' stroke-width='0' viewBox='0 0 20 20' height='1em' width='1em' xmlns='http://www.w3.org/2000/svg'><path d='M8 2a1 1 0 000 2h2a1 1 0 100-2H8z'></path><path d='M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2a1 1 0 110 2h-2v-2z'></path></svg>
+  </button>
+  
+  
+</div>
+                
+
+                
+              </li>
+            
+              
+              <li data-id="0" data-triple="x86_64-pc-windows-msvc" class="install-content hidden">
+                
+                  
+                  <div class="install-code-wrapper">
+  <pre style="background-color:#263238;">
+<span style="color:#82aaff;">cargo install rsql_cli</span></pre>
+
+  <button class="button copy-clipboard-button primary" data-copy="cargo install rsql_cli">
+    <svg stroke='currentColor' fill='currentColor' stroke-width='0' viewBox='0 0 20 20' height='1em' width='1em' xmlns='http://www.w3.org/2000/svg'><path d='M8 2a1 1 0 000 2h2a1 1 0 100-2H8z'></path><path d='M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2a1 1 0 110 2h-2v-2z'></path></svg>
+  </button>
+  
+  
+</div>
+                
+
+                
+              </li>
+            
+              
+              <li data-id="14" data-triple="x86_64-pc-windows-msvc" class="install-content hidden">
+                
+
+                
+                  
+                  <div class="download-wrapper">
+                    <a href="https://github.com/theseus-rs/rsql/releases/download/v0.18.1/rsql_cli-x86_64-pc-windows-msvc.zip">
+                      <button class="button primary">
+                        <span>Download</span>
+                        <span class="button-subtitle">rsql_cli-x86_64-pc-windows-msvc.zip</span>
+                      </button>
+                    </a>
+                  </div>
+                
+              </li>
+            
+          </ul>
+        </li>
+      
+        <li class="arch hidden" data-arch="x86_64-unknown-linux-gnu">
+          
+            <ul class="tabs">
+              
+                
+                
+                <li class="install-tab" data-id="11" data-triple="x86_64-unknown-linux-gnu">
+                  shell
+
+                  
+                </li>
+              
+                
+                
+                <li class="install-tab" data-id="1" data-triple="x86_64-unknown-linux-gnu">
+                  binstall
+
+                  
+                </li>
+              
+                
+                
+                <li class="install-tab" data-id="0" data-triple="x86_64-unknown-linux-gnu">
+                  cargo
+
+                  
+                </li>
+              
+                
+                
+                <li class="install-tab" data-id="7" data-triple="x86_64-unknown-linux-gnu">
+                  tarball
+
+                  
+                </li>
+              
+                
+                
+                <li class="install-tab" data-id="15" data-triple="x86_64-unknown-linux-gnu">
+                  tarball
+
+                  
+                </li>
+              
+            </ul>
+          
+
+          <ul class="contents">
+            
+              
+              <li data-id="11" data-triple="x86_64-unknown-linux-gnu" class="install-content">
+                
+                  
+                  <div class="install-code-wrapper">
+  <pre style="background-color:#263238;">
+<span style="color:#82aaff;">curl</span><span style="color:#89ddff;"> --</span><span style="color:#f78c6c;">proto </span><span style="color:#89ddff;">&#39;</span><span style="color:#c3e88d;">=https</span><span style="color:#89ddff;">&#39; --</span><span style="color:#f78c6c;">tlsv1</span><span style="color:#82aaff;">.2</span><span style="color:#89ddff;"> -</span><span style="color:#f78c6c;">LsSf</span><span style="color:#82aaff;"> https://github.com/theseus-rs/rsql/releases/download/v0.18.1/rsql_cli-installer.sh </span><span style="color:#89ddff;">| </span><span style="color:#82aaff;">sh</span></pre>
+
+  <button class="button copy-clipboard-button primary" data-copy="curl --proto '=https' --tlsv1.2 -LsSf https://github.com/theseus-rs/rsql/releases/download/v0.18.1/rsql_cli-installer.sh | sh">
+    <svg stroke='currentColor' fill='currentColor' stroke-width='0' viewBox='0 0 20 20' height='1em' width='1em' xmlns='http://www.w3.org/2000/svg'><path d='M8 2a1 1 0 000 2h2a1 1 0 100-2H8z'></path><path d='M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2a1 1 0 110 2h-2v-2z'></path></svg>
+  </button>
+  
+  
+    
+    
+      
+    
+    <a class="button primary" href="/rsql/rsql_cli/rsql_cli-installer.sh.txt">Source</a>
+  
+</div>
+                
+
+                
+              </li>
+            
+              
+              <li data-id="1" data-triple="x86_64-unknown-linux-gnu" class="install-content hidden">
+                
+                  
+                  <div class="install-code-wrapper">
+  <pre style="background-color:#263238;">
+<span style="color:#82aaff;">cargo binstall rsql_cli</span></pre>
+
+  <button class="button copy-clipboard-button primary" data-copy="cargo binstall rsql_cli">
+    <svg stroke='currentColor' fill='currentColor' stroke-width='0' viewBox='0 0 20 20' height='1em' width='1em' xmlns='http://www.w3.org/2000/svg'><path d='M8 2a1 1 0 000 2h2a1 1 0 100-2H8z'></path><path d='M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2a1 1 0 110 2h-2v-2z'></path></svg>
+  </button>
+  
+  
+</div>
+                
+
+                
+              </li>
+            
+              
+              <li data-id="0" data-triple="x86_64-unknown-linux-gnu" class="install-content hidden">
+                
+                  
+                  <div class="install-code-wrapper">
+  <pre style="background-color:#263238;">
+<span style="color:#82aaff;">cargo install rsql_cli</span></pre>
+
+  <button class="button copy-clipboard-button primary" data-copy="cargo install rsql_cli">
+    <svg stroke='currentColor' fill='currentColor' stroke-width='0' viewBox='0 0 20 20' height='1em' width='1em' xmlns='http://www.w3.org/2000/svg'><path d='M8 2a1 1 0 000 2h2a1 1 0 100-2H8z'></path><path d='M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2a1 1 0 110 2h-2v-2z'></path></svg>
+  </button>
+  
+  
+</div>
+                
+
+                
+              </li>
+            
+              
+              <li data-id="7" data-triple="x86_64-unknown-linux-gnu" class="install-content hidden">
+                
+
+                
+                  
+                  <div class="download-wrapper">
+                    <a href="https://github.com/theseus-rs/rsql/releases/download/v0.18.1/rsql-x86_64-unknown-linux-gnu.tar.gz">
+                      <button class="button primary">
+                        <span>Download</span>
+                        <span class="button-subtitle">rsql-x86_64-unknown-linux-gnu.tar.gz</span>
+                      </button>
+                    </a>
+                  </div>
+                
+              </li>
+            
+              
+              <li data-id="15" data-triple="x86_64-unknown-linux-gnu" class="install-content hidden">
+                
+
+                
+                  
+                  <div class="download-wrapper">
+                    <a href="https://github.com/theseus-rs/rsql/releases/download/v0.18.1/rsql_cli-x86_64-unknown-linux-gnu.tar.xz">
+                      <button class="button primary">
+                        <span>Download</span>
+                        <span class="button-subtitle">rsql_cli-x86_64-unknown-linux-gnu.tar.xz</span>
+                      </button>
+                    </a>
+                  </div>
+                
+              </li>
+            
+          </ul>
+        </li>
+      
+        <li class="arch hidden" data-arch="x86_64-unknown-linux-musl">
+          
+            <ul class="tabs">
+              
+                
+                
+                <li class="install-tab" data-id="11" data-triple="x86_64-unknown-linux-musl">
+                  shell
+
+                  
+                </li>
+              
+                
+                
+                <li class="install-tab" data-id="1" data-triple="x86_64-unknown-linux-musl">
+                  binstall
+
+                  
+                </li>
+              
+                
+                
+                <li class="install-tab" data-id="0" data-triple="x86_64-unknown-linux-musl">
+                  cargo
+
+                  
+                </li>
+              
+                
+                
+                <li class="install-tab" data-id="8" data-triple="x86_64-unknown-linux-musl">
+                  tarball
+
+                  
+                </li>
+              
+            </ul>
+          
+
+          <ul class="contents">
+            
+              
+              <li data-id="11" data-triple="x86_64-unknown-linux-musl" class="install-content">
+                
+                  
+                  <div class="install-code-wrapper">
+  <pre style="background-color:#263238;">
+<span style="color:#82aaff;">curl</span><span style="color:#89ddff;"> --</span><span style="color:#f78c6c;">proto </span><span style="color:#89ddff;">&#39;</span><span style="color:#c3e88d;">=https</span><span style="color:#89ddff;">&#39; --</span><span style="color:#f78c6c;">tlsv1</span><span style="color:#82aaff;">.2</span><span style="color:#89ddff;"> -</span><span style="color:#f78c6c;">LsSf</span><span style="color:#82aaff;"> https://github.com/theseus-rs/rsql/releases/download/v0.18.1/rsql_cli-installer.sh </span><span style="color:#89ddff;">| </span><span style="color:#82aaff;">sh</span></pre>
+
+  <button class="button copy-clipboard-button primary" data-copy="curl --proto '=https' --tlsv1.2 -LsSf https://github.com/theseus-rs/rsql/releases/download/v0.18.1/rsql_cli-installer.sh | sh">
+    <svg stroke='currentColor' fill='currentColor' stroke-width='0' viewBox='0 0 20 20' height='1em' width='1em' xmlns='http://www.w3.org/2000/svg'><path d='M8 2a1 1 0 000 2h2a1 1 0 100-2H8z'></path><path d='M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2a1 1 0 110 2h-2v-2z'></path></svg>
+  </button>
+  
+  
+    
+    
+      
+    
+    <a class="button primary" href="/rsql/rsql_cli/rsql_cli-installer.sh.txt">Source</a>
+  
+</div>
+                
+
+                
+              </li>
+            
+              
+              <li data-id="1" data-triple="x86_64-unknown-linux-musl" class="install-content hidden">
+                
+                  
+                  <div class="install-code-wrapper">
+  <pre style="background-color:#263238;">
+<span style="color:#82aaff;">cargo binstall rsql_cli</span></pre>
+
+  <button class="button copy-clipboard-button primary" data-copy="cargo binstall rsql_cli">
+    <svg stroke='currentColor' fill='currentColor' stroke-width='0' viewBox='0 0 20 20' height='1em' width='1em' xmlns='http://www.w3.org/2000/svg'><path d='M8 2a1 1 0 000 2h2a1 1 0 100-2H8z'></path><path d='M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2a1 1 0 110 2h-2v-2z'></path></svg>
+  </button>
+  
+  
+</div>
+                
+
+                
+              </li>
+            
+              
+              <li data-id="0" data-triple="x86_64-unknown-linux-musl" class="install-content hidden">
+                
+                  
+                  <div class="install-code-wrapper">
+  <pre style="background-color:#263238;">
+<span style="color:#82aaff;">cargo install rsql_cli</span></pre>
+
+  <button class="button copy-clipboard-button primary" data-copy="cargo install rsql_cli">
+    <svg stroke='currentColor' fill='currentColor' stroke-width='0' viewBox='0 0 20 20' height='1em' width='1em' xmlns='http://www.w3.org/2000/svg'><path d='M8 2a1 1 0 000 2h2a1 1 0 100-2H8z'></path><path d='M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2a1 1 0 110 2h-2v-2z'></path></svg>
+  </button>
+  
+  
+</div>
+                
+
+                
+              </li>
+            
+              
+              <li data-id="8" data-triple="x86_64-unknown-linux-musl" class="install-content hidden">
+                
+
+                
+                  
+                  <div class="download-wrapper">
+                    <a href="https://github.com/theseus-rs/rsql/releases/download/v0.18.1/rsql-x86_64-unknown-linux-musl.tar.gz">
+                      <button class="button primary">
+                        <span>Download</span>
+                        <span class="button-subtitle">rsql-x86_64-unknown-linux-musl.tar.gz</span>
+                      </button>
+                    </a>
+                  </div>
+                
+              </li>
+            
+          </ul>
+        </li>
+      
+    </ul>
+  </div>
+
+  
+    <div class="no-autodetect hidden">
+      <span class="no-autodetect-details">We weren't able to detect your OS.</span>
+    </div>
+    <noscript>
+      <a href="/rsql/rsql_cli/artifacts/">View all installation options</a>
+    </noscript>
+  
+  <div class="mac-switch hidden">This project doesn't offer Apple Silicon downloads, but you can run Intel macOS binaries via Rosetta 2.</div>
+
+  
+  
+  <div class="bottom-options ">
+    <a href="/rsql/rsql_cli/artifacts/" class="backup-download primary">View all installation options</a>
+    
+      <div class="arch-select hidden">
+        <select id="install-arch-select">
+          <option disabled="true" selected="true" value=""></option>
+          
+            <option value="aarch64-unknown-linux-gnu">Linux arm64</option>
+          
+            <option value="x86_64-unknown-linux-gnu">Linux x64</option>
+          
+            <option value="i686-unknown-linux-gnu">Linux x86</option>
+          
+            <option value="aarch64-apple-darwin">macOS Apple Silicon</option>
+          
+            <option value="x86_64-apple-darwin">macOS Intel</option>
+          
+            <option value="aarch64-unknown-linux-musl">musl Linux arm64</option>
+          
+            <option value="x86_64-unknown-linux-musl">musl Linux x64</option>
+          
+            <option value="x86_64-pc-windows-msvc">Windows x64</option>
+          
+        </select>
+      </div>
+    
+  </div>
+</div>
+
+<a href="/rsql/rsql_cli/artifacts/" class="button mobile-download primary">View all installation options</a>
+
+
+    <h1>rsql_cli</h1>
+<p><a href="https://github.com/theseus-rs/rsql/actions/workflows/ci.yml" rel="noopener noreferrer"><img src="https://github.com/theseus-rs/rsql/actions/workflows/ci.yml/badge.svg?branch=main" alt="ci"></a>
+<a href="https://codecov.io/gh/theseus-rs/rsql" rel="noopener noreferrer"><img src="https://codecov.io/gh/theseus-rs/rsql/branch/main/graph/badge.svg" alt="Code Coverage"></a>
+<a href="https://bencher.dev/perf/theseus-rs-rsql" rel="noopener noreferrer"><img src="https://img.shields.io/badge/%F0%9F%90%B0_bencher-enabled-6ec241" alt="Benchmarks"></a>
+<a href="https://crates.io/crates/rsql_cli" rel="noopener noreferrer"><img src="https://img.shields.io/crates/v/rsql_cli.svg" alt="Latest version"></a>
+<a href="https://theseus-rs.github.io/rsql/rsql_cli/" rel="noopener noreferrer"><img src="https://img.shields.io/github/downloads/theseus-rs/rsql/total.svg" alt="Github All Releases"></a>
+<a href="https://github.com/theseus-rs/rsql#license" rel="noopener noreferrer"><img src="https://img.shields.io/crates/l/rsql_cli" alt="License"></a>
+<a href="https://semver.org/spec/v2.0.0.html" rel="noopener noreferrer"><img src="https://img.shields.io/badge/%E2%9A%99%EF%B8%8F_SemVer-2.0.0-blue" alt="Semantic Versioning"></a></p>
+<p><code>rsql</code> is a command line interface for data.</p>
+<h2>Getting Started</h2>
+<p>Install <code>rsql</code> from <a href="https://theseus-rs.github.io/rsql/rsql_cli/" rel="noopener noreferrer">https://theseus-rs.github.io/rsql/rsql_cli/</a></p>
+<p><img src="https://github.com/theseus-rs/rsql/blob/main/rsql_cli/resources/demo.gif" alt=""></p>
+<h2>Safety</h2>
+<p>These crates use <code>#![forbid(unsafe_code)]</code> to ensure everything is implemented in 100% safe Rust.</p>
+<h2>License</h2>
+<p>Licensed under either of:</p>
+<ul>
+<li>Apache License, Version 2.0, (<a href="LICENSE-APACHE" rel="noopener noreferrer">LICENSE-APACHE</a> or <a href="http://www.apache.org/licenses/LICENSE-2.0" rel="noopener noreferrer">http://www.apache.org/licenses/LICENSE-2.0</a>)</li>
+<li>MIT license (<a href="LICENSE-MIT" rel="noopener noreferrer">LICENSE-MIT</a> or <a href="http://opensource.org/licenses/MIT" rel="noopener noreferrer">http://opensource.org/licenses/MIT</a>)</li>
+</ul>
+
+
+
+        </main>
+      </div>
+
+      <footer>
+        
+          <a href="https://github.com/theseus-rs/rsql"><div class="github-icon" aria-hidden="true"></div></a>
+        
+        <span>
+          rsql, Apache-2.0 OR MIT
+        </span>
+      </footer>
+    </div>
+
+    
+    
+
+    
+
+    <script src="/rsql/rsql_cli/artifacts.js"></script>
+
+
+  </body>
+</html>
