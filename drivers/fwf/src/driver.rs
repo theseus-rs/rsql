@@ -9,7 +9,6 @@ use rsql_driver::Error::{ConversionError, IoError};
 use rsql_driver::{Result, UrlExtension};
 use rsql_driver_polars::Connection;
 use std::collections::HashMap;
-use tokio::fs::read_to_string;
 use url::Url;
 
 #[derive(Debug)]
@@ -50,7 +49,10 @@ impl rsql_driver::Driver for Driver {
             ));
         }
 
-        let fwf_content = read_to_string(&file_name).await?;
+        #[cfg(target_family = "wasm")]
+        let fwf_content = std::fs::read_to_string(&file_name)?;
+        #[cfg(not(target_family = "wasm"))]
+        let fwf_content = tokio::fs::read_to_string(&file_name).await?;
         let lines = fwf_content.lines();
         let mut columns = vec![Vec::<String>::new(); widths.len()];
 

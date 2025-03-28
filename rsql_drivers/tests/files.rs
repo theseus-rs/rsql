@@ -7,39 +7,39 @@ use rsql_drivers::DriverManager;
 async fn test_file_drivers() -> Result<()> {
     DriverManager::initialize()?;
     let database_urls = vec![
-        #[cfg(feature = "arrow")]
+        #[cfg(feature = "driver-arrow")]
         (dataset_url("file", "users.arrow"), None),
-        #[cfg(feature = "avro")]
+        #[cfg(feature = "driver-avro")]
         (dataset_url("file", "users.avro"), None),
-        #[cfg(feature = "brotli")]
+        #[cfg(feature = "driver-brotli")]
         (dataset_url("file", "users.csv.br"), None),
-        #[cfg(feature = "bzip2")]
+        #[cfg(feature = "driver-bzip2")]
         (dataset_url("file", "users.csv.bz2"), None),
-        #[cfg(feature = "csv")]
+        #[cfg(feature = "driver-csv")]
         (dataset_url("file", "users.csv"), None),
-        #[cfg(feature = "duckdb")]
+        #[cfg(feature = "driver-duckdb")]
         (dataset_url("file", "users.duckdb"), None),
-        #[cfg(feature = "excel")]
+        #[cfg(feature = "driver-excel")]
         (dataset_url("file", "users.xlsx"), None),
-        #[cfg(feature = "gzip")]
+        #[cfg(feature = "driver-gzip")]
         (dataset_url("file", "users.csv.gz"), None),
-        #[cfg(feature = "json")]
+        #[cfg(feature = "driver-json")]
         (dataset_url("file", "users.json"), None),
-        #[cfg(feature = "jsonl")]
+        #[cfg(feature = "driver-jsonl")]
         (dataset_url("file", "users.jsonl"), None),
-        #[cfg(feature = "lz4")]
+        #[cfg(feature = "driver-lz4")]
         (dataset_url("file", "users.csv.lz4"), None),
-        #[cfg(feature = "ods")]
+        #[cfg(feature = "driver-ods")]
         (dataset_url("file", "users.ods"), None),
-        #[cfg(feature = "orc")]
+        #[cfg(feature = "driver-orc")]
         (dataset_url("file", "users.orc"), None),
-        #[cfg(feature = "parquet")]
+        #[cfg(feature = "driver-parquet")]
         (dataset_url("file", "users.parquet"), None),
-        #[cfg(feature = "sqlite")]
+        #[cfg(feature = "driver-sqlite")]
         (dataset_url("file", "users.sqlite3"), None),
-        #[cfg(feature = "tsv")]
+        #[cfg(feature = "driver-tsv")]
         (dataset_url("file", "users.tsv"), None),
-        #[cfg(feature = "xml")]
+        #[cfg(feature = "driver-xml")]
         (
             dataset_url("file", "users.xml"),
             Some(indoc! {r"
@@ -49,11 +49,11 @@ async fn test_file_drivers() -> Result<()> {
                 SELECT user.* FROM cte_user
             "}),
         ),
-        #[cfg(feature = "xz")]
+        #[cfg(feature = "driver-xz")]
         (dataset_url("file", "users.csv.xz"), None),
-        #[cfg(feature = "yaml")]
+        #[cfg(feature = "driver-yaml")]
         (dataset_url("file", "users.yaml"), None),
-        #[cfg(feature = "zstd")]
+        #[cfg(feature = "driver-zstd")]
         (dataset_url("file", "users.csv.zst"), None),
     ];
     for (database_url, sql) in database_urls {

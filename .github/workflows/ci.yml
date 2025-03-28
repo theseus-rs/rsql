@@ -82,9 +82,10 @@ jobs:
           if [[ "${{ matrix.target }}" == *"unknown"* ]]; then
             export RUSTFLAGS='--cfg getrandom_backend="wasm_js"'
           fi
+          sudo apt-get install gcc-multilib
           rustup target install ${{ matrix.target }}
           cargo build --package rsql_driver --target ${{ matrix.target }}
-          cargo build --package rsql_drivers --target ${{ matrix.target }}
+          cargo build --package rsql_drivers --features all-wasm --target ${{ matrix.target }}
           cargo build --package rsql_formatters --target ${{ matrix.target }}
 
       - name: Test
