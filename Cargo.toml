@@ -92,7 +92,7 @@ members = [
     "rsql_drivers",
     "rsql_formatters",
 ]
-resolver = "2"
+resolver = "3"
 
 [workspace.package]
 authors = ["Brian Heineman <brian.heineman@gmail.com>"]
