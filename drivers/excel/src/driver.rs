@@ -12,7 +12,6 @@ use serde_json::{Value, json};
 use std::collections::HashMap;
 use std::io::Cursor;
 use std::num::NonZeroUsize;
-use tokio::fs;
 use url::Url;
 
 #[derive(Debug)]
@@ -61,7 +60,10 @@ impl rsql_driver::Driver for Driver {
             .map_err(|error| ConversionError(error.to_string()))?;
 
         let mut context = SQLContext::new();
-        let data = fs::read(&file_name).await?;
+        #[cfg(target_family = "wasm")]
+        let data = std::fs::read(&file_name)?;
+        #[cfg(not(target_family = "wasm"))]
+        let data = tokio::fs::read(&file_name).await?;
         let mut sheets = open_workbook_auto_from_rs(Cursor::new(data))
             .map_err(|error| IoError(error.to_string()))?;
         let sheet_names = sheets.sheet_names();

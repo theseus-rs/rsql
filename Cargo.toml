@@ -150,9 +150,9 @@ libsql = "0.9.1"
 lz4 = "1.28.1"
 mockall = "0.13.1"
 num-format = "0.4.4"
-orc-rust = "0.6.0"
+orc-rust = { version = "0.6.0", default-features = false }
 os_info = "3.10.0"
-polars = "0.46.0"
+polars = { version = "0.46.0", default-features = false }
 polars-sql = "0.46.0"
 postgresql_embedded = "0.18.2"
 quick-xml = "0.37.3"
