@@ -6,5 +6,5 @@ license.workspace = true
 version.workspace = true
 
 [dependencies]
-rsql_drivers = { path = "../../rsql_drivers", features = ["sqlite"] }
+rsql_drivers = { path = "../../rsql_drivers", features = ["driver-sqlite"] }
 tokio = { workspace = true, features = ["full"] }

@@ -13,7 +13,6 @@ use serde_json::{Number, Value, json};
 use std::collections::HashMap;
 use std::io::Cursor;
 use std::num::NonZeroUsize;
-use tokio::fs;
 use url::Url;
 
 #[derive(Debug)]
@@ -32,7 +31,10 @@ impl rsql_driver::Driver for Driver {
 
         let file_name = parsed_url.to_file()?.to_string_lossy().to_string();
         let json = {
-            let xml = fs::read_to_string(&file_name).await?;
+            #[cfg(target_family = "wasm")]
+            let xml = std::fs::read_to_string(&file_name)?;
+            #[cfg(not(target_family = "wasm"))]
+            let xml = tokio::fs::read_to_string(&file_name).await?;
             let value = xml_to_json(&xml)?;
             serde_json::to_string(&value).map_err(|error| IoError(error.to_string()))?
         };
