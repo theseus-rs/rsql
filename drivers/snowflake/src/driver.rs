@@ -15,7 +15,6 @@ use sqlparser::dialect::{Dialect, SnowflakeDialect};
 use std::collections::HashMap;
 use std::fmt::Display;
 use std::str::FromStr;
-use tokio::sync::Mutex;
 use url::Url;
 
 const DATE_FORMATS: (&str, &str) = ("YYYY-MM-DD", "%Y-%m-%d");
@@ -52,7 +51,7 @@ pub struct SnowflakeConnection {
     subject: Option<String>,
     key_pair: Option<RS256KeyPair>,
     jwt_expires_at: Option<DateTime>,
-    client: Mutex<reqwest::Client>,
+    client: reqwest::Client,
 }
 
 impl SnowflakeConnection {
@@ -78,7 +77,7 @@ impl SnowflakeConnection {
         let base_url = format!("https://{base_url}/api/v2/statements");
 
         if let Some(password) = password {
-            let client = Mutex::new(Self::new_client_oauth(&password)?);
+            let client = Self::new_client_oauth(&password)?;
             Ok(Self {
                 url: url.to_string(),
                 base_url,
@@ -115,7 +114,7 @@ impl SnowflakeConnection {
                 .to_datetime(Timestamp::now())
                 .checked_add(1.hour())?;
 
-            let client = Mutex::new(Self::new_client_keypair(&issuer, &subject, &key_pair)?);
+            let client = Self::new_client_keypair(&issuer, &subject, &key_pair)?;
             Ok(Self {
                 url: url.to_string(),
                 base_url,
@@ -199,8 +198,6 @@ impl SnowflakeConnection {
         let url = format!("{}/{handle}", self.base_url);
 
         self.client
-            .lock()
-            .await
             .get(&url)
             .query(&[("partition", partition.to_string())])
             .send()
@@ -213,7 +210,7 @@ impl SnowflakeConnection {
     ///
     /// # Errors
     /// Errors if creating a new client with the key pair fails
-    async fn check_jwt_refresh(&mut self) -> Result<()> {
+    fn check_jwt_refresh(&mut self) -> Result<()> {
         if let (Some(jwt_expires_at), Some(issuer), Some(subject), Some(key_pair)) = (
             &self.jwt_expires_at,
             &self.issuer,
@@ -222,9 +219,7 @@ impl SnowflakeConnection {
         ) {
             let now = Offset::UTC.to_datetime(Timestamp::now());
             if *jwt_expires_at < now {
-                let new_client = Self::new_client_keypair(issuer, subject, key_pair)?;
-                let mut client = self.client.lock().await;
-                *client = new_client;
+                self.client = Self::new_client_keypair(issuer, subject, key_pair)?;
             }
         }
         Ok(())
@@ -235,10 +230,8 @@ impl SnowflakeConnection {
     /// # Errors
     /// Errors if the request fails to receive a response
     async fn request(&mut self, sql: &str) -> Result<reqwest::Response> {
-        self.check_jwt_refresh().await?;
+        self.check_jwt_refresh()?;
         self.client
-            .lock()
-            .await
             .post(&self.base_url)
             .body(
                 json!({
