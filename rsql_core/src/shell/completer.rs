@@ -2,7 +2,7 @@ use rsql_drivers::{Metadata, Table};
 use rustyline::Context;
 use rustyline::completion::{Candidate, Completer, Pair};
 use sqlparser::keywords::Keyword;
-use sqlparser::tokenizer::{Token, TokenWithLocation, Tokenizer};
+use sqlparser::tokenizer::{Token, TokenWithSpan, Tokenizer};
 use std::matches;
 use std::sync::LazyLock;
 use tracing::debug;
@@ -210,7 +210,7 @@ impl ReplCompleter {
 
     /// identifies table names and aliases in `tokens`
     /// returns vector of tuples with `Table` and optional alias String
-    fn tables_in_query(&self, tokens: &[TokenWithLocation]) -> Vec<(&Table, Option<String>)> {
+    fn tables_in_query(&self, tokens: &[TokenWithSpan]) -> Vec<(&Table, Option<String>)> {
         let tokens_no_location: Vec<_> = tokens
             .iter()
             .filter_map(|token| {
@@ -272,8 +272,8 @@ impl ReplCompleter {
     }
 
     fn suggest_type(
-        tokens: &[TokenWithLocation],
-        token_at_cursor: &TokenWithLocation,
+        tokens: &[TokenWithSpan],
+        token_at_cursor: &TokenWithSpan,
         tables: &[(&Table, Option<String>)],
     ) -> Suggestion {
         let token_string = token_at_cursor.token.to_string().trim().to_string();
@@ -281,7 +281,7 @@ impl ReplCompleter {
         let Some(token_idx) = tokens
             .iter()
             .enumerate()
-            .rfind(|(_, token)| token.location == token_at_cursor.location)
+            .rfind(|(_, token)| token.span == token_at_cursor.span)
             .map(|(i, _)| i.saturating_sub(1))
         else {
             return Suggestion::default();
@@ -307,10 +307,10 @@ impl ReplCompleter {
     }
 
     fn suggest_on_last_token(
-        tokens: &[TokenWithLocation],
+        tokens: &[TokenWithSpan],
         tables: &[(&Table, Option<String>)],
-        token_at_cursor: &TokenWithLocation,
-        previous_token: &TokenWithLocation,
+        token_at_cursor: &TokenWithSpan,
+        previous_token: &TokenWithSpan,
         previous_token_idx: usize,
     ) -> Suggestion {
         let token_string = token_at_cursor.token.to_string();
@@ -380,7 +380,7 @@ impl ReplCompleter {
 
     fn matches_for_token(
         &self,
-        token_at_cursor: &TokenWithLocation,
+        token_at_cursor: &TokenWithSpan,
         tables: &[(&Table, Option<String>)],
         suggestion: Suggestion,
     ) -> Vec<Pair> {
@@ -454,8 +454,8 @@ impl ReplCompleter {
 
     fn get_completions(
         &self,
-        token_at_cursor: &TokenWithLocation,
-        tokens: &[TokenWithLocation],
+        token_at_cursor: &TokenWithSpan,
+        tokens: &[TokenWithSpan],
     ) -> Vec<Pair> {
         let tables = self.tables_in_query(tokens);
         let suggestion = Self::suggest_type(tokens, token_at_cursor, &tables);
@@ -495,13 +495,13 @@ impl Completer for ReplCompleter {
         let Some(token_at_cursor) = tokens
             .iter()
             .enumerate()
-            .rfind(|(_, token)| token.location.column <= cursor_location)
+            .rfind(|(_, token)| token.span.start.column <= cursor_location)
             .map(|token| token.1.to_owned())
         else {
             return Ok((0, CANDIDATES.clone()));
         };
 
-        let start = usize::try_from(token_at_cursor.location.column.saturating_sub(
+        let start = usize::try_from(token_at_cursor.span.start.column.saturating_sub(
             match token_at_cursor.token {
                 Token::Period | Token::Whitespace(_) => 0,
                 _ => 1,
@@ -515,9 +515,9 @@ impl Completer for ReplCompleter {
 }
 
 fn find_previous_keyword(
-    tokens: &[TokenWithLocation],
+    tokens: &[TokenWithSpan],
     index: usize,
-) -> Option<(usize, &TokenWithLocation)> {
+) -> Option<(usize, &TokenWithSpan)> {
     tokens.iter().enumerate().rfind(|(i, token)| {
         *i < index
             && match &token.token {
@@ -792,7 +792,7 @@ mod test {
             .expect("valid sql");
         let mut index = tokens.len() - 1;
 
-        let mut keywords_found: Vec<&TokenWithLocation> = vec![];
+        let mut keywords_found: Vec<&TokenWithSpan> = vec![];
         while let Some((new_index, last_token)) = find_previous_keyword(&tokens, index) {
             index = new_index;
             keywords_found.push(last_token);
