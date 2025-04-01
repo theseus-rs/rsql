@@ -44,6 +44,7 @@ default-members = [
     "rsql_driver",
     "rsql_drivers",
     "rsql_formatters",
+    "rsql_repl",
 ]
 members = [
     "drivers/arrow",
@@ -91,6 +92,7 @@ members = [
     "rsql_driver",
     "rsql_drivers",
     "rsql_formatters",
+    "rsql_repl",
 ]
 resolver = "3"
 

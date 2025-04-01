@@ -14,7 +14,7 @@ version.workspace = true
 async-trait = { workspace = true }
 file_type = { workspace = true }
 futures-util = { workspace = true }
-reqwest = { workspace = true }
+reqwest = { workspace = true, features = ["stream"] }
 rsql_driver = { path = "../../rsql_driver", version = "0.18.1" }
 tempfile = { workspace = true }
 tracing = { workspace = true }
@@ -22,7 +22,6 @@ tokio = { workspace = true }
 url = { workspace = true }
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
-reqwest = { workspace = true, features = ["stream"] }
 tokio = { workspace = true, features = ["fs"] }
 
 [dev-dependencies]

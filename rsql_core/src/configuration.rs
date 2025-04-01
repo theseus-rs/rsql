@@ -3,7 +3,6 @@ use config::{Config, FileFormat};
 use dirs::home_dir;
 use indicatif::ProgressStyle;
 use rsql_formatters::FormatterOptions;
-use rustyline::EditMode;
 use std::env;
 use std::fs::{OpenOptions, create_dir_all};
 use std::io::Write;
@@ -291,6 +290,14 @@ impl FromStr for EchoMode {
             _ => Err(format!("Invalid echo mode: {s}")),
         }
     }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum EditMode {
+    /// Emacs keymap
+    Emacs,
+    /// Vi keymap
+    Vi,
 }
 
 /// The configuration for the application.

@@ -7439,6 +7439,7 @@ dependencies = [
  "inquire",
  "os_info",
  "rsql_core",
+ "rsql_repl",
  "rust-i18n",
  "serde",
  "static_vcruntime",
@@ -7454,38 +7455,19 @@ name = "rsql_core"
 version = "0.18.1"
 dependencies = [
  "anyhow",
- "async-trait",
- "clap",
- "clap-stdin",
- "clearscreen",
- "colored",
  "config",
- "criterion",
  "dark-light",
  "dirs",
  "getrandom 0.3.2",
  "indicatif",
- "indoc",
- "mockall",
- "num-format",
- "regex",
- "rsql_driver",
- "rsql_drivers",
  "rsql_formatters",
  "rust-i18n",
- "rustyline",
- "sqlparser 0.55.0",
  "sys-locale",
- "tempfile",
  "termbg",
- "test-log",
- "thiserror 2.0.12",
- "tokio",
  "tracing",
  "tracing-appender",
  "tracing-indicatif",
  "tracing-subscriber",
- "unicode-width 0.2.0",
 ]
 
 [[package]]
@@ -8207,6 +8189,39 @@ dependencies = [
  "test-log",
  "thiserror 2.0.12",
  "tokio",
+]
+
+[[package]]
+name = "rsql_repl"
+version = "0.18.1"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "clap",
+ "clap-stdin",
+ "clearscreen",
+ "colored",
+ "criterion",
+ "getrandom 0.3.2",
+ "indicatif",
+ "indoc",
+ "mockall",
+ "num-format",
+ "regex",
+ "rsql_core",
+ "rsql_driver",
+ "rsql_drivers",
+ "rsql_formatters",
+ "rust-i18n",
+ "rustyline",
+ "sqlparser 0.55.0",
+ "tempfile",
+ "test-log",
+ "thiserror 2.0.12",
+ "tokio",
+ "tracing",
+ "tracing-indicatif",
+ "unicode-width 0.2.0",
 ]
 
 [[package]]
