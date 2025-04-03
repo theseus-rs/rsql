@@ -79,7 +79,7 @@ impl Driver {
             };
             (host, path)
         };
-        let Some(file_name) = key.split('/').last() else {
+        let Some(file_name) = key.split('/').next_back() else {
             return Err(IoError("Invalid S3 URL; no file".to_string()));
         };
 
