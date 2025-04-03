@@ -57,7 +57,7 @@ impl ShellCommand for Command {
                     option: formatter_identifier.to_string(),
                 });
             }
-        };
+        }
 
         Ok(LoopCondition::Continue)
     }
