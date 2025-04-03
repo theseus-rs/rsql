@@ -425,10 +425,6 @@ impl rsql_driver::Connection for SnowflakeConnection {
         Ok(Box::new(MemoryQueryResult::new(column_names, rows)))
     }
 
-    async fn close(&mut self) -> Result<()> {
-        Ok(())
-    }
-
     fn dialect(&self) -> Box<dyn Dialect> {
         Box::new(SnowflakeDialect {})
     }

@@ -128,10 +128,6 @@ impl rsql_driver::Connection for Connection {
         let query_result = MemoryQueryResult::new(columns, rows);
         Ok(Box::new(query_result))
     }
-
-    async fn close(&mut self) -> Result<()> {
-        Ok(())
-    }
 }
 
 impl Connection {

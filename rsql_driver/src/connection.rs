@@ -105,7 +105,11 @@ pub trait Connection: Debug + Send + Sync {
     fn url(&self) -> &String;
     async fn execute(&mut self, sql: &str) -> Result<u64>;
     async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>>;
-    async fn close(&mut self) -> Result<()>;
+
+    async fn close(&mut self) -> Result<()> {
+        Ok(())
+    }
+
     async fn metadata(&mut self) -> Result<Metadata> {
         unimplemented!()
     }
