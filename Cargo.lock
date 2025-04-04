@@ -3188,9 +3188,9 @@ dependencies = [
 
 [[package]]
 name = "file_type"
-version = "0.8.2"
+version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6fcbcfae1c428ac50573694d8feb78e3df3f5851c136d53baf599078ef784909"
+checksum = "a463c5a8c1d775e4cde89f8fbe047a3d6969fa66557fbc6223ef6644f476506d"
 dependencies = [
  "phf",
 ]
@@ -3219,9 +3219,9 @@ dependencies = [
 
 [[package]]
 name = "flate2"
-version = "1.1.0"
+version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "11faaf5a5236997af9848be0bef4db95824b1d534ebc64d0f0c6cf3e67bd38dc"
+checksum = "7ced92e76e966ca2fd84c8f7aa01a4aea65b0eb6648d72f7c8f3e2764a67fece"
 dependencies = [
  "crc32fast",
  "libz-rs-sys",
@@ -4706,9 +4706,9 @@ dependencies = [
 
 [[package]]
 name = "libsql"
-version = "0.9.1"
+version = "0.9.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1f99d7048440c5f443f7e121b27159d4d3c66d0a75e20754fd6cbb00f3cc8c18"
+checksum = "09b9df6f5cc08ca4bb2467793926470210d3d8a916ea28260d6cd892bba6d8b4"
 dependencies = [
  "anyhow",
  "async-stream",
@@ -4746,9 +4746,9 @@ dependencies = [
 
 [[package]]
 name = "libsql-ffi"
-version = "0.9.1"
+version = "0.9.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c0e12afae859e7dc096ebc7a7cee806efa948e5b78ff9d0b4573ca7815480ab0"
+checksum = "4a1dcc2bf91e8511ece5bc2bac502b78bcbcecef80635dacb30020a40419e5d6"
 dependencies = [
  "bindgen 0.66.1",
  "cc",
@@ -4757,9 +4757,9 @@ dependencies = [
 
 [[package]]
 name = "libsql-hrana"
-version = "0.9.1"
+version = "0.9.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "71f16d7adbad5bee861c955011c155893937bd4c8711c91d949060363f24e0f6"
+checksum = "f14cd7d167c01bac254a4296b86a6ac090fd364c39af6c64071efdf07f206db7"
 dependencies = [
  "base64 0.21.7",
  "bytes",
@@ -4769,9 +4769,9 @@ dependencies = [
 
 [[package]]
 name = "libsql-rusqlite"
-version = "0.9.1"
+version = "0.9.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "96c4bd62bf66a14e46643bd44adbb843c791e7c3f835a1424ffa629df8a7a9f4"
+checksum = "881b3e3f05c8d3f22be9ccfa4f6a56ad25165a5458615aba8b7586558c694965"
 dependencies = [
  "bitflags 2.6.0",
  "fallible-iterator 0.2.0",
@@ -4801,9 +4801,9 @@ dependencies = [
 
 [[package]]
 name = "libsql-sys"
-version = "0.9.1"
+version = "0.9.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "659587f9ebebdb2ff1112e8af7f30fc212f8d5457a3a9a549eda48544e942a7f"
+checksum = "edae249cc733bb10e134d3c1522b408631f6a8741855caf7179927fd296f5715"
 dependencies = [
  "bytes",
  "libsql-ffi",
@@ -4815,9 +4815,9 @@ dependencies = [
 
 [[package]]
 name = "libsql_replication"
-version = "0.9.1"
+version = "0.9.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0666c23acca99c2ebc317071f87814ad006243fa6e15c02a83e40ff8e6948832"
+checksum = "b0c30add5755085fffd616190ff67703a391ae8324001738d7e6f00d6ea1b180"
 dependencies = [
  "aes",
  "async-stream",
@@ -4862,9 +4862,9 @@ dependencies = [
 
 [[package]]
 name = "libz-rs-sys"
-version = "0.4.2"
+version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "902bc563b5d65ad9bba616b490842ef0651066a1a1dc3ce1087113ffcb873c8d"
+checksum = "6489ca9bd760fe9642d7644e827b0c9add07df89857b0416ee15c1cc1a3b8c5a"
 dependencies = [
  "zlib-rs",
 ]
@@ -6871,9 +6871,9 @@ dependencies = [
 
 [[package]]
 name = "quick-xml"
-version = "0.37.3"
+version = "0.37.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bf763ab1c7a3aa408be466efc86efe35ed1bd3dd74173ed39d6b0d0a6f0ba148"
+checksum = "a4ce8c88de324ff838700f36fb6ab86c96df0e3c4ab6ef3a9b2044465cce1369"
 dependencies = [
  "memchr",
  "serde",
@@ -8056,7 +8056,7 @@ dependencies = [
  "indoc",
  "polars",
  "polars-sql",
- "quick-xml 0.37.3",
+ "quick-xml 0.37.4",
  "rsql_driver",
  "rsql_driver_polars",
  "rsql_driver_test_utils",
@@ -8177,7 +8177,7 @@ dependencies = [
  "indexmap 2.8.0",
  "indoc",
  "num-format",
- "quick-xml 0.37.3",
+ "quick-xml 0.37.4",
  "rsql_drivers",
  "rust-i18n",
  "serde_json",
@@ -8246,9 +8246,9 @@ dependencies = [
 
 [[package]]
 name = "rust-i18n"
-version = "3.1.3"
+version = "3.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "71b3a6e1c6565b77c86d868eea3068b0eb39582510f9c78cfbd5c67bd36fda9b"
+checksum = "a2b6307cde881492032919adf26e254981604a6657b339ae23cce8358e9ee203"
 dependencies = [
  "globwalk",
  "once_cell",
@@ -11607,9 +11607,9 @@ dependencies = [
 
 [[package]]
 name = "zlib-rs"
-version = "0.4.2"
+version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8b20717f0917c908dc63de2e44e97f1e6b126ca58d0e391cee86d504eb8fbd05"
+checksum = "868b928d7949e09af2f6086dfc1e01936064cc7a819253bce650d4e2a2d63ba8"
 
 [[package]]
 name = "zopfli"
