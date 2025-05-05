@@ -5,12 +5,9 @@
 #[macro_use]
 extern crate rust_i18n;
 
-pub mod commands;
 pub mod configuration;
-pub mod executors;
-pub mod shell;
 
-pub use rsql_formatters::writers;
+pub use configuration::{Configuration, ConfigurationBuilder, EchoMode, EditMode};
 
 use rust_i18n::i18n;
 

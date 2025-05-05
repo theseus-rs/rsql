@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## `rsql_cli` - [0.18.1](https://github.com/theseus-rs/rsql/compare/v0.18.0...v0.18.1) - 2025-03-27
+
+### Added
+- add dynamodb driver
+
+## `rsql_core` - [0.18.1](https://github.com/theseus-rs/rsql/compare/rsql_core-v0.18.0...rsql_core-v0.18.1) - 2025-03-27
+
+### Added
+- add dynamodb driver
+
+## `rsql_drivers` - [0.18.1](https://github.com/theseus-rs/rsql/compare/rsql_drivers-v0.18.0...rsql_drivers-v0.18.1) - 2025-03-27
+
+### Added
+- add dynamodb driver
+
+## `rsql_driver_s3` - [0.18.1](https://github.com/theseus-rs/rsql/compare/rsql_driver_s3-v0.18.0...rsql_driver_s3-v0.18.1) - 2025-03-27
+
+### Fixed
+- correct s3 driver password
+
+## `rsql_driver_dynamodb` - [0.18.1](https://github.com/theseus-rs/rsql/releases/tag/rsql_driver_dynamodb-v0.18.1) - 2025-03-27
+
+### Added
+- add dynamodb driver
+
 ## `rsql_cli` - [0.18.0](https://github.com/theseus-rs/rsql/compare/v0.17.2...v0.18.0) - 2025-03-25
 
 ### Added

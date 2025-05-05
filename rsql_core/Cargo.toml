@@ -12,34 +12,14 @@ version.workspace = true
 
 [dependencies]
 anyhow = { workspace = true }
-async-trait = { workspace = true }
-clap = { workspace = true, features = ["derive", "env"] }
-clap-stdin = { workspace = true, features = ["tokio"] }
-clearscreen = { workspace = true }
-colored = { workspace = true }
 config = { workspace = true }
 dark-light = { workspace = true }
 dirs = { workspace = true }
 indicatif = { workspace = true }
-indoc = { workspace = true }
-num-format = { workspace = true }
-regex = { workspace = true }
-rsql_driver = { path = "../rsql_driver", version = "0.18.0" }
-rsql_drivers = { path = "../rsql_drivers", version = "0.18.0" }
-rsql_formatters = { path = "../rsql_formatters", version = "0.18.0" }
+rsql_formatters = { path = "../rsql_formatters", version = "0.18.1" }
 rust-i18n = { workspace = true }
-rustyline = { workspace = true }
-sqlparser = { workspace = true }
 sys-locale = { workspace = true }
-tempfile = { workspace = true }
 termbg = { workspace = true }
-thiserror = { workspace = true }
-tokio = { workspace = true, features = [
-    "macros",
-    "process",
-    "rt",
-    "rt-multi-thread",
-] }
 tracing = { workspace = true }
 tracing-appender = { workspace = true }
 tracing-indicatif = { workspace = true }
@@ -47,134 +27,6 @@ tracing-subscriber = { workspace = true, features = [
     "env-filter",
     "tracing-log",
 ] }
-unicode-width = { workspace = true }
 
 [target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dependencies]
 getrandom = { workspace = true, features = ["wasm_js"] }
-
-[dev-dependencies]
-criterion = { workspace = true, features = ["async_tokio"] }
-mockall = { workspace = true }
-test-log = { workspace = true }
-tokio = { workspace = true }
-
-[features]
-all = ["all-drivers", "all-formats"]
-all-drivers = [
-    "driver-arrow",
-    "driver-avro",
-    "driver-brotli",
-    "driver-bzip2",
-    "driver-cockroachdb",
-    "driver-csv",
-    "driver-delimited",
-    "driver-duckdb",
-    "driver-excel",
-    "driver-file",
-    "driver-fwf",
-    "driver-gzip",
-    "driver-http",
-    "driver-https",
-    "driver-json",
-    "driver-jsonl",
-    "driver-lz4",
-    "driver-mariadb",
-    "driver-mysql",
-    "driver-ods",
-    "driver-orc",
-    "driver-parquet",
-    "driver-postgres",
-    "driver-postgresql",
-    "driver-redshift",
-    "driver-rusqlite",
-    "driver-s3",
-    "driver-snowflake",
-    "driver-sqlite",
-    "driver-sqlserver",
-    "driver-tsv",
-    "driver-xml",
-    "driver-xz",
-    "driver-yaml",
-    "driver-zstd",
-]
-default = ["native-tls"]
-driver-arrow = ["rsql_drivers/arrow"]
-driver-avro = ["rsql_drivers/avro"]
-driver-brotli = ["rsql_drivers/brotli"]
-driver-bzip2 = ["rsql_drivers/bzip2"]
-driver-cockroachdb = ["rsql_drivers/cockroachdb"]
-driver-csv = ["rsql_drivers/csv"]
-driver-delimited = ["rsql_drivers/delimited"]
-driver-duckdb = ["rsql_drivers/duckdb"]
-driver-excel = ["rsql_drivers/excel"]
-driver-file = ["rsql_drivers/file"]
-driver-fwf = ["rsql_drivers/fwf"]
-driver-gzip = ["rsql_drivers/gzip"]
-driver-http = ["rsql_drivers/http"]
-driver-https = ["rsql_drivers/https"]
-driver-json = ["rsql_drivers/json"]
-driver-jsonl = ["rsql_drivers/jsonl"]
-driver-libsql = ["rsql_drivers/libsql"]
-driver-lz4 = ["rsql_drivers/lz4"]
-driver-mariadb = ["rsql_drivers/mariadb"]
-driver-mysql = ["rsql_drivers/mysql"]
-driver-ods = ["rsql_drivers/ods"]
-driver-orc = ["rsql_drivers/orc"]
-driver-parquet = ["rsql_drivers/parquet"]
-driver-postgres = ["rsql_drivers/postgres"]
-driver-postgresql = ["rsql_drivers/postgresql"]
-driver-redshift = ["rsql_drivers/redshift"]
-driver-rusqlite = ["rsql_drivers/rusqlite"]
-driver-s3 = ["rsql_drivers/s3"]
-driver-snowflake = ["rsql_drivers/snowflake"]
-driver-sqlite = ["rsql_drivers/sqlite"]
-driver-sqlserver = ["rsql_drivers/sqlserver"]
-driver-tsv = ["rsql_drivers/tsv"]
-driver-xml = ["rsql_drivers/xml"]
-driver-xz = ["rsql_drivers/xz"]
-driver-yaml = ["rsql_drivers/yaml"]
-driver-zstd = ["rsql_drivers/zstd"]
-all-formats = [
-    "format-ascii",
-    "format-csv",
-    "format-expanded",
-    "format-html",
-    "format-json",
-    "format-jsonl",
-    "format-markdown",
-    "format-plain",
-    "format-psql",
-    "format-sqlite",
-    "format-tsv",
-    "format-unicode",
-    "format-xml",
-    "format-yaml",
-]
-format-ascii = ["rsql_formatters/ascii"]
-format-csv = ["rsql_formatters/csv"]
-format-expanded = ["rsql_formatters/expanded"]
-format-html = ["rsql_formatters/html"]
-format-json = ["rsql_formatters/json"]
-format-jsonl = ["rsql_formatters/jsonl"]
-format-markdown = ["rsql_formatters/markdown"]
-format-plain = ["rsql_formatters/plain"]
-format-psql = ["rsql_formatters/psql"]
-format-sqlite = ["rsql_formatters/sqlite"]
-format-tsv = ["rsql_formatters/tsv"]
-format-unicode = ["rsql_formatters/unicode"]
-format-xml = ["rsql_formatters/xml"]
-format-yaml = ["rsql_formatters/yaml"]
-native-tls = ["rsql_drivers/native-tls"]
-rustls = ["rsql_drivers/rustls"]
-
-[lints.clippy]
-unwrap_used = "deny"
-
-[package.metadata.docs.rs]
-features = []
-rustdoc-args = []
-targets = ["x86_64-unknown-linux-gnu"]
-
-[[bench]]
-harness = false
-name = "bench_main"

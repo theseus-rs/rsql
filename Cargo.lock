@@ -267,24 +267,6 @@ checksum = "7c02d123df017efcdfbd739ef81735b36c5ba83ec3c59c80a9d7ecc718f92e50"
 
 [[package]]
 name = "arrow"
-version = "51.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "219d05930b81663fd3b32e3bde8ce5bff3c4d23052a99f11a8fa50a3b47b2658"
-dependencies = [
- "arrow-arith 51.0.0",
- "arrow-array 51.0.0",
- "arrow-buffer 51.0.0",
- "arrow-cast 51.0.0",
- "arrow-data 51.0.0",
- "arrow-ord 51.0.0",
- "arrow-row 51.0.0",
- "arrow-schema 51.0.0",
- "arrow-select 51.0.0",
- "arrow-string 51.0.0",
-]
-
-[[package]]
-name = "arrow"
 version = "53.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d3a3ec4fe573f9d1f59d99c085197ef669b00b088ba1d7bb75224732d9357a74"
@@ -305,18 +287,21 @@ dependencies = [
 ]
 
 [[package]]
-name = "arrow-arith"
-version = "51.0.0"
+name = "arrow"
+version = "54.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0272150200c07a86a390be651abdd320a2d12e84535f0837566ca87ecd8f95e0"
+checksum = "dc208515aa0151028e464cc94a692156e945ce5126abd3537bb7fd6ba2143ed1"
 dependencies = [
- "arrow-array 51.0.0",
- "arrow-buffer 51.0.0",
- "arrow-data 51.0.0",
- "arrow-schema 51.0.0",
- "chrono",
- "half",
- "num",
+ "arrow-arith 54.2.1",
+ "arrow-array 54.2.1",
+ "arrow-buffer 54.3.0",
+ "arrow-cast 54.2.1",
+ "arrow-data 54.3.0",
+ "arrow-ord 54.2.1",
+ "arrow-row 54.2.1",
+ "arrow-schema 54.3.0",
+ "arrow-select 54.2.1",
+ "arrow-string 54.2.1",
 ]
 
 [[package]]
@@ -335,18 +320,16 @@ dependencies = [
 ]
 
 [[package]]
-name = "arrow-array"
-version = "51.0.0"
+name = "arrow-arith"
+version = "54.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8010572cf8c745e242d1b632bd97bd6d4f40fefed5ed1290a8f433abaa686fea"
+checksum = "e07e726e2b3f7816a85c6a45b6ec118eeeabf0b2a8c208122ad949437181f49a"
 dependencies = [
- "ahash 0.8.11",
- "arrow-buffer 51.0.0",
- "arrow-data 51.0.0",
- "arrow-schema 51.0.0",
+ "arrow-array 54.2.1",
+ "arrow-buffer 54.3.0",
+ "arrow-data 54.3.0",
+ "arrow-schema 54.3.0",
  "chrono",
- "half",
- "hashbrown 0.14.5",
  "num",
 ]
 
@@ -368,13 +351,18 @@ dependencies = [
 ]
 
 [[package]]
-name = "arrow-buffer"
-version = "51.0.0"
+name = "arrow-array"
+version = "54.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0d0a2432f0cba5692bf4cb757469c66791394bac9ec7ce63c1afe74744c37b27"
+checksum = "a2262eba4f16c78496adfd559a29fe4b24df6088efc9985a873d58e92be022d5"
 dependencies = [
- "bytes",
+ "ahash 0.8.11",
+ "arrow-buffer 54.3.0",
+ "arrow-data 54.3.0",
+ "arrow-schema 54.3.0",
+ "chrono",
  "half",
+ "hashbrown 0.15.2",
  "num",
 ]
 
@@ -390,24 +378,14 @@ dependencies = [
 ]
 
 [[package]]
-name = "arrow-cast"
-version = "51.0.0"
+name = "arrow-buffer"
+version = "54.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9abc10cd7995e83505cc290df9384d6e5412b207b79ce6bdff89a10505ed2cba"
+checksum = "bc6ed265c73f134a583d02c3cab5e16afab9446d8048ede8707e31f85fad58a0"
 dependencies = [
- "arrow-array 51.0.0",
- "arrow-buffer 51.0.0",
- "arrow-data 51.0.0",
- "arrow-schema 51.0.0",
- "arrow-select 51.0.0",
- "atoi",
- "base64 0.22.1",
- "chrono",
- "comfy-table",
+ "bytes",
  "half",
- "lexical-core 0.8.5",
  "num",
- "ryu",
 ]
 
 [[package]]
@@ -426,7 +404,28 @@ dependencies = [
  "chrono",
  "comfy-table",
  "half",
- "lexical-core 1.0.5",
+ "lexical-core",
+ "num",
+ "ryu",
+]
+
+[[package]]
+name = "arrow-cast"
+version = "54.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4103d88c5b441525ed4ac23153be7458494c2b0c9a11115848fdb9b81f6f886a"
+dependencies = [
+ "arrow-array 54.2.1",
+ "arrow-buffer 54.3.0",
+ "arrow-data 54.3.0",
+ "arrow-schema 54.3.0",
+ "arrow-select 54.2.1",
+ "atoi",
+ "base64 0.22.1",
+ "chrono",
+ "comfy-table",
+ "half",
+ "lexical-core",
  "num",
  "ryu",
 ]
@@ -446,20 +445,8 @@ dependencies = [
  "csv",
  "csv-core",
  "lazy_static",
- "lexical-core 1.0.5",
+ "lexical-core",
  "regex",
-]
-
-[[package]]
-name = "arrow-data"
-version = "51.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2742ac1f6650696ab08c88f6dd3f0eb68ce10f8c253958a18c943a68cd04aec5"
-dependencies = [
- "arrow-buffer 51.0.0",
- "arrow-schema 51.0.0",
- "half",
- "num",
 ]
 
 [[package]]
@@ -470,6 +457,18 @@ checksum = "cd962fc3bf7f60705b25bcaa8eb3318b2545aa1d528656525ebdd6a17a6cd6fb"
 dependencies = [
  "arrow-buffer 53.4.1",
  "arrow-schema 53.4.1",
+ "half",
+ "num",
+]
+
+[[package]]
+name = "arrow-data"
+version = "54.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5f2cebf504bb6a92a134a87fff98f01b14fbb3a93ecf7aef90cd0f888c5fffa4"
+dependencies = [
+ "arrow-buffer 54.3.0",
+ "arrow-schema 54.3.0",
  "half",
  "num",
 ]
@@ -502,25 +501,10 @@ dependencies = [
  "chrono",
  "half",
  "indexmap 2.8.0",
- "lexical-core 1.0.5",
+ "lexical-core",
  "num",
  "serde",
  "serde_json",
-]
-
-[[package]]
-name = "arrow-ord"
-version = "51.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e3e6b61e3dc468f503181dccc2fc705bdcc5f2f146755fa5b56d0a6c5943f412"
-dependencies = [
- "arrow-array 51.0.0",
- "arrow-buffer 51.0.0",
- "arrow-data 51.0.0",
- "arrow-schema 51.0.0",
- "arrow-select 51.0.0",
- "half",
- "num",
 ]
 
 [[package]]
@@ -539,18 +523,16 @@ dependencies = [
 ]
 
 [[package]]
-name = "arrow-row"
-version = "51.0.0"
+name = "arrow-ord"
+version = "54.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "848ee52bb92eb459b811fb471175ea3afcf620157674c8794f539838920f9228"
+checksum = "f841bfcc1997ef6ac48ee0305c4dfceb1f7c786fe31e67c1186edf775e1f1160"
 dependencies = [
- "ahash 0.8.11",
- "arrow-array 51.0.0",
- "arrow-buffer 51.0.0",
- "arrow-data 51.0.0",
- "arrow-schema 51.0.0",
- "half",
- "hashbrown 0.14.5",
+ "arrow-array 54.2.1",
+ "arrow-buffer 54.3.0",
+ "arrow-data 54.3.0",
+ "arrow-schema 54.3.0",
+ "arrow-select 54.2.1",
 ]
 
 [[package]]
@@ -568,12 +550,16 @@ dependencies = [
 ]
 
 [[package]]
-name = "arrow-schema"
-version = "51.0.0"
+name = "arrow-row"
+version = "54.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "02d9483aaabe910c4781153ae1b6ae0393f72d9ef757d38d09d450070cf2e528"
+checksum = "1eeb55b0a0a83851aa01f2ca5ee5648f607e8506ba6802577afdda9d75cdedcd"
 dependencies = [
- "bitflags 2.6.0",
+ "arrow-array 54.2.1",
+ "arrow-buffer 54.3.0",
+ "arrow-data 54.3.0",
+ "arrow-schema 54.3.0",
+ "half",
 ]
 
 [[package]]
@@ -583,17 +569,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "35b0f9c0c3582dd55db0f136d3b44bfa0189df07adcf7dc7f2f2e74db0f52eb8"
 
 [[package]]
-name = "arrow-select"
-version = "51.0.0"
+name = "arrow-schema"
+version = "54.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "849524fa70e0e3c5ab58394c770cb8f514d0122d20de08475f7b472ed8075830"
+checksum = "a5c53775bba63f319189f366d2b86e9a8889373eb198f07d8544938fc9f8ed9a"
 dependencies = [
- "ahash 0.8.11",
- "arrow-array 51.0.0",
- "arrow-buffer 51.0.0",
- "arrow-data 51.0.0",
- "arrow-schema 51.0.0",
- "num",
+ "bitflags 2.6.0",
 ]
 
 [[package]]
@@ -611,20 +592,17 @@ dependencies = [
 ]
 
 [[package]]
-name = "arrow-string"
-version = "51.0.0"
+name = "arrow-select"
+version = "54.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9373cb5a021aee58863498c37eb484998ef13377f69989c6c5ccfbd258236cdb"
+checksum = "7e2932aece2d0c869dd2125feb9bd1709ef5c445daa3838ac4112dcfa0fda52c"
 dependencies = [
- "arrow-array 51.0.0",
- "arrow-buffer 51.0.0",
- "arrow-data 51.0.0",
- "arrow-schema 51.0.0",
- "arrow-select 51.0.0",
- "memchr",
+ "ahash 0.8.11",
+ "arrow-array 54.2.1",
+ "arrow-buffer 54.3.0",
+ "arrow-data 54.3.0",
+ "arrow-schema 54.3.0",
  "num",
- "regex",
- "regex-syntax 0.8.5",
 ]
 
 [[package]]
@@ -638,6 +616,23 @@ dependencies = [
  "arrow-data 53.4.1",
  "arrow-schema 53.4.1",
  "arrow-select 53.4.1",
+ "memchr",
+ "num",
+ "regex",
+ "regex-syntax 0.8.5",
+]
+
+[[package]]
+name = "arrow-string"
+version = "54.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "912e38bd6a7a7714c1d9b61df80315685553b7455e8a6045c27531d8ecd5b458"
+dependencies = [
+ "arrow-array 54.2.1",
+ "arrow-buffer 54.3.0",
+ "arrow-data 54.3.0",
+ "arrow-schema 54.3.0",
+ "arrow-select 54.2.1",
  "memchr",
  "num",
  "regex",
@@ -1056,6 +1051,29 @@ dependencies = [
  "pin-project-lite",
  "tracing",
  "uuid",
+]
+
+[[package]]
+name = "aws-sdk-dynamodb"
+version = "1.69.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c42f454f50a050aaa3f3d200a3ac072e48c18c4bb5356c38be7eee1da1439a43"
+dependencies = [
+ "aws-credential-types",
+ "aws-runtime",
+ "aws-smithy-async",
+ "aws-smithy-http",
+ "aws-smithy-json",
+ "aws-smithy-runtime",
+ "aws-smithy-runtime-api",
+ "aws-smithy-types",
+ "aws-types",
+ "bytes",
+ "fastrand",
+ "http 0.2.12",
+ "once_cell",
+ "regex-lite",
+ "tracing",
 ]
 
 [[package]]
@@ -2102,9 +2120,9 @@ dependencies = [
 
 [[package]]
 name = "clap"
-version = "4.5.32"
+version = "4.5.34"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6088f3ae8c3608d19260cd7445411865a485688711b78b5be70d78cd96136f83"
+checksum = "e958897981290da2a852763fe9cdb89cd36977a5d729023127095fa94d95e2ff"
 dependencies = [
  "clap_builder",
  "clap_derive",
@@ -2122,9 +2140,9 @@ dependencies = [
 
 [[package]]
 name = "clap_builder"
-version = "4.5.32"
+version = "4.5.34"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "22a7ef7f676155edfb82daa97f99441f3ebf4a58d5e32f295a56259f1b6facc8"
+checksum = "83b0f35019843db2160b5bb19ae09b4e6411ac33fc6a712003c33e03090e2489"
 dependencies = [
  "anstream",
  "anstyle",
@@ -2222,7 +2240,6 @@ version = "7.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "24f165e7b643266ea80cb858aed492ad9280e3e05ce24d4a99d7d7b889b6a4d9"
 dependencies = [
- "crossterm 0.28.1",
  "strum 0.26.3",
  "strum_macros 0.26.4",
  "unicode-width 0.2.0",
@@ -2823,7 +2840,7 @@ checksum = "1435fa1053d8b2fbbe9be7e97eca7f33d37b28409959813daefc1446a14247f1"
 
 [[package]]
 name = "drivers"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "rsql_drivers",
  "tokio",
@@ -2831,17 +2848,18 @@ dependencies = [
 
 [[package]]
 name = "duckdb"
-version = "0.10.2"
+version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "424ede399a5d1084e65c0888fda71e407e5809400c92ff2cf510bfd1697b9c76"
+checksum = "6d8c35886fbb5356fe90c8a9b69da5623d509c32bdfb6eefa7f57081eb05f69b"
 dependencies = [
- "arrow 51.0.0",
+ "arrow 54.2.1",
  "cast",
  "fallible-iterator 0.3.0",
  "fallible-streaming-iterator",
- "hashlink 0.8.4",
+ "hashlink 0.9.1",
  "libduckdb-sys",
  "memchr",
+ "num-integer",
  "rust_decimal",
  "smallvec",
  "strum 0.25.0",
@@ -3170,9 +3188,9 @@ dependencies = [
 
 [[package]]
 name = "file_type"
-version = "0.8.1"
+version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e237c2e6ae6183998137b1157b9e0fddfa25ce480f99f40ec1a5c2d49747c6d1"
+checksum = "a463c5a8c1d775e4cde89f8fbe047a3d6969fa66557fbc6223ef6644f476506d"
 dependencies = [
  "phf",
 ]
@@ -3201,9 +3219,9 @@ dependencies = [
 
 [[package]]
 name = "flate2"
-version = "1.1.0"
+version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "11faaf5a5236997af9848be0bef4db95824b1d534ebc64d0f0c6cf3e67bd38dc"
+checksum = "7ced92e76e966ca2fd84c8f7aa01a4aea65b0eb6648d72f7c8f3e2764a67fece"
 dependencies = [
  "crc32fast",
  "libz-rs-sys",
@@ -3677,6 +3695,15 @@ name = "hashlink"
 version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e8094feaf31ff591f651a2664fb9cfd92bba7a60ce3197265e9482ebe753c8f7"
+dependencies = [
+ "hashbrown 0.14.5",
+]
+
+[[package]]
+name = "hashlink"
+version = "0.9.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6ba4ff7128dee98c7dc9794b6a411377e1404dba1c97deb8d1a55297bd25d8af"
 dependencies = [
  "hashbrown 0.14.5",
 ]
@@ -4520,39 +4547,15 @@ checksum = "830d08ce1d1d941e6b30645f1a0eb5643013d835ce3779a5fc208261dbe10f55"
 
 [[package]]
 name = "lexical-core"
-version = "0.8.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2cde5de06e8d4c2faabc400238f9ae1c74d5412d03a7bd067645ccbc47070e46"
-dependencies = [
- "lexical-parse-float 0.8.5",
- "lexical-parse-integer 0.8.6",
- "lexical-util 0.8.5",
- "lexical-write-float 0.8.5",
- "lexical-write-integer 0.8.5",
-]
-
-[[package]]
-name = "lexical-core"
 version = "1.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b765c31809609075565a70b4b71402281283aeda7ecaf4818ac14a7b2ade8958"
 dependencies = [
- "lexical-parse-float 1.0.5",
- "lexical-parse-integer 1.0.5",
- "lexical-util 1.0.6",
- "lexical-write-float 1.0.5",
- "lexical-write-integer 1.0.5",
-]
-
-[[package]]
-name = "lexical-parse-float"
-version = "0.8.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "683b3a5ebd0130b8fb52ba0bdc718cc56815b6a097e28ae5a6997d0ad17dc05f"
-dependencies = [
- "lexical-parse-integer 0.8.6",
- "lexical-util 0.8.5",
- "static_assertions",
+ "lexical-parse-float",
+ "lexical-parse-integer",
+ "lexical-util",
+ "lexical-write-float",
+ "lexical-write-integer",
 ]
 
 [[package]]
@@ -4561,18 +4564,8 @@ version = "1.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "de6f9cb01fb0b08060209a057c048fcbab8717b4c1ecd2eac66ebfe39a65b0f2"
 dependencies = [
- "lexical-parse-integer 1.0.5",
- "lexical-util 1.0.6",
- "static_assertions",
-]
-
-[[package]]
-name = "lexical-parse-integer"
-version = "0.8.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6d0994485ed0c312f6d965766754ea177d07f9c00c9b82a5ee62ed5b47945ee9"
-dependencies = [
- "lexical-util 0.8.5",
+ "lexical-parse-integer",
+ "lexical-util",
  "static_assertions",
 ]
 
@@ -4582,16 +4575,7 @@ version = "1.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "72207aae22fc0a121ba7b6d479e42cbfea549af1479c3f3a4f12c70dd66df12e"
 dependencies = [
- "lexical-util 1.0.6",
- "static_assertions",
-]
-
-[[package]]
-name = "lexical-util"
-version = "0.8.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5255b9ff16ff898710eb9eb63cb39248ea8a5bb036bea8085b1a767ff6c4e3fc"
-dependencies = [
+ "lexical-util",
  "static_assertions",
 ]
 
@@ -4606,33 +4590,12 @@ dependencies = [
 
 [[package]]
 name = "lexical-write-float"
-version = "0.8.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "accabaa1c4581f05a3923d1b4cfd124c329352288b7b9da09e766b0668116862"
-dependencies = [
- "lexical-util 0.8.5",
- "lexical-write-integer 0.8.5",
- "static_assertions",
-]
-
-[[package]]
-name = "lexical-write-float"
 version = "1.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c5afc668a27f460fb45a81a757b6bf2f43c2d7e30cb5a2dcd3abf294c78d62bd"
 dependencies = [
- "lexical-util 1.0.6",
- "lexical-write-integer 1.0.5",
- "static_assertions",
-]
-
-[[package]]
-name = "lexical-write-integer"
-version = "0.8.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e1b6f3d1f4422866b68192d62f77bc5c700bee84f3069f2469d7bc8c77852446"
-dependencies = [
- "lexical-util 0.8.5",
+ "lexical-util",
+ "lexical-write-integer",
  "static_assertions",
 ]
 
@@ -4642,7 +4605,7 @@ version = "1.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "629ddff1a914a836fb245616a7888b62903aae58fa771e1d83943035efa0f978"
 dependencies = [
- "lexical-util 1.0.6",
+ "lexical-util",
  "static_assertions",
 ]
 
@@ -4660,9 +4623,9 @@ checksum = "5aaeb2981e0606ca11d79718f8bb01164f1d6ed75080182d3abf017e6d244b6d"
 
 [[package]]
 name = "libduckdb-sys"
-version = "0.10.2"
+version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "51b3f02cecc430f61561bde538d42af4be2d9d5a8b058f74883e460bc1055461"
+checksum = "ddeb5c68cb108d753a03613337f4bc9bed32281123d1f7884971f060f532fb6c"
 dependencies = [
  "autocfg",
  "cc",
@@ -4743,9 +4706,9 @@ dependencies = [
 
 [[package]]
 name = "libsql"
-version = "0.9.1"
+version = "0.9.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1f99d7048440c5f443f7e121b27159d4d3c66d0a75e20754fd6cbb00f3cc8c18"
+checksum = "09b9df6f5cc08ca4bb2467793926470210d3d8a916ea28260d6cd892bba6d8b4"
 dependencies = [
  "anyhow",
  "async-stream",
@@ -4783,9 +4746,9 @@ dependencies = [
 
 [[package]]
 name = "libsql-ffi"
-version = "0.9.1"
+version = "0.9.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c0e12afae859e7dc096ebc7a7cee806efa948e5b78ff9d0b4573ca7815480ab0"
+checksum = "4a1dcc2bf91e8511ece5bc2bac502b78bcbcecef80635dacb30020a40419e5d6"
 dependencies = [
  "bindgen 0.66.1",
  "cc",
@@ -4794,9 +4757,9 @@ dependencies = [
 
 [[package]]
 name = "libsql-hrana"
-version = "0.9.1"
+version = "0.9.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "71f16d7adbad5bee861c955011c155893937bd4c8711c91d949060363f24e0f6"
+checksum = "f14cd7d167c01bac254a4296b86a6ac090fd364c39af6c64071efdf07f206db7"
 dependencies = [
  "base64 0.21.7",
  "bytes",
@@ -4806,9 +4769,9 @@ dependencies = [
 
 [[package]]
 name = "libsql-rusqlite"
-version = "0.9.1"
+version = "0.9.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "96c4bd62bf66a14e46643bd44adbb843c791e7c3f835a1424ffa629df8a7a9f4"
+checksum = "881b3e3f05c8d3f22be9ccfa4f6a56ad25165a5458615aba8b7586558c694965"
 dependencies = [
  "bitflags 2.6.0",
  "fallible-iterator 0.2.0",
@@ -4838,9 +4801,9 @@ dependencies = [
 
 [[package]]
 name = "libsql-sys"
-version = "0.9.1"
+version = "0.9.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "659587f9ebebdb2ff1112e8af7f30fc212f8d5457a3a9a549eda48544e942a7f"
+checksum = "edae249cc733bb10e134d3c1522b408631f6a8741855caf7179927fd296f5715"
 dependencies = [
  "bytes",
  "libsql-ffi",
@@ -4852,9 +4815,9 @@ dependencies = [
 
 [[package]]
 name = "libsql_replication"
-version = "0.9.1"
+version = "0.9.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0666c23acca99c2ebc317071f87814ad006243fa6e15c02a83e40ff8e6948832"
+checksum = "b0c30add5755085fffd616190ff67703a391ae8324001738d7e6f00d6ea1b180"
 dependencies = [
  "aes",
  "async-stream",
@@ -4899,9 +4862,9 @@ dependencies = [
 
 [[package]]
 name = "libz-rs-sys"
-version = "0.4.2"
+version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "902bc563b5d65ad9bba616b490842ef0651066a1a1dc3ce1087113ffcb873c8d"
+checksum = "6489ca9bd760fe9642d7644e827b0c9add07df89857b0416ee15c1cc1a3b8c5a"
 dependencies = [
  "zlib-rs",
 ]
@@ -5523,9 +5486,9 @@ checksum = "b410bbe7e14ab526a0e86877eb47c6996a2bd7746f027ba551028c925390e4e9"
 
 [[package]]
 name = "openssl"
-version = "0.10.70"
+version = "0.10.72"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "61cfb4e166a8bb8c9b55c500bc2308550148ece889be90f609377e58140f42c6"
+checksum = "fedfea7d58a1f73118430a55da6a286e7b044961736ce96a16a17068ea25e5da"
 dependencies = [
  "bitflags 2.6.0",
  "cfg-if",
@@ -5564,9 +5527,9 @@ dependencies = [
 
 [[package]]
 name = "openssl-sys"
-version = "0.9.105"
+version = "0.9.107"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8b22d5b84be05a8d6947c7cb71f7c849aa0f112acd4bf51c2a7c1c988ac0a9dc"
+checksum = "8288979acd84749c744a9014b4382d42b8f7b2592847b5afb2ed29e5d16ede07"
 dependencies = [
  "cc",
  "libc",
@@ -6075,7 +6038,6 @@ dependencies = [
  "polars-ops",
  "polars-parquet",
  "polars-sql",
- "polars-time",
  "polars-utils",
  "version_check",
 ]
@@ -6155,7 +6117,6 @@ dependencies = [
  "bytemuck",
  "chrono",
  "chrono-tz",
- "comfy-table",
  "either",
  "hashbrown 0.14.5",
  "hashbrown 0.15.2",
@@ -6226,7 +6187,6 @@ dependencies = [
  "async-trait",
  "atoi_simd",
  "bytes",
- "chrono",
  "fast-float2",
  "futures",
  "glob",
@@ -6244,7 +6204,6 @@ dependencies = [
  "polars-json",
  "polars-parquet",
  "polars-schema",
- "polars-time",
  "polars-utils",
  "rayon",
  "regex",
@@ -6912,9 +6871,9 @@ dependencies = [
 
 [[package]]
 name = "quick-xml"
-version = "0.37.2"
+version = "0.37.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "165859e9e55f79d67b96c5d96f4e88b6f2695a1972849c15a6a3f5c59fc2c003"
+checksum = "a4ce8c88de324ff838700f36fb6ab86c96df0e3c4ab6ef3a9b2044465cce1369"
 dependencies = [
  "memchr",
  "serde",
@@ -7469,7 +7428,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_cli"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "anyhow",
  "axoupdater",
@@ -7480,6 +7439,7 @@ dependencies = [
  "inquire",
  "os_info",
  "rsql_core",
+ "rsql_repl",
  "rust-i18n",
  "serde",
  "static_vcruntime",
@@ -7492,46 +7452,27 @@ dependencies = [
 
 [[package]]
 name = "rsql_core"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "anyhow",
- "async-trait",
- "clap",
- "clap-stdin",
- "clearscreen",
- "colored",
  "config",
- "criterion",
  "dark-light",
  "dirs",
  "getrandom 0.3.2",
  "indicatif",
- "indoc",
- "mockall",
- "num-format",
- "regex",
- "rsql_driver",
- "rsql_drivers",
  "rsql_formatters",
  "rust-i18n",
- "rustyline",
- "sqlparser 0.52.0",
  "sys-locale",
- "tempfile",
  "termbg",
- "test-log",
- "thiserror 2.0.12",
- "tokio",
  "tracing",
  "tracing-appender",
  "tracing-indicatif",
  "tracing-subscriber",
- "unicode-width 0.2.0",
 ]
 
 [[package]]
 name = "rsql_driver"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -7547,7 +7488,7 @@ dependencies = [
  "rust_decimal",
  "serde",
  "serde_json",
- "sqlparser 0.52.0",
+ "sqlparser 0.55.0",
  "thiserror 2.0.12",
  "tokio",
  "tracing",
@@ -7558,7 +7499,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_arrow"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "async-trait",
  "file_type",
@@ -7573,7 +7514,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_avro"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "async-trait",
  "file_type",
@@ -7588,7 +7529,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_brotli"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "async-trait",
  "brotli",
@@ -7604,7 +7545,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_bzip2"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "async-trait",
  "bzip2",
@@ -7620,7 +7561,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_cockroachdb"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -7634,7 +7575,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_csv"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "async-trait",
  "file_type",
@@ -7647,7 +7588,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_delimited"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "async-trait",
  "file_type",
@@ -7662,7 +7603,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_duckdb"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "async-trait",
  "duckdb",
@@ -7672,14 +7613,32 @@ dependencies = [
  "regex",
  "rsql_driver",
  "rsql_driver_test_utils",
- "sqlparser 0.52.0",
+ "sqlparser 0.55.0",
  "tokio",
  "url",
 ]
 
 [[package]]
+name = "rsql_driver_dynamodb"
+version = "0.18.1"
+dependencies = [
+ "async-trait",
+ "aws-config",
+ "aws-credential-types",
+ "aws-sdk-dynamodb",
+ "file_type",
+ "indexmap 2.8.0",
+ "rsql_driver",
+ "testcontainers-modules",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+ "url",
+]
+
+[[package]]
 name = "rsql_driver_excel"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "async-trait",
  "calamine",
@@ -7697,7 +7656,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_file"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "async-trait",
  "file_type",
@@ -7710,7 +7669,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_fwf"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "async-trait",
  "file_type",
@@ -7725,7 +7684,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_gzip"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "async-trait",
  "file_type",
@@ -7741,7 +7700,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_http"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "async-trait",
  "file_type",
@@ -7753,7 +7712,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_https"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "async-trait",
  "file_type",
@@ -7769,7 +7728,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_json"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "async-trait",
  "file_type",
@@ -7784,7 +7743,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_jsonl"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "async-trait",
  "file_type",
@@ -7799,7 +7758,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_libsql"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "async-trait",
  "file_type",
@@ -7812,7 +7771,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_lz4"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "async-trait",
  "file_type",
@@ -7828,7 +7787,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_mariadb"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -7842,7 +7801,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_mysql"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -7853,7 +7812,7 @@ dependencies = [
  "rsql_driver",
  "rust_decimal",
  "serde_json",
- "sqlparser 0.52.0",
+ "sqlparser 0.55.0",
  "sqlx 0.7.4",
  "testcontainers",
  "testcontainers-modules",
@@ -7863,7 +7822,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_ods"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "async-trait",
  "file_type",
@@ -7875,7 +7834,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_orc"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "arrow-array 53.4.1",
  "async-trait",
@@ -7892,7 +7851,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_parquet"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "async-trait",
  "file_type",
@@ -7907,7 +7866,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_polars"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "async-trait",
  "indexmap 2.8.0",
@@ -7920,7 +7879,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_postgres"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "async-trait",
  "bit-vec",
@@ -7932,7 +7891,7 @@ dependencies = [
  "rsql_driver_postgresql",
  "rust_decimal",
  "serde_json",
- "sqlparser 0.52.0",
+ "sqlparser 0.55.0",
  "tokio",
  "tokio-postgres",
  "tracing",
@@ -7942,7 +7901,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_postgresql"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "async-trait",
  "bit-vec",
@@ -7954,7 +7913,7 @@ dependencies = [
  "rsql_driver",
  "rust_decimal",
  "serde_json",
- "sqlparser 0.52.0",
+ "sqlparser 0.55.0",
  "sqlx 0.7.4",
  "tokio",
  "tracing",
@@ -7964,14 +7923,14 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_redshift"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "anyhow",
  "async-trait",
  "file_type",
  "rsql_driver",
  "rsql_driver_postgresql",
- "sqlparser 0.52.0",
+ "sqlparser 0.55.0",
  "testcontainers",
  "testcontainers-modules",
  "tokio",
@@ -7980,7 +7939,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_rusqlite"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "async-trait",
  "file_type",
@@ -7988,14 +7947,14 @@ dependencies = [
  "rsql_driver_sqlite",
  "rsql_driver_test_utils",
  "rusqlite",
- "sqlparser 0.52.0",
+ "sqlparser 0.55.0",
  "tokio",
  "url",
 ]
 
 [[package]]
 name = "rsql_driver_s3"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "async-trait",
  "aws-config",
@@ -8014,7 +7973,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_snowflake"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "async-trait",
  "base64 0.22.1",
@@ -8025,7 +7984,7 @@ dependencies = [
  "rsql_driver",
  "serde_json",
  "sha2",
- "sqlparser 0.52.0",
+ "sqlparser 0.55.0",
  "thiserror 2.0.12",
  "tokio",
  "url",
@@ -8034,7 +7993,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_sqlite"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "async-trait",
  "file_type",
@@ -8042,7 +8001,7 @@ dependencies = [
  "indoc",
  "rsql_driver",
  "rsql_driver_test_utils",
- "sqlparser 0.52.0",
+ "sqlparser 0.55.0",
  "sqlx 0.7.4",
  "tokio",
  "url",
@@ -8050,7 +8009,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_sqlserver"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -8061,7 +8020,7 @@ dependencies = [
  "jiff",
  "rsql_driver",
  "rust_decimal",
- "sqlparser 0.52.0",
+ "sqlparser 0.55.0",
  "testcontainers",
  "testcontainers-modules",
  "tiberius",
@@ -8072,11 +8031,11 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_test_utils"
-version = "0.18.0"
+version = "0.18.1"
 
 [[package]]
 name = "rsql_driver_tsv"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "async-trait",
  "file_type",
@@ -8089,7 +8048,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_xml"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "async-trait",
  "file_type",
@@ -8097,7 +8056,7 @@ dependencies = [
  "indoc",
  "polars",
  "polars-sql",
- "quick-xml 0.37.2",
+ "quick-xml 0.37.4",
  "rsql_driver",
  "rsql_driver_polars",
  "rsql_driver_test_utils",
@@ -8108,7 +8067,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_xz"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "async-trait",
  "file_type",
@@ -8124,7 +8083,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_yaml"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "async-trait",
  "file_type",
@@ -8141,7 +8100,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_driver_zstd"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "async-trait",
  "file_type",
@@ -8157,7 +8116,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_drivers"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "file_type",
  "getrandom 0.3.2",
@@ -8171,6 +8130,7 @@ dependencies = [
  "rsql_driver_csv",
  "rsql_driver_delimited",
  "rsql_driver_duckdb",
+ "rsql_driver_dynamodb",
  "rsql_driver_excel",
  "rsql_driver_file",
  "rsql_driver_fwf",
@@ -8206,7 +8166,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_formatters"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "ansi_colours",
  "anyhow",
@@ -8217,7 +8177,7 @@ dependencies = [
  "indexmap 2.8.0",
  "indoc",
  "num-format",
- "quick-xml 0.37.2",
+ "quick-xml 0.37.4",
  "rsql_drivers",
  "rust-i18n",
  "serde_json",
@@ -8229,6 +8189,39 @@ dependencies = [
  "test-log",
  "thiserror 2.0.12",
  "tokio",
+]
+
+[[package]]
+name = "rsql_repl"
+version = "0.18.1"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "clap",
+ "clap-stdin",
+ "clearscreen",
+ "colored",
+ "criterion",
+ "getrandom 0.3.2",
+ "indicatif",
+ "indoc",
+ "mockall",
+ "num-format",
+ "regex",
+ "rsql_core",
+ "rsql_driver",
+ "rsql_drivers",
+ "rsql_formatters",
+ "rust-i18n",
+ "rustyline",
+ "sqlparser 0.55.0",
+ "tempfile",
+ "test-log",
+ "thiserror 2.0.12",
+ "tokio",
+ "tracing",
+ "tracing-indicatif",
+ "unicode-width 0.2.0",
 ]
 
 [[package]]
@@ -8253,9 +8246,9 @@ dependencies = [
 
 [[package]]
 name = "rust-i18n"
-version = "3.1.3"
+version = "3.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "71b3a6e1c6565b77c86d868eea3068b0eb39582510f9c78cfbd5c67bd36fda9b"
+checksum = "a2b6307cde881492032919adf26e254981604a6657b339ae23cce8358e9ee203"
 dependencies = [
  "globwalk",
  "once_cell",
@@ -8318,9 +8311,9 @@ dependencies = [
 
 [[package]]
 name = "rust_decimal"
-version = "1.37.0"
+version = "1.37.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5c24af6e7ac43c88a8a458d1139d0246fdce2f6cd2f1ac6cb51eb88b29c978af"
+checksum = "faa7de2ba56ac291bd90c6b9bece784a52ae1411f9506544b3eae36dd2356d50"
 dependencies = [
  "arrayvec",
  "borsh",
@@ -9065,20 +9058,21 @@ dependencies = [
 
 [[package]]
 name = "sqlparser"
-version = "0.52.0"
+version = "0.53.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9a875d8cd437cc8a97e9aeaeea352ec9a19aea99c23e9effb17757291de80b08"
+checksum = "05a528114c392209b3264855ad491fcce534b94a38771b0a0b97a79379275ce8"
 dependencies = [
  "log",
 ]
 
 [[package]]
 name = "sqlparser"
-version = "0.53.0"
+version = "0.55.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "05a528114c392209b3264855ad491fcce534b94a38771b0a0b97a79379275ce8"
+checksum = "c4521174166bac1ff04fe16ef4524c70144cd29682a45978978ca3d7f4e0be11"
 dependencies = [
  "log",
+ "recursive",
 ]
 
 [[package]]
@@ -11613,9 +11607,9 @@ dependencies = [
 
 [[package]]
 name = "zlib-rs"
-version = "0.4.2"
+version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8b20717f0917c908dc63de2e44e97f1e6b126ca58d0e391cee86d504eb8fbd05"
+checksum = "868b928d7949e09af2f6086dfc1e01936064cc7a819253bce650d4e2a2d63ba8"
 
 [[package]]
 name = "zopfli"

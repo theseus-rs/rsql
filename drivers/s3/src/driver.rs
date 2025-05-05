@@ -79,7 +79,7 @@ impl Driver {
             };
             (host, path)
         };
-        let Some(file_name) = key.split('/').last() else {
+        let Some(file_name) = key.split('/').next_back() else {
             return Err(IoError("Invalid S3 URL; no file".to_string()));
         };
 
@@ -159,17 +159,17 @@ impl Driver {
     fn credentials(parsed_url: &Url, parameters: &HashMap<String, String>) -> Option<Credentials> {
         let username = parsed_url.username();
         if username.is_empty() {
-            None
-        } else {
-            let access_key = username.to_string();
-            let secret_key = username.to_string();
-            let session_token = parameters.get("session_token").cloned();
-            Some(Credentials::from_keys(
-                access_key,
-                secret_key,
-                session_token,
-            ))
+            return None;
         }
+
+        let access_key = username.to_string();
+        let secret_key = parsed_url.password()?.to_string();
+        let session_token = parameters.get("session_token").cloned();
+        Some(Credentials::from_keys(
+            access_key,
+            secret_key,
+            session_token,
+        ))
     }
 
     /// Extracts the region from the URL, or the `S3_REGION` environment variable and returns it as

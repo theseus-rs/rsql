@@ -8,7 +8,6 @@ use std::collections::HashMap;
 use std::fs::create_dir_all;
 use std::path::{Path, PathBuf};
 use tempfile::TempDir;
-use tokio::fs::File;
 use tokio::io::AsyncWriteExt;
 use tracing::debug;
 use url::Url;
@@ -137,7 +136,8 @@ impl Driver {
             .unwrap_or_default();
         create_dir_all(temp_dir)?;
         let file_path = temp_dir.join(file_name);
-        let mut file = File::create_new(&file_path)
+
+        let mut file = tokio::fs::File::create_new(&file_path)
             .await
             .map_err(|error| IoError(error.to_string()))?;
         let mut stream = response.bytes_stream();

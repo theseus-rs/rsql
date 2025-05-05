@@ -55,77 +55,79 @@ impl DriverManager {
     /// # Errors
     /// * If a lock for drivers cannot be acquired
     pub fn initialize() -> Result<()> {
-        #[cfg(feature = "arrow")]
+        #[cfg(feature = "driver-arrow")]
         Self::add(Arc::new(rsql_driver_arrow::Driver))?;
-        #[cfg(feature = "avro")]
+        #[cfg(feature = "driver-avro")]
         Self::add(Arc::new(rsql_driver_avro::Driver))?;
-        #[cfg(feature = "brotli")]
+        #[cfg(feature = "driver-brotli")]
         Self::add(Arc::new(rsql_driver_brotli::Driver))?;
-        #[cfg(feature = "bzip2")]
+        #[cfg(feature = "driver-bzip2")]
         Self::add(Arc::new(rsql_driver_bzip2::Driver))?;
-        #[cfg(feature = "cockroachdb")]
+        #[cfg(feature = "driver-cockroachdb")]
         Self::add(Arc::new(rsql_driver_cockroachdb::Driver))?;
-        #[cfg(feature = "csv")]
+        #[cfg(feature = "driver-csv")]
         Self::add(Arc::new(rsql_driver_csv::Driver))?;
-        #[cfg(feature = "delimited")]
+        #[cfg(feature = "driver-delimited")]
         Self::add(Arc::new(rsql_driver_delimited::Driver))?;
-        #[cfg(feature = "duckdb")]
+        #[cfg(feature = "driver-duckdb")]
         Self::add(Arc::new(rsql_driver_duckdb::Driver))?;
-        #[cfg(feature = "excel")]
+        #[cfg(feature = "driver-dynamodb")]
+        Self::add(Arc::new(rsql_driver_dynamodb::Driver))?;
+        #[cfg(feature = "driver-excel")]
         Self::add(Arc::new(rsql_driver_excel::Driver))?;
-        #[cfg(feature = "file")]
+        #[cfg(feature = "driver-file")]
         Self::add(Arc::new(rsql_driver_file::Driver))?;
-        #[cfg(feature = "fwf")]
+        #[cfg(feature = "driver-fwf")]
         Self::add(Arc::new(rsql_driver_fwf::Driver))?;
-        #[cfg(feature = "gzip")]
+        #[cfg(feature = "driver-gzip")]
         Self::add(Arc::new(rsql_driver_gzip::Driver))?;
-        #[cfg(feature = "http")]
+        #[cfg(feature = "driver-http")]
         Self::add(Arc::new(rsql_driver_http::Driver))?;
-        #[cfg(feature = "https")]
+        #[cfg(feature = "driver-https")]
         Self::add(Arc::new(rsql_driver_https::Driver))?;
-        #[cfg(feature = "json")]
+        #[cfg(feature = "driver-json")]
         Self::add(Arc::new(rsql_driver_json::Driver))?;
-        #[cfg(feature = "jsonl")]
+        #[cfg(feature = "driver-jsonl")]
         Self::add(Arc::new(rsql_driver_jsonl::Driver))?;
-        #[cfg(feature = "libsql")]
+        #[cfg(feature = "driver-libsql")]
         Self::add(Arc::new(rsql_driver_libsql::Driver))?;
-        #[cfg(feature = "lz4")]
+        #[cfg(feature = "driver-lz4")]
         Self::add(Arc::new(rsql_driver_lz4::Driver))?;
-        #[cfg(feature = "mariadb")]
+        #[cfg(feature = "driver-mariadb")]
         Self::add(Arc::new(rsql_driver_mariadb::Driver))?;
-        #[cfg(feature = "mysql")]
+        #[cfg(feature = "driver-mysql")]
         Self::add(Arc::new(rsql_driver_mysql::Driver))?;
-        #[cfg(feature = "ods")]
+        #[cfg(feature = "driver-ods")]
         Self::add(Arc::new(rsql_driver_ods::Driver))?;
-        #[cfg(feature = "orc")]
+        #[cfg(feature = "driver-orc")]
         Self::add(Arc::new(rsql_driver_orc::Driver))?;
-        #[cfg(feature = "parquet")]
+        #[cfg(feature = "driver-parquet")]
         Self::add(Arc::new(rsql_driver_parquet::Driver))?;
-        #[cfg(feature = "postgres")]
+        #[cfg(feature = "driver-postgres")]
         Self::add(Arc::new(rsql_driver_postgres::Driver))?;
-        #[cfg(feature = "postgresql")]
+        #[cfg(feature = "driver-postgresql")]
         Self::add(Arc::new(rsql_driver_postgresql::Driver))?;
-        #[cfg(feature = "redshift")]
+        #[cfg(feature = "driver-redshift")]
         Self::add(Arc::new(rsql_driver_redshift::Driver))?;
-        #[cfg(feature = "rusqlite")]
+        #[cfg(feature = "driver-rusqlite")]
         Self::add(Arc::new(rsql_driver_rusqlite::Driver))?;
-        #[cfg(feature = "s3")]
+        #[cfg(feature = "driver-s3")]
         Self::add(Arc::new(rsql_driver_s3::Driver))?;
-        #[cfg(feature = "snowflake")]
+        #[cfg(feature = "driver-snowflake")]
         Self::add(Arc::new(rsql_driver_snowflake::Driver))?;
-        #[cfg(feature = "sqlite")]
+        #[cfg(feature = "driver-sqlite")]
         Self::add(Arc::new(rsql_driver_sqlite::Driver))?;
-        #[cfg(feature = "sqlserver")]
+        #[cfg(feature = "driver-sqlserver")]
         Self::add(Arc::new(rsql_driver_sqlserver::Driver))?;
-        #[cfg(feature = "tsv")]
+        #[cfg(feature = "driver-tsv")]
         Self::add(Arc::new(rsql_driver_tsv::Driver))?;
-        #[cfg(feature = "xml")]
+        #[cfg(feature = "driver-xml")]
         Self::add(Arc::new(rsql_driver_xml::Driver))?;
-        #[cfg(feature = "xz")]
+        #[cfg(feature = "driver-xz")]
         Self::add(Arc::new(rsql_driver_xz::Driver))?;
-        #[cfg(feature = "yaml")]
+        #[cfg(feature = "driver-yaml")]
         Self::add(Arc::new(rsql_driver_yaml::Driver))?;
-        #[cfg(feature = "zstd")]
+        #[cfg(feature = "driver-zstd")]
         Self::add(Arc::new(rsql_driver_zstd::Driver))?;
         Ok(())
     }
@@ -182,77 +184,79 @@ mod tests {
     fn test_initialize() -> Result<()> {
         DriverManager::initialize()?;
         let driver_count = 0;
-        #[cfg(feature = "arrow")]
+        #[cfg(feature = "driver-arrow")]
         let driver_count = driver_count + 1;
-        #[cfg(feature = "avro")]
+        #[cfg(feature = "driver-avro")]
         let driver_count = driver_count + 1;
-        #[cfg(feature = "brotli")]
+        #[cfg(feature = "driver-brotli")]
         let driver_count = driver_count + 1;
-        #[cfg(feature = "bzip2")]
+        #[cfg(feature = "driver-bzip2")]
         let driver_count = driver_count + 1;
-        #[cfg(feature = "cockroachdb")]
+        #[cfg(feature = "driver-cockroachdb")]
         let driver_count = driver_count + 1;
-        #[cfg(feature = "csv")]
+        #[cfg(feature = "driver-csv")]
         let driver_count = driver_count + 1;
-        #[cfg(feature = "delimited")]
+        #[cfg(feature = "driver-delimited")]
         let driver_count = driver_count + 1;
-        #[cfg(feature = "duckdb")]
+        #[cfg(feature = "driver-duckdb")]
         let driver_count = driver_count + 1;
-        #[cfg(feature = "excel")]
+        #[cfg(feature = "driver-dynamodb")]
         let driver_count = driver_count + 1;
-        #[cfg(feature = "file")]
+        #[cfg(feature = "driver-excel")]
         let driver_count = driver_count + 1;
-        #[cfg(feature = "fwf")]
+        #[cfg(feature = "driver-file")]
         let driver_count = driver_count + 1;
-        #[cfg(feature = "gzip")]
+        #[cfg(feature = "driver-fwf")]
         let driver_count = driver_count + 1;
-        #[cfg(feature = "http")]
+        #[cfg(feature = "driver-gzip")]
         let driver_count = driver_count + 1;
-        #[cfg(feature = "https")]
+        #[cfg(feature = "driver-http")]
         let driver_count = driver_count + 1;
-        #[cfg(feature = "json")]
+        #[cfg(feature = "driver-https")]
         let driver_count = driver_count + 1;
-        #[cfg(feature = "jsonl")]
+        #[cfg(feature = "driver-json")]
         let driver_count = driver_count + 1;
-        #[cfg(feature = "libsql")]
+        #[cfg(feature = "driver-jsonl")]
         let driver_count = driver_count + 1;
-        #[cfg(feature = "lz4")]
+        #[cfg(feature = "driver-libsql")]
         let driver_count = driver_count + 1;
-        #[cfg(feature = "mariadb")]
+        #[cfg(feature = "driver-lz4")]
         let driver_count = driver_count + 1;
-        #[cfg(feature = "mysql")]
+        #[cfg(feature = "driver-mariadb")]
         let driver_count = driver_count + 1;
-        #[cfg(feature = "ods")]
+        #[cfg(feature = "driver-mysql")]
         let driver_count = driver_count + 1;
-        #[cfg(feature = "orc")]
+        #[cfg(feature = "driver-ods")]
         let driver_count = driver_count + 1;
-        #[cfg(feature = "parquet")]
+        #[cfg(feature = "driver-orc")]
         let driver_count = driver_count + 1;
-        #[cfg(feature = "postgres")]
+        #[cfg(feature = "driver-parquet")]
         let driver_count = driver_count + 1;
-        #[cfg(feature = "postgresql")]
+        #[cfg(feature = "driver-postgres")]
         let driver_count = driver_count + 1;
-        #[cfg(feature = "redshift")]
+        #[cfg(feature = "driver-postgresql")]
         let driver_count = driver_count + 1;
-        #[cfg(feature = "rusqlite")]
+        #[cfg(feature = "driver-redshift")]
         let driver_count = driver_count + 1;
-        #[cfg(feature = "s3")]
+        #[cfg(feature = "driver-rusqlite")]
         let driver_count = driver_count + 1;
-        #[cfg(feature = "snowflake")]
+        #[cfg(feature = "driver-s3")]
         let driver_count = driver_count + 1;
-        #[cfg(feature = "sqlite")]
+        #[cfg(feature = "driver-snowflake")]
         let driver_count = driver_count + 1;
-        #[cfg(feature = "sqlserver")]
+        #[cfg(feature = "driver-sqlite")]
         let driver_count = driver_count + 1;
-        #[cfg(feature = "tsv")]
+        #[cfg(feature = "driver-sqlserver")]
         let driver_count = driver_count + 1;
-        #[cfg(feature = "xml")]
+        #[cfg(feature = "driver-tsv")]
         let driver_count = driver_count + 1;
-        #[cfg(feature = "xz")]
+        #[cfg(feature = "driver-xml")]
         let driver_count = driver_count + 1;
-        #[cfg(feature = "yaml")]
+        #[cfg(feature = "driver-xz")]
         let driver_count = driver_count + 1;
-        #[cfg(feature = "zstd")]
+        #[cfg(feature = "driver-yaml")]
+        let driver_count = driver_count + 1;
+        #[cfg(feature = "driver-zstd")]
         let driver_count = driver_count + 1;
 
         let drivers = DriverManager::drivers()?;

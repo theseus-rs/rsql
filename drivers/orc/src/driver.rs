@@ -125,7 +125,7 @@ impl rsql_driver::Driver for Driver {
                     )));
                 } else {
                     return Err(IoError(format!("Unsupported data type {column:?}")));
-                };
+                }
             }
         }
 
