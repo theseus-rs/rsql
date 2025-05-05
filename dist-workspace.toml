@@ -4,7 +4,7 @@ members = ["cargo:."]
 # Config for 'dist'
 [dist]
 # Whether to embed dependency information using cargo-auditable
-cargo-auditable = true
+cargo-auditable = false
 # Whether to use cargo-cyclonedx to generate an SBOM
 cargo-cyclonedx = true
 # The preferred dist version to use in CI (Cargo.toml SemVer syntax)
@@ -15,22 +15,40 @@ ci = "github"
 create-release = false
 # Whether to enable GitHub Attestations
 github-attestations = true
+# Path that installers should place binaries in
+install-path = "CARGO_HOME"
+# Whether to install an updater program
+install-updater = false
 # The installers to generate for each app
 installers = ["shell", "powershell", "homebrew", "msi"]
+# Post-announce jobs to run in CI
+post-announce-jobs = ["./release-post-announce"]
+# Which actions to run on pull requests
+pr-run-mode = "upload"
+# Publish jobs to run in CI
+publish-jobs = ["homebrew"]
 # A GitHub repo to push Homebrew formulas to
 tap = "theseus-rs/homebrew-tap"
 # Target platforms to build apps for (Rust target-triple syntax)
-targets = ["aarch64-apple-darwin", "x86_64-apple-darwin", "x86_64-unknown-linux-gnu", "x86_64-pc-windows-msvc"]
-# Post-announce jobs to run in CI
-post-announce-jobs = ["./release-post-announce"]
-# Publish jobs to run in CI
-publish-jobs = ["homebrew"]
-# Which actions to run on pull requests
-pr-run-mode = "upload"
-# Whether to install an updater program
-install-updater = false
-# Path that installers should place binaries in
-install-path = "CARGO_HOME"
+targets = ["aarch64-apple-darwin", "aarch64-unknown-linux-gnu", "x86_64-apple-darwin", "x86_64-unknown-linux-gnu", "x86_64-unknown-linux-musl", "x86_64-pc-windows-msvc"]
 
 [dist.github-custom-runners]
-aarch64-apple-darwin = "macos-15"
+global = "ubuntu-latest"
+
+[dist.github-custom-runners.aarch64-apple-darwin]
+runner = "macos-15"
+
+[dist.github-custom-runners.aarch64-unknown-linux-gnu]
+runner = "ubuntu-24.04-arm"
+
+[dist.github-custom-runners.x86_64-unknown-linux-gnu]
+runner = "ubuntu-latest"
+
+[dist.github-custom-runners.x86_64-unknown-linux-musl]
+runner = "ubuntu-latest"
+
+[dist.github-custom-runners.aarch64-pc-windows-msvc]
+runner = "ubuntu-latest"
+# https://github.com/axodotdev/cargo-dist/blob/c8ba950c63f9c38c77782912ec6cdb6807bd0fbd/cargo-dist/src/backend/ci/github.rs#L678-L688
+host = "x86_64-unknown-linux-gnu"
+container = { image = "messense/cargo-xwin", host = "x86_64-unknown-linux-musl", package_manager = "apt" }
