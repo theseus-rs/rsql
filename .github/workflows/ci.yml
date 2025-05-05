@@ -79,17 +79,17 @@ jobs:
           RUST_BACKTRACE: 1
           RUST_LOG: info
         run: |
+          sudo apt-get install gcc-multilib
+          rustup target install ${{ matrix.target }}
           if [[ "${{ matrix.target }}" == *"unknown"* ]]; then
             export RUSTFLAGS='--cfg getrandom_backend="wasm_js"'
           fi
-          sudo apt-get install gcc-multilib
-          rustup target install ${{ matrix.target }}
           cargo build --package rsql_driver --target ${{ matrix.target }}
           cargo build --package rsql_drivers --features all-wasm --target ${{ matrix.target }}
           cargo build --package rsql_formatters --target ${{ matrix.target }}
 
       - name: Test
-        if: ${{ !startsWith(matrix.platform, 'linux-') && !startsWith(matrix.platform, 'wasm32-') }}
+        if: ${{ !startsWith(matrix.platform, 'linux-') && !startsWith(matrix.platform, 'wasm') }}
         timeout-minutes: 120
         env:
           CARGO_TERM_COLOR: always
