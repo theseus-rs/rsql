@@ -87,11 +87,6 @@ jobs:
         with:
           target: ${{ matrix.target }}
 
-      # Install bindgen (https://aws.github.io/aws-lc-rs/platform_support.html#bindgen)
-      - name: Install bindgen for aws-lc-rs
-        run: |
-          cargo install --force --locked bindgen-cli
-
       - uses: taiki-e/upload-rust-binary-action@v1
         with:
           bin: rsql
