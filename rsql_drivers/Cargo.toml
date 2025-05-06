@@ -12,44 +12,44 @@ version.workspace = true
 
 [dependencies]
 file_type = { workspace = true }
-rsql_driver = { path = "../rsql_driver", version = "0.18.1" }
-rsql_driver_arrow = { path = "../drivers/arrow", optional = true, version = "0.18.1" }
-rsql_driver_avro = { path = "../drivers/avro", optional = true, version = "0.18.1" }
-rsql_driver_brotli = { path = "../drivers/brotli", optional = true, version = "0.18.1" }
-rsql_driver_bzip2 = { path = "../drivers/bzip2", optional = true, version = "0.18.1" }
-rsql_driver_cockroachdb = { path = "../drivers/cockroachdb", optional = true, version = "0.18.1" }
-rsql_driver_csv = { path = "../drivers/csv", optional = true, version = "0.18.1" }
-rsql_driver_delimited = { path = "../drivers/delimited", optional = true, version = "0.18.1" }
-rsql_driver_duckdb = { path = "../drivers/duckdb", optional = true, version = "0.18.1" }
-rsql_driver_dynamodb = { path = "../drivers/dynamodb", optional = true, version = "0.18.1" }
-rsql_driver_excel = { path = "../drivers/excel", optional = true, version = "0.18.1" }
-rsql_driver_file = { path = "../drivers/file", optional = true, version = "0.18.1" }
-rsql_driver_fwf = { path = "../drivers/fwf", optional = true, version = "0.18.1" }
-rsql_driver_gzip = { path = "../drivers/gzip", optional = true, version = "0.18.1" }
-rsql_driver_http = { path = "../drivers/http", optional = true, version = "0.18.1" }
-rsql_driver_https = { path = "../drivers/https", optional = true, version = "0.18.1" }
-rsql_driver_json = { path = "../drivers/json", optional = true, version = "0.18.1" }
-rsql_driver_jsonl = { path = "../drivers/jsonl", optional = true, version = "0.18.1" }
-rsql_driver_libsql = { path = "../drivers/libsql", optional = true, version = "0.18.1" }
-rsql_driver_lz4 = { path = "../drivers/lz4", optional = true, version = "0.18.1" }
-rsql_driver_mariadb = { path = "../drivers/mariadb", optional = true, version = "0.18.1" }
-rsql_driver_mysql = { path = "../drivers/mysql", optional = true, version = "0.18.1" }
-rsql_driver_ods = { path = "../drivers/ods", optional = true, version = "0.18.1" }
-rsql_driver_orc = { path = "../drivers/orc", optional = true, version = "0.18.1" }
-rsql_driver_parquet = { path = "../drivers/parquet", optional = true, version = "0.18.1" }
-rsql_driver_postgres = { path = "../drivers/postgres", optional = true, version = "0.18.1" }
-rsql_driver_postgresql = { path = "../drivers/postgresql", optional = true, version = "0.18.1" }
-rsql_driver_redshift = { path = "../drivers/redshift", optional = true, version = "0.18.1" }
-rsql_driver_rusqlite = { path = "../drivers/rusqlite", optional = true, version = "0.18.1" }
-rsql_driver_s3 = { path = "../drivers/s3", optional = true, version = "0.18.1" }
-rsql_driver_snowflake = { path = "../drivers/snowflake", optional = true, version = "0.18.1" }
-rsql_driver_sqlite = { path = "../drivers/sqlite", optional = true, version = "0.18.1" }
-rsql_driver_sqlserver = { path = "../drivers/sqlserver", optional = true, version = "0.18.1" }
-rsql_driver_tsv = { path = "../drivers/tsv", optional = true, version = "0.18.1" }
-rsql_driver_xml = { path = "../drivers/xml", optional = true, version = "0.18.1" }
-rsql_driver_xz = { path = "../drivers/xz", optional = true, version = "0.18.1" }
-rsql_driver_yaml = { path = "../drivers/yaml", optional = true, version = "0.18.1" }
-rsql_driver_zstd = { path = "../drivers/zstd", optional = true, version = "0.18.1" }
+rsql_driver = { path = "../rsql_driver", version = "0.18.2" }
+rsql_driver_arrow = { path = "../drivers/arrow", optional = true, version = "0.18.2" }
+rsql_driver_avro = { path = "../drivers/avro", optional = true, version = "0.18.2" }
+rsql_driver_brotli = { path = "../drivers/brotli", optional = true, version = "0.18.2" }
+rsql_driver_bzip2 = { path = "../drivers/bzip2", optional = true, version = "0.18.2" }
+rsql_driver_cockroachdb = { path = "../drivers/cockroachdb", optional = true, version = "0.18.2" }
+rsql_driver_csv = { path = "../drivers/csv", optional = true, version = "0.18.2" }
+rsql_driver_delimited = { path = "../drivers/delimited", optional = true, version = "0.18.2" }
+rsql_driver_duckdb = { path = "../drivers/duckdb", optional = true, version = "0.18.2" }
+rsql_driver_dynamodb = { path = "../drivers/dynamodb", optional = true, version = "0.18.2" }
+rsql_driver_excel = { path = "../drivers/excel", optional = true, version = "0.18.2" }
+rsql_driver_file = { path = "../drivers/file", optional = true, version = "0.18.2" }
+rsql_driver_fwf = { path = "../drivers/fwf", optional = true, version = "0.18.2" }
+rsql_driver_gzip = { path = "../drivers/gzip", optional = true, version = "0.18.2" }
+rsql_driver_http = { path = "../drivers/http", optional = true, version = "0.18.2" }
+rsql_driver_https = { path = "../drivers/https", optional = true, version = "0.18.2" }
+rsql_driver_json = { path = "../drivers/json", optional = true, version = "0.18.2" }
+rsql_driver_jsonl = { path = "../drivers/jsonl", optional = true, version = "0.18.2" }
+rsql_driver_libsql = { path = "../drivers/libsql", optional = true, version = "0.18.2" }
+rsql_driver_lz4 = { path = "../drivers/lz4", optional = true, version = "0.18.2" }
+rsql_driver_mariadb = { path = "../drivers/mariadb", optional = true, version = "0.18.2" }
+rsql_driver_mysql = { path = "../drivers/mysql", optional = true, version = "0.18.2" }
+rsql_driver_ods = { path = "../drivers/ods", optional = true, version = "0.18.2" }
+rsql_driver_orc = { path = "../drivers/orc", optional = true, version = "0.18.2" }
+rsql_driver_parquet = { path = "../drivers/parquet", optional = true, version = "0.18.2" }
+rsql_driver_postgres = { path = "../drivers/postgres", optional = true, version = "0.18.2" }
+rsql_driver_postgresql = { path = "../drivers/postgresql", optional = true, version = "0.18.2" }
+rsql_driver_redshift = { path = "../drivers/redshift", optional = true, version = "0.18.2" }
+rsql_driver_rusqlite = { path = "../drivers/rusqlite", optional = true, version = "0.18.2" }
+rsql_driver_s3 = { path = "../drivers/s3", optional = true, version = "0.18.2" }
+rsql_driver_snowflake = { path = "../drivers/snowflake", optional = true, version = "0.18.2" }
+rsql_driver_sqlite = { path = "../drivers/sqlite", optional = true, version = "0.18.2" }
+rsql_driver_sqlserver = { path = "../drivers/sqlserver", optional = true, version = "0.18.2" }
+rsql_driver_tsv = { path = "../drivers/tsv", optional = true, version = "0.18.2" }
+rsql_driver_xml = { path = "../drivers/xml", optional = true, version = "0.18.2" }
+rsql_driver_xz = { path = "../drivers/xz", optional = true, version = "0.18.2" }
+rsql_driver_yaml = { path = "../drivers/yaml", optional = true, version = "0.18.2" }
+rsql_driver_zstd = { path = "../drivers/zstd", optional = true, version = "0.18.2" }
 tokio = { workspace = true, features = ["fs"], optional = true }
 tracing = { workspace = true }
 
@@ -58,7 +58,7 @@ getrandom = { workspace = true, features = ["wasm_js"] }
 
 [dev-dependencies]
 indoc = { workspace = true }
-rsql_driver_test_utils = { path = "../drivers/test_utils", version = "0.18.1" }
+rsql_driver_test_utils = { path = "../drivers/test_utils", version = "0.18.2" }
 tokio = { workspace = true, features = ["macros", "rt"] }
 
 [features]

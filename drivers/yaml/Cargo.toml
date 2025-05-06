@@ -15,8 +15,8 @@ async-trait = { workspace = true }
 file_type = { workspace = true }
 polars = { workspace = true, features = ["json", "lazy"] }
 polars-sql = { workspace = true }
-rsql_driver = { path = "../../rsql_driver", version = "0.18.1" }
-rsql_driver_polars = { path = "../polars", version = "0.18.1" }
+rsql_driver = { path = "../../rsql_driver", version = "0.18.2" }
+rsql_driver_polars = { path = "../polars", version = "0.18.2" }
 serde_json = { workspace = true, features = ["preserve_order"] }
 serde_yaml = { workspace = true }
 tokio = { workspace = true }
@@ -26,6 +26,6 @@ url = { workspace = true }
 tokio = { workspace = true, features = ["fs"] }
 
 [dev-dependencies]
-rsql_driver_test_utils = { path = "../test_utils", version = "0.18.1" }
+rsql_driver_test_utils = { path = "../test_utils", version = "0.18.2" }
 tokio = { workspace = true, features = ["macros", "rt"] }
 
