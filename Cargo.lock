@@ -7503,7 +7503,6 @@ dependencies = [
  "thiserror 2.0.12",
  "tokio",
  "tracing",
- "tracing-subscriber",
  "url",
  "uuid",
 ]
@@ -8204,7 +8203,7 @@ dependencies = [
 
 [[package]]
 name = "rsql_repl"
-version = "0.18.1"
+version = "0.18.2"
 dependencies = [
  "anyhow",
  "async-trait",

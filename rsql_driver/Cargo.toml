@@ -37,7 +37,6 @@ uuid = { workspace = true, features = ["js"] }
 rsql_driver_test_utils = { path = "../drivers/test_utils", version = "0.18.2" }
 serde_json = { workspace = true, features = ["preserve_order"] }
 tokio = { workspace = true, features = ["macros", "rt"] }
-tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
 
 [features]
 default = []
