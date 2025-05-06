@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## `rsql_repl` - [0.18.2](https://github.com/theseus-rs/rsql/releases/tag/rsql_repl-v0.18.2) - 2025-05-06
+
+### Other
+- update to Rust 1.86.0
+- update benchmark runner
+
 ## `rsql_cli` - [0.18.2](https://github.com/theseus-rs/rsql/compare/v0.18.1...v0.18.2) - 2025-03-28
 
 ### Added
