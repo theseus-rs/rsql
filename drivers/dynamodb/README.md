@@ -13,7 +13,7 @@
 ## Usage
 
 Driver url format:
-`dynamodb://[<access_key_id>:<secret_access_key>@]<host>[:<port>]>[?region=<region>][&session_token=<token>]`
+`dynamodb://[<access_key_id>:<secret_access_key>@]<host>[:<port>]>[?region=<region>][&session_token=<token>][&scheme=<http|https>]`
 
 ## Safety
 

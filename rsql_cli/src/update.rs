@@ -3,7 +3,7 @@ use axoupdater::AxoUpdater;
 use chrono::{DateTime, Duration, Utc};
 use inquire::Confirm;
 use inquire::ui::RenderConfig;
-use rsql_core::configuration::Configuration;
+use rsql_core::Configuration;
 use std::fs::{File, create_dir_all};
 use std::io::{Read, Write};
 

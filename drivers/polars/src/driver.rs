@@ -106,10 +106,6 @@ impl rsql_driver::Connection for Connection {
         Ok(Box::new(query_result))
     }
 
-    async fn close(&mut self) -> Result<()> {
-        Ok(())
-    }
-
     async fn metadata(&mut self) -> Result<Metadata> {
         metadata::get_metadata(self).await
     }

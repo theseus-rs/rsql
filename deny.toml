@@ -19,6 +19,7 @@ allow = [
     "BSL-1.0",
     "bzip2-1.0.6",
     "CC0-1.0",
+    "CDLA-Permissive-2.0",
     "ISC",
     "LGPL-3.0",
     "MIT",
@@ -32,7 +33,6 @@ allow = [
 [advisories]
 ignore = [
     "RUSTSEC-2023-0071",
-    "RUSTSEC-2023-0086",
     "RUSTSEC-2024-0320",
     "RUSTSEC-2024-0363",
     "RUSTSEC-2024-0436",

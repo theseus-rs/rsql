@@ -112,10 +112,6 @@ impl rsql_driver::Connection for Connection {
         Ok(Box::new(query_result))
     }
 
-    async fn close(&mut self) -> Result<()> {
-        Ok(())
-    }
-
     fn dialect(&self) -> Box<dyn Dialect> {
         Box::new(SQLiteDialect {})
     }
