@@ -13,10 +13,10 @@ version.workspace = true
 [dependencies]
 async-trait = { workspace = true }
 file_type = { workspace = true }
-rsql_driver = { path = "../../rsql_driver", version = "0.18.3" }
-rsql_driver_delimited = { path = "../delimited", version = "0.18.3" }
+rsql_driver = { path = "../../rsql_driver", version = "0.18.4" }
+rsql_driver_delimited = { path = "../delimited", version = "0.18.4" }
 url = { workspace = true }
 
 [dev-dependencies]
-rsql_driver_test_utils = { path = "../test_utils", version = "0.18.3" }
+rsql_driver_test_utils = { path = "../test_utils", version = "0.18.4" }
 tokio = { workspace = true, features = ["macros", "rt"] }
