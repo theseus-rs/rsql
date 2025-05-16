@@ -15,7 +15,7 @@ async-trait = { workspace = true }
 file_type = { workspace = true }
 futures-util = { workspace = true }
 reqwest = { workspace = true, features = ["gzip", "json", "stream"] }
-rsql_driver = { path = "../../rsql_driver", version = "0.18.2" }
+rsql_driver = { path = "../../rsql_driver", version = "0.18.3" }
 tempfile = { workspace = true }
 tracing = { workspace = true }
 tokio = { workspace = true }
@@ -25,7 +25,7 @@ url = { workspace = true }
 tokio = { workspace = true, features = ["fs"] }
 
 [dev-dependencies]
-rsql_driver_csv = { path = "../csv", version = "0.18.2" }
+rsql_driver_csv = { path = "../csv", version = "0.18.3" }
 tokio = { workspace = true, features = ["macros", "rt"] }
 
 [features]
