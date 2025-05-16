@@ -58,7 +58,8 @@ impl Driver {
     fn decompress_file(file: &PathBuf, temp_dir: &Path) -> Result<PathBuf> {
         let Some(file_name) = file.file_name() else {
             return Err(ConversionError(format!(
-                "File name is not a valid path: {file:?}"
+                "File name is not a valid path: {}",
+                file.display()
             )));
         };
 

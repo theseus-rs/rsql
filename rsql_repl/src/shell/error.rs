@@ -71,7 +71,7 @@ mod tests {
 
     #[test]
     fn test_rusty_line_error() {
-        let std_io_error = std::io::Error::new(std::io::ErrorKind::Other, "test");
+        let std_io_error = std::io::Error::other("test");
         let error = rustyline::error::ReadlineError::Io(std_io_error);
         let io_error = Error::from(error);
 
@@ -80,7 +80,7 @@ mod tests {
 
     #[test]
     fn test_std_io_error() {
-        let error = std::io::Error::new(std::io::ErrorKind::Other, "test");
+        let error = std::io::Error::other("test");
         let io_error = Error::from(error);
 
         assert_eq!(io_error.to_string(), "test");
