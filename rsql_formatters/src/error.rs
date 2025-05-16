@@ -81,7 +81,7 @@ mod tests {
     ))]
     #[test]
     fn test_csv_error() {
-        let std_io_error = std::io::Error::new(std::io::ErrorKind::Other, "test");
+        let std_io_error = std::io::Error::other("test");
         let csv_error = csv::Error::from(std_io_error);
         let io_error = Error::from(csv_error);
         assert_eq!(io_error.to_string(), "test");
@@ -119,7 +119,7 @@ mod tests {
 
     #[test]
     fn test_std_io_error() {
-        let error = std::io::Error::new(std::io::ErrorKind::Other, "test");
+        let error = std::io::Error::other("test");
         let io_error = Error::from(error);
         assert_eq!(io_error.to_string(), "test");
     }

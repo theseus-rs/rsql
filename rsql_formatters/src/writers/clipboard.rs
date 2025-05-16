@@ -68,7 +68,7 @@ impl Write for ClipboardWriter {
         })?;
         self.clipboard
             .set_text(data)
-            .map_err(|_| io::Error::new(io::ErrorKind::Other, "Failed to set clipboard text"))?;
+            .map_err(|_| io::Error::other("Failed to set clipboard text"))?;
         Ok(())
     }
 }
