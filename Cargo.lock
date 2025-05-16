@@ -2005,7 +2005,7 @@ dependencies = [
  "log",
  "quick-xml 0.37.5",
  "serde",
- "zip",
+ "zip 2.5.0",
 ]
 
 [[package]]
@@ -2159,9 +2159,9 @@ dependencies = [
 
 [[package]]
 name = "clap"
-version = "4.5.37"
+version = "4.5.38"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eccb054f56cbd38340b380d4a8e69ef1f02f1af43db2f0cc817a4774d80ae071"
+checksum = "ed93b9805f8ba930df42c2590f05453d5ec36cbb85d018868a5b24d31f6ac000"
 dependencies = [
  "clap_builder",
  "clap_derive",
@@ -2179,9 +2179,9 @@ dependencies = [
 
 [[package]]
 name = "clap_builder"
-version = "4.5.37"
+version = "4.5.38"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "efd9466fac8543255d3b1fcad4762c5e116ffe808c8a3043d4263cd4fd4862a2"
+checksum = "379026ff283facf611b0ea629334361c4211d1b12ee01024eec1591133b04120"
 dependencies = [
  "anstream",
  "anstyle",
@@ -3223,9 +3223,9 @@ dependencies = [
 
 [[package]]
 name = "file_type"
-version = "0.8.5"
+version = "0.8.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1efcd9afe2ed382da7c5868d967f8df0baa08c7a96478bec1a4fe8c5c75695e0"
+checksum = "738904d73a892fb0cd6ea1b61402c1510475be373fe1d24933fa5e2a8a7aaa44"
 dependencies = [
  "phf",
 ]
@@ -3523,9 +3523,9 @@ dependencies = [
 
 [[package]]
 name = "getrandom"
-version = "0.3.2"
+version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "73fea8450eea4bac3940448fb7ae50d91f034f941199fcd9d909a5a07aa455f0"
+checksum = "26145e563e54f2cadc477553f1ec5ee650b00862f0a58bcd12cbdc5f0ea2d2f4"
 dependencies = [
  "cfg-if",
  "js-sys",
@@ -4474,7 +4474,7 @@ version = "0.1.33"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "38f262f097c174adebe41eb73d66ae9c06b2844fb0da69969647bbddd9b0538a"
 dependencies = [
- "getrandom 0.3.2",
+ "getrandom 0.3.3",
  "libc",
 ]
 
@@ -4704,18 +4704,18 @@ dependencies = [
 
 [[package]]
 name = "liblzma"
-version = "0.3.6"
+version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a631d2b24be269775ba8f7789a6afa1ac228346a20c9e87dbbbe4975a79fd764"
+checksum = "66352d7a8ac12d4877b6e6ea5a9b7650ee094257dc40889955bea5bc5b08c1d0"
 dependencies = [
  "liblzma-sys",
 ]
 
 [[package]]
 name = "liblzma-sys"
-version = "0.3.13"
+version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "efdadf1a99aceff34553de1461674ab6ac7e7f0843ae9875e339f4a14eb43475"
+checksum = "5839bad90c3cc2e0b8c4ed8296b80e86040240f81d46b9c0e9bc8dd51ddd3af1"
 dependencies = [
  "cc",
  "libc",
@@ -4741,9 +4741,9 @@ dependencies = [
 
 [[package]]
 name = "libsql"
-version = "0.9.5"
+version = "0.9.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6727853bc40440b0f2e991038988f37a047d86f5d582a6705a1f5fc71701682a"
+checksum = "401f255994be7b7f210216f0144be30fb853c58ba71d0e135164131a1a6095ae"
 dependencies = [
  "anyhow",
  "async-stream",
@@ -4781,9 +4781,9 @@ dependencies = [
 
 [[package]]
 name = "libsql-ffi"
-version = "0.9.5"
+version = "0.9.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3a9135c5be13ff689bf5d8fb4f7e274dc862076a8d67dc261912fd7ce667954b"
+checksum = "a2ecd5f930e89afb74b6c5c56a0c7893b06cf495ffcde8d806c43be2e3529d00"
 dependencies = [
  "bindgen 0.66.1",
  "cc",
@@ -4792,9 +4792,9 @@ dependencies = [
 
 [[package]]
 name = "libsql-hrana"
-version = "0.9.5"
+version = "0.9.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9f1ca5a5f1214cf769ca18a468536889f8d51dbc8471a70db8e749d0be2e48c3"
+checksum = "d69b605be4f58a8f6017dcf4c10931454c14e43309871a19e005b2ba00e56ff7"
 dependencies = [
  "base64 0.21.7",
  "bytes",
@@ -4804,9 +4804,9 @@ dependencies = [
 
 [[package]]
 name = "libsql-rusqlite"
-version = "0.9.5"
+version = "0.9.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0680893efd88d8c6b69612a6805b252e074e311979d4d01301a427f46c772040"
+checksum = "ff98aad65b47b61a5d58bb25456c8935ff38faff50913f7b5fcd2d2de8355724"
 dependencies = [
  "bitflags 2.9.0",
  "fallible-iterator 0.2.0",
@@ -4836,9 +4836,9 @@ dependencies = [
 
 [[package]]
 name = "libsql-sys"
-version = "0.9.5"
+version = "0.9.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "57e2c69ed06a8a1602542ffb9df59fa3dd8d89336778f621d194d24626119e31"
+checksum = "e18e7dc8b328afe903f730f184555f4a607560e170e1392b4e5b9f58addd0c4a"
 dependencies = [
  "bytes",
  "libsql-ffi",
@@ -4850,9 +4850,9 @@ dependencies = [
 
 [[package]]
 name = "libsql_replication"
-version = "0.9.5"
+version = "0.9.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9b915b4f00f876c9c59ea1a5a387b2f819c358c077f2228cf09091a2a1f02cf2"
+checksum = "fba0d482d5bf0d0b67287b03d06e6186759cf62016645b076f626dddc6a4b1a5"
 dependencies = [
  "aes",
  "async-stream",
@@ -5626,9 +5626,9 @@ dependencies = [
 
 [[package]]
 name = "os_info"
-version = "3.10.0"
+version = "3.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2a604e53c24761286860eba4e2c8b23a0161526476b1de520139d69cdb85a6b5"
+checksum = "41fc863e2ca13dc2d5c34fb22ea4a588248ac14db929616ba65c45f21744b1e9"
 dependencies = [
  "log",
  "serde",
@@ -6631,9 +6631,9 @@ dependencies = [
 
 [[package]]
 name = "postgresql_archive"
-version = "0.18.2"
+version = "0.18.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f799d21d3a7225f5efb33449b97046135244b46a3d963faa61a888816df2c85a"
+checksum = "66ca0d6fa1abae94ba3e97611bb358ca482443a3965dcfb9eb36b5103f5e0cc9"
 dependencies = [
  "async-trait",
  "flate2",
@@ -6656,14 +6656,14 @@ dependencies = [
  "thiserror 2.0.12",
  "tracing",
  "url",
- "zip",
+ "zip 3.0.0",
 ]
 
 [[package]]
 name = "postgresql_commands"
-version = "0.18.3"
+version = "0.18.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "456a3989996d0157bafc6ef2aead19fa1b3f7ca7460784237627a9d02f4bb3a7"
+checksum = "a677c4ec498588694340f653f352cb1d4986bef97e4ccc5c7505b765410eef37"
 dependencies = [
  "thiserror 2.0.12",
  "tracing",
@@ -6671,9 +6671,9 @@ dependencies = [
 
 [[package]]
 name = "postgresql_embedded"
-version = "0.18.2"
+version = "0.18.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a49030a517128776430b69490c9c4b9cd8c8a63b6ef1bc923835dea523e025c5"
+checksum = "516c3eac61dbd00b623c48abbb7f4c51af1f6f79fa7c4bf3d79135a01daf3573"
 dependencies = [
  "anyhow",
  "postgresql_archive",
@@ -6917,7 +6917,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bcbafbbdbb0f638fe3f35f3c56739f77a8a1d070cb25603226c83339b391472b"
 dependencies = [
  "bytes",
- "getrandom 0.3.2",
+ "getrandom 0.3.3",
  "rand 0.9.1",
  "ring",
  "rustc-hash 2.1.1",
@@ -7031,7 +7031,7 @@ version = "0.9.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "99d9a13982dcf210057a8a78572b2217b667c3beacbf3a0d8b454f6f82837d38"
 dependencies = [
- "getrandom 0.3.2",
+ "getrandom 0.3.3",
 ]
 
 [[package]]
@@ -7469,7 +7469,7 @@ dependencies = [
  "config",
  "dark-light",
  "dirs",
- "getrandom 0.3.2",
+ "getrandom 0.3.3",
  "indicatif",
  "rsql_formatters",
  "rust-i18n",
@@ -7489,7 +7489,7 @@ dependencies = [
  "async-trait",
  "base64 0.22.1",
  "file_type",
- "getrandom 0.3.2",
+ "getrandom 0.3.3",
  "indexmap 2.9.0",
  "jiff",
  "mockall",
@@ -8129,7 +8129,7 @@ name = "rsql_drivers"
 version = "0.18.2"
 dependencies = [
  "file_type",
- "getrandom 0.3.2",
+ "getrandom 0.3.3",
  "indoc",
  "rsql_driver",
  "rsql_driver_arrow",
@@ -8212,7 +8212,7 @@ dependencies = [
  "clearscreen",
  "colored",
  "criterion",
- "getrandom 0.3.2",
+ "getrandom 0.3.3",
  "indicatif",
  "indoc",
  "mockall",
@@ -9737,12 +9737,12 @@ checksum = "1ac9aa371f599d22256307c24a9d748c041e548cbf599f35d890f9d365361790"
 
 [[package]]
 name = "tempfile"
-version = "3.19.1"
+version = "3.20.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7437ac7763b9b123ccf33c338a5cc1bac6f69b45a136c19bdd8a65e3916435bf"
+checksum = "e8a64e3985349f2441a1a9ef0b853f869006c3855f2cda6862a94d26ebb9d6a1"
 dependencies = [
  "fastrand",
- "getrandom 0.3.2",
+ "getrandom 0.3.3",
  "once_cell",
  "rustix 1.0.7",
  "windows-sys 0.59.0",
@@ -10601,7 +10601,7 @@ version = "1.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "458f7a779bf54acc9f347480ac654f68407d3aab21269a6e3c9f922acd9e2da9"
 dependencies = [
- "getrandom 0.3.2",
+ "getrandom 0.3.3",
  "js-sys",
  "serde",
  "wasm-bindgen",
@@ -11627,6 +11627,20 @@ dependencies = [
  "arbitrary",
  "crc32fast",
  "crossbeam-utils",
+ "flate2",
+ "indexmap 2.9.0",
+ "memchr",
+ "zopfli",
+]
+
+[[package]]
+name = "zip"
+version = "3.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "12598812502ed0105f607f941c386f43d441e00148fce9dec3ca5ffb0bde9308"
+dependencies = [
+ "arbitrary",
+ "crc32fast",
  "flate2",
  "indexmap 2.9.0",
  "memchr",
