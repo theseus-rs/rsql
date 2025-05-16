@@ -22,7 +22,7 @@ use tracing::debug;
 use url::Url;
 use uuid::Uuid;
 
-const POSTGRESQL_EMBEDDED_VERSION: &str = "=17.4.0";
+const POSTGRESQL_EMBEDDED_VERSION: &str = "=17.5.0";
 
 #[derive(Debug)]
 pub struct Driver;
