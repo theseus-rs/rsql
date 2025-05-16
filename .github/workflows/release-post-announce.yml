@@ -30,10 +30,10 @@ jobs:
           # - { target: armv5te-unknown-linux-gnueabi, os: ubuntu-latest }
           # - { target: armv5te-unknown-linux-musleabi, os: ubuntu-latest }
           # - { target: armv7-linux-androideabi, os: ubuntu-latest }
-          - { target: armv7-unknown-linux-gnueabi, os: ubuntu-latest }
-          - { target: armv7-unknown-linux-gnueabihf, os: ubuntu-latest }
-          - { target: armv7-unknown-linux-musleabi, os: ubuntu-latest }
-          - { target: armv7-unknown-linux-musleabihf, os: ubuntu-latest }
+          # - { target: armv7-unknown-linux-gnueabi, os: ubuntu-latest }
+          # - { target: armv7-unknown-linux-gnueabihf, os: ubuntu-latest }
+          # - { target: armv7-unknown-linux-musleabi, os: ubuntu-latest }
+          # - { target: armv7-unknown-linux-musleabihf, os: ubuntu-latest }
           # - { target: i586-unknown-linux-gnu, os: ubuntu-latest }
           # - { target: i586-unknown-linux-musl, os: ubuntu-latest }
           # - { target: i686-unknown-freebsd, os: ubuntu-latest }
@@ -50,9 +50,9 @@ jobs:
           # - { target: mipsel-unknown-linux-musl, os: ubuntu-latest }
           # - { target: powerpc-unknown-linux-gnu, os: ubuntu-latest }
           # - { target: powerpc64-unknown-linux-gnu, os: ubuntu-latest }
-          - { target: powerpc64le-unknown-linux-gnu, os: ubuntu-latest }
+          # - { target: powerpc64le-unknown-linux-gnu, os: ubuntu-latest }
           # - { target: riscv64gc-unknown-linux-gnu, os: ubuntu-latest }
-          - { target: s390x-unknown-linux-gnu, os: ubuntu-latest }
+          # - { target: s390x-unknown-linux-gnu, os: ubuntu-latest }
           # - { target: sparc64-unknown-linux-gnu, os: ubuntu-latest }
           # - { target: sparcv9-sun-solaris, os: ubuntu-latest }
           # - { target: thumbv6m-none-eabi, os: ubuntu-latest }
