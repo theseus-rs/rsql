@@ -12,7 +12,6 @@ fwf = "run --manifest-path ./rsql_cli/Cargo.toml -- --url fwf://datasets/users.f
 gzip = "run --manifest-path ./rsql_cli/Cargo.toml -- --url gzip://datasets/users.csv.gz"
 http = "run --manifest-path ./rsql_cli/Cargo.toml -- --url http://raw.githubusercontent.com/theseus-rs/rsql/refs/heads/main/datasets/users.csv"
 https = "run --manifest-path ./rsql_cli/Cargo.toml -- --url https://raw.githubusercontent.com/theseus-rs/rsql/refs/heads/main/datasets/users.csv"
-# libsql currently conflicts with the rusqlite crate; hopefully the limbo rewrite in Rust will resolve this
 libsql = "run --manifest-path ./rsql_cli/Cargo.toml -- --url libsql://?memory=true"
 lz4 = "run --manifest-path ./rsql_cli/Cargo.toml -- --url lz4://datasets/users.csv.lz4"
 json = "run --manifest-path ./rsql_cli/Cargo.toml -- --url json://datasets/users.json"

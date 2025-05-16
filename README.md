@@ -86,7 +86,7 @@ rsql --url "<url>" -- "<query>"
 | https¹             | `https://<path>[?_headers=<headers>]`                                                                                                                                            |
 | json (polars)      | `json://<file>`                                                                                                                                                                  |
 | jsonl (polars)     | `jsonl://<file>`                                                                                                                                                                 |
-| libsql²            | `libsql://<host>?[<memory=true>][&file=<database_file>][&auth_token=<token>]`                                                                                                    |
+| libsql             | `libsql://<host>?[<memory=true>][&file=<database_file>][&auth_token=<token>]`                                                                                                    |
 | lz4¹               | `lz4://<file>`                                                                                                                                                                   |
 | mariadb (sqlx)     | `mariadb://<user>[:<password>]@<host>[:<port>]/<database>`                                                                                                                       |
 | mysql (sqlx)       | `mysql://<user>[:<password>]@<host>[:<port>]/<database>`                                                                                                                         |
@@ -107,9 +107,7 @@ rsql --url "<url>" -- "<query>"
 | yaml               | `yaml://<file>`                                                                                                                                                                  |
 | zstd¹              | `zstd://<file>`                                                                                                                                                                  |
 
-¹ the driver will attempt to detect the type of file and automatically use the appropriate driver.  
-² `libsql` needs to be enabled with the `libsql` feature flag; it is disabled by default as it conflicts
-with `rusqlite`.
+¹ the driver will attempt to detect the type of file and automatically use the appropriate driver.
 
 ## Safety
 

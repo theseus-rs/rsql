@@ -69,6 +69,7 @@ all-drivers = [
     "driver-https",
     "driver-json",
     "driver-jsonl",
+    "driver-libsql",
     "driver-lz4",
     "driver-mariadb",
     "driver-mysql",
