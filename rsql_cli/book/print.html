@@ -1,0 +1,974 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js oranda-dark">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>rsql</title>
+        <meta name="robots" content="noindex" />
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+        <link rel="stylesheet" href="oranda-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "oranda-dark" : "oranda-dark";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('orandamdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('orandamdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('orandamdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('oranda-dark')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction/index.html">Introduction</a></li><li class="chapter-item expanded "><a href="chapter1/index.html"><strong aria-hidden="true">1.</strong> Getting Started</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="chapter1/installation.html"><strong aria-hidden="true">1.1.</strong> Installation</a></li><li class="chapter-item expanded "><a href="chapter1/first-query.html"><strong aria-hidden="true">1.2.</strong> First Query</a></li></ol></li><li class="chapter-item expanded "><a href="chapter2/index.html"><strong aria-hidden="true">2.</strong> Commands</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="chapter2/bail/index.html"><strong aria-hidden="true">2.1.</strong> bail</a></li><li class="chapter-item expanded "><a href="chapter2/changes/index.html"><strong aria-hidden="true">2.2.</strong> changes</a></li><li class="chapter-item expanded "><a href="chapter2/clear/index.html"><strong aria-hidden="true">2.3.</strong> clear</a></li><li class="chapter-item expanded "><a href="chapter2/color/index.html"><strong aria-hidden="true">2.4.</strong> color</a></li><li class="chapter-item expanded "><a href="chapter2/describe/index.html"><strong aria-hidden="true">2.5.</strong> describe</a></li><li class="chapter-item expanded "><a href="chapter2/drivers/index.html"><strong aria-hidden="true">2.6.</strong> drivers</a></li><li class="chapter-item expanded "><a href="chapter2/echo/index.html"><strong aria-hidden="true">2.7.</strong> echo</a></li><li class="chapter-item expanded "><a href="chapter2/exit/index.html"><strong aria-hidden="true">2.8.</strong> exit</a></li><li class="chapter-item expanded "><a href="chapter2/footer/index.html"><strong aria-hidden="true">2.9.</strong> footer</a></li><li class="chapter-item expanded "><a href="chapter2/format/index.html"><strong aria-hidden="true">2.10.</strong> format</a></li><li class="chapter-item expanded "><a href="chapter2/header/index.html"><strong aria-hidden="true">2.11.</strong> header</a></li><li class="chapter-item expanded "><a href="chapter2/help/index.html"><strong aria-hidden="true">2.12.</strong> help</a></li><li class="chapter-item expanded "><a href="chapter2/history/index.html"><strong aria-hidden="true">2.13.</strong> history</a></li><li class="chapter-item expanded "><a href="chapter2/indexes/index.html"><strong aria-hidden="true">2.14.</strong> indexes</a></li><li class="chapter-item expanded "><a href="chapter2/limit/index.html"><strong aria-hidden="true">2.15.</strong> limit</a></li><li class="chapter-item expanded "><a href="chapter2/locale/index.html"><strong aria-hidden="true">2.16.</strong> locale</a></li><li class="chapter-item expanded "><a href="chapter2/output/index.html"><strong aria-hidden="true">2.17.</strong> output</a></li><li class="chapter-item expanded "><a href="chapter2/print/index.html"><strong aria-hidden="true">2.18.</strong> print</a></li><li class="chapter-item expanded "><a href="chapter2/quit/index.html"><strong aria-hidden="true">2.19.</strong> quit</a></li><li class="chapter-item expanded "><a href="chapter2/read/index.html"><strong aria-hidden="true">2.20.</strong> read</a></li><li class="chapter-item expanded "><a href="chapter2/rows/index.html"><strong aria-hidden="true">2.21.</strong> rows</a></li><li class="chapter-item expanded "><a href="chapter2/schemas/index.html"><strong aria-hidden="true">2.22.</strong> schemas</a></li><li class="chapter-item expanded "><a href="chapter2/sleep/index.html"><strong aria-hidden="true">2.23.</strong> sleep</a></li><li class="chapter-item expanded "><a href="chapter2/system/index.html"><strong aria-hidden="true">2.24.</strong> system</a></li><li class="chapter-item expanded "><a href="chapter2/tables/index.html"><strong aria-hidden="true">2.25.</strong> tables</a></li><li class="chapter-item expanded "><a href="chapter2/tee/index.html"><strong aria-hidden="true">2.26.</strong> tee</a></li><li class="chapter-item expanded "><a href="chapter2/timer/index.html"><strong aria-hidden="true">2.27.</strong> timer</a></li></ol></li><li class="chapter-item expanded "><a href="appendix/index.html"><strong aria-hidden="true">3.</strong> Appendix</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="appendix/rsql-toml.html"><strong aria-hidden="true">3.1.</strong> A - Configuration File (rsql.toml)</a></li><li class="chapter-item expanded "><a href="appendix/supported-locales.html"><strong aria-hidden="true">3.2.</strong> B - Supported Locales</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="oranda-dark">Oranda Dark</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="oranda-light">Oranda Light</button></li>
+
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">rsql</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
+<p>Welcome to <code>rsql</code>, a command line SQL interface for data. <code>rsql</code> is designed to work with a variety of
+data sources, operating systems, and CPU architectures.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="getting-started"><a class="header" href="#getting-started">Getting Started</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="installation"><a class="header" href="#installation">Installation</a></h2>
+<p>To install rsql, use one of the commands below, or navigate to the <a href="https://theseus-rs.github.io/rsql/rsql_cli/">rsql</a>
+site and select an installation method. If you are attempting to install on a platform not
+listed on the project site, you can find additional builds attached to
+the <a href="https://github.com/theseus-rs/rsql/releases/latest">latest release</a>.</p>
+<h3 id="linux--macos"><a class="header" href="#linux--macos">Linux / MacOS</a></h3>
+<pre><code class="language-shell">curl --proto '=https' --tlsv1.2 -LsSf https://github.com/theseus-rs/rsql/releases/latest/download/rsql_cli-installer.sh | sh
+</code></pre>
+<h3 id="windows"><a class="header" href="#windows">Windows</a></h3>
+<pre><code class="language-shell">irm https://github.com/theseus-rs/rsql/releases/latest/download/rsql_cli-installer.ps1 | iex
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="first-query"><a class="header" href="#first-query">First Query</a></h2>
+<p>The following examples show how to run a simple query using the <code>rsql</code> CLI tool for different data sources.</p>
+<h3 id="cockroachdb"><a class="header" href="#cockroachdb">CockroachDB</a></h3>
+<pre><code class="language-shell">rsql --url &quot;cockroachdb://&lt;user[:password&gt;]@&lt;host&gt;[:&lt;port&gt;]/&lt;database&gt;&quot; -- &quot;SELECT version();&quot;
+</code></pre>
+<h3 id="duckdb"><a class="header" href="#duckdb">DuckDB</a></h3>
+<pre><code class="language-shell">rsql --url &quot;duckdb://&quot; -- &quot;SELECT version();&quot;
+</code></pre>
+<h3 id="libsql"><a class="header" href="#libsql">LibSQL</a></h3>
+<pre><code class="language-shell">rsql --url &quot;libsql://?memory=true&quot; -- &quot;SELECT sqlite_version();&quot;
+</code></pre>
+<h3 id="mariadb"><a class="header" href="#mariadb">MariaDB</a></h3>
+<pre><code class="language-shell">rsql --url &quot;mariadb://&lt;user&gt;[:&lt;password&gt;]@&lt;host&gt;[:&lt;port&gt;]/&lt;database&gt;&quot; -- &quot;SELECT version();&quot;
+</code></pre>
+<h3 id="mysql"><a class="header" href="#mysql">MySQL</a></h3>
+<pre><code class="language-shell">rsql --url &quot;mysql://&lt;user&gt;[:&lt;password&gt;]@&lt;host&gt;[:&lt;port&gt;]/&lt;database&gt;&quot; -- &quot;SELECT version();&quot;
+</code></pre>
+<h3 id="postgres"><a class="header" href="#postgres">Postgres</a></h3>
+<pre><code class="language-shell">rsql --url &quot;postgres://?embedded=true&quot; -- &quot;SELECT version();&quot;
+</code></pre>
+<h3 id="postgresql"><a class="header" href="#postgresql">PostgreSQL</a></h3>
+<pre><code class="language-shell">rsql --url &quot;postgresql://?embedded=true&quot; -- &quot;SELECT version();&quot;
+</code></pre>
+<h3 id="redshift"><a class="header" href="#redshift">Redshift</a></h3>
+<pre><code class="language-shell">rsql --url &quot;redshift://&lt;user[:password&gt;]@&lt;host&gt;[:&lt;port&gt;]/&lt;database&gt;&quot; -- &quot;SELECT version();&quot;
+</code></pre>
+<h3 id="rusqlite"><a class="header" href="#rusqlite">Rusqlite</a></h3>
+<pre><code class="language-shell">rsql --url &quot;rusqlite://&quot; -- &quot;SELECT sqlite_version();&quot;
+</code></pre>
+<h3 id="snowflake"><a class="header" href="#snowflake">Snowflake</a></h3>
+<pre><code class="language-shell">rsql --url &quot;snowflake://&lt;user&gt;@&lt;account&gt;.snowflakecomputing.com/[?private_key_file=pkey_file&amp;public_key_file=pubkey_file]&quot; -- &quot;SELECT CURRENT_VERSION();&quot;
+</code></pre>
+<p>or</p>
+<pre><code class="language-shell">rsql --url &quot;snowflake://&lt;user&gt;[:&lt;token&gt;]@&lt;account&gt;.snowflakecomputing.com/&quot; -- &quot;SELECT CURRENT_VERSION();&quot;
+</code></pre>
+<h3 id="sqlite"><a class="header" href="#sqlite">Sqlite</a></h3>
+<pre><code class="language-shell">rsql --url &quot;sqlite://&quot; -- &quot;SELECT sqlite_version();&quot;
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="commands"><a class="header" href="#commands">Commands</a></h1>
+<p>Commands are the primary way to interact with the rsql CLI. A command is a single word that is used
+to perform a specific action preceded by the command identifier (eg: <code>.help</code>). The commands are
+localized for each supported language. A shortened version of the command can be used as long as it
+is unique. For example, <code>.desc</code> can be used in place of <code>.describe</code>.</p>
+<h3 id="demonstration"><a class="header" href="#demonstration">Demonstration</a></h3>
+<p><img src="chapter2/./demo.gif" alt="" /></p>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="bail"><a class="header" href="#bail">bail</a></h2>
+<h3 id="usage"><a class="header" href="#usage">Usage</a></h3>
+<pre><code class="language-text">.bail &lt;on|off&gt;
+</code></pre>
+<h3 id="description"><a class="header" href="#description">Description</a></h3>
+<p>The bail command sets the behavior of the CLI when an error occurs. By default, the CLI will continue processing after
+the first error. If the bail command is set to <code>on</code>, the CLI will exit after the first error.</p>
+<h3 id="examples"><a class="header" href="#examples">Examples</a></h3>
+<p>Show the current bail setting:</p>
+<pre><code class="language-text">.bail
+</code></pre>
+<p>Enable bail on first error:</p>
+<pre><code class="language-text">.bail on
+</code></pre>
+<p>Disable bail on first error:</p>
+<pre><code class="language-text">.bail off
+</code></pre>
+<h3 id="demonstration-1"><a class="header" href="#demonstration-1">Demonstration</a></h3>
+<p><img src="chapter2/bail/./demo.gif" alt="" /></p>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="changes"><a class="header" href="#changes">changes</a></h2>
+<h3 id="usage-1"><a class="header" href="#usage-1">Usage</a></h3>
+<pre><code class="language-text">.changes &lt;on|off&gt;
+</code></pre>
+<h3 id="description-1"><a class="header" href="#description-1">Description</a></h3>
+<p>The changes command toggles the display of the number of rows changed by a SQL statement.
+When the display is turned on, the number of rows changed is displayed after the execution
+of a SQL statement. When the display is turned off, the number of rows changed is not
+displayed.</p>
+<h3 id="examples-1"><a class="header" href="#examples-1">Examples</a></h3>
+<p>Show the current changes setting:</p>
+<pre><code class="language-text">.changes
+</code></pre>
+<p>Turn on the rows changed display:</p>
+<pre><code class="language-text">.changes on
+</code></pre>
+<p>Turn off the rows changed display:</p>
+<pre><code class="language-text">.changes off
+</code></pre>
+<h3 id="demonstration-2"><a class="header" href="#demonstration-2">Demonstration</a></h3>
+<p><img src="chapter2/changes/./demo.gif" alt="" /></p>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="clear"><a class="header" href="#clear">clear</a></h2>
+<h3 id="usage-2"><a class="header" href="#usage-2">Usage</a></h3>
+<pre><code class="language-text">.clear
+</code></pre>
+<h3 id="description-2"><a class="header" href="#description-2">Description</a></h3>
+<p>The clear command clears the screen.</p>
+<h3 id="examples-2"><a class="header" href="#examples-2">Examples</a></h3>
+<p>Clear the screen:</p>
+<pre><code class="language-text">.clear
+</code></pre>
+<h3 id="demonstration-3"><a class="header" href="#demonstration-3">Demonstration</a></h3>
+<p><img src="chapter2/clear/./demo.gif" alt="" /></p>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="color"><a class="header" href="#color">color</a></h2>
+<h3 id="usage-3"><a class="header" href="#usage-3">Usage</a></h3>
+<pre><code class="language-text">.color &lt;on|off&gt;
+</code></pre>
+<h3 id="description-3"><a class="header" href="#description-3">Description</a></h3>
+<p>Controls if output is in color. By default, the color command is set to <code>on</code>. If the <code>color</code> command is set to <code>off</code>,
+the output will not be in color.</p>
+<h3 id="examples-3"><a class="header" href="#examples-3">Examples</a></h3>
+<p>Show the current color setting:</p>
+<pre><code class="language-text">.color
+</code></pre>
+<p>Enable color output:</p>
+<pre><code class="language-text">.color on
+</code></pre>
+<p>Disable color output:</p>
+<pre><code class="language-text">.color off
+</code></pre>
+<h3 id="demonstration-4"><a class="header" href="#demonstration-4">Demonstration</a></h3>
+<p><img src="chapter2/color/./demo.gif" alt="" /></p>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="describe"><a class="header" href="#describe">describe</a></h2>
+<h3 id="usage-4"><a class="header" href="#usage-4">Usage</a></h3>
+<pre><code class="language-text">.describe [table]
+</code></pre>
+<h3 id="description-4"><a class="header" href="#description-4">Description</a></h3>
+<p>The describe command provides information about the specified data table.</p>
+<h3 id="examples-4"><a class="header" href="#examples-4">Examples</a></h3>
+<p>Describe the table named users.</p>
+<pre><code class="language-text">.describe users
+</code></pre>
+<h3 id="demonstration-5"><a class="header" href="#demonstration-5">Demonstration</a></h3>
+<p><img src="chapter2/describe/./demo.gif" alt="" /></p>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="drivers"><a class="header" href="#drivers">drivers</a></h2>
+<h3 id="usage-5"><a class="header" href="#usage-5">Usage</a></h3>
+<pre><code class="language-text">.drivers
+</code></pre>
+<h3 id="description-5"><a class="header" href="#description-5">Description</a></h3>
+<p>The drivers command displays the available data drivers.</p>
+<div class="table-wrapper"><table><thead><tr><th>Driver</th><th>Description</th><th>URL</th></tr></thead><tbody>
+<tr><td><code>arrow</code></td><td>Arrow IPC provided by <a href="https://github.com/pola-rs/polars">Polars</a></td><td><code>arrow://&lt;file&gt;</code></td></tr>
+<tr><td><code>avro</code></td><td>Avro provided by <a href="https://github.com/pola-rs/polars">Polars</a></td><td><code>avro://&lt;file&gt;</code></td></tr>
+<tr><td><code>brotli</code></td><td>Brotli compressed file</td><td><code>brotli://&lt;file&gt;</code></td></tr>
+<tr><td><code>bzip2</code></td><td>Bzip2 compressed file</td><td><code>bzip2://&lt;file&gt;</code></td></tr>
+<tr><td><code>cockroachdb</code></td><td>CockroachDB provided by <a href="https://github.com/launchbadge/sqlx">SQLx</a></td><td><code>cockroachdb://&lt;user&gt;[:&lt;password&gt;]@&lt;host&gt;[:&lt;port&gt;]/&lt;database&gt;</code></td></tr>
+<tr><td><code>csv</code></td><td>Comma Separated Value (CSV) provided by <a href="https://github.com/pola-rs/polars">Polars</a></td><td><code>csv://&lt;file&gt;[?has_header=&lt;true\|false&gt;][&amp;quote=&lt;char&gt;][&amp;skip_rows=&lt;n&gt;]</code></td></tr>
+<tr><td><code>delimited</code></td><td>Delimited provided by <a href="https://github.com/pola-rs/polars">Polars</a></td><td><code>delimited://&lt;file&gt;[?separator=&lt;char&gt;][&amp;has_header=&lt;true\|false&gt;][&amp;quote=&lt;char&gt;][&amp;skip_rows=&lt;n&gt;]</code></td></tr>
+<tr><td><code>duckdb</code></td><td>DuckDB provided by <a href="https://duckdb.org/">DuckDB</a></td><td><code>duckdb://[&lt;file&gt;]</code></td></tr>
+<tr><td><code>dynamodb</code></td><td>DynamoDB</td><td><code>dynamodb://[&lt;access_key_id&gt;:&lt;secret_access_key&gt;@]&lt;host&gt;[:&lt;port&gt;]&gt;[?region=&lt;region&gt;][&amp;session_token=&lt;token&gt;][&amp;scheme=&lt;http\|https&gt;]</code></td></tr>
+<tr><td><code>excel</code></td><td>Excel</td><td><code>excel://&lt;file&gt;[?has_header=&lt;true\|false&gt;][&amp;skip_rows=&lt;n&gt;]</code></td></tr>
+<tr><td><code>file</code></td><td>File</td><td><code>file://&lt;file&gt;</code></td></tr>
+<tr><td><code>fwf</code></td><td>Fixed Width Format</td><td><code>fwf://&lt;file&gt;?widths=&lt;widths&gt;[&amp;headers=&lt;headers&gt;]</code></td></tr>
+<tr><td><code>gzip</code></td><td>Gzip compressed file</td><td><code>gzip://&lt;file&gt;</code></td></tr>
+<tr><td><code>http</code></td><td>HTTP</td><td><code>http://&lt;path&gt;[?_headers=&lt;headers&gt;]</code></td></tr>
+<tr><td><code>https</code></td><td>HTTPS</td><td><code>https://&lt;path&gt;[?_headers=&lt;headers&gt;]</code></td></tr>
+<tr><td><code>json</code></td><td>JSON provided by <a href="https://github.com/pola-rs/polars">Polars</a></td><td><code>json://&lt;file&gt;</code></td></tr>
+<tr><td><code>jsonl</code></td><td>JSONL provided by <a href="https://github.com/pola-rs/polars">Polars</a></td><td><code>jsonl://&lt;file&gt;</code></td></tr>
+<tr><td><code>libsql</code></td><td>LibSQL provided by <a href="https://github.com/tursodatabase/libsql">Turso</a></td><td><code>libsql://&lt;host&gt;?[&lt;memory=true&gt;][&amp;file=&lt;database_file&gt;][&amp;auth_token=&lt;token&gt;]</code></td></tr>
+<tr><td><code>lz4</code></td><td>LZ4 compressed file</td><td><code>lz4://&lt;file&gt;</code></td></tr>
+<tr><td><code>mariadb</code></td><td>MariaDB provided by <a href="https://github.com/launchbadge/sqlx">SQLx</a></td><td><code>mariadb://&lt;user&gt;[:&lt;password&gt;]@&lt;host&gt;[:&lt;port&gt;]/&lt;database&gt;</code></td></tr>
+<tr><td><code>mysql</code></td><td>MySQL provided by <a href="https://github.com/launchbadge/sqlx">SQLx</a></td><td><code>mysql://&lt;user&gt;[:&lt;password&gt;]@&lt;host&gt;[:&lt;port&gt;]/&lt;database&gt;</code></td></tr>
+<tr><td><code>ods</code></td><td>OpenDocument Spreadsheet</td><td><code>ods://&lt;file&gt;[?has_header=&lt;true\|false&gt;][&amp;skip_rows=&lt;n&gt;]</code></td></tr>
+<tr><td><code>orc</code></td><td>Optimized Row Columnar (ORC)</td><td><code>orc://&lt;file&gt;</code></td></tr>
+<tr><td><code>parquet</code></td><td>Parquet provided by <a href="https://github.com/pola-rs/polars">Polars</a></td><td><code>parquet://&lt;file&gt;</code></td></tr>
+<tr><td><code>postgres</code></td><td>PostgreSQL provided by <a href="https://github.com/sfackler/rust-postgres">rust-postgres</a></td><td><code>postgres://&lt;user&gt;[:&lt;password&gt;]@&lt;host&gt;[:&lt;port&gt;]/&lt;database&gt;?&lt;embedded=true&gt;</code></td></tr>
+<tr><td><code>postgresql</code></td><td>PostgreSQL provided by <a href="https://github.com/launchbadge/sqlx">SQLx</a></td><td><code>postgresql://&lt;user&gt;[:&lt;password&gt;]@&lt;host&gt;[:&lt;port&gt;]/&lt;database&gt;?&lt;embedded=true&gt;</code></td></tr>
+<tr><td><code>redshift</code></td><td>Redshift provided by <a href="https://github.com/launchbadge/sqlx">SQLx</a></td><td><code>redshift://&lt;user&gt;[:&lt;password&gt;]@&lt;host&gt;[:&lt;port&gt;]/&lt;database&gt;</code></td></tr>
+<tr><td><code>rusqlite</code></td><td>SQLite provided by <a href="https://github.com/rusqlite/rusqlite?tab=readme-ov-file#rusqlite">Rusqlite</a></td><td><code>rusqlite://[&lt;file&gt;]</code></td></tr>
+<tr><td><code>s3</code></td><td>Simple Storage Service (S3)</td><td><code>s3://[&lt;access_key_id&gt;:&lt;secret_access_key&gt;@]&lt;host&gt;[:&lt;port&gt;]/&lt;bucket&gt;/&lt;object&gt;[?region=&lt;region&gt;][&amp;session_token=&lt;token&gt;][&amp;force_path_style=(true\|false)][&amp;scheme=&lt;http\|https&gt;]</code></td></tr>
+<tr><td><code>snowflake</code></td><td>Snowflake provided by <a href="https://docs.snowflake.com/en/developer-guide/sql-api/index">Snowflake SQL API</a></td><td><code>snowflake://&lt;user&gt;[:&lt;token&gt;]@&lt;account&gt;.snowflakecomputing.com/[?private_key_file=pkey_file&amp;public_key_file=pubkey_file]</code></td></tr>
+<tr><td><code>sqlite</code></td><td>SQLite provided by <a href="https://github.com/launchbadge/sqlx">SQLx</a></td><td><code>sqlite://[&lt;file&gt;]</code></td></tr>
+<tr><td><code>sqlserver</code></td><td>SQL Server provided by <a href="https://github.com/prisma/tiberius">Tiberius</a></td><td><code>sqlserver://&lt;user&gt;[:&lt;password&gt;]@&lt;host&gt;[:&lt;port&gt;]/&lt;database&gt;</code></td></tr>
+<tr><td><code>tsv</code></td><td>Tab Separated Value (TSV) provided by <a href="https://github.com/pola-rs/polars">Polars</a></td><td><code>tsv://&lt;file&gt;[?has_header=&lt;true\|false&gt;][&amp;quote=&lt;char&gt;][&amp;skip_rows=&lt;n&gt;]</code></td></tr>
+<tr><td><code>xml</code></td><td>Extensible Markup Language (XML) provided by <a href="https://github.com/pola-rs/polars">Polars</a></td><td><code>xml://&lt;file&gt;</code></td></tr>
+<tr><td><code>xz</code></td><td>XZ compressed file</td><td><code>xz://&lt;file&gt;</code></td></tr>
+<tr><td><code>yaml</code></td><td>Extensible Markup Language (YAML) provided by <a href="https://github.com/pola-rs/polars">Polars</a></td><td><code>yaml://&lt;file&gt;</code></td></tr>
+<tr><td><code>zstd</code></td><td>Zstd compressed file</td><td><code>zstd://&lt;file&gt;</code></td></tr>
+</tbody></table>
+</div>
+<h3 id="examples-5"><a class="header" href="#examples-5">Examples</a></h3>
+<p>Show the available drivers:</p>
+<pre><code class="language-text">.drivers
+</code></pre>
+<h3 id="demonstration-6"><a class="header" href="#demonstration-6">Demonstration</a></h3>
+<p><img src="chapter2/drivers/./demo.gif" alt="" /></p>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="echo"><a class="header" href="#echo">echo</a></h2>
+<h3 id="usage-6"><a class="header" href="#usage-6">Usage</a></h3>
+<pre><code class="language-text">.echo &lt;on|prompt|off&gt;
+</code></pre>
+<h3 id="description-6"><a class="header" href="#description-6">Description</a></h3>
+<p>Echo executed commands. By default, the echo command is set to <code>off</code>. If the <code>echo</code> command is set to <code>on</code>, the
+commands will be echoed to the defined output. If the <code>echo</code> command is set to <code>prompt</code>, prompt and commands will
+be echoed to the defined output.</p>
+<h3 id="examples-6"><a class="header" href="#examples-6">Examples</a></h3>
+<p>Show the current echo setting:</p>
+<pre><code class="language-text">.echo
+</code></pre>
+<p>Enable echoing commands:</p>
+<pre><code class="language-text">.echo on
+</code></pre>
+<p>Enable echoing the prompt and commands:</p>
+<pre><code class="language-text">.echo prompt
+</code></pre>
+<p>Disable echoing commands:</p>
+<pre><code class="language-text">.echo off
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="exit"><a class="header" href="#exit">exit</a></h2>
+<h3 id="usage-7"><a class="header" href="#usage-7">Usage</a></h3>
+<pre><code class="language-text">.exit [code]
+</code></pre>
+<h3 id="description-7"><a class="header" href="#description-7">Description</a></h3>
+<p>Exit the shell with an optional status code. If no status code is provided, the exit status will be the exit status of
+the last command executed.</p>
+<h3 id="examples-7"><a class="header" href="#examples-7">Examples</a></h3>
+<p>Exit the shell with a status code of 0.</p>
+<pre><code class="language-text">.exit
+</code></pre>
+<p>Exit the shell with a status code of 1.</p>
+<pre><code class="language-text">.exit 1
+</code></pre>
+<h3 id="demonstration-7"><a class="header" href="#demonstration-7">Demonstration</a></h3>
+<p><img src="chapter2/exit/./demo.gif" alt="" /></p>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="footer"><a class="header" href="#footer">footer</a></h2>
+<h3 id="usage-8"><a class="header" href="#usage-8">Usage</a></h3>
+<pre><code class="language-text">.footer &lt;on|off&gt;
+</code></pre>
+<h3 id="description-8"><a class="header" href="#description-8">Description</a></h3>
+<p>The footer command sets the display of the footer in the CLI. By default, the footer is displayed. If the <code>footer</code>
+command is set to <code>off</code>, the footer will not be displayed.</p>
+<h3 id="examples-8"><a class="header" href="#examples-8">Examples</a></h3>
+<p>Show the current footer setting:</p>
+<pre><code class="language-text">.footer
+</code></pre>
+<p>Enable the footer:</p>
+<pre><code class="language-text">.footer on
+</code></pre>
+<p>Disable the footer:</p>
+<pre><code class="language-text">.footer off
+</code></pre>
+<h3 id="demonstration-8"><a class="header" href="#demonstration-8">Demonstration</a></h3>
+<p><img src="chapter2/footer/./demo.gif" alt="" /></p>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="format"><a class="header" href="#format">format</a></h2>
+<h3 id="usage-9"><a class="header" href="#usage-9">Usage</a></h3>
+<pre><code class="language-text">.format [format]
+</code></pre>
+<h3 id="description-9"><a class="header" href="#description-9">Description</a></h3>
+<p>The format command sets the format mode for the CLI. The default format mode is <code>unicode</code>.</p>
+<div class="table-wrapper"><table><thead><tr><th>Format</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>ascii</code></td><td>ASCII characters to draw a table</td></tr>
+<tr><td><code>csv</code></td><td><a href="https://www.ietf.org/rfc/rfc4180.txt">Comma Separated Values (CSV)</a></td></tr>
+<tr><td><code>expanded</code></td><td><a href="https://www.postgresql.org/docs/current/app-psql.html">PostgreSQL Expanded Format</a></td></tr>
+<tr><td><code>html</code></td><td><a href="https://html.spec.whatwg.org/multipage/">HyperText Markup Language (HTML)</a></td></tr>
+<tr><td><code>json</code></td><td><a href="https://datatracker.ietf.org/doc/html/rfc8259">JavaScript Object Notation (JSON)</a></td></tr>
+<tr><td><code>jsonl</code></td><td><a href="https://jsonlines.org/">JSON Lines (JSONL)</a></td></tr>
+<tr><td><code>markdown</code></td><td><a href="https://www.markdownguide.org/extended-syntax/#tables">Markdown</a></td></tr>
+<tr><td><code>plain</code></td><td>Column based layout</td></tr>
+<tr><td><code>psql</code></td><td><a href="https://www.postgresql.org/docs/current/app-psql.html">PostgreSQL Standard Format</a></td></tr>
+<tr><td><code>sqlite</code></td><td>SQLite formatted table</td></tr>
+<tr><td><code>tsv</code></td><td><a href="https://en.wikipedia.org/wiki/Tab-separated_values">Tab Separated Values (TSV)</a></td></tr>
+<tr><td><code>unicode</code></td><td>Unicode characters to draw a table</td></tr>
+<tr><td><code>xml</code></td><td><a href="https://www.w3.org/TR/xml11/">Extensible Markup Language (XML)</a></td></tr>
+<tr><td><code>yaml</code></td><td><a href="https://yaml.org/spec/1.2.2/">YAML Ain’t Markup Language (YAML)</a></td></tr>
+</tbody></table>
+</div>
+<h3 id="examples-9"><a class="header" href="#examples-9">Examples</a></h3>
+<p>Show the current format mode:</p>
+<pre><code class="language-text">.format
+</code></pre>
+<p>Set the format mode to <code>ascii</code>:</p>
+<pre><code class="language-text">.format ascii
+</code></pre>
+<p>Set the format mode to <code>unicode</code>:</p>
+<pre><code class="language-text">.format unicode
+</code></pre>
+<h3 id="demonstration-9"><a class="header" href="#demonstration-9">Demonstration</a></h3>
+<p><img src="chapter2/format/./demo.gif" alt="" /></p>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="header"><a class="header" href="#header">header</a></h2>
+<h3 id="usage-10"><a class="header" href="#usage-10">Usage</a></h3>
+<pre><code class="language-text">.header &lt;on|off&gt;
+</code></pre>
+<h3 id="description-10"><a class="header" href="#description-10">Description</a></h3>
+<p>The header command sets the display of the header in the CLI. By default, the header is displayed. If the <code>header</code>
+command is set to <code>off</code>, the header will not be displayed.</p>
+<h3 id="examples-10"><a class="header" href="#examples-10">Examples</a></h3>
+<p>Show the current header setting:</p>
+<pre><code class="language-text">.header
+</code></pre>
+<p>Enable the header:</p>
+<pre><code class="language-text">.header on
+</code></pre>
+<p>Disable the header:</p>
+<pre><code class="language-text">.header off
+</code></pre>
+<h3 id="demonstration-10"><a class="header" href="#demonstration-10">Demonstration</a></h3>
+<p><img src="chapter2/header/./demo.gif" alt="" /></p>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="help"><a class="header" href="#help">help</a></h2>
+<h3 id="usage-11"><a class="header" href="#usage-11">Usage</a></h3>
+<pre><code class="language-text">.help
+</code></pre>
+<h3 id="description-11"><a class="header" href="#description-11">Description</a></h3>
+<p>The help command displays help information for the CLI.</p>
+<h3 id="examples-11"><a class="header" href="#examples-11">Examples</a></h3>
+<p>Show the help information:</p>
+<pre><code class="language-text">.help
+</code></pre>
+<h3 id="demonstration-11"><a class="header" href="#demonstration-11">Demonstration</a></h3>
+<p><img src="chapter2/help/./demo.gif" alt="" /></p>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="history"><a class="header" href="#history">history</a></h2>
+<h3 id="usage-12"><a class="header" href="#usage-12">Usage</a></h3>
+<pre><code class="language-text">.history &lt;on|off&gt;
+</code></pre>
+<h3 id="description-12"><a class="header" href="#description-12">Description</a></h3>
+<p>The history command displays the command history for the CLI.</p>
+<h3 id="examples-12"><a class="header" href="#examples-12">Examples</a></h3>
+<p>Show the current history setting and display the history:</p>
+<pre><code class="language-text">.history
+</code></pre>
+<p>Enable history:</p>
+<pre><code class="language-text">.history on
+</code></pre>
+<p>Disable history:</p>
+<pre><code class="language-text">.history off
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="indexes"><a class="header" href="#indexes">indexes</a></h2>
+<h3 id="usage-13"><a class="header" href="#usage-13">Usage</a></h3>
+<pre><code class="language-text">.indexes [table]
+</code></pre>
+<h3 id="description-13"><a class="header" href="#description-13">Description</a></h3>
+<p>Display the indexes for a table. If no table is specified, display the indexes for all tables.</p>
+<h3 id="examples-13"><a class="header" href="#examples-13">Examples</a></h3>
+<p>Display the indexes for all tables:</p>
+<pre><code class="language-text">.indexes
+</code></pre>
+<p>Display the indexes for the <code>users</code> table:</p>
+<pre><code class="language-text">.indexes users
+</code></pre>
+<h3 id="demonstration-12"><a class="header" href="#demonstration-12">Demonstration</a></h3>
+<p><img src="chapter2/indexes/./demo.gif" alt="" /></p>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="limit"><a class="header" href="#limit">limit</a></h2>
+<h3 id="usage-14"><a class="header" href="#usage-14">Usage</a></h3>
+<pre><code class="language-text">.limit [rows]
+</code></pre>
+<h3 id="description-14"><a class="header" href="#description-14">Description</a></h3>
+<p>Set the limit of rows to be displayed. The default limit is 100.
+If the limit is set to 0, then all rows are displayed.</p>
+<h3 id="examples-14"><a class="header" href="#examples-14">Examples</a></h3>
+<p>Display the current limit setting:</p>
+<pre><code class="language-text">.limit
+</code></pre>
+<p>Set row limit to unlimited:</p>
+<pre><code class="language-text">.limit 0
+</code></pre>
+<p>Set row limit to 10:</p>
+<pre><code class="language-text">.limit 10
+</code></pre>
+<h3 id="demonstration-13"><a class="header" href="#demonstration-13">Demonstration</a></h3>
+<p><img src="chapter2/limit/./demo.gif" alt="" /></p>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="locale"><a class="header" href="#locale">locale</a></h2>
+<h3 id="usage-15"><a class="header" href="#usage-15">Usage</a></h3>
+<pre><code class="language-text">.locale [locale]
+</code></pre>
+<h3 id="description-15"><a class="header" href="#description-15">Description</a></h3>
+<p>The locale command sets the locale for the CLI. The locale is used to display numeric values in the specified locale.
+The default locale is determined by the system settings, or the <code>en</code> locale if the system settings can not be
+determined.</p>
+<h3 id="examples-15"><a class="header" href="#examples-15">Examples</a></h3>
+<p>Show the current locale setting:</p>
+<pre><code class="language-text">.locale
+</code></pre>
+<p>Set the locale to <code>en-GB</code>:</p>
+<pre><code class="language-text">.locale en-GB
+</code></pre>
+<h3 id="demonstration-14"><a class="header" href="#demonstration-14">Demonstration</a></h3>
+<p><img src="chapter2/locale/./demo.gif" alt="" /></p>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="output"><a class="header" href="#output">output</a></h2>
+<h3 id="usage-16"><a class="header" href="#usage-16">Usage</a></h3>
+<pre><code class="language-text">.output [filename]
+</code></pre>
+<h3 id="description-16"><a class="header" href="#description-16">Description</a></h3>
+<p>The output command redirects the output commands to the system clipboard or a file. If no option is provided, the output
+is redirected to stdout (console).</p>
+<h3 id="examples-16"><a class="header" href="#examples-16">Examples</a></h3>
+<p>Redirect the output of commands to the system clipboard:</p>
+<pre><code class="language-text">.output clipboard
+</code></pre>
+<p>Redirect the output of commands to a file named <code>output.txt</code>:</p>
+<pre><code class="language-text">.output output.txt
+</code></pre>
+<p>Redirect the output of commands to stdout (console):</p>
+<pre><code class="language-text">.output
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="print"><a class="header" href="#print">print</a></h2>
+<h3 id="usage-17"><a class="header" href="#usage-17">Usage</a></h3>
+<pre><code class="language-text">.print [string]
+</code></pre>
+<h3 id="description-17"><a class="header" href="#description-17">Description</a></h3>
+<p>The print command prints a message to the output.</p>
+<h3 id="examples-17"><a class="header" href="#examples-17">Examples</a></h3>
+<p>Print a message to the output:</p>
+<pre><code class="language-text">.print &quot;hello, world!
+</code></pre>
+<h3 id="demonstration-15"><a class="header" href="#demonstration-15">Demonstration</a></h3>
+<p><img src="chapter2/print/./demo.gif" alt="" /></p>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="quit"><a class="header" href="#quit">quit</a></h2>
+<h3 id="usage-18"><a class="header" href="#usage-18">Usage</a></h3>
+<pre><code class="language-bash">.quit
+</code></pre>
+<h3 id="description-18"><a class="header" href="#description-18">Description</a></h3>
+<p>The quit command exits the CLI.</p>
+<h3 id="examples-18"><a class="header" href="#examples-18">Examples</a></h3>
+<p>Exit the CLI:</p>
+<pre><code class="language-bash">.quit
+</code></pre>
+<h3 id="demonstration-16"><a class="header" href="#demonstration-16">Demonstration</a></h3>
+<p><img src="chapter2/quit/./demo.gif" alt="" /></p>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="read"><a class="header" href="#read">read</a></h2>
+<h3 id="usage-19"><a class="header" href="#usage-19">Usage</a></h3>
+<pre><code class="language-text">.read [filename]
+</code></pre>
+<h3 id="description-19"><a class="header" href="#description-19">Description</a></h3>
+<p>Read and execute SQL commands from a file. The file must contain valid SQL commands.
+Multi-line SQL statements should be terminated with a semicolon (<code>;</code>).</p>
+<h3 id="examples-19"><a class="header" href="#examples-19">Examples</a></h3>
+<p>Read and execute SQL commands from a file named <code>commands.sql</code>:</p>
+<pre><code class="language-text">.read commands.sql
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="rows"><a class="header" href="#rows">rows</a></h2>
+<h3 id="usage-20"><a class="header" href="#usage-20">Usage</a></h3>
+<pre><code class="language-text">.rows &lt;on|off&gt;
+</code></pre>
+<h3 id="description-20"><a class="header" href="#description-20">Description</a></h3>
+<p>The rows command toggles the display of the number of rows returned by a query. When enabled, the number of rows
+returned by a query is displayed after the query results.</p>
+<h3 id="examples-20"><a class="header" href="#examples-20">Examples</a></h3>
+<p>Show the current rows setting:</p>
+<pre><code class="language-text">.rows
+</code></pre>
+<p>Turn on the rows returned display:</p>
+<pre><code class="language-text">.rows on
+</code></pre>
+<p>Turn off the rows returned display:</p>
+<pre><code class="language-text">.rows off
+</code></pre>
+<h3 id="demonstration-17"><a class="header" href="#demonstration-17">Demonstration</a></h3>
+<p><img src="chapter2/rows/./demo.gif" alt="" /></p>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="tables"><a class="header" href="#tables">tables</a></h2>
+<h3 id="usage-21"><a class="header" href="#usage-21">Usage</a></h3>
+<pre><code class="language-text">.schemas
+</code></pre>
+<h3 id="description-21"><a class="header" href="#description-21">Description</a></h3>
+<p>The schemas command lists the schemas in the data source.</p>
+<h3 id="examples-21"><a class="header" href="#examples-21">Examples</a></h3>
+<p>List the schemas in the data source:</p>
+<pre><code class="language-text">.schemas
+</code></pre>
+<h3 id="demonstration-18"><a class="header" href="#demonstration-18">Demonstration</a></h3>
+<p><img src="chapter2/schemas/./demo.gif" alt="" /></p>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="sleep"><a class="header" href="#sleep">sleep</a></h2>
+<h3 id="usage-22"><a class="header" href="#usage-22">Usage</a></h3>
+<pre><code class="language-text">.sleep &lt;seconds&gt;
+</code></pre>
+<h3 id="description-22"><a class="header" href="#description-22">Description</a></h3>
+<p>The sleep command pauses the CLI for the specified number of seconds. This command is can be used in scripts
+to simulate delayed user interaction with a data source.</p>
+<h3 id="examples-22"><a class="header" href="#examples-22">Examples</a></h3>
+<p>Sleep for 1 second:</p>
+<pre><code class="language-text">.sleep
+</code></pre>
+<p>Sleep for 3 seconds:</p>
+<pre><code class="language-text">.sleep 3
+</code></pre>
+<p>Sleep for .5 seconds:</p>
+<pre><code class="language-text">.sleep .5
+</code></pre>
+<h3 id="demonstration-19"><a class="header" href="#demonstration-19">Demonstration</a></h3>
+<p><img src="chapter2/sleep/./demo.gif" alt="" /></p>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="system"><a class="header" href="#system">system</a></h2>
+<h3 id="usage-23"><a class="header" href="#usage-23">Usage</a></h3>
+<pre><code class="language-text">.system command [args]
+</code></pre>
+<h3 id="description-23"><a class="header" href="#description-23">Description</a></h3>
+<p>The system command executes the specified operating system command. The command and any optional arguments are passed
+to the operating system shell for execution. The output of the command is displayed to the defined output.</p>
+<h3 id="examples-23"><a class="header" href="#examples-23">Examples</a></h3>
+<p>Print the current working directory:</p>
+<pre><code class="language-text">.system pwd
+</code></pre>
+<p>List the current directory:</p>
+<pre><code class="language-text">.system ls -l
+</code></pre>
+<h3 id="demonstration-20"><a class="header" href="#demonstration-20">Demonstration</a></h3>
+<p><img src="chapter2/system/./demo.gif" alt="" /></p>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="tables-1"><a class="header" href="#tables-1">tables</a></h2>
+<h3 id="usage-24"><a class="header" href="#usage-24">Usage</a></h3>
+<pre><code class="language-text">.tables
+</code></pre>
+<h3 id="description-24"><a class="header" href="#description-24">Description</a></h3>
+<p>The tables command lists the tables in the schema.</p>
+<h3 id="examples-24"><a class="header" href="#examples-24">Examples</a></h3>
+<p>List the tables in the schema:</p>
+<pre><code class="language-text">.tables
+</code></pre>
+<h3 id="demonstration-21"><a class="header" href="#demonstration-21">Demonstration</a></h3>
+<p><img src="chapter2/tables/./demo.gif" alt="" /></p>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="output-1"><a class="header" href="#output-1">output</a></h2>
+<h3 id="usage-25"><a class="header" href="#usage-25">Usage</a></h3>
+<pre><code class="language-text">.tee [filename]
+</code></pre>
+<h3 id="description-25"><a class="header" href="#description-25">Description</a></h3>
+<p>The tee command redirects the output of commands to the system clipboard or a file and stdout (console). If option is
+provided, the output is redirected to stdout (console).</p>
+<h3 id="examples-25"><a class="header" href="#examples-25">Examples</a></h3>
+<p>Redirect the output of commands to the system clipboard and the console:</p>
+<pre><code class="language-text">.tee clipboard
+</code></pre>
+<p>Redirect the output of commands to a file named <code>output.txt</code> and the console:</p>
+<pre><code class="language-text">.tee output.txt
+</code></pre>
+<p>Redirect the output of commands to stdout (console):</p>
+<pre><code class="language-text">.tee
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="timer"><a class="header" href="#timer">timer</a></h2>
+<h3 id="usage-26"><a class="header" href="#usage-26">Usage</a></h3>
+<pre><code class="language-text">.timer &lt;on|off&gt;
+</code></pre>
+<h3 id="description-26"><a class="header" href="#description-26">Description</a></h3>
+<p>The timer command toggles the display of the time taken to execute a query.</p>
+<h3 id="examples-26"><a class="header" href="#examples-26">Examples</a></h3>
+<p>Show the current timer setting:</p>
+<pre><code class="language-text">.timer
+</code></pre>
+<p>Turn on the timer:</p>
+<pre><code class="language-text">.timer on
+</code></pre>
+<p>Turn off the timer:</p>
+<pre><code class="language-text">.timer off
+</code></pre>
+<h3 id="demonstration-22"><a class="header" href="#demonstration-22">Demonstration</a></h3>
+<p><img src="chapter2/timer/./demo.gif" alt="" /></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="appendix"><a class="header" href="#appendix">Appendix</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="configuration-file-rsqltoml"><a class="header" href="#configuration-file-rsqltoml">Configuration File (rsql.toml)</a></h2>
+<p>A default <a href="appendix/rsql-toml.html#rsqltoml-1">rsql.toml</a> file will be created on startup if one does not already exist.
+This file is used to configure the behavior of the rsql CLI and will be written to the <code>$HOME/.rsql</code> directory
+on Unix-like systems and <code>%APPDATA%\rsql</code> on Windows. The file is written in the <a href="https://toml.io/en/">TOML</a> format.</p>
+<h3 id="rsqltoml"><a class="header" href="#rsqltoml">rsql.toml</a></h3>
+<p>The following is an example of a <code>rsql.toml</code> file:</p>
+<pre><code class="language-toml">[global]
+
+# The locale to use.  If not specified, an attempt will be made to detect
+# the system locale, but if that fails, the default &quot;en&quot; (US English)
+# locale will be used.
+#locale = &quot;en&quot;
+
+# Indicate if the program should exit after the first error occurs.
+#
+# Possible values:
+#   true - exit after the first error
+#   false - continue processing after the first error
+bail_on_error = false
+
+# Indicate if color should be used in the output.
+#
+# Possible values:
+#   true - use color in the output
+#   false - don't use color in the output
+#color = true
+
+# The string used to initiate a command.
+#
+# This is used to determine if a line is a command or not. For example,
+# if the command identifier is set to &quot;.&quot;, then any line that starts with
+# a &quot;.&quot; will be considered a command.
+command_identifier = &quot;.&quot;
+
+# Indicate if executed commands should be echoed to the defined output.
+#
+# Possible values:
+#   true - echo executed commands
+#   prompt - echo prompt and executed commands 
+#   false - don't echo executed commands
+echo = false
+
+[log]
+
+# The log level to use.
+#
+# Possible values:
+#   &quot;off&quot;  - Designates that trace instrumentation should be completely
+#            disabled.
+#   &quot;error&quot; - Designates very serious errors.
+#   &quot;warn&quot; - Designates hazardous situations.
+#   &quot;info&quot; - Designates useful information.
+#   &quot;debug&quot; - Designates lower priority information.
+#   &quot;trace&quot; - Designates very low priority, often extremely verbose,
+#             information.
+level = &quot;info&quot;
+
+# The frequency to rotate the logs.
+#
+# Possible values:
+#   &quot;minutely&quot; - Rotate the logs minutely.
+#   &quot;hourly&quot; - Rotate the logs hourly.
+#   &quot;daily&quot; - Rotate the logs daily.
+#   &quot;never&quot; - Never rotate the logs.
+rotation = &quot;daily&quot;
+
+[shell]
+
+# The key binding mode to use.
+#
+# Possible values:
+#   &quot;emacs&quot; - use the Emacs key bindings
+#   &quot;vi&quot; - use the Vi key bindings
+edit_mode = &quot;emacs&quot;
+
+# Indicate if commands should be saved to the history file.
+#
+# Possible values:
+#   true - save commands to the history file
+#   false - don't save commands to the history file
+history.enabled = true
+
+# Indicate if duplicate commands should be saved to the history file.
+#
+# Possible values:
+#   true - save duplicate commands to the history file
+#   false - don't save duplicate commands to the history file
+history.ignore_dups = true
+
+# The maximum number of history entries to keep.
+#
+# 0 means no limit.
+history.limit = 1000
+
+# Indicate if smart completions should be used.
+#
+# Possible values:
+#   true - smart completions are enabled
+#   false - smart completions are disabled
+smart.completions = true
+
+# The theme to use when light mode is detected.
+theme.light = &quot;Solarized (light)&quot;
+
+# The theme to use when dark mode is detected.
+theme.dark = &quot;Solarized (dark)&quot;
+
+# The theme to use. This value overrides the light and dark mode themes
+# when set.
+#
+# Possible values:
+#   &quot;base16-ocean.dark&quot;
+#   &quot;base16-ocean.light&quot;
+#   &quot;Solarized (dark)&quot;
+#   &quot;Solarized (light)&quot;
+#theme = &quot;Solarized (dark)&quot;
+
+[results]
+
+# Indicate if changes should be displayed.
+#
+# Possible values:
+#   true - display the changes
+#   false - don't display the changes
+changes = true
+
+# Indicate if footer should be displayed when displaying results.
+#
+# Possible values:
+#   true - display the footer
+#   false - don't display the footer
+footer = true
+
+# The format to use for results.
+#
+# Possible values:
+#   &quot;ascii&quot; - ASCII characters to draw a table
+#   &quot;csv&quot; - Comma Separated Values (CSV)
+#   &quot;html&quot; - HyperText Markup Language (HTML)
+#   &quot;json&quot; - JavaScript Object Notation (JSON)
+#   &quot;jsonl&quot; - JSON Lines (JSONL)
+#   &quot;markdown&quot; - Markdown
+#   &quot;plain&quot; - Column based layout
+#   &quot;psql&quot; - PostgreSQL formatted table
+#   &quot;sqlite&quot; - SQLite formatted table
+#   &quot;tsv&quot; - Tab Separated Values (TSV)
+#   &quot;unicode&quot; - Unicode characters to draw a table
+#   &quot;xml&quot; - Extensible Markup Language (XML)
+#   &quot;yaml&quot; - YAML Ain’t Markup Language (YAML)
+format = &quot;psql&quot;
+
+# Indicate if header should be displayed when displaying results.
+#
+# Possible values:
+#   true - display the header
+#   false - don't display the header
+header = true
+
+# The maximum number of rows to display. 0 means no limit.
+limit = 100
+
+# Indicate if rows returned should be displayed.
+#
+# Possible values:
+#   true - display the rows
+#   false - don't display the rows
+rows = true
+
+# Enable timer for commands.
+#
+# Possible values:
+#   true - enable timer
+#   false - disable timer
+timer = true
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="supported-locales"><a class="header" href="#supported-locales">Supported Locales</a></h2>
+<p>Each locale includes a <a href="https://www.iso.org/iso-639-language-code">ISO 639-1</a> language code and an optional
+<a href="https://www.iso.org/iso-3166-country-codes.html">ISO 3166-1</a> country code to specify language and regional
+settings.</p>
+<p>The following locales have translations available for use. Most of the translations are &quot;machine translations&quot; and will
+often be less than perfect. If you would like to contribute a better translation, or add a new locale, please submit
+your contribution to <a href="https://github.com/theseus-rs/rsql">rsql</a>.</p>
+<div class="table-wrapper"><table><thead><tr><th>Locale</th><th>Description</th></tr></thead><tbody>
+<tr><td>ar</td><td>Arabic</td></tr>
+<tr><td>be</td><td>Belarusian</td></tr>
+<tr><td>bg</td><td>Bulgarian</td></tr>
+<tr><td>bn</td><td>Bengali</td></tr>
+<tr><td>cs</td><td>Czech</td></tr>
+<tr><td>da</td><td>Danish</td></tr>
+<tr><td>de</td><td>German</td></tr>
+<tr><td>el</td><td>Greek</td></tr>
+<tr><td>en-GB</td><td>English (United Kingdom)</td></tr>
+<tr><td>es</td><td>Spanish</td></tr>
+<tr><td>et</td><td>Estonian</td></tr>
+<tr><td>fi</td><td>Finnish</td></tr>
+<tr><td>fr</td><td>French</td></tr>
+<tr><td>ga</td><td>Irish</td></tr>
+<tr><td>he</td><td>Hebrew</td></tr>
+<tr><td>hi</td><td>Hindi</td></tr>
+<tr><td>hr</td><td>Croatian</td></tr>
+<tr><td>hu</td><td>Hungarian</td></tr>
+<tr><td>is</td><td>Icelandic</td></tr>
+<tr><td>it</td><td>Italian</td></tr>
+<tr><td>ja</td><td>Japanese</td></tr>
+<tr><td>jv</td><td>Javanese</td></tr>
+<tr><td>ka</td><td>Georgian</td></tr>
+<tr><td>ko</td><td>Korean</td></tr>
+<tr><td>lt</td><td>Lithuanian</td></tr>
+<tr><td>lv</td><td>Latvian</td></tr>
+<tr><td>mk</td><td>Macedonian</td></tr>
+<tr><td>ms</td><td>Malay</td></tr>
+<tr><td>mt</td><td>Maltese</td></tr>
+<tr><td>nl</td><td>Dutch</td></tr>
+<tr><td>no</td><td>Norwegian</td></tr>
+<tr><td>pl</td><td>Polish</td></tr>
+<tr><td>pt</td><td>Portuguese</td></tr>
+<tr><td>ro</td><td>Romanian</td></tr>
+<tr><td>ru</td><td>Russian</td></tr>
+<tr><td>sk</td><td>Slovak</td></tr>
+<tr><td>sl</td><td>Slovenian</td></tr>
+<tr><td>sq</td><td>Albanian</td></tr>
+<tr><td>sr</td><td>Serbian</td></tr>
+<tr><td>sv</td><td>Swedish</td></tr>
+<tr><td>th</td><td>Thai</td></tr>
+<tr><td>tr</td><td>Turkish</td></tr>
+<tr><td>uk</td><td>Ukrainian</td></tr>
+<tr><td>vi</td><td>Vietnamese</td></tr>
+<tr><td>yi</td><td>Yiddish</td></tr>
+<tr><td>zh</td><td>Chinese</td></tr>
+</tbody></table>
+</div>
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+        <script>
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+
+    </div>
+    </body>
+</html>
