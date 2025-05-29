@@ -65,6 +65,8 @@ impl DriverManager {
         Self::add(Arc::new(rsql_driver_bzip2::Driver))?;
         #[cfg(feature = "driver-cockroachdb")]
         Self::add(Arc::new(rsql_driver_cockroachdb::Driver))?;
+        #[cfg(feature = "driver-cratedb")]
+        Self::add(Arc::new(rsql_driver_cratedb::Driver))?;
         #[cfg(feature = "driver-csv")]
         Self::add(Arc::new(rsql_driver_csv::Driver))?;
         #[cfg(feature = "driver-delimited")]

@@ -1,0 +1,29 @@
+[package]
+authors.workspace = true
+categories.workspace = true
+description = "rsql cratedb driver"
+edition.workspace = true
+keywords.workspace = true
+license.workspace = true
+name = "rsql_driver_cratedb"
+repository.workspace = true
+rust-version.workspace = true
+version.workspace = true
+
+[dependencies]
+async-trait = { workspace = true }
+file_type = { workspace = true }
+rsql_driver = { path = "../../rsql_driver", version = "0.18.3" }
+rsql_driver_postgresql = { path = "../postgresql", version = "0.18.3" }
+url = { workspace = true }
+
+[dev-dependencies]
+anyhow = { workspace = true }
+testcontainers = { workspace = true }
+testcontainers-modules = { workspace = true, features = ["cratedb"] }
+tokio = { workspace = true, features = ["macros", "rt"] }
+
+[features]
+default = ["native-tls"]
+native-tls = ["rsql_driver_postgresql/native-tls"]
+rustls = ["rsql_driver_postgresql/rustls"]

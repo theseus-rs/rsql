@@ -57,6 +57,7 @@ all-drivers = [
     "driver-brotli",
     "driver-bzip2",
     "driver-cockroachdb",
+    "driver-cratedb",
     "driver-csv",
     "driver-delimited",
     "driver-duckdb",
@@ -95,6 +96,7 @@ driver-avro = ["rsql_drivers/driver-avro"]
 driver-brotli = ["rsql_drivers/driver-brotli"]
 driver-bzip2 = ["rsql_drivers/driver-bzip2"]
 driver-cockroachdb = ["rsql_drivers/driver-cockroachdb"]
+driver-cratedb = ["rsql_drivers/driver-cratedb"]
 driver-csv = ["rsql_drivers/driver-csv"]
 driver-delimited = ["rsql_drivers/driver-delimited"]
 driver-duckdb = ["rsql_drivers/driver-duckdb"]

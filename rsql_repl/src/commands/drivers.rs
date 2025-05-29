@@ -55,6 +55,7 @@ mod tests {
         assert_eq!(description, "Display available database drivers");
     }
 
+    #[expect(clippy::too_many_lines)]
     #[tokio::test]
     async fn test_execute() -> anyhow::Result<()> {
         rsql_drivers::DriverManager::initialize()?;
@@ -88,6 +89,8 @@ mod tests {
             "bzip2",
             #[cfg(feature = "driver-cockroachdb")]
             "cockroachdb",
+            #[cfg(feature = "driver-cratedb")]
+            "cratedb",
             #[cfg(feature = "driver-csv")]
             "csv",
             #[cfg(feature = "driver-delimited")]

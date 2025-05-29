@@ -7584,6 +7584,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "rsql_driver_cratedb"
+version = "0.18.3"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "file_type",
+ "rsql_driver",
+ "rsql_driver_postgresql",
+ "testcontainers",
+ "testcontainers-modules",
+ "tokio",
+ "url",
+]
+
+[[package]]
 name = "rsql_driver_csv"
 version = "0.18.3"
 dependencies = [
@@ -8137,6 +8152,7 @@ dependencies = [
  "rsql_driver_brotli",
  "rsql_driver_bzip2",
  "rsql_driver_cockroachdb",
+ "rsql_driver_cratedb",
  "rsql_driver_csv",
  "rsql_driver_delimited",
  "rsql_driver_duckdb",
@@ -9843,9 +9859,9 @@ dependencies = [
 
 [[package]]
 name = "testcontainers-modules"
-version = "0.12.0"
+version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7f29549c522bd43086d038c421ed69cdf88bc66387acf3aa92b26f965fa95ec2"
+checksum = "eac95cde96549fc19c6bf19ef34cc42bd56e264c1cb97e700e21555be0ecf9e2"
 dependencies = [
  "testcontainers",
 ]
