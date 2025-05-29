@@ -5,6 +5,7 @@ default-members = [
     "drivers/brotli",
     "drivers/bzip2",
     "drivers/cockroachdb",
+    "drivers/cratedb",
     "drivers/csv",
     "drivers/delimited",
     "drivers/duckdb",
@@ -52,6 +53,7 @@ members = [
     "drivers/brotli",
     "drivers/bzip2",
     "drivers/cockroachdb",
+    "drivers/cratedb",
     "drivers/csv",
     "drivers/delimited",
     "drivers/duckdb",
@@ -178,7 +180,7 @@ tempfile = "3.20.0"
 termbg = "0.6.2"
 test-log = "0.2.17"
 testcontainers = "0.24.0"
-testcontainers-modules = "0.12.0"
+testcontainers-modules = "0.12.1"
 thiserror = "2.0.12"
 tiberius = { version = "0.12.3", default-features = false }
 tokio = "1.45.0"

@@ -18,6 +18,7 @@ rsql_driver_avro = { path = "../drivers/avro", optional = true, version = "0.18.
 rsql_driver_brotli = { path = "../drivers/brotli", optional = true, version = "0.18.3" }
 rsql_driver_bzip2 = { path = "../drivers/bzip2", optional = true, version = "0.18.3" }
 rsql_driver_cockroachdb = { path = "../drivers/cockroachdb", optional = true, version = "0.18.3" }
+rsql_driver_cratedb = { path = "../drivers/cratedb", optional = true, version = "0.18.3" }
 rsql_driver_csv = { path = "../drivers/csv", optional = true, version = "0.18.3" }
 rsql_driver_delimited = { path = "../drivers/delimited", optional = true, version = "0.18.3" }
 rsql_driver_duckdb = { path = "../drivers/duckdb", optional = true, version = "0.18.3" }
@@ -68,6 +69,7 @@ all = [
     "driver-brotli",
     "driver-bzip2",
     "driver-cockroachdb",
+    "driver-cratedb",
     "driver-csv",
     "driver-delimited",
     "driver-duckdb",
@@ -107,6 +109,7 @@ all-wasm = [
     "driver-brotli",
     "driver-bzip2",
     # "driver-cockroachdb",
+    # "driver-cratedb",
     "driver-csv",
     "driver-delimited",
     # "driver-duckdb",
@@ -146,6 +149,7 @@ driver-avro = ["dep:rsql_driver_avro"]
 driver-brotli = ["dep:rsql_driver_brotli"]
 driver-bzip2 = ["dep:rsql_driver_bzip2"]
 driver-cockroachdb = ["dep:rsql_driver_cockroachdb"]
+driver-cratedb = ["dep:rsql_driver_cratedb"]
 driver-csv = ["dep:rsql_driver_csv"]
 driver-delimited = ["dep:rsql_driver_delimited"]
 driver-duckdb = ["dep:rsql_driver_duckdb"]
@@ -180,6 +184,7 @@ driver-yaml = ["dep:rsql_driver_yaml"]
 driver-zstd = ["dep:rsql_driver_zstd"]
 native-tls = [
     "rsql_driver_cockroachdb/native-tls",
+    "rsql_driver_cratedb/native-tls",
     "rsql_driver_https/native-tls",
     "rsql_driver_mariadb/native-tls",
     "rsql_driver_mysql/native-tls",
@@ -190,6 +195,7 @@ native-tls = [
 ]
 rustls = [
     "rsql_driver_cockroachdb/rustls",
+    "rsql_driver_cratedb/rustls",
     "rsql_driver_https/rustls",
     "rsql_driver_mariadb/rustls",
     "rsql_driver_mysql/rustls",
