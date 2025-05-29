@@ -150,14 +150,15 @@ inquire = "0.7.5"
 jiff = "0.2.14"
 jwt-simple = { version = "0.12.12", default-features = false }
 liblzma = "0.4.1"
+
 libsql = "0.9.8"
 lz4 = "1.28.1"
 mockall = "0.13.1"
 num-format = "0.4.4"
 orc-rust = { version = "0.6.0", default-features = false }
 os_info = "3.11.0"
-polars = { version = "0.46.0", default-features = false, features = ["dtype-categorical"] }
-polars-sql = "0.46.0"
+polars = { version = "0.48.1", default-features = false, features = ["dtype-categorical"] }
+polars-sql = "0.48.1"
 postgresql_embedded = "0.18.5"
 quick-xml = "0.37.5"
 regex = "1.11.1"
