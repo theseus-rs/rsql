@@ -240,20 +240,21 @@ impl ReplCompleter {
 
         debug!("Table aliases found: {:?}", table_aliases);
 
-        let tables = if let Some(schema) = self.metadata.current_schema() {
-            tokens_no_location
-                .iter()
-                .filter_map(|token| {
-                    if let Token::Word(word) = token {
-                        schema.get(&word.value)
-                    } else {
-                        None
-                    }
-                })
-                .collect()
-        } else {
-            vec![]
-        };
+        let mut tables = Vec::<&Table>::new();
+        if let Some(catalog) = self.metadata.current_catalog() {
+            if let Some(schema) = catalog.current_schema() {
+                tables = tokens_no_location
+                    .iter()
+                    .filter_map(|token| {
+                        if let Token::Word(word) = token {
+                            schema.get(&word.value)
+                        } else {
+                            None
+                        }
+                    })
+                    .collect();
+            }
+        }
 
         tables
             .into_iter()
@@ -391,19 +392,21 @@ impl ReplCompleter {
                 .cloned()
                 .collect(),
             Suggestion::Table(starts_with) => {
-                if let Some(schema) = self.metadata.current_schema() {
-                    schema
-                        .tables()
-                        .iter()
-                        .filter(|table| table.name().starts_with(starts_with.trim()))
-                        .map(|table| Pair {
-                            display: format!("Table: {}", table.name()),
-                            replacement: table.name().to_string(),
-                        })
-                        .collect()
-                } else {
-                    vec![]
+                let mut tables = Vec::new();
+                if let Some(catalog) = self.metadata.current_catalog() {
+                    if let Some(schema) = catalog.current_schema() {
+                        tables = schema
+                            .tables()
+                            .iter()
+                            .filter(|table| table.name().starts_with(starts_with.trim()))
+                            .map(|table| Pair {
+                                display: format!("Table: {}", table.name()),
+                                replacement: table.name().to_string(),
+                            })
+                            .collect();
+                    }
                 }
+                tables
             }
             Suggestion::TableColumn(table_name) => tables
                 .iter()
@@ -439,15 +442,20 @@ impl ReplCompleter {
                     replacement: table_alias,
                 })
                 .collect(),
-            Suggestion::Schema => self
-                .metadata
-                .schemas()
-                .iter()
-                .map(|schema| Pair {
-                    display: format!("Schema: {}", schema.name()),
-                    replacement: schema.name().to_string(),
-                })
-                .collect(),
+            Suggestion::Schema => {
+                if let Some(catalog) = self.metadata.current_catalog() {
+                    catalog
+                        .schemas()
+                        .iter()
+                        .map(|schema| Pair {
+                            display: format!("Schema: {}", schema.name()),
+                            replacement: schema.name().to_string(),
+                        })
+                        .collect()
+                } else {
+                    Vec::new()
+                }
+            }
         }
     }
 
@@ -530,6 +538,7 @@ fn find_previous_keyword(
 mod test {
     use super::*;
     use crate::shell::helper::ReplHelper;
+    use rsql_driver::Catalog;
     use rsql_drivers::{Column, Schema};
     use rustyline::history::DefaultHistory;
     use sqlparser::{dialect::GenericDialect, tokenizer::Word};
@@ -778,7 +787,9 @@ mod test {
         schema.add(orders_table);
 
         let mut metadata = Metadata::new();
-        metadata.add(schema);
+        let mut catalog = Catalog::new("default", true);
+        catalog.add(schema);
+        metadata.add(catalog);
         metadata
     }
 

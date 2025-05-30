@@ -1,40 +1,82 @@
 use indoc::indoc;
 use regex::Regex;
 use rsql_driver::Error::IoError;
-use rsql_driver::{Column, Connection, Index, Metadata, Result, Schema, Table, Value};
+use rsql_driver::{Catalog, Column, Connection, Index, Metadata, Result, Schema, Table, Value};
 
 pub(crate) async fn get_metadata(connection: &mut dyn Connection) -> Result<Metadata> {
     let mut metadata = Metadata::with_dialect(connection.dialect());
 
-    retrieve_schemas(connection, &mut metadata).await?;
+    retrieve_catalogs(connection, &mut metadata).await?;
 
     Ok(metadata)
 }
 
-async fn retrieve_schemas(connection: &mut dyn Connection, metadata: &mut Metadata) -> Result<()> {
-    let mut schemas = vec![];
-    let sql = indoc! { "SELECT name FROM pragma_database_list" };
+async fn retrieve_catalogs(connection: &mut dyn Connection, metadata: &mut Metadata) -> Result<()> {
+    let mut catalogs = vec![];
+    let sql = indoc! { r"
+        SELECT
+            catalog_name,
+            catalog_name = current_database() AS current_catalog
+        FROM
+            information_schema.schemata
+        GROUP BY
+            catalog_name
+        ORDER BY
+            catalog_name
+    "};
     let mut query_result = connection.query(sql).await?;
-    let mut current = true;
 
     while let Some(row) = query_result.next().await {
-        let database_name = match row.first() {
+        let catalog_name = match row.first() {
             Some(value) => value.to_string(),
             None => continue,
         };
-        let schema = Schema::new(database_name, current);
-        current = false;
-        schemas.push(schema);
+        let current = matches!(row.get(1), Some(Value::Bool(true)));
+        let catalog = Catalog::new(catalog_name, current);
+        catalogs.push(catalog);
     }
 
-    schemas.sort_by_key(|schema| schema.name().to_string());
+    for mut catalog in catalogs {
+        retrieve_schemas(connection, &mut catalog).await?;
+        metadata.add(catalog);
+    }
+
+    Ok(())
+}
+
+async fn retrieve_schemas(connection: &mut dyn Connection, catalog: &mut Catalog) -> Result<()> {
+    let mut schemas = vec![];
+    let sql = indoc! { r"
+        SELECT
+            schema_name,
+            schema_name = current_schema() AS current_schema
+        FROM
+            information_schema.schemata
+        WHERE
+            catalog_name = current_database()
+        GROUP BY
+            schema_name
+        ORDER BY
+            schema_name
+    "};
+    let mut query_result = connection.query(sql).await?;
+
+    while let Some(row) = query_result.next().await {
+        let schema_name = match row.first() {
+            Some(value) => value.to_string(),
+            None => continue,
+        };
+        let current = matches!(row.get(1), Some(Value::Bool(true)));
+        let schema = Schema::new(schema_name, current);
+        schemas.push(schema);
+    }
 
     for mut schema in schemas {
         if schema.current() {
             retrieve_tables(connection, &mut schema).await?;
             retrieve_indexes(connection, &mut schema).await?;
         }
-        metadata.add(schema);
+        catalog.add(schema);
     }
 
     Ok(())
@@ -50,6 +92,9 @@ async fn retrieve_tables(connection: &mut dyn Connection, schema: &mut Schema) -
                 column_default
             FROM
                 information_schema.columns
+            WHERE
+                table_catalog = current_database()
+                AND table_schema = current_schema()
             ORDER BY
                 table_name,
                 ordinal_position
@@ -178,7 +223,10 @@ mod test {
             .await?;
 
         let metadata = connection.metadata().await?;
-        let schema = metadata.current_schema().expect("schema");
+        assert_eq!(metadata.catalogs().len(), 3);
+        let catalog = metadata.current_catalog().expect("catalog");
+        assert_eq!(catalog.schemas().len(), 1);
+        let schema = catalog.current_schema().expect("schema");
         assert_eq!(schema.tables().len(), 2);
 
         let contacts_table = schema.get("contacts").expect("contacts table");

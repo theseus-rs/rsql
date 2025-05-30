@@ -34,7 +34,8 @@ async fn test_schema(connection: &mut dyn rsql_driver::Connection) -> anyhow::Re
         .await?;
 
     let metadata = connection.metadata().await?;
-    let schema = metadata.current_schema().expect("schema");
+    let catalog = metadata.current_catalog().expect("catalog");
+    let schema = catalog.current_schema().expect("schema");
     let tables = schema
         .tables()
         .iter()

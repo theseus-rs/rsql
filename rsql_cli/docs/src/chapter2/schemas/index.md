@@ -1,4 +1,4 @@
-## tables
+## schemas
 
 ### Usage
 

@@ -444,10 +444,9 @@ mod test {
         );
         assert!(query_result.next().await.is_none());
 
-        let db_metadata = connection.metadata().await?;
-        let schema = db_metadata
-            .current_schema()
-            .expect("expected at least one schema");
+        let metadata = connection.metadata().await?;
+        let catalog = metadata.current_catalog().expect("catalog");
+        let schema = catalog.current_schema().expect("schema");
         assert!(schema.tables().iter().any(|table| table.name() == "person"));
 
         connection.close().await?;

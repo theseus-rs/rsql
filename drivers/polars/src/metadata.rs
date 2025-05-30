@@ -2,20 +2,32 @@ use crate::Connection as PolarsConnection;
 use polars::datatypes::{DataType, Field};
 use polars::prelude::SchemaExt;
 use rsql_driver::Error::IoError;
-use rsql_driver::{Column, Metadata, Result, Schema, Table};
+use rsql_driver::{Catalog, Column, Metadata, Result, Schema, Table};
 
 pub(crate) async fn get_metadata(connection: &mut PolarsConnection) -> Result<Metadata> {
     let mut metadata = Metadata::default();
 
-    retrieve_schemas(connection, &mut metadata).await?;
+    retrieve_catalogs(connection, &mut metadata).await?;
 
     Ok(metadata)
 }
 
-async fn retrieve_schemas(
+async fn retrieve_catalogs(
     connection: &mut PolarsConnection,
     metadata: &mut Metadata,
 ) -> Result<()> {
+    let mut catalogs = vec![Catalog::new("default", true)];
+    catalogs.sort_by_key(|catalog| catalog.name().to_string());
+
+    for mut catalog in catalogs {
+        retrieve_schemas(connection, &mut catalog).await?;
+        metadata.add(catalog);
+    }
+
+    Ok(())
+}
+
+async fn retrieve_schemas(connection: &mut PolarsConnection, catalog: &mut Catalog) -> Result<()> {
     let mut schemas = vec![Schema::new("polars", true)];
 
     schemas.sort_by_key(|schema| schema.name().to_string());
@@ -24,7 +36,7 @@ async fn retrieve_schemas(
         if schema.current() {
             retrieve_tables(connection, &mut schema).await?;
         }
-        metadata.add(schema);
+        catalog.add(schema);
     }
 
     Ok(())
@@ -101,7 +113,10 @@ mod test {
         let mut connection = PolarsConnection::new("polars://", context).await?;
 
         let metadata = connection.metadata().await?;
-        let schema = metadata.current_schema().expect("schema");
+        assert_eq!(metadata.catalogs().len(), 1);
+        let catalog = metadata.current_catalog().expect("catalog");
+        assert_eq!(catalog.schemas().len(), 1);
+        let schema = catalog.current_schema().expect("schema");
         assert_eq!(schema.tables().len(), 1);
 
         let users_table = schema.get("users").expect("users table");

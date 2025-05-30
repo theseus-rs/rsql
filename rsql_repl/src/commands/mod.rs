@@ -1,4 +1,5 @@
 pub mod bail;
+pub mod catalogs;
 pub mod changes;
 pub mod clear;
 pub mod color;

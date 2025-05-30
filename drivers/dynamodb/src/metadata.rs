@@ -1,16 +1,28 @@
 use aws_sdk_dynamodb::Client;
 use rsql_driver::Error::IoError;
-use rsql_driver::{Column, Connection, Index, Metadata, Result, Schema, Table};
+use rsql_driver::{Catalog, Column, Connection, Index, Metadata, Result, Schema, Table};
 
 pub(crate) async fn get_metadata(connection: &dyn Connection, client: &Client) -> Result<Metadata> {
     let mut metadata = Metadata::with_dialect(connection.dialect());
 
-    retrieve_schemas(client, &mut metadata).await?;
+    retrieve_catalogs(client, &mut metadata).await?;
 
     Ok(metadata)
 }
 
-async fn retrieve_schemas(client: &Client, metadata: &mut Metadata) -> Result<()> {
+async fn retrieve_catalogs(client: &Client, metadata: &mut Metadata) -> Result<()> {
+    let mut catalogs = vec![Catalog::new("default", true)];
+    catalogs.sort_by_key(|catalog| catalog.name().to_string());
+
+    for mut catalog in catalogs {
+        retrieve_schemas(client, &mut catalog).await?;
+        metadata.add(catalog);
+    }
+
+    Ok(())
+}
+
+async fn retrieve_schemas(client: &Client, catalog: &mut Catalog) -> Result<()> {
     let mut schemas = vec![];
     let schema_name = "dynamodb";
     let schema = Schema::new(schema_name, true);
@@ -20,7 +32,7 @@ async fn retrieve_schemas(client: &Client, metadata: &mut Metadata) -> Result<()
         if schema.current() {
             retrieve_tables(client, &mut schema).await?;
         }
-        metadata.add(schema);
+        catalog.add(schema);
     }
 
     Ok(())

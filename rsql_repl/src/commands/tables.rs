@@ -28,12 +28,14 @@ impl ShellCommand for Command {
         let columns = vec![table_label];
         let mut rows = Vec::new();
 
-        if let Some(database) = metadata.current_schema() {
-            let tables = database.tables();
-            for table in tables {
-                let value = Value::String(table.name().to_string());
-                let row = vec![value];
-                rows.push(row);
+        if let Some(catalog) = metadata.current_catalog() {
+            if let Some(database) = catalog.current_schema() {
+                let tables = database.tables();
+                for table in tables {
+                    let value = Value::String(table.name().to_string());
+                    let row = vec![value];
+                    rows.push(row);
+                }
             }
         }
 
@@ -63,6 +65,7 @@ mod tests {
     use crate::commands::{CommandManager, CommandOptions};
     use crate::writers::Output;
     use rsql_core::Configuration;
+    use rsql_driver::Catalog;
     use rsql_drivers::{Metadata, MockConnection, Schema, Table};
     use rsql_formatters::FormatterManager;
     use rustyline::history::DefaultHistory;
@@ -82,11 +85,13 @@ mod tests {
     #[tokio::test]
     async fn test_execute() -> anyhow::Result<()> {
         let mut metadata = Metadata::new();
-        let mut database = Schema::new("default", true);
+        let mut catalog = Catalog::new("default", true);
+        let mut schema = Schema::new("default", true);
         let table_name = "table1";
         let table = Table::new(table_name);
-        database.add(table);
-        metadata.add(database);
+        schema.add(table);
+        catalog.add(schema);
+        metadata.add(catalog);
 
         let mock_connection = &mut MockConnection::new();
         mock_connection

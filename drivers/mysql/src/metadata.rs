@@ -1,22 +1,64 @@
 use indoc::indoc;
-use rsql_driver::{Column, Connection, Index, Metadata, Result, Schema, Table, Value};
+use rsql_driver::{Catalog, Column, Connection, Index, Metadata, Result, Schema, Table, Value};
 
 pub(crate) async fn get_metadata(connection: &mut dyn Connection) -> Result<Metadata> {
     let mut metadata = Metadata::with_dialect(connection.dialect());
 
-    retrieve_schemas(connection, &mut metadata).await?;
+    retrieve_catalogs(connection, &mut metadata).await?;
 
     Ok(metadata)
 }
 
-async fn retrieve_schemas(connection: &mut dyn Connection, metadata: &mut Metadata) -> Result<()> {
+async fn retrieve_catalogs(connection: &mut dyn Connection, metadata: &mut Metadata) -> Result<()> {
+    let mut catalogs = vec![];
+    let sql = indoc! { r"
+        SELECT
+            catalog_name,
+            catalog_name = database() AS current_catalog
+        FROM
+            information_schema.schemata
+        GROUP BY
+            catalog_name
+        ORDER BY
+            catalog_name
+    "};
+    let mut query_result = connection.query(sql).await?;
+
+    while let Some(row) = query_result.next().await {
+        let catalog_name = match row.first() {
+            Some(value) => value.to_string(),
+            None => continue,
+        };
+        let current = matches!(row.get(1), Some(Value::Bool(true)));
+        let catalog = Catalog::new(catalog_name, current);
+        catalogs.push(catalog);
+    }
+
+    // If there is only one catalog, set it as the current catalog
+    if catalogs.len() == 1 {
+        if let Some(catalog) = catalogs.first_mut() {
+            catalog.set_current(true);
+        }
+    }
+
+    for mut catalog in catalogs {
+        retrieve_schemas(connection, &mut catalog).await?;
+        metadata.add(catalog);
+    }
+
+    Ok(())
+}
+
+async fn retrieve_schemas(connection: &mut dyn Connection, catalog: &mut Catalog) -> Result<()> {
     let mut schemas = vec![];
     let sql = indoc! { r"
         SELECT
             schema_name,
-            schema_name = database() AS current_schema
+            schema_name = schema() AS current_schema
         FROM
             information_schema.schemata
+        GROUP BY
+            schema_name
         ORDER BY
             schema_name
     "};
@@ -37,7 +79,7 @@ async fn retrieve_schemas(connection: &mut dyn Connection, metadata: &mut Metada
             retrieve_tables(connection, &mut schema).await?;
             retrieve_indexes(connection, &mut schema).await?;
         }
-        metadata.add(schema);
+        catalog.add(schema);
     }
 
     Ok(())
@@ -55,7 +97,7 @@ async fn retrieve_tables(connection: &mut dyn Connection, schema: &mut Schema) -
             FROM
                 information_schema.columns
             WHERE
-                table_schema = DATABASE()
+                table_schema = schema()
             ORDER BY
                 table_name,
                 ordinal_position
@@ -122,7 +164,7 @@ async fn retrieve_indexes(connection: &mut dyn Connection, schema: &mut Schema) 
             FROM
                 information_schema.statistics
             WHERE
-                table_schema = DATABASE()
+                table_schema = database()
             ORDER BY
                 table_name,
                 index_name,

@@ -1,15 +1,27 @@
 use indoc::indoc;
-use rsql_driver::{Column, Connection, Index, Metadata, Result, Schema, Table};
+use rsql_driver::{Catalog, Column, Connection, Index, Metadata, Result, Schema, Table};
 
 pub(crate) async fn get_metadata(connection: &mut dyn Connection) -> Result<Metadata> {
     let mut metadata = Metadata::with_dialect(connection.dialect());
 
-    retrieve_schemas(connection, &mut metadata).await?;
+    retrieve_catalogs(connection, &mut metadata).await?;
 
     Ok(metadata)
 }
 
-async fn retrieve_schemas(connection: &mut dyn Connection, metadata: &mut Metadata) -> Result<()> {
+async fn retrieve_catalogs(connection: &mut dyn Connection, metadata: &mut Metadata) -> Result<()> {
+    let mut catalogs = vec![Catalog::new("default", true)];
+    catalogs.sort_by_key(|catalog| catalog.name().to_string());
+
+    for mut catalog in catalogs {
+        retrieve_schemas(connection, &mut catalog).await?;
+        metadata.add(catalog);
+    }
+
+    Ok(())
+}
+
+async fn retrieve_schemas(connection: &mut dyn Connection, catalog: &mut Catalog) -> Result<()> {
     let mut schemas = vec![];
     let sql = indoc! { "SELECT name FROM pragma_database_list ORDER BY name" };
     let mut query_result = connection.query(sql).await?;
@@ -29,7 +41,7 @@ async fn retrieve_schemas(connection: &mut dyn Connection, metadata: &mut Metada
             retrieve_tables(connection, &mut schema).await?;
             retrieve_indexes(connection, &mut schema).await?;
         }
-        metadata.add(schema);
+        catalog.add(schema);
     }
 
     Ok(())
@@ -186,7 +198,10 @@ mod test {
             .await?;
 
         let metadata = connection.metadata().await?;
-        let schema = metadata.current_schema().expect("schema");
+        assert_eq!(metadata.catalogs().len(), 1);
+        let catalog = metadata.current_catalog().expect("catalog");
+        assert_eq!(catalog.schemas().len(), 1);
+        let schema = catalog.current_schema().expect("schema");
         assert_eq!(schema.tables().len(), 2);
 
         let contacts_table = schema.get("contacts").expect("contacts table");

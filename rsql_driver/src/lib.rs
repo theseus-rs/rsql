@@ -25,7 +25,7 @@ pub use connection::{
 pub use driver::{Driver, MockDriver};
 pub use driver_manager::DriverManager;
 pub use error::{Error, Result};
-pub use metadata::{Column, Index, Metadata, Schema, Table};
+pub use metadata::{Catalog, Column, Index, Metadata, Schema, Table};
 pub use url::UrlExtension;
 pub use value::Value;
 
