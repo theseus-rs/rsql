@@ -52,8 +52,10 @@ impl ShellCommand for Command {
         let mut indexes_column_rows = Vec::new();
         let mut table: Option<&Table> = None;
 
-        if let Some(database) = metadata.current_schema() {
-            table = database.get(table_name);
+        if let Some(catalog) = metadata.current_catalog() {
+            if let Some(schema) = catalog.current_schema() {
+                table = schema.get(table_name);
+            }
         }
 
         if let Some(table) = table {
@@ -138,6 +140,7 @@ mod tests {
     use crate::writers::Output;
     use indoc::indoc;
     use rsql_core::Configuration;
+    use rsql_driver::Catalog;
     use rsql_drivers::{Column, Index, Metadata, MockConnection, Schema, Table};
     use rsql_formatters::FormatterManager;
     use rustyline::history::DefaultHistory;
@@ -182,8 +185,10 @@ mod tests {
     #[tokio::test]
     async fn test_execute_invalid_table() -> anyhow::Result<()> {
         let mut metadata = Metadata::default();
-        let database = Schema::default();
-        metadata.add(database);
+        let mut catalog = Catalog::new("default", true);
+        let schema = Schema::default();
+        catalog.add(schema);
+        metadata.add(catalog);
         let mock_connection = &mut MockConnection::new();
         mock_connection
             .expect_metadata()
@@ -213,15 +218,17 @@ mod tests {
             ..default::Default::default()
         };
         let mut metadata = Metadata::default();
-        let mut database = Schema::new("default", true);
+        let mut catalog = Catalog::new("default", true);
+        let mut schema = Schema::new("default", true);
         let table_name = "users";
         let mut table = Table::new(table_name);
         table.add_column(Column::new("id", "INTEGER", true, None));
         table.add_column(Column::new("name", "TEXT", false, None));
         table.add_index(Index::new("users_id_idx", vec!["id"], true));
         table.add_index(Index::new("users_name_idx", vec!["name"], false));
-        database.add(table);
-        metadata.add(database);
+        schema.add(table);
+        catalog.add(schema);
+        metadata.add(catalog);
 
         let mock_connection = &mut MockConnection::new();
         mock_connection

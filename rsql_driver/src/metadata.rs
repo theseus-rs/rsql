@@ -4,11 +4,50 @@ use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
 use sqlparser::dialect::{self, Dialect};
 
-/// Metadata contains the schema, table, column, and index definitions for a data source.
+/// Metadata contains the catalog, schema, table, column, and index definitions for a data source.
+///
+/// ```text
+/// ┌────────────────────────┐
+/// │ CATALOG (database)     │
+/// │ ┌───────────────────┐  │
+/// │ │SCHEMA (namespace) │  │
+/// │ │┌────────┬────────┐│  │
+/// │ ││ TABLE  │ TABLE  ││  │
+/// │ ││ row    │ row    ││  │
+/// │ ││ row    │ row    ││  │
+/// │ ││ row    │ row    ││  │
+/// │ │└────────┴────────┘│  │
+/// │ └───────────────────┘  │
+/// │ ┌───────────────────┐  │
+/// │ │SCHEMA (namespace) │  │
+/// │ │┌────────┬────────┐│  │
+/// │ ││ TABLE  │ TABLE  ││  │
+/// │ ││ row    │ row    ││  │
+/// │ ││ row    │ row    ││  │
+/// │ ││ row    │ row    ││  │
+/// │ │└────────┴────────┘│  │
+/// │ └───────────────────┘  │
+/// └────────────────────────┘
+/// ```
+///
+/// ```text
+/// ┌───────────────────────────────────┐
+/// │              TABLE                │
+/// ├───────────┬───────────┬───────────┤
+/// │ Column A  │ Column B  │ Column C  │
+/// ├───────────┼───────────┼───────────┤
+/// │ Value A1  │ Value B1  │ Value C1  │ ← Row 1
+/// │ Value A2  │ Value B2  │ Value C2  │ ← Row 2
+/// │ Value A3  │ Value B3  │ Value C3  │ ← Row 3
+/// │     ⋮     │     ⋮     │     ⋮     │
+/// │ Value An  │ Value Bn  │ Value Cn  │ ← Row n
+/// └───────────┴───────────┴───────────┘
+/// ```
+///
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct Metadata {
-    schemas: IndexMap<String, Schema>,
     dialect: MetadataDialect,
+    catalogs: IndexMap<String, Catalog>,
 }
 
 impl Metadata {
@@ -16,8 +55,8 @@ impl Metadata {
     #[must_use]
     pub fn new() -> Self {
         Self {
-            schemas: IndexMap::new(),
             dialect: MetadataDialect::Generic,
+            catalogs: IndexMap::new(),
         }
     }
 
@@ -25,12 +64,84 @@ impl Metadata {
     #[must_use]
     pub fn with_dialect(dialect: Box<dyn Dialect>) -> Self {
         Self {
-            schemas: IndexMap::new(),
             dialect: dialect.into(),
+            catalogs: IndexMap::new(),
         }
     }
 
-    /// Adds a schema to the metadata.
+    /// Returns the dialect for the metadata.
+    #[must_use]
+    pub fn dialect(&self) -> Box<dyn Dialect> {
+        self.dialect.into()
+    }
+
+    /// Adds a catalog to the metadata.
+    pub fn add(&mut self, catalog: Catalog) {
+        self.catalogs.insert(catalog.name.clone(), catalog);
+    }
+
+    /// Returns the catalog with the specified name.
+    pub fn get<S: Into<String>>(&self, name: S) -> Option<&Catalog> {
+        let name = name.into();
+        self.catalogs.get(&name)
+    }
+
+    /// Returns the mutable catalog with the specified name.
+    pub fn get_mut<S: Into<String>>(&mut self, name: S) -> Option<&mut Catalog> {
+        let name = name.into();
+        self.catalogs.get_mut(&name)
+    }
+
+    /// Returns the current catalog.
+    #[must_use]
+    pub fn current_catalog(&self) -> Option<&Catalog> {
+        self.catalogs.values().find(|catalog| catalog.current)
+    }
+
+    /// Returns the catalogs in the metadata.
+    #[must_use]
+    pub fn catalogs(&self) -> Vec<&Catalog> {
+        let values: Vec<&Catalog> = self.catalogs.values().collect();
+        values
+    }
+}
+
+/// Catalogs contains the schemas in a data source.
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct Catalog {
+    name: String,
+    current: bool,
+    schemas: IndexMap<String, Schema>,
+}
+
+impl Catalog {
+    /// Creates a new Catalog instance.
+    pub fn new<S: Into<String>>(name: S, current: bool) -> Self {
+        Self {
+            name: name.into(),
+            current,
+            schemas: IndexMap::new(),
+        }
+    }
+
+    /// Returns the name of the catalog.
+    #[must_use]
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    /// Returns whether the catalog is the current catalog.
+    #[must_use]
+    pub fn current(&self) -> bool {
+        self.current
+    }
+
+    /// Sets the current catalog.
+    pub fn set_current(&mut self, current: bool) {
+        self.current = current;
+    }
+
+    /// Adds a schema to the catalog.
     pub fn add(&mut self, schema: Schema) {
         self.schemas.insert(schema.name.clone(), schema);
     }
@@ -47,23 +158,17 @@ impl Metadata {
         self.schemas.get_mut(&name)
     }
 
-    /// Returns the current schema.
+    /// Returns the current schema in the catalog.
     #[must_use]
     pub fn current_schema(&self) -> Option<&Schema> {
         self.schemas.values().find(|schema| schema.current)
     }
 
-    /// Returns the schemas in the metadata.
+    /// Returns the schemas in the catalog.
     #[must_use]
     pub fn schemas(&self) -> Vec<&Schema> {
         let values: Vec<&Schema> = self.schemas.values().collect();
         values
-    }
-
-    /// Returns the dialect for the metadata.
-    #[must_use]
-    pub fn dialect(&self) -> Box<dyn Dialect> {
-        self.dialect.into()
     }
 }
 
@@ -95,6 +200,11 @@ impl Schema {
     #[must_use]
     pub fn current(&self) -> bool {
         self.current
+    }
+
+    /// Sets the current schema.
+    pub fn set_current(&mut self, current: bool) {
+        self.current = current;
     }
 
     /// Adds a table to the schema.
@@ -343,25 +453,38 @@ mod test {
     #[test]
     fn test_metadata() {
         let mut metadata = Metadata::new();
-        assert_eq!(metadata.schemas().len(), 0);
+        assert_eq!(
+            (*metadata.dialect()).type_id(),
+            dialect::GenericDialect {}.type_id()
+        );
+        assert!(metadata.catalogs().is_empty());
+        let catalog = Catalog::new("catalog", true);
+        metadata.add(catalog);
+        assert!(metadata.get("catalog").is_some());
+        assert!(metadata.get_mut("catalog").is_some());
+        assert_eq!(metadata.catalogs().len(), 1);
+        assert!(metadata.current_catalog().is_some());
 
-        let default_schema = Schema::new("default", true);
-        let test_schema = Schema::new("test", false);
+        let dialect = Box::new(dialect::PostgreSqlDialect {});
+        let metadata = Metadata::with_dialect(dialect);
+        assert_eq!(
+            (*metadata.dialect()).type_id(),
+            dialect::PostgreSqlDialect {}.type_id()
+        );
+    }
 
-        assert!(metadata.current_schema().is_none());
-        metadata.add(default_schema.clone());
-        metadata.add(test_schema.clone());
-        assert_eq!(metadata.schemas().len(), 2);
+    #[test]
+    fn test_catalog() {
+        let mut catalog = Catalog::new("catalog", true);
+        assert_eq!(catalog.name(), "catalog");
+        assert!(catalog.current());
+        assert_eq!(catalog.schemas().len(), 0);
 
-        let current_schema = metadata.current_schema();
-        assert!(current_schema.is_some());
-        if let Some(schema) = current_schema {
-            assert_eq!(schema.name(), "default");
-            assert!(schema.current());
-        }
-        assert!(metadata.get("default").is_some());
-        assert!(metadata.get("default").is_some());
-        assert!(metadata.get_mut("default").is_some());
+        let schema = Schema::new("schema", true);
+        catalog.add(schema.clone());
+        assert_eq!(catalog.schemas().len(), 1);
+        assert!(catalog.get("schema").is_some());
+        assert!(catalog.get_mut("schema").is_some());
     }
 
     #[test]

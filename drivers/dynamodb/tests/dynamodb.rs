@@ -75,7 +75,8 @@ async fn test_dynamodb_driver() -> Result<()> {
 
 async fn test_schema(connection: &mut dyn rsql_driver::Connection) -> Result<()> {
     let metadata = connection.metadata().await?;
-    let schema = metadata.current_schema().expect("schema");
+    let catalog = metadata.current_catalog().expect("catalog");
+    let schema = catalog.current_schema().expect("schema");
     let tables = schema
         .tables()
         .iter()

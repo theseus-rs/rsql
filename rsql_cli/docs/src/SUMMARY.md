@@ -8,6 +8,7 @@
 
 - [Commands](chapter2/index.md)
     - [bail](chapter2/bail/index.md)
+    - [catalogs](chapter2/catalogs/index.md)
     - [changes](chapter2/changes/index.md)
     - [clear](chapter2/clear/index.md)
     - [color](chapter2/color/index.md)

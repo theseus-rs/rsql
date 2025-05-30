@@ -52,10 +52,9 @@ async fn test_connection_interface(connection: &mut dyn Connection) -> anyhow::R
     );
     assert!(query_result.next().await.is_none());
 
-    let db_metadata = connection.metadata().await?;
-    let schema = db_metadata
-        .current_schema()
-        .expect("expected at least one schema");
+    let metadata = connection.metadata().await?;
+    let catalog = metadata.current_catalog().expect("catalog");
+    let schema = catalog.current_schema().expect("schema");
     assert!(schema.tables().iter().any(|table| table.name() == "person"));
 
     Ok(())
@@ -170,7 +169,8 @@ async fn test_schema(connection: &mut dyn Connection) -> anyhow::Result<()> {
         .await?;
 
     let metadata = connection.metadata().await?;
-    let schema = metadata.current_schema().expect("schema");
+    let catalog = metadata.current_catalog().expect("catalog");
+    let schema = catalog.current_schema().expect("schema");
 
     let contacts_table = schema.get("contacts").expect("contacts table");
     assert_eq!(contacts_table.name(), "contacts");

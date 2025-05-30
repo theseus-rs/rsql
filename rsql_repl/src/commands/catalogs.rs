@@ -4,18 +4,18 @@ use rsql_drivers::{MemoryQueryResult, Value};
 use rsql_formatters::Results;
 use rust_i18n::t;
 
-/// List the schemas in the database
+/// List the catalogs in the database
 #[derive(Debug, Default)]
 pub struct Command;
 
 #[async_trait]
 impl ShellCommand for Command {
     fn name(&self, locale: &str) -> String {
-        t!("schemas_command", locale = locale).to_string()
+        t!("catalogs_command", locale = locale).to_string()
     }
 
     fn description(&self, locale: &str) -> String {
-        t!("schemas_description", locale = locale).to_string()
+        t!("catalogs_description", locale = locale).to_string()
     }
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
@@ -24,17 +24,13 @@ impl ShellCommand for Command {
         let metadata = options.connection.metadata().await?;
         let configuration = options.configuration;
         let locale = &configuration.locale;
-        let schema_label = t!("schema", locale = locale).to_string();
-        let current_label = t!("schemas_current", locale = locale).to_string();
+        let schema_label = t!("catalog", locale = locale).to_string();
+        let current_label = t!("catalogs_current", locale = locale).to_string();
         let columns = vec![schema_label, current_label];
         let mut rows = Vec::new();
 
-        let schemas = if let Some(catalog) = metadata.current_catalog() {
-            catalog.schemas()
-        } else {
-            Vec::new()
-        };
-        for schema in schemas {
+        let catalogs = metadata.catalogs();
+        for schema in catalogs {
             let name = Value::String(schema.name().to_string());
             let current = if schema.current() {
                 Value::String(t!("yes", locale = locale).to_string())
@@ -72,29 +68,27 @@ mod tests {
     use crate::writers::Output;
     use rsql_core::Configuration;
     use rsql_driver::Catalog;
-    use rsql_drivers::{Metadata, MockConnection, Schema};
+    use rsql_drivers::{Metadata, MockConnection};
     use rsql_formatters::FormatterManager;
     use rustyline::history::DefaultHistory;
 
     #[test]
     fn test_name() {
         let name = Command.name("en");
-        assert_eq!(name, "schemas");
+        assert_eq!(name, "catalogs");
     }
 
     #[test]
     fn test_description() {
         let description = Command.description("en");
-        assert_eq!(description, "List the schemas in the catalog");
+        assert_eq!(description, "List the catalogs in the database");
     }
 
     #[tokio::test]
     async fn test_execute() -> anyhow::Result<()> {
         let mut metadata = Metadata::new();
-        let mut catalog = Catalog::new("catalog", true);
-        let schema_name = "default";
-        let schema = Schema::new(schema_name, true);
-        catalog.add(schema);
+        let catalog_name = "default";
+        let catalog = Catalog::new(catalog_name, true);
         metadata.add(catalog);
 
         let mock_connection = &mut MockConnection::new();
@@ -108,15 +102,15 @@ mod tests {
             formatter_manager: &FormatterManager::default(),
             connection: mock_connection,
             history: &DefaultHistory::new(),
-            input: vec![".schemas".to_string()],
+            input: vec![".catalogs".to_string()],
             output: &mut output,
         };
 
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        let schemas = output.to_string();
-        assert!(schemas.contains(schema_name));
+        let catalogs = output.to_string();
+        assert!(catalogs.contains(catalog_name));
         Ok(())
     }
 }

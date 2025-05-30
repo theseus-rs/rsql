@@ -57,7 +57,10 @@ async fn test_json_metadata() -> Result<()> {
     assert!(query_result.next().await.is_none());
 
     let metadata = connection.metadata().await?;
-    let tables = metadata.current_schema().expect("schema").tables();
+    assert_eq!(metadata.catalogs().len(), 1);
+    let catalog = metadata.current_catalog().expect("catalog");
+    assert_eq!(catalog.schemas().len(), 1);
+    let tables = catalog.current_schema().expect("schema").tables();
     assert_eq!(tables.len(), 1);
     let cheyenne_table = tables[0];
     assert_eq!(cheyenne_table.name(), "cheyenne");

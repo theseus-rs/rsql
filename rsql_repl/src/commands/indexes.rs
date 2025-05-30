@@ -34,21 +34,23 @@ impl ShellCommand for Command {
         let columns = vec![table_label, index_label];
         let mut rows = Vec::new();
 
-        if let Some(database) = metadata.current_schema() {
-            let tables = match table_filter {
-                Some(table_name) => match database.get(table_name) {
-                    Some(table) => vec![table],
-                    None => Vec::new(),
-                },
-                None => database.tables(),
-            };
+        if let Some(catalog) = metadata.current_catalog() {
+            if let Some(schema) = catalog.current_schema() {
+                let tables = match table_filter {
+                    Some(table_name) => match schema.get(table_name) {
+                        Some(table) => vec![table],
+                        None => Vec::new(),
+                    },
+                    None => schema.tables(),
+                };
 
-            for table in tables {
-                for index in table.indexes() {
-                    let table_value = Value::String(table.name().to_string());
-                    let index_value = Value::String(index.name().to_string());
-                    let row = vec![table_value, index_value];
-                    rows.push(row);
+                for table in tables {
+                    for index in table.indexes() {
+                        let table_value = Value::String(table.name().to_string());
+                        let index_value = Value::String(index.name().to_string());
+                        let row = vec![table_value, index_value];
+                        rows.push(row);
+                    }
                 }
             }
         }
@@ -79,6 +81,7 @@ mod tests {
     use crate::commands::{CommandManager, CommandOptions};
     use crate::writers::Output;
     use rsql_core::Configuration;
+    use rsql_driver::Catalog;
     use rsql_drivers::{Index, Metadata, MockConnection, Schema, Table};
     use rsql_formatters::FormatterManager;
     use rustyline::history::DefaultHistory;
@@ -104,13 +107,15 @@ mod tests {
     #[tokio::test]
     async fn test_execute() -> anyhow::Result<()> {
         let mut metadata = Metadata::new();
-        let mut database = Schema::new("default", true);
+        let mut catalog = Catalog::new("default", true);
+        let mut schema = Schema::new("default", true);
         let mut table = Table::new("table1");
         let index_name = "index1";
         let index = Index::new(index_name, Vec::new(), false);
         table.add_index(index);
-        database.add(table);
-        metadata.add(database);
+        schema.add(table);
+        catalog.add(schema);
+        metadata.add(catalog);
 
         let mock_connection = &mut MockConnection::new();
         mock_connection
@@ -138,14 +143,16 @@ mod tests {
     #[tokio::test]
     async fn test_execute_with_table() -> anyhow::Result<()> {
         let mut metadata = Metadata::new();
-        let mut database = Schema::new("default", true);
+        let mut catalog = Catalog::new("default", true);
+        let mut schema = Schema::new("default", true);
         let table_name = "table1";
         let mut table = Table::new(table_name);
         let index_name = "index1";
         let index = Index::new(index_name, Vec::new(), false);
         table.add_index(index);
-        database.add(table);
-        metadata.add(database);
+        schema.add(table);
+        catalog.add(schema);
+        metadata.add(catalog);
 
         let mock_connection = &mut MockConnection::new();
         mock_connection

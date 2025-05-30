@@ -111,7 +111,9 @@ pub trait Connection: Debug + Send + Sync {
     }
 
     async fn metadata(&mut self) -> Result<Metadata> {
-        unimplemented!()
+        let dialect = self.dialect();
+        let metadata = Metadata::with_dialect(dialect);
+        Ok(metadata)
     }
 
     fn dialect(&self) -> Box<dyn Dialect> {
