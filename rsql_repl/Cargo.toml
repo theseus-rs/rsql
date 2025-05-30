@@ -64,6 +64,7 @@ all-drivers = [
     "driver-dynamodb",
     "driver-excel",
     "driver-file",
+    "driver-flightsql",
     "driver-fwf",
     "driver-gzip",
     "driver-http",
@@ -103,6 +104,7 @@ driver-duckdb = ["rsql_drivers/driver-duckdb"]
 driver-dynamodb = ["rsql_drivers/driver-dynamodb"]
 driver-excel = ["rsql_drivers/driver-excel"]
 driver-file = ["rsql_drivers/driver-file"]
+driver-flightsql = ["rsql_drivers/driver-flightsql"]
 driver-fwf = ["rsql_drivers/driver-fwf"]
 driver-gzip = ["rsql_drivers/driver-gzip"]
 driver-http = ["rsql_drivers/driver-http"]

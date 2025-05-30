@@ -12,6 +12,7 @@ default-members = [
     "drivers/dynamodb",
     "drivers/excel",
     "drivers/file",
+    "drivers/flightsql",
     "drivers/fwf",
     "drivers/gzip",
     "drivers/http",
@@ -60,6 +61,7 @@ members = [
     "drivers/dynamodb",
     "drivers/excel",
     "drivers/file",
+    "drivers/flightsql",
     "drivers/fwf",
     "drivers/gzip",
     "drivers/http",
@@ -113,6 +115,7 @@ ansi_colours = "1.2.3"
 anyhow = "1.0.98"
 arboard = "3.4.1"
 arrow-array = "53.4.1"
+arrow-flight = "53.4.1"
 async-trait = "0.1.88"
 axoupdater = "0.9.0"
 aws-credential-types = { version = "1.2.3", features = ["hardcoded-credentials"] }
@@ -172,6 +175,7 @@ serde_yaml = "0.9.34"
 sha2 = "0.10.8"
 sqlx = "0.7.4"
 sqlparser = "0.56.0"
+tonic = "0.12.3"
 supports-color = "3.0.2"
 sys-locale = "0.3.2"
 syntect = "5.2.0"

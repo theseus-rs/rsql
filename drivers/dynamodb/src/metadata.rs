@@ -12,7 +12,7 @@ pub(crate) async fn get_metadata(connection: &dyn Connection, client: &Client) -
 
 async fn retrieve_catalogs(client: &Client, metadata: &mut Metadata) -> Result<()> {
     let mut catalogs = vec![Catalog::new("default", true)];
-    catalogs.sort_by_key(|catalog| catalog.name().to_string());
+    catalogs.sort_by_key(|catalog| catalog.name().to_ascii_lowercase());
 
     for mut catalog in catalogs {
         retrieve_schemas(client, &mut catalog).await?;

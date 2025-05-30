@@ -353,10 +353,6 @@ impl rsql_driver::Connection for SnowflakeConnection {
         Ok(row_count)
     }
 
-    async fn metadata(&mut self) -> Result<Metadata> {
-        Ok(Metadata::with_dialect(self.dialect()))
-    }
-
     async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {
         let response = self
             .request(sql)
@@ -423,6 +419,10 @@ impl rsql_driver::Connection for SnowflakeConnection {
         }
 
         Ok(Box::new(MemoryQueryResult::new(column_names, rows)))
+    }
+
+    async fn metadata(&mut self) -> Result<Metadata> {
+        Ok(Metadata::with_dialect(self.dialect()))
     }
 
     fn dialect(&self) -> Box<dyn Dialect> {

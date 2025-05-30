@@ -1,0 +1,28 @@
+[package]
+authors.workspace = true
+categories.workspace = true
+description = "rsql flightsql driver"
+edition.workspace = true
+keywords.workspace = true
+license.workspace = true
+name = "rsql_driver_flightsql"
+repository.workspace = true
+rust-version.workspace = true
+version.workspace = true
+
+[dependencies]
+arrow-array = { workspace = true }
+arrow-flight = { workspace = true, features = ["flight-sql-experimental"] }
+async-trait = { workspace = true }
+file_type = { workspace = true }
+futures-util = { workspace = true }
+jiff = { workspace = true }
+rsql_driver = { path = "../../rsql_driver", version = "0.18.3" }
+tonic = { workspace = true }
+url = { workspace = true }
+
+[dev-dependencies]
+anyhow = { workspace = true }
+testcontainers = { workspace = true }
+testcontainers-modules = { workspace = true, features = ["arrow_flightsql"] }
+tokio = { workspace = true, features = ["macros", "rt"] }

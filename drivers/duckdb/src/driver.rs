@@ -74,10 +74,6 @@ impl rsql_driver::Connection for Connection {
         Ok(rows as u64)
     }
 
-    async fn metadata(&mut self) -> Result<Metadata> {
-        metadata::get_metadata(self).await
-    }
-
     async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {
         let connection = match self.connection.lock() {
             Ok(connection) => connection,
@@ -107,6 +103,10 @@ impl rsql_driver::Connection for Connection {
 
         let query_result = MemoryQueryResult::new(columns, rows);
         Ok(Box::new(query_result))
+    }
+
+    async fn metadata(&mut self) -> Result<Metadata> {
+        metadata::get_metadata(self).await
     }
 
     fn dialect(&self) -> Box<dyn Dialect> {
