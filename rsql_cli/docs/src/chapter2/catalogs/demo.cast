@@ -1,7 +1,7 @@
-{"version": 2, "width": 120, "height": 30, "timestamp": 1740088988, "env": {"SHELL": "/bin/zsh", "TERM": "xterm-256color"}}
-[0.026734, "o", "\u001b]11;?\u001b\\"]
-[0.05074, "o", "⠁ connect [00:00:00] [                                                                             ] 0 B/0 B (0 B/s, 0s)"]
-[0.050869, "o", "\r\u001b[2K"]
-[1.095007, "o", "rsql> \u001b[38;2;131;148;150m.catalog\u001b[0m\r\n"]
-[1.096268, "o", " Catalog | Current \r\n--------+---------\r\n default   | Yes     \r\n1 row \u001b[2m(599.958µs)\u001b[0m"]
-[1.096392, "o", "\r\n"]
+{"version": 2, "width": 187, "height": 39, "timestamp": 1748630061, "env": {"SHELL": "/bin/zsh", "TERM": "xterm-256color"}}
+[0.028666, "o", "\u001b]11;?\u001b\\"]
+[0.051913, "o", "⠁ connect [00:00:00] [                                                                                                                                                ] 0 B/0 B (0 B/s, 0s)"]
+[0.05201, "o", "\r\u001b[2K⠁ connect [00:00:00] [                                                                                                                                                ] 0 B/0 B (0 B/s, 0s)\r\n  ↳ ⠁ connect [00:00:00] [                                                                                                                                            ] 0 B/0 B (0 B/s, 0s)\u001b[1A\r\u001b[2K\u001b[1B\r\u001b[2K\u001b[1A⠁ connect [00:00:00] [                                                                                                                                                ] 0 B/0 B (0 B/s, 0s)\r\u001b[2K"]
+[1.08708, "o", "rsql> \u001b[38;2;131;148;150m.catalogs\u001b[0m\r\n"]
+[1.08768, "o", " Catalog | Current \r\n---------+---------\r\n default | Yes     \r\n"]
+[1.08778, "o", "1 row \u001b[2m(305.542µs)\u001b[0m\r\n"]

@@ -1,9 +1,9 @@
-{"version": 2, "width": 120, "height": 30, "timestamp": 1740088897, "env": {"SHELL": "/bin/zsh", "TERM": "xterm-256color"}}
-[0.025827, "o", "\u001b]11;?\u001b\\"]
-[0.048506, "o", "⠁ connect [00:00:00] [                                                                             ] 0 B/0 B (0 B/s, 0s)"]
-[0.048616, "o", "\r\u001b[2K"]
-[0.0589, "o", "rsql> \u001b[38;2;131;148;150m.bail\u001b[0m\r\n"]
-[0.059089, "o", "Bail on error: off\r\n"]
-[1.088215, "o", "rsql> \u001b[38;2;131;148;150m.bail off\u001b[0m\r\n"]
-[2.137316, "o", "rsql> \u001b[38;2;131;148;150m.invalid\u001b[38;2;133;153;0m-\u001b[38;2;131;148;150mcommand\u001b[0m\r\n"]
-[2.137937, "o", "\u001b[31m\u001b[31mError\u001b[0m\u001b[31m\u001b[0m: Invalid command '\u001b[1m.invalid-command\u001b[0m', for help type '\u001b[1m.help\u001b[0m'\r\n"]
+{"version": 2, "width": 187, "height": 39, "timestamp": 1748629960, "env": {"SHELL": "/bin/zsh", "TERM": "xterm-256color"}}
+[0.027998, "o", "\u001b]11;?\u001b\\"]
+[0.057255, "o", "⠁ connect [00:00:00] [                                                                                                                                                ] 0 B/0 B (0 B/s, 0s)"]
+[0.057278, "o", "\r\u001b[2K⠁ connect [00:00:00] [                                                                                                                                                ] 0 B/0 B (0 B/s, 0s)\r\n  ↳ ⠁ connect [00:00:00] [                                                                                                                                            ] 0 B/0 B (0 B/s, 0s)\u001b[1A\r\u001b[2K\u001b[1B\r\u001b[2K\u001b[1A⠁ connect [00:00:00] [                                                                                                                                                ] 0 B/0 B (0 B/s, 0s)\r\u001b[2K"]
+[0.068488, "o", "rsql> \u001b[38;2;131;148;150m.bail\u001b[0m\r\n"]
+[0.068661, "o", "Bail on error: off\r\n"]
+[1.111055, "o", "rsql> \u001b[38;2;131;148;150m.bail off\u001b[0m\r\n"]
+[2.161548, "o", "rsql> \u001b[38;2;131;148;150m.invalid\u001b[38;2;133;153;0m-\u001b[38;2;131;148;150mcommand\u001b[0m\r\n"]
+[2.162131, "o", "\u001b[31m\u001b[31mError\u001b[0m\u001b[31m\u001b[0m: Invalid command '\u001b[1m.invalid-command\u001b[0m', for help type '\u001b[1m.help\u001b[0m'\r\n"]
