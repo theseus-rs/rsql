@@ -25,6 +25,7 @@ rsql_driver_duckdb = { path = "../drivers/duckdb", optional = true, version = "0
 rsql_driver_dynamodb = { path = "../drivers/dynamodb", optional = true, version = "0.18.3" }
 rsql_driver_excel = { path = "../drivers/excel", optional = true, version = "0.18.3" }
 rsql_driver_file = { path = "../drivers/file", optional = true, version = "0.18.3" }
+rsql_driver_flightsql = { path = "../drivers/flightsql", optional = true, version = "0.18.3" }
 rsql_driver_fwf = { path = "../drivers/fwf", optional = true, version = "0.18.3" }
 rsql_driver_gzip = { path = "../drivers/gzip", optional = true, version = "0.18.3" }
 rsql_driver_http = { path = "../drivers/http", optional = true, version = "0.18.3" }
@@ -75,8 +76,9 @@ all = [
     "driver-duckdb",
     "driver-dynamodb",
     "driver-excel",
-    "driver-fwf",
     "driver-file",
+    "driver-flightsql",
+    "driver-fwf",
     "driver-gzip",
     "driver-http",
     "driver-https",
@@ -115,8 +117,9 @@ all-wasm = [
     # "driver-duckdb",
     # "driver-dynamodb",
     "driver-excel",
-    "driver-fwf",
     "driver-file",
+    #"driver-flightsql",
+    "driver-fwf",
     "driver-gzip",
     # "driver-http",
     # "driver-https",
@@ -155,8 +158,9 @@ driver-delimited = ["dep:rsql_driver_delimited"]
 driver-duckdb = ["dep:rsql_driver_duckdb"]
 driver-dynamodb = ["dep:rsql_driver_dynamodb"]
 driver-excel = ["dep:rsql_driver_excel"]
-driver-fwf = ["dep:rsql_driver_fwf"]
 driver-file = ["dep:rsql_driver_file"]
+driver-flightsql = ["dep:rsql_driver_flightsql"]
+driver-fwf = ["dep:rsql_driver_fwf"]
 driver-gzip = ["dep:rsql_driver_gzip"]
 driver-http = ["dep:rsql_driver_http"]
 driver-https = ["dep:rsql_driver_https"]

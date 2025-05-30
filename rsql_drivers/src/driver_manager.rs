@@ -79,6 +79,8 @@ impl DriverManager {
         Self::add(Arc::new(rsql_driver_excel::Driver))?;
         #[cfg(feature = "driver-file")]
         Self::add(Arc::new(rsql_driver_file::Driver))?;
+        #[cfg(feature = "driver-flightsql")]
+        Self::add(Arc::new(rsql_driver_flightsql::Driver))?;
         #[cfg(feature = "driver-fwf")]
         Self::add(Arc::new(rsql_driver_fwf::Driver))?;
         #[cfg(feature = "driver-gzip")]

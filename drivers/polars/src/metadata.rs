@@ -17,7 +17,7 @@ async fn retrieve_catalogs(
     metadata: &mut Metadata,
 ) -> Result<()> {
     let mut catalogs = vec![Catalog::new("default", true)];
-    catalogs.sort_by_key(|catalog| catalog.name().to_string());
+    catalogs.sort_by_key(|catalog| catalog.name().to_ascii_lowercase());
 
     for mut catalog in catalogs {
         retrieve_schemas(connection, &mut catalog).await?;
@@ -30,7 +30,7 @@ async fn retrieve_catalogs(
 async fn retrieve_schemas(connection: &mut PolarsConnection, catalog: &mut Catalog) -> Result<()> {
     let mut schemas = vec![Schema::new("polars", true)];
 
-    schemas.sort_by_key(|schema| schema.name().to_string());
+    schemas.sort_by_key(|schema| schema.name().to_ascii_lowercase());
 
     for mut schema in schemas {
         if schema.current() {

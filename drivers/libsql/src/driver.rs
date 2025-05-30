@@ -90,10 +90,6 @@ impl rsql_driver::Connection for Connection {
         Ok(rows)
     }
 
-    async fn metadata(&mut self) -> Result<Metadata> {
-        metadata::get_metadata(self).await
-    }
-
     async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {
         let mut statement = self
             .connection
@@ -127,6 +123,10 @@ impl rsql_driver::Connection for Connection {
 
         let query_result = MemoryQueryResult::new(columns, rows);
         Ok(Box::new(query_result))
+    }
+
+    async fn metadata(&mut self) -> Result<Metadata> {
+        metadata::get_metadata(self).await
     }
 }
 

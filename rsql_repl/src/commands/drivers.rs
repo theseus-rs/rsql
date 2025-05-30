@@ -103,6 +103,8 @@ mod tests {
             "excel",
             #[cfg(feature = "driver-file")]
             "file",
+            #[cfg(feature = "driver-flightsql")]
+            "flightsql",
             #[cfg(feature = "driver-fwf")]
             "fwf",
             #[cfg(feature = "driver-gzip")]

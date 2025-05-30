@@ -37,19 +37,19 @@ visit the [rsql](https://theseus-rs.github.io/rsql/rsql_cli/) site.
 
 ## Features
 
-| Feature               |                                                                                                                                                                                                                       |
-|-----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Data Sources          | Arrow, Avro, CockroachDB, CrateDB, CSV, Delimited, DuckDB, DynamoDB, Excel, FWF, JSON, JSONL, LibSQL (Turso), MariaDB, MySQL, ODS, ORC, Parquet, PostgreSQL, Redshift, Snowflake, SQLite3, SQL Server, TSV, XML, YAML |
-| Compression           | Brotli, Bzip2, Gzip, LZ4, XZ, Zstd                                                                                                                                                                                    |
-| Syntax Highlighting   | ✅                                                                                                                                                                                                                     |
-| Result Highlighting   | ✅                                                                                                                                                                                                                     |
-| Query Auto-completion | ✅                                                                                                                                                                                                                     |
-| History               | ✅                                                                                                                                                                                                                     |
-| SQL File Execution    | ✅                                                                                                                                                                                                                     |
-| Embedded PostgreSQL   | ✅                                                                                                                                                                                                                     |
-| Output Formats        | ascii, csv, expanded, html, json, jsonl, markdown, plain, psql, sqlite, tsv, unicode, xml, yaml                                                                                                                       |
-| Localized Interface   | 40+ languages¹                                                                                                                                                                                                        |
-| Key Bindings          | emacs, vi                                                                                                                                                                                                             |
+| Feature               |                                                                                                                                                                                                                                  |
+|-----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Data Sources          | Arrow, Avro, CockroachDB, CrateDB, CSV, Delimited, DuckDB, DynamoDB, Excel, FlightSQL, FWF, JSON, JSONL, LibSQL (Turso), MariaDB, MySQL, ODS, ORC, Parquet, PostgreSQL, Redshift, Snowflake, SQLite3, SQL Server, TSV, XML, YAML |
+| Compression           | Brotli, Bzip2, Gzip, LZ4, XZ, Zstd                                                                                                                                                                                               |
+| Syntax Highlighting   | ✅                                                                                                                                                                                                                                |
+| Result Highlighting   | ✅                                                                                                                                                                                                                                |
+| Query Auto-completion | ✅                                                                                                                                                                                                                                |
+| History               | ✅                                                                                                                                                                                                                                |
+| SQL File Execution    | ✅                                                                                                                                                                                                                                |
+| Embedded PostgreSQL   | ✅                                                                                                                                                                                                                                |
+| Output Formats        | ascii, csv, expanded, html, json, jsonl, markdown, plain, psql, sqlite, tsv, unicode, xml, yaml                                                                                                                                  |
+| Localized Interface   | 40+ languages¹                                                                                                                                                                                                                   |
+| Key Bindings          | emacs, vi                                                                                                                                                                                                                        |
 
 ¹ Computer translations; human translations welcome
 
@@ -81,6 +81,7 @@ rsql --url "<url>" -- "<query>"
 | dynamodb           | `dynamodb://[<access_key_id>:<secret_access_key>@]<host>[:<port>]>[?region=<region>][&session_token=<token>][&scheme=<http\|https>]`                                             |
 | excel              | `excel://<file>[?has_header=<true\|false>][&skip_rows=<n>]`                                                                                                                      |
 | file¹              | `file://<file>`                                                                                                                                                                  |
+| flightsql          | `flightsql://<user[:password>]@<host>[:<port>][?scheme=<http\|https>]`                                                                                                           |
 | fwf                | `fwf://<file>?widths=<widths>[&headers=<headers>]`                                                                                                                               |
 | gzip¹              | `gzip://<file>`                                                                                                                                                                  |
 | http¹              | `http://<path>[?_headers=<headers>]`                                                                                                                                             |

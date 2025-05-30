@@ -132,10 +132,6 @@ impl rsql_driver::Connection for Connection {
         Ok(rows)
     }
 
-    async fn metadata(&mut self) -> Result<Metadata> {
-        rsql_driver_postgresql::get_metadata(self).await
-    }
-
     async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {
         let statement = self
             .client
@@ -177,6 +173,10 @@ impl rsql_driver::Connection for Connection {
         }
 
         Ok(())
+    }
+
+    async fn metadata(&mut self) -> Result<Metadata> {
+        rsql_driver_postgresql::get_metadata(self).await
     }
 
     fn dialect(&self) -> Box<dyn Dialect> {

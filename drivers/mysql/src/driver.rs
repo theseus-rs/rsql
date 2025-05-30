@@ -70,10 +70,6 @@ impl rsql_driver::Connection for Connection {
         Ok(rows)
     }
 
-    async fn metadata(&mut self) -> Result<Metadata> {
-        metadata::get_metadata(self).await
-    }
-
     async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {
         let query_rows = sqlx::query(sql)
             .fetch_all(&self.pool)
@@ -106,6 +102,10 @@ impl rsql_driver::Connection for Connection {
     async fn close(&mut self) -> Result<()> {
         self.pool.close().await;
         Ok(())
+    }
+
+    async fn metadata(&mut self) -> Result<Metadata> {
+        metadata::get_metadata(self).await
     }
 
     fn dialect(&self) -> Box<dyn Dialect> {
