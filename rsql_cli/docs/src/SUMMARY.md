@@ -12,6 +12,7 @@
     - [changes](chapter2/changes/index.md)
     - [clear](chapter2/clear/index.md)
     - [color](chapter2/color/index.md)
+    - [completions](chapter2/completions/index.md)
     - [describe](chapter2/describe/index.md)
     - [drivers](chapter2/drivers/index.md)
     - [echo](chapter2/echo/index.md)

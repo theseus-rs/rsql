@@ -27,4 +27,7 @@ List the current directory:
 
 ### Demonstration
 
-![](./demo.gif)
+<video width="640" height="480" controls>
+  <source src="./demo.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>

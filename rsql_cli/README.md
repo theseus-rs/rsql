@@ -14,7 +14,10 @@
 
 Install `rsql` from https://theseus-rs.github.io/rsql/rsql_cli/
 
-![](https://github.com/theseus-rs/rsql/blob/main/rsql_cli/resources/demo.gif)
+<video width="640" height="480" controls>
+  <source src="https://github.com/theseus-rs/rsql/blob/main/rsql_cli/resources/demo.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>
 
 ## Safety
 
