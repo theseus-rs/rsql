@@ -33,10 +33,7 @@ irm https://github.com/theseus-rs/rsql/releases/latest/download/rsql_cli-install
 For more information, and additional installations instructions (cargo, homebrew, msi),
 visit the [rsql](https://theseus-rs.github.io/rsql/rsql_cli/) site.
 
-<video width="640" height="480" controls>
-  <source src="./rsql_cli/resources/demo.webm" type="video/webm">
-  Your browser does not support the video tag.
-</video>
+[demo.webm](https://github.com/user-attachments/assets/dfb09f20-fc87-45a5-9593-aaeb3233d5a5)
 
 ## Features
 
