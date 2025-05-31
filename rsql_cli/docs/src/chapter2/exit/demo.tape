@@ -1,0 +1,1 @@
+Type ".exit 1"

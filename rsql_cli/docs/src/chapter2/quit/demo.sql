@@ -1,2 +1,0 @@
-.echo prompt
-.quit
