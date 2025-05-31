@@ -16,7 +16,7 @@ config = { workspace = true }
 dark-light = { workspace = true }
 dirs = { workspace = true }
 indicatif = { workspace = true }
-rsql_formatters = { path = "../rsql_formatters", version = "0.18.3" }
+rsql_formatters = { path = "../rsql_formatters", version = "0.19.0" }
 rust-i18n = { workspace = true }
 sys-locale = { workspace = true }
 termbg = { workspace = true }
