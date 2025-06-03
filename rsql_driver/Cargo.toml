@@ -34,7 +34,7 @@ getrandom = { workspace = true, features = ["wasm_js"] }
 uuid = { workspace = true, features = ["js"] }
 
 [dev-dependencies]
-rsql_driver_test_utils = { path = "../drivers/test_utils", version = "0.19.0" }
+rsql_driver_test_utils = { path = "../drivers/test_utils", version = "0.19.1" }
 serde_json = { workspace = true, features = ["preserve_order"] }
 tokio = { workspace = true, features = ["macros", "rt"] }
 
