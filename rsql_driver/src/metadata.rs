@@ -104,6 +104,13 @@ impl Metadata {
         let values: Vec<&Catalog> = self.catalogs.values().collect();
         values
     }
+
+    /// Returns the current schema of the current catalog
+    #[must_use]
+    pub fn current_catalog_schema(&self) -> Option<&Schema> {
+        self.current_catalog()
+            .and_then(|catalog| catalog.current_schema())
+    }
 }
 
 /// Catalogs contains the schemas in a data source.
@@ -536,5 +543,13 @@ mod test {
         assert_eq!(index.name(), "users_id_idx");
         assert_eq!(index.columns(), &["id".to_string(), "email".to_string()]);
         assert!(index.unique());
+    }
+
+    #[test]
+    fn test_current_catalog() {
+        let mut metadata = Metadata::new();
+        let catalog = Catalog::new("default", true);
+        metadata.add(catalog);
+        assert_eq!(metadata.current_catalog().unwrap().name(), "default");
     }
 }

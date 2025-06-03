@@ -1,11 +1,12 @@
+use std::matches;
+use std::sync::LazyLock;
+
 use rsql_core::Configuration;
 use rsql_drivers::{Metadata, Table};
 use rustyline::Context;
 use rustyline::completion::{Candidate, Completer, Pair};
 use sqlparser::keywords::Keyword;
 use sqlparser::tokenizer::{Token, TokenWithSpan, Tokenizer};
-use std::matches;
-use std::sync::LazyLock;
 use tracing::debug;
 
 static CANDIDATES: LazyLock<Vec<Pair>> = LazyLock::new(init_candidates);
@@ -226,13 +227,13 @@ impl ReplCompleter {
                 (Token::Word(table), Token::Word(as_keyword), Token::Word(alias))
                     if as_keyword.keyword == Keyword::AS =>
                 {
-                    Some((table.value.clone(), alias.value.clone()))
+                    Some((table.value.as_str(), alias.value.as_str()))
                 }
                 (Token::Word(table), Token::Word(alias), _)
                     if alias.keyword == Keyword::NoKeyword
                         && table.keyword == Keyword::NoKeyword =>
                 {
-                    Some((table.value.clone(), alias.value.clone()))
+                    Some((table.value.as_str(), alias.value.as_str()))
                 }
                 _ => None,
             })
@@ -240,10 +241,10 @@ impl ReplCompleter {
 
         debug!("Table aliases found: {:?}", table_aliases);
 
-        let mut tables = Vec::<&Table>::new();
-        if let Some(catalog) = self.metadata.current_catalog() {
-            if let Some(schema) = catalog.current_schema() {
-                tables = tokens_no_location
+        self.metadata
+            .current_catalog_schema()
+            .map(|schema| {
+                tokens_no_location
                     .iter()
                     .filter_map(|token| {
                         if let Token::Word(word) = token {
@@ -252,21 +253,18 @@ impl ReplCompleter {
                             None
                         }
                     })
-                    .collect();
-            }
-        }
-
-        tables
+                    .collect::<Vec<&Table>>()
+            })
+            .unwrap_or_default()
             .into_iter()
             .map(|table| {
-                if let Some((_, alias)) = table_aliases
-                    .iter()
-                    .find(|(table_name, _)| table.name() == table_name)
-                {
-                    (table, Some(alias.clone()))
-                } else {
-                    (table, None)
-                }
+                (
+                    table,
+                    table_aliases
+                        .iter()
+                        .find(|(table_name, _)| table.name() == *table_name)
+                        .map(|(_, alias)| (*alias).to_string()),
+                )
             })
             .collect()
     }
@@ -287,12 +285,10 @@ impl ReplCompleter {
             return Suggestion::default();
         };
 
-        let token_before_cursor_search = tokens
+        let Some((token_before_cursor_idx, token_before_cursor)) = tokens
             .iter()
             .enumerate()
-            .rfind(|(i, token)| *i <= token_idx && !matches!(token.token, Token::Whitespace(_)));
-
-        let Some((token_before_cursor_idx, token_before_cursor)) = token_before_cursor_search
+            .rfind(|(i, token)| *i <= token_idx && !matches!(token.token, Token::Whitespace(_)))
         else {
             return Suggestion::Keyword(token_string);
         };
@@ -391,23 +387,21 @@ impl ReplCompleter {
                 .filter(|c| c.replacement().starts_with(&starts_with))
                 .cloned()
                 .collect(),
-            Suggestion::Table(starts_with) => {
-                let mut tables = Vec::new();
-                if let Some(catalog) = self.metadata.current_catalog() {
-                    if let Some(schema) = catalog.current_schema() {
-                        tables = schema
-                            .tables()
-                            .iter()
-                            .filter(|table| table.name().starts_with(starts_with.trim()))
-                            .map(|table| Pair {
-                                display: format!("Table: {}", table.name()),
-                                replacement: table.name().to_string(),
-                            })
-                            .collect();
-                    }
-                }
-                tables
-            }
+            Suggestion::Table(starts_with) => self
+                .metadata
+                .current_catalog_schema()
+                .map(|schema| {
+                    schema
+                        .tables()
+                        .iter()
+                        .filter(|table| table.name().starts_with(starts_with.trim()))
+                        .map(|table| Pair {
+                            display: format!("Table: {}", table.name()),
+                            replacement: table.name().to_string(),
+                        })
+                        .collect()
+                })
+                .unwrap_or_default(),
             Suggestion::TableColumn(table_name) => tables
                 .iter()
                 .find(|(table, _)| table.name() == table_name)
@@ -442,8 +436,10 @@ impl ReplCompleter {
                     replacement: table_alias,
                 })
                 .collect(),
-            Suggestion::Schema => {
-                if let Some(catalog) = self.metadata.current_catalog() {
+            Suggestion::Schema => self
+                .metadata
+                .current_catalog()
+                .map(|catalog| {
                     catalog
                         .schemas()
                         .iter()
@@ -452,10 +448,8 @@ impl ReplCompleter {
                             replacement: schema.name().to_string(),
                         })
                         .collect()
-                } else {
-                    Vec::new()
-                }
-            }
+                })
+                .unwrap_or_default(),
         }
     }
 
@@ -536,12 +530,14 @@ fn find_previous_keyword(
 
 #[cfg(test)]
 mod test {
-    use super::*;
-    use crate::shell::helper::ReplHelper;
     use rsql_driver::Catalog;
     use rsql_drivers::{Column, Schema};
     use rustyline::history::DefaultHistory;
-    use sqlparser::{dialect::GenericDialect, tokenizer::Word};
+    use sqlparser::dialect::GenericDialect;
+    use sqlparser::tokenizer::Word;
+
+    use super::*;
+    use crate::shell::helper::ReplHelper;
 
     #[test]
     fn test_complete() -> anyhow::Result<()> {
