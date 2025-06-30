@@ -73,8 +73,8 @@ rsql --url "<url>" -- "<query>"
 | avro (polars)      | `avro://<file>`                                                                                                                                                                  |
 | brotli¹            | `brotli://<file>`                                                                                                                                                                |
 | bzip2¹             | `bzip2://<file>`                                                                                                                                                                 |
-| cockroachdb (sqlx) | `cockroachdb://<user[:password>]@<host>[:<port>]/<database>`                                                                                                                     |
-| cratedb (sqlx)     | `cratedb://<user[:password>]@<host>[:<port>]/<database>`                                                                                                                         |
+| cockroachdb (sqlx) | `cockroachdb://<user>[:<password>]@<host>[:<port>]/<database>`                                                                                                                   |
+| cratedb (sqlx)     | `cratedb://<user>[:<password>]@<host>[:<port>]/<database>`                                                                                                                       |
 | csv (polars)       | `csv://<file>[?has_header=<true\|false>][&quote=<char>][&skip_rows=<n>]`                                                                                                         |
 | delimited (polars) | `delimited://<file>[?separator=<char>][&has_header=<true\|false>][&quote=<char>][&skip_rows=<n>]`                                                                                |
 | duckdb             | `duckdb://[<file>]`                                                                                                                                                              |
@@ -97,7 +97,7 @@ rsql --url "<url>" -- "<query>"
 | parquet (polars)   | `parquet://<file>`                                                                                                                                                               |
 | postgres           | `postgres://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`                                                                                                      |
 | postgresql (sqlx)  | `postgresql://<user>[:<password>]@<host>[:<port>]/<database>?<embedded=true>`                                                                                                    |
-| redshift (sqlx)    | `redshift://<user[:password>]@<host>[:<port>]/<database>`                                                                                                                        |
+| redshift (sqlx)    | `redshift://<user>[:<password>]@<host>[:<port>]/<database>`                                                                                                                      |
 | rusqlite           | `rusqlite://[<file>]`                                                                                                                                                            |
 | s3¹                | `s3://[<access_key_id>:<secret_access_key>@]<host>[:<port>]/<bucket>/<object>[?region=<region>][&session_token=<token>][&force_path_style=(true\|false)][&scheme=<http\|https>]` |
 | snowflake          | `snowflake://<user>[:<token>]@<account>.snowflakecomputing.com/[?private_key_file=pkey_file&public_key_file=pubkey_file]`                                                        |
