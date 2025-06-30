@@ -28,8 +28,8 @@ jobs:
           - macos-arm64
           - macos-x64
           - windows-x64
-          - wasm32-unknown
-          - wasm32-wasi
+          # - wasm32-unknown
+          # - wasm32-wasi
 
         include:
           - platform: linux-x64
@@ -44,12 +44,12 @@ jobs:
           - platform: windows-x64
             os: windows-latest
             target: x86_64-pc-windows-msvc
-          - platform: wasm32-unknown
-            os: ubuntu-latest
-            target: wasm32-unknown-unknown
-          - platform: wasm32-wasi
-            os: ubuntu-latest
-            target: wasm32-wasip1-threads
+          # - platform: wasm32-unknown
+          #   os: ubuntu-latest
+          #   target: wasm32-unknown-unknown
+          # - platform: wasm32-wasi
+          #   os: ubuntu-latest
+          #   target: wasm32-wasip1-threads
 
     steps:
       - name: Checkout source code

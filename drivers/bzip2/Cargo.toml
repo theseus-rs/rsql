@@ -12,7 +12,7 @@ version.workspace = true
 
 [dependencies]
 async-trait = { workspace = true }
-bzip2 = { workspace = true, features = ["libbz2-rs-sys"] }
+bzip2 = { workspace = true }
 file_type = { workspace = true }
 rsql_driver = { path = "../../rsql_driver", version = "0.19.1" }
 tempfile = { workspace = true }
