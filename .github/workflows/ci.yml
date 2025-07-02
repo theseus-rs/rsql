@@ -42,7 +42,7 @@ jobs:
             os: macos-13
             target: x86_64-apple-darwin
           - platform: windows-x64
-            os: windows-2022
+            os: windows-latest
             target: x86_64-pc-windows-msvc
           - platform: wasm32-unknown
             os: ubuntu-latest
