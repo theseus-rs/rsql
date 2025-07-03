@@ -38,6 +38,10 @@ interface for all your data querying needs.
 ```shell
 curl --proto '=https' --tlsv1.2 -LsSf https://github.com/theseus-rs/rsql/releases/latest/download/rsql_cli-installer.sh | sh
 ```
+or [Homebrew](https://brew.sh/):
+```shell
+brew install rsql
+```
 
 **Windows:**
 
