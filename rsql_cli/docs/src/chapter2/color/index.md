@@ -1,6 +1,6 @@
 ## color
 
-The `.color` command controls whether rsql outputs colored text in the terminal. Color output improves readability,
+The `.color` command controls whether rsql outputs color text in the terminal. Color output improves readability,
 especially for large result sets or when distinguishing between different types of output. By default, color is enabled.
 
 ### Usage

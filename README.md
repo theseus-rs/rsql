@@ -34,16 +34,19 @@ interface for all your data querying needs.
 ### Installation
 
 **Linux / MacOS:**
+
 ```shell
 curl --proto '=https' --tlsv1.2 -LsSf https://github.com/theseus-rs/rsql/releases/latest/download/rsql_cli-installer.sh | sh
 ```
 
 **Windows:**
+
 ```shell
 irm https://github.com/theseus-rs/rsql/releases/latest/download/rsql_cli-installer.ps1 | iex
 ```
 
 **Cargo**
+
 ```shell
 cargo install rsql_cli
 ```
@@ -53,6 +56,7 @@ For detailed installation instructions, visit the [rsql documentation](https://t
 ### Basic Usage
 
 **Interactive Mode:**
+
 ```shell
 # Connect to a database
 rsql --url "postgresql://user:pass@localhost/mydb"
@@ -65,6 +69,7 @@ rsql --url "duckdb://"
 ```
 
 **Execute Single Query:**
+
 ```shell
 # Run a query and exit
 rsql --url "sqlite://database.db" -- "SELECT * FROM users LIMIT 10"
@@ -76,6 +81,7 @@ rsql --url "parquet://data.parquet" -- "SELECT column1, COUNT(*) FROM table GROU
 ## 📊 Supported Data Sources
 
 ### Databases
+
 - **PostgreSQL** (`postgresql://` / `postgres://`) - Including embedded PostgreSQL
 - **MySQL** / **MariaDB** (`mysql://` / `mariadb://`)
 - **SQLite** (`sqlite://` / `rusqlite://`)
@@ -89,6 +95,7 @@ rsql --url "parquet://data.parquet" -- "SELECT column1, COUNT(*) FROM table GROU
 - **DynamoDB** (`dynamodb://`)
 
 ### File Formats
+
 - **CSV/TSV** (`csv://` / `tsv://`) - Comma/tab-separated values
 - **Parquet** (`parquet://`) - Columnar storage format
 - **Arrow** (`arrow://`) - In-memory columnar format
@@ -102,16 +109,19 @@ rsql --url "parquet://data.parquet" -- "SELECT column1, COUNT(*) FROM table GROU
 - **Fixed Width** (`fwf://`) - Fixed-width format
 
 ### Cloud & Remote
+
 - **FlightSQL** (`flightsql://`) - Apache Arrow Flight SQL
 - **S3** (`s3://`) - Amazon S3 and S3-compatible storage
 - **HTTP/HTTPS** (`http://` / `https://`) - Remote files
 
 ### Compression
+
 Automatically handles: Gzip, Brotli, Bzip2, LZ4, XZ, Zstd
 
 ## 🎯 Common Use Cases
 
 ### Database Operations
+
 ```shell
 # Connect to PostgreSQL
 rsql --url "postgresql://user:pass@localhost/mydb"
@@ -124,6 +134,7 @@ rsql --url "sqlite://database.db"
 ```
 
 ### File Analysis
+
 ```shell
 # Analyze CSV data
 rsql --url "csv://sales.csv" -- "SELECT region, SUM(revenue) FROM table GROUP BY region"
@@ -136,6 +147,7 @@ rsql --url "parquet://logs.parquet" -- "SELECT date, COUNT(*) FROM table GROUP B
 ```
 
 ### Data Transformation
+
 ```shell
 # Convert CSV to JSON
 rsql --url "csv://input.csv" --format json -- "SELECT * FROM table"
@@ -154,7 +166,9 @@ rsql --url "duckdb://" -- "
 ## 🛠️ Advanced Features
 
 ### Output Formats
+
 Control output with `--format`:
+
 - `ascii` - ASCII table (default)
 - `json` - JSON format
 - `csv` - Comma-separated values
@@ -165,6 +179,7 @@ Control output with `--format`:
 - And more...
 
 ### Configuration
+
 ```shell
 # Set default format
 rsql --url "sqlite://db.sqlite" --format json
@@ -181,16 +196,19 @@ rsql --url "..." --format expanded
 ### File Format Examples
 
 **CSV with custom options:**
+
 ```shell
 rsql --url "csv://data.csv?has_header=true&skip_rows=1"
 ```
 
 **Fixed-width file:**
+
 ```shell
 rsql --url "fwf://data.txt?widths=10,20,15&headers=id,name,email"
 ```
 
 **Delimited file with custom separator:**
+
 ```shell
 rsql --url "delimited://data.txt?separator=|&has_header=true"
 ```
@@ -198,11 +216,13 @@ rsql --url "delimited://data.txt?separator=|&has_header=true"
 ### Database Examples
 
 **PostgreSQL with SSL:**
+
 ```shell
 rsql --url "postgresql://user:pass@localhost/db?sslmode=require"
 ```
 
 **MySQL with charset:**
+
 ```shell
 rsql --url "mysql://user:pass@localhost/db?charset=utf8mb4"
 ```
@@ -214,11 +234,11 @@ rsql --url "mysql://user:pass@localhost/db?charset=utf8mb4"
 | Data Sources          | Arrow, Avro, CockroachDB, CrateDB, CSV, Delimited, DuckDB, DynamoDB, Excel, FlightSQL, FWF, JSON, JSONL, LibSQL (Turso), MariaDB, MySQL, ODS, ORC, Parquet, PostgreSQL, Redshift, Snowflake, SQLite3, SQL Server, TSV, XML, YAML |
 | Compression           | Brotli, Bzip2, Gzip, LZ4, XZ, Zstd                                                                                                                                                                                               |
 | Syntax Highlighting   | ✅ Full SQL syntax highlighting                                                                                                                                                                                                   |
-| Result Highlighting   | ✅ Colored output for better readability                                                                                                                                                                                           |
-| Query Auto-completion | ✅ Smart completion for SQL keywords and table names                                                                                                                                                                               |
-| History               | ✅ Command history with search                                                                                                                                                                                                     |
-| SQL File Execution    | ✅ Execute .sql files directly                                                                                                                                                                                                     |
-| Embedded PostgreSQL   | ✅ No external PostgreSQL installation required                                                                                                                                                                                    |
+| Result Highlighting   | ✅ Color output for better readability                                                                                                                                                                                            |
+| Query Auto-completion | ✅ Smart completion for SQL keywords and table names                                                                                                                                                                              |
+| History               | ✅ Command history with search                                                                                                                                                                                                    |
+| SQL File Execution    | ✅ Execute .sql files directly                                                                                                                                                                                                    |
+| Embedded PostgreSQL   | ✅ No external PostgreSQL installation required                                                                                                                                                                                   |
 | Output Formats        | ascii, csv, expanded, html, json, jsonl, markdown, plain, psql, sqlite, tsv, unicode, xml, yaml                                                                                                                                  |
 | Localized Interface   | 40+ languages¹                                                                                                                                                                                                                   |
 | Key Bindings          | emacs, vi                                                                                                                                                                                                                        |
@@ -286,7 +306,8 @@ Licensed under either of:
 
 ## 🤝 Contributing
 
-Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any additional terms or conditions.
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the work by you, as
+defined in the Apache-2.0 license, shall be dual licensed as above, without any additional terms or conditions.
 
 ### Development Environment
 
@@ -306,4 +327,5 @@ Unless you explicitly state otherwise, any contribution intentionally submitted 
 
 ---
 
-**Need help?** Check out the [documentation](https://theseus-rs.github.io/rsql/rsql_cli/) or [open an issue](https://github.com/theseus-rs/rsql/issues) on GitHub.
+**Need help?** Check out the [documentation](https://theseus-rs.github.io/rsql/rsql_cli/)
+or [open an issue](https://github.com/theseus-rs/rsql/issues) on GitHub.
