@@ -16,7 +16,7 @@ indexmap = { workspace = true }
 jiff = { workspace = true }
 polars = { workspace = true, features = ["ipc", "polars-sql"] }
 polars-sql = { workspace = true }
-rsql_driver = { path = "../../rsql_driver", version = "0.19.0" }
+rsql_driver = { path = "../../rsql_driver", version = "0.19.1" }
 tokio = { workspace = true, features = ["sync"] }
 
 [dev-dependencies]
