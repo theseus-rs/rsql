@@ -1,22 +1,35 @@
 ## schemas
 
+The `.schemas` command lists all schemas available in the connected data source. Schemas are logical containers for
+tables, views, and other database objects, and are especially important in multi-tenant or enterprise databases.
+
 ### Usage
 
 ```text
 .schemas
 ```
 
-### Description
+### When to use
 
-The schemas command lists the schemas in the data source.
+- Use `.schemas` to discover available schemas when connecting to complex databases.
+- Helpful for exploring unfamiliar data sources, organizing queries, or verifying access permissions.
 
 ### Examples
 
-List the schemas in the data source:
+List all schemas in the current data source:
 
 ```text
 .schemas
 ```
+
+### Troubleshooting
+
+- If no schemas are listed, ensure your connection has the necessary permissions.
+- Some databases may not support schemas; in that case, this command may return an empty result.
+
+### Related
+
+- See also: [catalogs](../catalogs/index.md) and [tables](../tables/index.md) for further exploration.
 
 ### Demonstration
 

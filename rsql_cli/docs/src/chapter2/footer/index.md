@@ -1,15 +1,19 @@
 ## footer
 
+The `.footer` command controls whether rsql displays a footer after query results. The footer typically shows summary
+information such as row counts, execution time, and other metadata. By default, the footer is displayed.
+
 ### Usage
 
 ```text
 .footer <on|off>
 ```
 
-### Description
+### When to use
 
-The footer command sets the display of the footer in the CLI. By default, the footer is displayed. If the `footer`
-command is set to `off`, the footer will not be displayed.
+- Enable the footer (`on`) to see summary information after each query—useful for data analysis and performance
+  monitoring.
+- Disable the footer (`off`) for a cleaner output, especially when exporting results or scripting.
 
 ### Examples
 
@@ -30,6 +34,17 @@ Disable the footer:
 ```text
 .footer off
 ```
+
+### Troubleshooting
+
+- If you do not see summary information, ensure `.footer on` is set.
+- For minimal output, use `.footer off` in combination with `.header off` and `.changes off`.
+
+### Related
+
+- See the `footer` option in [rsql.toml configuration](../../appendix/rsql-toml.md).
+- For output customization, see [format](../format/index.md), [header](../header/index.md),
+  and [changes](../changes/index.md).
 
 ### Demonstration
 

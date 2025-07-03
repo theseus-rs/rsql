@@ -1,22 +1,42 @@
 ## describe
 
+The `.describe` command provides detailed information about a table, including its columns, data types, and constraints.
+This is useful for understanding the structure of your data, especially when working with unfamiliar tables or preparing
+queries.
+
 ### Usage
 
 ```text
 .describe [table]
 ```
 
-### Description
+### When to use
 
-The describe command provides information about the specified data table.
+- Use `.describe` to inspect table schemas before writing queries or performing data transformations.
+- Helpful for data exploration, debugging, and documentation.
 
 ### Examples
 
-Describe the table named users.
+Describe the table named `users`:
 
 ```text
 .describe users
 ```
+
+Describe the current table (if context is set):
+
+```text
+.describe
+```
+
+### Troubleshooting
+
+- If you receive an error, ensure the table name is correct and you have access permissions.
+- Some data sources may require fully qualified table names (e.g., `schema.table`).
+
+### Related
+
+- See also: [tables](../tables/index.md), [schemas](../schemas/index.md), and [indexes](../indexes/index.md).
 
 ### Demonstration
 

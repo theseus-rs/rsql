@@ -1,15 +1,20 @@
 ## bail
 
+The `.bail` command controls how rsql handles errors during command execution. By default, rsql continues processing
+after an error, which is useful for running scripts or multiple commands in a session. Enabling bail mode (`on`) will
+cause rsql to immediately exit on the first error, which is helpful for automation, CI/CD, or when you want to ensure no
+further actions are taken after a failure.
+
 ### Usage
 
 ```text
 .bail <on|off>
 ```
 
-### Description
+### When to use
 
-The bail command sets the behavior of the CLI when an error occurs. By default, the CLI will continue processing after
-the first error. If the bail command is set to `on`, the CLI will exit after the first error.
+- **Enable bail** (`on`) when running scripts where any error should halt execution.
+- **Disable bail** (`off`) for interactive sessions or when you want to review multiple errors in one run.
 
 ### Examples
 
@@ -19,17 +24,27 @@ Show the current bail setting:
 .bail
 ```
 
-Enable bail on first error:
+Enable bail on first error (recommended for automation):
 
 ```text
 .bail on
 ```
 
-Disable bail on first error:
+Disable bail on first error (recommended for exploration):
 
 ```text
 .bail off
 ```
+
+### Troubleshooting
+
+- If your script stops unexpectedly, check if `.bail on` is set.
+- If errors are being ignored, ensure `.bail off` is not set unintentionally.
+
+### Related
+
+- See the `bail_on_error` option in [rsql.toml configuration](../../appendix/rsql-toml.md).
+- For error handling in scripts, see [Best Practices](../../chapter1/index.md#best-practices).
 
 ### Demonstration
 

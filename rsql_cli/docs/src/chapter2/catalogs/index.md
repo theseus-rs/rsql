@@ -1,22 +1,35 @@
 ## catalogs
 
+The `.catalogs` command lists all catalogs available in the connected data source. Catalogs are top-level containers for
+schemas and tables, and are especially relevant in enterprise databases or cloud data warehouses.
+
 ### Usage
 
 ```text
 .catalogs
 ```
 
-### Description
+### When to use
 
-The catalogs command lists the catalogs in the data source.
+- Use `.catalogs` to discover available catalogs when connecting to complex or multi-tenant databases.
+- Helpful for exploring unfamiliar data sources or verifying access permissions.
 
 ### Examples
 
-List the catalogs in the data source:
+List all catalogs in the current data source:
 
 ```text
 .catalogs
 ```
+
+### Troubleshooting
+
+- If no catalogs are listed, ensure your connection has the necessary permissions.
+- Some databases may not support catalogs; in that case, this command may return an empty result.
+
+### Related
+
+- See also: [schemas](../schemas/index.md) and [tables](../tables/index.md) commands for further exploration.
 
 ### Demonstration
 

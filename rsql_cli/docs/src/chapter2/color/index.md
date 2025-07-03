@@ -1,15 +1,18 @@
 ## color
 
+The `.color` command controls whether rsql outputs colored text in the terminal. Color output improves readability,
+especially for large result sets or when distinguishing between different types of output. By default, color is enabled.
+
 ### Usage
 
 ```text
 .color <on|off>
 ```
 
-### Description
+### When to use
 
-Controls if output is in color. By default, the color command is set to `on`. If the `color` command is set to `off`,
-the output will not be in color.
+- Enable color (`on`) for interactive use, demos, or when you want visually distinct output.
+- Disable color (`off`) for scripts, logs, or when redirecting output to files where ANSI codes are undesirable.
 
 ### Examples
 
@@ -30,6 +33,16 @@ Disable color output:
 ```text
 .color off
 ```
+
+### Troubleshooting
+
+- If you see strange characters in redirected output, try `.color off`.
+- Some terminals may not support color; in that case, disabling color is recommended.
+
+### Related
+
+- See the `color` option in [rsql.toml configuration](../../appendix/rsql-toml.md).
+- For output customization, see [format](../format/index.md).
 
 ### Demonstration
 

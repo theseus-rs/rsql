@@ -1,15 +1,18 @@
 ## header
 
+The `.header` command controls whether rsql displays a header row (column names) above query results. By default, the
+header is displayed, making it easier to interpret data, especially for wide tables or unfamiliar queries.
+
 ### Usage
 
 ```text
 .header <on|off>
 ```
 
-### Description
+### When to use
 
-The header command sets the display of the header in the CLI. By default, the header is displayed. If the `header`
-command is set to `off`, the header will not be displayed.
+- Enable the header (`on`) for interactive exploration, data analysis, or when sharing results with others.
+- Disable the header (`off`) for minimal output, such as when exporting data for further processing.
 
 ### Examples
 
@@ -30,6 +33,17 @@ Disable the header:
 ```text
 .header off
 ```
+
+### Troubleshooting
+
+- If you do not see column names, ensure `.header on` is set.
+- For scripting or exporting, use `.header off` to avoid extra lines in output files.
+
+### Related
+
+- See the `header` option in [rsql.toml configuration](../../appendix/rsql-toml.md).
+- For output customization, see [format](../format/index.md), [footer](../footer/index.md),
+  and [changes](../changes/index.md).
 
 ### Demonstration
 

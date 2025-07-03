@@ -1,29 +1,42 @@
 ## exit
 
+The `.exit` command immediately terminates the rsql session. You can optionally provide an exit code, which is useful
+for scripting and automation to indicate success or failure to the calling process.
+
 ### Usage
 
 ```text
 .exit [code]
 ```
 
-### Description
+### When to use
 
-Exit the shell with an optional status code. If no status code is provided, the exit status will be the exit status of
-the last command executed.
+- Use `.exit` to leave the CLI at any time.
+- Provide a non-zero exit code (e.g., `.exit 1`) to signal an error in scripts or CI/CD pipelines.
 
 ### Examples
 
-Exit the shell with a status code of 0.
+Exit the shell with a status code of 0 (success):
 
 ```text
 .exit
 ```
 
-Exit the shell with a status code of 1.
+Exit the shell with a status code of 1 (failure):
 
 ```text
 .exit 1
 ```
+
+### Troubleshooting
+
+- If the shell does not exit as expected, check for background processes or pending operations.
+- In scripts, use `.exit <code>` to control flow based on success or failure.
+
+### Related
+
+- For quitting without specifying a code, see [quit](../quit/index.md).
+- For error handling, see [bail](../bail/index.md).
 
 ### Demonstration
 

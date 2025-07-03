@@ -1,14 +1,16 @@
 ## format
 
+The `.format` command sets the output format for query results in rsql. This allows you to tailor the display for
+readability, data export, or integration with other tools. The default format is `psql`, but many formats are available
+for different use cases.
+
 ### Usage
 
 ```text
 .format [format]
 ```
 
-### Description
-
-The format command sets the format mode for the CLI. The default format mode is `unicode`.
+### Available Formats
 
 | Format     | Description                                                                         |
 |------------|-------------------------------------------------------------------------------------|
@@ -27,6 +29,13 @@ The format command sets the format mode for the CLI. The default format mode is 
 | `xml`      | [Extensible Markup Language (XML)](https://www.w3.org/TR/xml11/)                    |
 | `yaml`     | [YAML Ain’t Markup Language (YAML)](https://yaml.org/spec/1.2.2/)                   |
 
+### When to use
+
+- Use `unicode`, `ascii`, or `psql` for interactive exploration.
+- Use `csv`, `tsv`, `json`, `jsonl`, `xml`, or `yaml` for exporting data or integrating with other tools.
+- Use `markdown` or `html` for documentation or reporting.
+- Use `expanded` for wide tables or when you want each row displayed vertically.
+
 ### Examples
 
 Show the current format mode:
@@ -41,11 +50,21 @@ Set the format mode to `ascii`:
 .format ascii
 ```
 
-Set the format mode to `unicode`:
+Set the format mode to `json` for machine-readable output:
 
 ```text
-.format unicode
+.format json
 ```
+
+### Troubleshooting
+
+- If output looks garbled in your terminal, try switching to `ascii` or `plain`.
+- For large exports, prefer `csv`, `tsv`, or `jsonl` for best performance.
+
+### Related
+
+- See the `format` option in [rsql.toml configuration](../../appendix/rsql-toml.md).
+- For header/footer control, see [header](../header/index.md) and [footer](../footer/index.md).
 
 ### Demonstration
 

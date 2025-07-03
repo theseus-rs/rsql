@@ -1,12 +1,43 @@
 ## Configuration File (rsql.toml)
 
-A default [rsql.toml](#rsqltoml-1) file will be created on startup if one does not already exist.
-This file is used to configure the behavior of the rsql CLI and will be written to the `$HOME/.rsql` directory
-on Unix-like systems and `%APPDATA%\rsql` on Windows. The file is written in the [TOML](https://toml.io/en/) format.
+A default [rsql.toml](#rsqltoml-1) file will be created on startup if one does not already exist. This file configures
+the behavior of the rsql CLI and is written to `$HOME/.rsql` on Unix-like systems and `%APPDATA%\rsql` on Windows. The
+file uses the [TOML](https://toml.io/en/) format.
 
-### rsql.toml
+### Why use rsql.toml?
 
-The following is an example of a `rsql.toml` file:
+The configuration file allows you to customize rsql's behavior, appearance, and output to fit your workflow. Use it to
+set defaults for output format, locale, logging, themes, and more. This is especially useful for scripting, automation,
+or when working in different environments (dev, staging, prod).
+
+### Configuration Options Summary
+
+| Section     | Option              | Default           | Possible Values / Description                                                         |
+|-------------|---------------------|-------------------|---------------------------------------------------------------------------------------|
+| `[global]`  | locale              | "en"              | Any supported locale (see [Supported Locales](./supported-locales.md))                |
+| `[global]`  | bail_on_error       | false             | true, false                                                                           |
+| `[global]`  | color               | true              | true, false                                                                           |
+| `[global]`  | command_identifier  | "."               | Any string (e.g., ".", ":", "/")                                                      |
+| `[global]`  | echo                | false             | true, false, prompt                                                                   |
+| `[log]`     | level               | "info"            | off, error, warn, info, debug, trace                                                  |
+| `[log]`     | rotation            | "daily"           | minutely, hourly, daily, never                                                        |
+| `[shell]`   | edit_mode           | "emacs"           | emacs, vi                                                                             |
+| `[shell]`   | history.enabled     | true              | true, false                                                                           |
+| `[shell]`   | history.ignore_dups | true              | true, false                                                                           |
+| `[shell]`   | history.limit       | 1000              | 0 (no limit), or any positive integer                                                 |
+| `[shell]`   | smart.completions   | true              | true, false                                                                           |
+| `[shell]`   | theme.light         | Solarized (light) | See [themes](#themes)                                                                 |
+| `[shell]`   | theme.dark          | Solarized (dark)  | See [themes](#themes)                                                                 |
+| `[shell]`   | theme               | (unset)           | base16-ocean.dark, base16-ocean.light, Solarized (dark), Solarized (light)            |
+| `[results]` | changes             | true              | true, false                                                                           |
+| `[results]` | footer              | true              | true, false                                                                           |
+| `[results]` | format              | "psql"            | ascii, csv, html, json, jsonl, markdown, plain, psql, sqlite, tsv, unicode, xml, yaml |
+| `[results]` | header              | true              | true, false                                                                           |
+| `[results]` | limit               | 100               | 0 (no limit), or any positive integer                                                 |
+| `[results]` | rows                | true              | true, false                                                                           |
+| `[results]` | timer               | true              | true, false                                                                           |
+
+### Example rsql.toml
 
 ```toml
 [global]
@@ -178,3 +209,14 @@ rows = true
 #   false - disable timer
 timer = true
 ```
+
+### Troubleshooting Configuration
+
+- If rsql does not pick up changes, ensure you are editing the correct `rsql.toml` file (
+  see [FAQ](./index.md#faq--tips--tricks)).
+- Invalid TOML syntax will cause rsql to fail to start or ignore the config. Validate your file with a TOML linter.
+- For option-specific issues, see the relevant command documentation (
+  e.g., [format](../chapter2/format/index.md), [locale](../chapter2/locale/index.md)).
+
+For more details on each option, see the [Commands](../chapter2/index.md) section.
+
