@@ -11,61 +11,221 @@
 [![License](https://img.shields.io/crates/l/rsql_cli)](https://github.com/theseus-rs/rsql_cli#license)
 [![Semantic Versioning](https://img.shields.io/badge/%E2%9A%99%EF%B8%8F_SemVer-2.0.0-blue)](https://semver.org/spec/v2.0.0.html)
 
-`rsql` is a command line SQL interface for data.  `rsql` is a modern, feature-rich, and user-friendly client, that has
-been designed to be easy to use, and to provide a consistent experience across all supported data sources.
+> A modern, feature-rich command line SQL interface for data
 
-## Getting Started
+`rsql` is a powerful and user-friendly command line SQL client that works with over 20 different data sources and
+formats. Whether you're working with databases, files, or cloud services, `rsql` provides a consistent and intuitive
+interface for all your data querying needs.
 
-`rsql` can be installed using the following methods:
+## ✨ Highlights
 
-### Linux / MacOS
+- **Universal SQL Interface**: Query databases, files, and cloud services with standard SQL
+- **Rich Interactive Experience**: Syntax highlighting, auto-completion, and command history
+- **Multiple Output Formats**: ASCII tables, JSON, CSV, HTML, and more
+- **Extensive Data Source Support**: PostgreSQL, MySQL, SQLite, DuckDB, Parquet, CSV, Excel, and many more
+- **Compression Support**: Automatically handles compressed files (gzip, brotli, etc.)
+- **Embedded Database**: Run PostgreSQL queries without external setup
+- **Multilingual**: Interface available in 40+ languages
 
+[demo.webm](https://github.com/user-attachments/assets/dfb09f20-fc87-45a5-9593-aaeb3233d5a5)
+
+## 🚀 Quick Start
+
+### Installation
+
+**Linux / MacOS:**
 ```shell
 curl --proto '=https' --tlsv1.2 -LsSf https://github.com/theseus-rs/rsql/releases/latest/download/rsql_cli-installer.sh | sh
 ```
 
-### Windows
-
+**Windows:**
 ```shell
 irm https://github.com/theseus-rs/rsql/releases/latest/download/rsql_cli-installer.ps1 | iex
 ```
 
-For more information, and additional installations instructions (cargo, homebrew, msi),
-visit the [rsql](https://theseus-rs.github.io/rsql/rsql_cli/) site.
+**Cargo**
+```shell
+cargo install rsql_cli
+```
 
-[demo.webm](https://github.com/user-attachments/assets/dfb09f20-fc87-45a5-9593-aaeb3233d5a5)
+For detailed installation instructions, visit the [rsql documentation](https://theseus-rs.github.io/rsql/rsql_cli/).
 
-## Features
+### Basic Usage
 
-| Feature               |                                                                                                                                                                                                                                  |
+**Interactive Mode:**
+```shell
+# Connect to a database
+rsql --url "postgresql://user:pass@localhost/mydb"
+
+# Query a CSV file
+rsql --url "csv://data.csv"
+
+# Use DuckDB for in-memory analytics
+rsql --url "duckdb://"
+```
+
+**Execute Single Query:**
+```shell
+# Run a query and exit
+rsql --url "sqlite://database.db" -- "SELECT * FROM users LIMIT 10"
+
+# Query a Parquet file
+rsql --url "parquet://data.parquet" -- "SELECT column1, COUNT(*) FROM table GROUP BY column1"
+```
+
+## 📊 Supported Data Sources
+
+### Databases
+- **PostgreSQL** (`postgresql://` / `postgres://`) - Including embedded PostgreSQL
+- **MySQL** / **MariaDB** (`mysql://` / `mariadb://`)
+- **SQLite** (`sqlite://` / `rusqlite://`)
+- **DuckDB** (`duckdb://`) - High-performance analytics
+- **CockroachDB** (`cockroachdb://`)
+- **SQL Server** (`sqlserver://`)
+- **Redshift** (`redshift://`)
+- **Snowflake** (`snowflake://`)
+- **CrateDB** (`cratedb://`)
+- **LibSQL/Turso** (`libsql://`)
+- **DynamoDB** (`dynamodb://`)
+
+### File Formats
+- **CSV/TSV** (`csv://` / `tsv://`) - Comma/tab-separated values
+- **Parquet** (`parquet://`) - Columnar storage format
+- **Arrow** (`arrow://`) - In-memory columnar format
+- **Avro** (`avro://`) - Binary serialization format
+- **ORC** (`orc://`) - Optimized row columnar format
+- **Excel** (`excel://`) - .xlsx and .xls files
+- **JSON/JSONL** (`json://` / `jsonl://`) - JSON documents
+- **XML** (`xml://`) - XML documents
+- **YAML** (`yaml://`) - YAML documents
+- **ODS** (`ods://`) - OpenDocument Spreadsheet
+- **Fixed Width** (`fwf://`) - Fixed-width format
+
+### Cloud & Remote
+- **FlightSQL** (`flightsql://`) - Apache Arrow Flight SQL
+- **S3** (`s3://`) - Amazon S3 and S3-compatible storage
+- **HTTP/HTTPS** (`http://` / `https://`) - Remote files
+
+### Compression
+Automatically handles: Gzip, Brotli, Bzip2, LZ4, XZ, Zstd
+
+## 🎯 Common Use Cases
+
+### Database Operations
+```shell
+# Connect to PostgreSQL
+rsql --url "postgresql://user:pass@localhost/mydb"
+
+# Use embedded PostgreSQL (no external setup required)
+rsql --url "postgresql://user@localhost/mydb?embedded=true"
+
+# SQLite file
+rsql --url "sqlite://database.db"
+```
+
+### File Analysis
+```shell
+# Analyze CSV data
+rsql --url "csv://sales.csv" -- "SELECT region, SUM(revenue) FROM table GROUP BY region"
+
+# Query Excel spreadsheet
+rsql --url "excel://report.xlsx" -- "SELECT * FROM table WHERE amount > 1000"
+
+# Analyze Parquet files
+rsql --url "parquet://logs.parquet" -- "SELECT date, COUNT(*) FROM table GROUP BY date"
+```
+
+### Data Transformation
+```shell
+# Convert CSV to JSON
+rsql --url "csv://input.csv" --format json -- "SELECT * FROM table"
+
+# Query compressed files
+rsql --url "csv://data.csv.gz" -- "SELECT column1, column2 FROM table"
+
+# Combine multiple formats
+rsql --url "duckdb://" -- "
+  SELECT * FROM read_csv_auto('file1.csv') 
+  UNION ALL 
+  SELECT * FROM read_parquet('file2.parquet')
+"
+```
+
+## 🛠️ Advanced Features
+
+### Output Formats
+Control output with `--format`:
+- `ascii` - ASCII table (default)
+- `json` - JSON format
+- `csv` - Comma-separated values
+- `html` - HTML table
+- `markdown` - Markdown table
+- `xml` - XML format
+- `yaml` - YAML format
+- And more...
+
+### Configuration
+```shell
+# Set default format
+rsql --url "sqlite://db.sqlite" --format json
+
+# Custom delimiter for CSV output
+rsql --url "postgresql://..." --format csv --delimiter ";"
+
+# Expanded output for wide tables
+rsql --url "..." --format expanded
+```
+
+## 📚 Examples
+
+### File Format Examples
+
+**CSV with custom options:**
+```shell
+rsql --url "csv://data.csv?has_header=true&skip_rows=1"
+```
+
+**Fixed-width file:**
+```shell
+rsql --url "fwf://data.txt?widths=10,20,15&headers=id,name,email"
+```
+
+**Delimited file with custom separator:**
+```shell
+rsql --url "delimited://data.txt?separator=|&has_header=true"
+```
+
+### Database Examples
+
+**PostgreSQL with SSL:**
+```shell
+rsql --url "postgresql://user:pass@localhost/db?sslmode=require"
+```
+
+**MySQL with charset:**
+```shell
+rsql --url "mysql://user:pass@localhost/db?charset=utf8mb4"
+```
+
+## 🔧 Features
+
+| Feature               | Description                                                                                                                                                                                                                      |
 |-----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Data Sources          | Arrow, Avro, CockroachDB, CrateDB, CSV, Delimited, DuckDB, DynamoDB, Excel, FlightSQL, FWF, JSON, JSONL, LibSQL (Turso), MariaDB, MySQL, ODS, ORC, Parquet, PostgreSQL, Redshift, Snowflake, SQLite3, SQL Server, TSV, XML, YAML |
 | Compression           | Brotli, Bzip2, Gzip, LZ4, XZ, Zstd                                                                                                                                                                                               |
-| Syntax Highlighting   | ✅                                                                                                                                                                                                                                |
-| Result Highlighting   | ✅                                                                                                                                                                                                                                |
-| Query Auto-completion | ✅                                                                                                                                                                                                                                |
-| History               | ✅                                                                                                                                                                                                                                |
-| SQL File Execution    | ✅                                                                                                                                                                                                                                |
-| Embedded PostgreSQL   | ✅                                                                                                                                                                                                                                |
+| Syntax Highlighting   | ✅ Full SQL syntax highlighting                                                                                                                                                                                                   |
+| Result Highlighting   | ✅ Colored output for better readability                                                                                                                                                                                           |
+| Query Auto-completion | ✅ Smart completion for SQL keywords and table names                                                                                                                                                                               |
+| History               | ✅ Command history with search                                                                                                                                                                                                     |
+| SQL File Execution    | ✅ Execute .sql files directly                                                                                                                                                                                                     |
+| Embedded PostgreSQL   | ✅ No external PostgreSQL installation required                                                                                                                                                                                    |
 | Output Formats        | ascii, csv, expanded, html, json, jsonl, markdown, plain, psql, sqlite, tsv, unicode, xml, yaml                                                                                                                                  |
 | Localized Interface   | 40+ languages¹                                                                                                                                                                                                                   |
 | Key Bindings          | emacs, vi                                                                                                                                                                                                                        |
 
 ¹ Computer translations; human translations welcome
 
-## Usage
-
-### Interactive Mode
-
-```shell
-rsql --url "<url>"
-```
-
-### Running a single Query
-
-```shell
-rsql --url "<url>" -- "<query>"
-```
+## 🔗 Connection URLs
 
 | Driver             | URL                                                                                                                                                                              |
 |--------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -113,22 +273,22 @@ rsql --url "<url>" -- "<query>"
 ² `libsql` needs to be enabled with the `libsql` feature flag; it is disabled by default as it conflicts
 with `rusqlite`.
 
-## Safety
+## 🛡️ Safety
 
 These crates use `#![forbid(unsafe_code)]` to ensure everything is implemented in 100% safe Rust.
 
-## License
+## 📄 License
 
 Licensed under either of:
 
 - Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or <http://www.apache.org/licenses/LICENSE-2.0>)
 - MIT license ([LICENSE-MIT](LICENSE-MIT) or <http://opensource.org/licenses/MIT>)
 
-## Contribution
+## 🤝 Contributing
 
-Unless you explicitly state otherwise, any contribution intentionally submitted
-for inclusion in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any
-additional terms or conditions.
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any additional terms or conditions.
+
+### Development Environment
 
 <a href="https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/theseus-rs/rsql">
 <img
@@ -143,3 +303,7 @@ additional terms or conditions.
   alt="GitHub Codespaces"
 />
 </a>
+
+---
+
+**Need help?** Check out the [documentation](https://theseus-rs.github.io/rsql/rsql_cli/) or [open an issue](https://github.com/theseus-rs/rsql/issues) on GitHub.
