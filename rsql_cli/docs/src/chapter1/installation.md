@@ -7,8 +7,15 @@ the [latest release](https://github.com/theseus-rs/rsql/releases/latest).
 
 ### Linux / MacOS
 
+You can install rsql using the provided installer script, which will download the latest release and set it up for you.
 ```shell
 curl --proto '=https' --tlsv1.2 -LsSf https://github.com/theseus-rs/rsql/releases/latest/download/rsql_cli-installer.sh | sh
+```
+
+Alternatively, you can use [Homebrew](https://brew.sh/):
+
+```shell
+brew install rsql
 ```
 
 ### Windows
