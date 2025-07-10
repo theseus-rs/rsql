@@ -55,7 +55,7 @@ runner = "ubuntu-latest"
 container = { image = "quay.io/pypa/musllinux_1_2_x86_64", host = "x86_64-unknown-linux-musl" }
 
 [dist.github-custom-runners.x86_64-pc-windows-msvc]
-runner = "windows-latest"
+runner = "windows-2022"
 
 [dist.github-custom-runners.aarch64-pc-windows-msvc]
 runner = "ubuntu-latest"
