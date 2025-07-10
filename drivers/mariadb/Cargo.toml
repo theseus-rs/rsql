@@ -13,8 +13,8 @@ version.workspace = true
 [dependencies]
 async-trait = { workspace = true }
 file_type = { workspace = true }
-rsql_driver = { path = "../../rsql_driver", version = "0.19.0" }
-rsql_driver_mysql = { path = "../mysql", version = "0.19.0" }
+rsql_driver = { path = "../../rsql_driver", version = "0.19.1" }
+rsql_driver_mysql = { path = "../mysql", version = "0.19.1" }
 
 [dev-dependencies]
 anyhow = { workspace = true }
