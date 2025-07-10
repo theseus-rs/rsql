@@ -2176,7 +2176,7 @@ checksum = "efdce149c370f133a071ca8ef6ea340b7b88748ab0810097a9e2976eaa34b4f3"
 dependencies = [
  "chrono",
  "chrono-tz-build",
- "phf",
+ "phf 0.11.3",
 ]
 
 [[package]]
@@ -2239,9 +2239,9 @@ dependencies = [
 
 [[package]]
 name = "clap"
-version = "4.5.40"
+version = "4.5.41"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "40b6887a1d8685cebccf115538db5c0efe625ccac9696ad45c409d96566e910f"
+checksum = "be92d32e80243a54711e5d7ce823c35c41c9d929dc4ab58e1276f625841aadf9"
 dependencies = [
  "clap_builder",
  "clap_derive",
@@ -2259,9 +2259,9 @@ dependencies = [
 
 [[package]]
 name = "clap_builder"
-version = "4.5.40"
+version = "4.5.41"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e0c66c08ce9f0c698cbce5c0279d0bb6ac936d8674174fe48f736533b964f59e"
+checksum = "707eab41e9622f9139419d573eca0900137718000c517d47da73045f54331c3d"
 dependencies = [
  "anstream",
  "anstyle",
@@ -2271,9 +2271,9 @@ dependencies = [
 
 [[package]]
 name = "clap_derive"
-version = "4.5.40"
+version = "4.5.41"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d2c7947ae4cc3d851207c1adb5b5e260ff0cca11446b1d6d1423788e442257ce"
+checksum = "ef4f52386a59ca4c860f7393bcf8abd8dfd91ecccc0f774635ff68e92eeef491"
 dependencies = [
  "heck 0.5.0",
  "proc-macro2",
@@ -2389,9 +2389,9 @@ dependencies = [
 
 [[package]]
 name = "config"
-version = "0.15.11"
+version = "0.15.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "595aae20e65c3be792d05818e8c63025294ac3cb7e200f11459063a352a6ef80"
+checksum = "5b1eb4fb07bc7f012422df02766c7bd5971effb894f573865642f06fa3265440"
 dependencies = [
  "async-trait",
  "convert_case",
@@ -2401,7 +2401,7 @@ dependencies = [
  "rust-ini",
  "serde",
  "serde_json",
- "toml 0.8.23",
+ "toml 0.9.0",
  "winnow",
  "yaml-rust2",
 ]
@@ -3288,11 +3288,11 @@ dependencies = [
 
 [[package]]
 name = "file_type"
-version = "0.8.7"
+version = "0.8.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dd117e092a1038c71be6b6f2e092a9c71477c06c347458068b0ef494c9632807"
+checksum = "b2f6ef2155b2573eb00e0cc1bb199606c3b031cce6c04037aca217f24c495e46"
 dependencies = [
- "phf",
+ "phf 0.12.1",
 ]
 
 [[package]]
@@ -4354,9 +4354,9 @@ dependencies = [
 
 [[package]]
 name = "indicatif"
-version = "0.17.12"
+version = "0.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4adb2ee6ad319a912210a36e56e3623555817bcc877a7e6e8802d1d69c4d8056"
+checksum = "70a646d946d06bedbbc4cac4c218acf4bbf2d87757a784857025f4d447e4e1cd"
 dependencies = [
  "console",
  "portable-atomic",
@@ -4903,9 +4903,9 @@ dependencies = [
  "indexmap 2.10.0",
  "log",
  "memchr",
- "phf",
+ "phf 0.11.3",
  "phf_codegen",
- "phf_shared",
+ "phf_shared 0.11.3",
  "uncased",
 ]
 
@@ -5986,7 +5986,16 @@ version = "0.11.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1fd6780a80ae0c52cc120a26a1a42c1ae51b247a253e4e06113d23d2c2edd078"
 dependencies = [
- "phf_shared",
+ "phf_shared 0.11.3",
+]
+
+[[package]]
+name = "phf"
+version = "0.12.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "913273894cec178f401a31ec4b656318d95473527be05c0752cc41cdc32be8b7"
+dependencies = [
+ "phf_shared 0.12.1",
 ]
 
 [[package]]
@@ -5996,7 +6005,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "aef8048c789fa5e851558d709946d6d79a8ff88c0440c587967f8e94bfb1216a"
 dependencies = [
  "phf_generator",
- "phf_shared",
+ "phf_shared 0.11.3",
 ]
 
 [[package]]
@@ -6005,7 +6014,7 @@ version = "0.11.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3c80231409c20246a13fddb31776fb942c38553c51e871f8cbd687a4cfb5843d"
 dependencies = [
- "phf_shared",
+ "phf_shared 0.11.3",
  "rand 0.8.5",
 ]
 
@@ -6017,6 +6026,15 @@ checksum = "67eabc2ef2a60eb7faa00097bd1ffdb5bd28e62bf39990626a582201b7a754e5"
 dependencies = [
  "siphasher",
  "uncased",
+]
+
+[[package]]
+name = "phf_shared"
+version = "0.12.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "06005508882fb681fd97892ecff4b7fd0fee13ef1aa569f8695dae7ab9099981"
+dependencies = [
+ "siphasher",
 ]
 
 [[package]]
@@ -8972,6 +8990,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "serde_spanned"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "40734c41988f7306bb04f0ecf60ec0f3f1caa34290e4e8ea471dcd3346483b83"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "serde_urlencoded"
 version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -9974,7 +10001,7 @@ checksum = "d4ea810f0692f9f51b382fff5893887bb4580f5fa246fde546e0b13e7fcee662"
 dependencies = [
  "fnv",
  "nom",
- "phf",
+ "phf 0.11.3",
  "phf_codegen",
 ]
 
@@ -10221,9 +10248,9 @@ checksum = "1f3ccbac311fea05f86f61904b462b55fb3df8837a366dfc601a0161d0532f20"
 
 [[package]]
 name = "tokio"
-version = "1.46.0"
+version = "1.46.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1140bb80481756a8cbe10541f37433b459c5aa1e727b4c020fbfebdc25bf3ec4"
+checksum = "0cc3a2344dafbe23a245241fe8b09735b521110d30fcefbbd5feb1797ca35d17"
 dependencies = [
  "backtrace",
  "bytes",
@@ -10285,7 +10312,7 @@ dependencies = [
  "log",
  "parking_lot 0.12.4",
  "percent-encoding",
- "phf",
+ "phf 0.11.3",
  "pin-project-lite",
  "postgres-protocol",
  "postgres-types",
@@ -10383,9 +10410,22 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dc1beb996b9d83529a9e75c17a1686767d148d70663143c7854d8b4a09ced362"
 dependencies = [
  "serde",
- "serde_spanned",
- "toml_datetime",
+ "serde_spanned 0.6.9",
+ "toml_datetime 0.6.11",
  "toml_edit",
+]
+
+[[package]]
+name = "toml"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f271e09bde39ab52250160a67e88577e0559ad77e9085de6e9051a2c4353f8f8"
+dependencies = [
+ "serde",
+ "serde_spanned 1.0.0",
+ "toml_datetime 0.7.0",
+ "toml_parser",
+ "winnow",
 ]
 
 [[package]]
@@ -10398,6 +10438,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "toml_datetime"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bade1c3e902f58d73d3f294cd7f20391c1cb2fbcb643b73566bc773971df91e3"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "toml_edit"
 version = "0.22.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -10405,9 +10454,18 @@ checksum = "41fe8c660ae4257887cf66394862d21dbca4a6ddd26f04a3560410406a2f819a"
 dependencies = [
  "indexmap 2.10.0",
  "serde",
- "serde_spanned",
- "toml_datetime",
+ "serde_spanned 0.6.9",
+ "toml_datetime 0.6.11",
  "toml_write",
+ "winnow",
+]
+
+[[package]]
+name = "toml_parser"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b5c1c469eda89749d2230d8156a5969a69ffe0d6d01200581cdc6110674d293e"
+dependencies = [
  "winnow",
 ]
 
@@ -10626,9 +10684,9 @@ dependencies = [
 
 [[package]]
 name = "tracing-indicatif"
-version = "0.3.9"
+version = "0.3.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8201ca430e0cd893ef978226fd3516c06d9c494181c8bf4e5b32e30ed4b40aa1"
+checksum = "8c714cc8fc46db04fcfddbd274c6ef59bebb1b435155984e7c6e89c3ce66f200"
 dependencies = [
  "indicatif",
  "tracing",
