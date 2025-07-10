@@ -154,10 +154,10 @@ rsql --url "parquet://logs.parquet" -- "SELECT date, COUNT(*) FROM table GROUP B
 
 ```shell
 # Convert CSV to JSON
-rsql --url "csv://input.csv" --format json -- "SELECT * FROM table"
+rsql --url "csv://input.csv" --format json -- "SELECT * FROM input"
 
 # Query compressed files
-rsql --url "csv://data.csv.gz" -- "SELECT column1, column2 FROM table"
+rsql --url "csv://data.csv.gz" -- "SELECT column1, column2 FROM data"
 
 # Combine multiple formats
 rsql --url "duckdb://" -- "

@@ -143,6 +143,11 @@ impl Connection {
                 Some(v) => Ok(Value::I64(v)),
                 None => Ok(Value::Null),
             }
+        } else if let Ok(value) = row.try_get::<Option<u64>, &str>(column_name) {
+            match value {
+                Some(v) => Ok(Value::U64(v)),
+                None => Ok(Value::Null),
+            }
         } else if let Ok(value) = row.try_get::<Option<f32>, &str>(column_name) {
             match value {
                 Some(v) => Ok(Value::F32(v)),

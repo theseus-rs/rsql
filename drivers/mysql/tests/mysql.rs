@@ -75,6 +75,7 @@ async fn test_data_types(connection: &mut dyn Connection) -> anyhow::Result<()> 
                 mediumint_type MEDIUMINT,
                 int_type INT,
                 bigint_type BIGINT,
+                bigint_unsigned_type BIGINT UNSIGNED,
                 decimal_type DECIMAL(5,2),
                 float_type FLOAT,
                 double_type DOUBLE,
@@ -91,11 +92,11 @@ async fn test_data_types(connection: &mut dyn Connection) -> anyhow::Result<()> 
             INSERT INTO data_types (
                 char_type, varchar_type, text_type, binary_type, varbinary_type, blob_type,
                 tinyint_type, smallint_type, mediumint_type, int_type, bigint_type,
-                decimal_type, float_type, double_type, date_type, time_type, datetime_type,
-                timestamp_type, json_type
+                bigint_unsigned_type, decimal_type, float_type, double_type, date_type, time_type,
+                datetime_type, timestamp_type, json_type
             ) VALUES (
                  'a', 'foo', 'foo', 'foo', 'foo', 'foo',
-                 127, 32767, 8388607, 2147483647, 9223372036854775807,
+                 127, 32767, 8388607, 2147483647, 9223372036854775807, 18446744073709551615,
                  123.45, 123.0, 123.0, '2022-01-01', '14:30:00', '2022-01-01 14:30:00',
                  '2022-01-01 14:30:00', '{"key": "value"}'
              )
@@ -105,8 +106,8 @@ async fn test_data_types(connection: &mut dyn Connection) -> anyhow::Result<()> 
     let sql = indoc! {r"
             SELECT char_type, varchar_type, text_type, binary_type, varbinary_type, blob_type,
                    tinyint_type, smallint_type, mediumint_type, int_type, bigint_type,
-                   decimal_type, float_type, double_type, date_type, time_type, datetime_type,
-                   timestamp_type, json_type
+                   bigint_unsigned_type, decimal_type, float_type, double_type, date_type,
+                   time_type, datetime_type, timestamp_type, json_type
               FROM data_types
         "};
     let mut query_result = connection.query(sql).await?;
@@ -124,6 +125,7 @@ async fn test_data_types(connection: &mut dyn Connection) -> anyhow::Result<()> 
             Value::I32(8_388_607),
             Value::I32(2_147_483_647),
             Value::I64(9_223_372_036_854_775_807),
+            Value::U64(18_446_744_073_709_551_615),
             Value::Decimal(rust_decimal::Decimal::from_str("123.45").expect("invalid decimal")),
             Value::F32(123.0),
             Value::F32(123.0),
