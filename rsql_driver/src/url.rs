@@ -29,9 +29,9 @@ impl UrlExtension for Url {
 
         let path = path.replace('/', MAIN_SEPARATOR_STR);
         let file_path = PathBuf::from(path);
-        if !file_path.exists() && !file_path.is_file() {
-            let file_path = file_path.to_string_lossy();
-            return Err(IoError(format!("File not found: {file_path}")));
+        let path = file_path.to_string_lossy().to_string();
+        if path.is_empty() || path == MAIN_SEPARATOR_STR {
+            return Err(IoError("No file provided".to_string()));
         }
         Ok(file_path)
     }
@@ -52,8 +52,16 @@ mod test {
     }
 
     #[test]
-    fn test_file_error() -> Result<()> {
+    fn test_file_path() -> Result<()> {
         let url = Url::parse("file:///foo")?;
+        let path = url.to_file()?.to_string_lossy().to_string();
+        assert!(path.ends_with("foo"));
+        Ok(())
+    }
+
+    #[test]
+    fn test_file_error() -> Result<()> {
+        let url = Url::parse("file://")?;
         assert!(url.to_file().is_err());
         Ok(())
     }
