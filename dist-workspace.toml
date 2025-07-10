@@ -40,11 +40,15 @@ runner = "macos-15"
 
 [dist.github-custom-runners.aarch64-unknown-linux-gnu]
 runner = "ubuntu-latest"
-container = { image = "quay.io/pypa/manylinux_2_28_x86_64", host = "x86_64-unknown-linux-musl" }
+# Disable this for now; openssl-sys fails to build due to missing perl dependency
+# error: "Can't locate IPC/Cmd.pm in @INC"
+#container = { image = "quay.io/pypa/manylinux_2_28_x86_64", host = "x86_64-unknown-linux-musl" }
 
 [dist.github-custom-runners.x86_64-unknown-linux-gnu]
 runner = "ubuntu-latest"
-container = { image = "quay.io/pypa/manylinux_2_28_x86_64", host = "x86_64-unknown-linux-musl" }
+# Disable this for now; openssl-sys fails to build due to missing perl dependency
+# error: "Can't locate IPC/Cmd.pm in @INC"
+#container = { image = "quay.io/pypa/manylinux_2_28_x86_64", host = "x86_64-unknown-linux-musl" }
 
 [dist.github-custom-runners.x86_64-unknown-linux-musl]
 runner = "ubuntu-latest"
