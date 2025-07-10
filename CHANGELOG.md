@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## `rsql_cli` - [0.19.1](https://github.com/theseus-rs/rsql/compare/v0.19.0...v0.19.1) - 2025-07-10
+
+### Fixed
+- correct url.to_file() logic to return path even if file does not exist
+- add support for mysql bigint unsigned
+
+### Other
+- update linux build configuration
+- add documentation for Homebrew
+- minor documentation updates
+- update the online documentation
+- fix 'system' command demo
+- clean up completer, add convenience function for current schema
+
+## `rsql_repl` - [0.19.1](https://github.com/theseus-rs/rsql/compare/rsql_repl-v0.19.0...rsql_repl-v0.19.1) - 2025-07-10
+
+### Other
+- clean up completer, add convenience function for current schema
+
+## `rsql_driver_mysql` - [0.19.1](https://github.com/theseus-rs/rsql/compare/rsql_driver_mysql-v0.19.0...rsql_driver_mysql-v0.19.1) - 2025-07-10
+
+### Fixed
+- add support for mysql bigint unsigned
+
+## `rsql_driver` - [0.19.1](https://github.com/theseus-rs/rsql/compare/rsql_driver-v0.19.0...rsql_driver-v0.19.1) - 2025-07-10
+
+### Fixed
+- correct url.to_file() logic to return path even if file does not exist
+
+### Other
+- clean up completer, add convenience function for current schema
+
 ## `rsql_driver_cratedb` - [0.19.0](https://github.com/theseus-rs/rsql/releases/tag/rsql_driver_cratedb-v0.19.0) - 2025-05-29
 
 ### Added
