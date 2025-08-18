@@ -8394,6 +8394,7 @@ dependencies = [
  "csv",
  "indexmap 2.10.0",
  "indoc",
+ "jiff",
  "num-format",
  "quick-xml 0.38.1",
  "rsql_drivers",

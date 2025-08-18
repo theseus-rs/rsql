@@ -59,7 +59,7 @@ mod tests {
         let expected = indoc! {r"
                id   
              12,345 
-            1 row (5.678µs)
+            1 row (5µs 678ns)
         "};
         assert_eq!(plain_output, expected);
         Ok(())

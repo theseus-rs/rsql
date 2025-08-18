@@ -19,6 +19,7 @@ colored = { workspace = true }
 csv = { workspace = true, optional = true }
 indexmap = { workspace = true, features = ["serde"] }
 indoc = { workspace = true }
+jiff = { workspace = true }
 num-format = { workspace = true }
 quick-xml = { workspace = true, features = ["serialize"], optional = true }
 rsql_drivers = { path = "../rsql_drivers", version = "0.19.1" }
@@ -37,7 +38,7 @@ syntect = { workspace = true }
 
 [dev-dependencies]
 test-log = { workspace = true }
-tokio = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
 
 [features]
 all = [
