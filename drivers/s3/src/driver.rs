@@ -143,10 +143,10 @@ impl Driver {
         let content_type = content_type.trim().to_lowercase();
         if !["text/plain", "application/octet-stream"].contains(&content_type.as_str()) {
             let file_types = FileType::from_media_type(content_type.to_lowercase());
-            if !file_types.is_empty() {
-                if let Some(file_type) = file_types.first() {
-                    return Ok(file_type);
-                }
+            if !file_types.is_empty()
+                && let Some(file_type) = file_types.first()
+            {
+                return Ok(file_type);
             }
         }
         let file_type =

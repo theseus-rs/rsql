@@ -64,10 +64,10 @@ impl Driver {
         };
 
         let mut file_name = PathBuf::from(file_name);
-        if let Some(extension) = file_name.extension() {
-            if extension.to_string_lossy().to_string().to_lowercase() == "br" {
-                file_name.set_extension("");
-            }
+        if let Some(extension) = file_name.extension()
+            && extension.to_string_lossy().to_string().to_lowercase() == "br"
+        {
+            file_name.set_extension("");
         }
         create_dir_all(temp_dir)?;
         file_name = temp_dir.join(file_name);

@@ -52,10 +52,10 @@ impl ShellCommand for Command {
         let mut indexes_column_rows = Vec::new();
         let mut table: Option<&Table> = None;
 
-        if let Some(catalog) = metadata.current_catalog() {
-            if let Some(schema) = catalog.current_schema() {
-                table = schema.get(table_name);
-            }
+        if let Some(catalog) = metadata.current_catalog()
+            && let Some(schema) = catalog.current_schema()
+        {
+            table = schema.get(table_name);
         }
 
         if let Some(table) = table {

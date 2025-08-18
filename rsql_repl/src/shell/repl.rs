@@ -212,10 +212,10 @@ impl Shell {
         );
         let result = executor.execute(line.as_str()).await;
 
-        if let Err(executors::Error::InvalidCommand { command_name }) = &result {
-            if self.invalid_command_help_available(command_name.clone())? {
-                return Ok(LoopCondition::Continue);
-            }
+        if let Err(executors::Error::InvalidCommand { command_name }) = &result
+            && self.invalid_command_help_available(command_name.clone())?
+        {
+            return Ok(LoopCondition::Continue);
         }
 
         match result {

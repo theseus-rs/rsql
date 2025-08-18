@@ -28,14 +28,14 @@ impl ShellCommand for Command {
         let columns = vec![table_label];
         let mut rows = Vec::new();
 
-        if let Some(catalog) = metadata.current_catalog() {
-            if let Some(database) = catalog.current_schema() {
-                let tables = database.tables();
-                for table in tables {
-                    let value = Value::String(table.name().to_string());
-                    let row = vec![value];
-                    rows.push(row);
-                }
+        if let Some(catalog) = metadata.current_catalog()
+            && let Some(database) = catalog.current_schema()
+        {
+            let tables = database.tables();
+            for table in tables {
+                let value = Value::String(table.name().to_string());
+                let row = vec![value];
+                rows.push(row);
             }
         }
 

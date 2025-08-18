@@ -35,10 +35,10 @@ async fn retrieve_catalogs(connection: &mut dyn Connection, metadata: &mut Metad
     }
 
     // If there is only one catalog, set it as the current catalog
-    if catalogs.len() == 1 {
-        if let Some(catalog) = catalogs.first_mut() {
-            catalog.set_current(true);
-        }
+    if catalogs.len() == 1
+        && let Some(catalog) = catalogs.first_mut()
+    {
+        catalog.set_current(true);
     }
 
     for mut catalog in catalogs {

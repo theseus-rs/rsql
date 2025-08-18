@@ -194,7 +194,7 @@ mod test {
         Ok(())
     }
 
-    /// Ref: https://www.sqlite.org/datatype3.html
+    /// Reference: <https://www.sqlite.org/datatype3.html>
     #[tokio::test]
     async fn test_table_data_types() -> Result<()> {
         let driver = crate::Driver;

@@ -34,23 +34,23 @@ impl ShellCommand for Command {
         let columns = vec![table_label, index_label];
         let mut rows = Vec::new();
 
-        if let Some(catalog) = metadata.current_catalog() {
-            if let Some(schema) = catalog.current_schema() {
-                let tables = match table_filter {
-                    Some(table_name) => match schema.get(table_name) {
-                        Some(table) => vec![table],
-                        None => Vec::new(),
-                    },
-                    None => schema.tables(),
-                };
+        if let Some(catalog) = metadata.current_catalog()
+            && let Some(schema) = catalog.current_schema()
+        {
+            let tables = match table_filter {
+                Some(table_name) => match schema.get(table_name) {
+                    Some(table) => vec![table],
+                    None => Vec::new(),
+                },
+                None => schema.tables(),
+            };
 
-                for table in tables {
-                    for index in table.indexes() {
-                        let table_value = Value::String(table.name().to_string());
-                        let index_value = Value::String(index.name().to_string());
-                        let row = vec![table_value, index_value];
-                        rows.push(row);
-                    }
+            for table in tables {
+                for index in table.indexes() {
+                    let table_value = Value::String(table.name().to_string());
+                    let index_value = Value::String(index.name().to_string());
+                    let row = vec![table_value, index_value];
+                    rows.push(row);
                 }
             }
         }
