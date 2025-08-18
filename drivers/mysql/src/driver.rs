@@ -234,10 +234,10 @@ impl Connection {
         } else {
             let column_type = column.type_info();
             let type_name = format!("{column_type:?}");
-            return Err(UnsupportedColumnType {
+            Err(UnsupportedColumnType {
                 column_name: column_name.to_string(),
                 column_type: type_name,
-            });
+            })
         }
     }
 }

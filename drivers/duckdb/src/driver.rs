@@ -240,7 +240,7 @@ mod test {
         Ok(())
     }
 
-    /// Ref: https://duckdb.org/docs/sql/data_types/overview.html
+    /// Reference: <https://duckdb.org/docs/sql/data_types/overview.html>
     #[tokio::test]
     async fn test_table_data_types() -> Result<()> {
         let driver = crate::Driver;

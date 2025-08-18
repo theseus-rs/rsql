@@ -164,12 +164,11 @@ impl rsql_driver::Connection for Connection {
     }
 
     async fn close(&mut self) -> Result<()> {
-        if let Some(postgresql) = &self.postgresql {
-            if postgresql.status() == Status::Started {
-                if let Err(error) = postgresql.stop().await {
-                    return Err(IoError(error.to_string()));
-                }
-            }
+        if let Some(postgresql) = &self.postgresql
+            && postgresql.status() == Status::Started
+            && let Err(error) = postgresql.stop().await
+        {
+            return Err(IoError(error.to_string()));
         }
 
         Ok(())

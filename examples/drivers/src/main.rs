@@ -2,7 +2,7 @@
 #![deny(clippy::pedantic)]
 use rsql_drivers::{DriverManager, Result};
 
-/// Example of using the DriverManager to connect to a database.
+/// Example of using the `DriverManager` to connect to a database.
 #[tokio::main]
 async fn main() -> Result<()> {
     DriverManager::initialize()?;

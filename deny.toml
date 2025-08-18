@@ -21,7 +21,7 @@ allow = [
     "CC0-1.0",
     "CDLA-Permissive-2.0",
     "ISC",
-    "LGPL-3.0",
+    "LGPL-3.0-or-later",
     "MIT",
     "MPL-2.0",
     "PostgreSQL",
