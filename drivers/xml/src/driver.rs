@@ -107,7 +107,11 @@ pub fn xml_to_json(xml: &str) -> Result<Value> {
             }
             Ok(Event::Text(e)) => {
                 if let Some((_, map)) = stack.last_mut() {
-                    let text = e.unescape().unwrap_or_default().into_owned();
+                    let text = reader
+                        .decoder()
+                        .decode(e.as_ref())
+                        .unwrap_or_default()
+                        .into_owned();
                     if !text.is_empty() {
                         let value = infer_value(&text);
                         map.insert("#text".to_string(), value);

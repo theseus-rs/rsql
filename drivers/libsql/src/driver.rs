@@ -91,7 +91,7 @@ impl rsql_driver::Connection for Connection {
     }
 
     async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {
-        let mut statement = self
+        let statement = self
             .connection
             .prepare(sql)
             .await
