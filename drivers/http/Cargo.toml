@@ -13,9 +13,9 @@ version.workspace = true
 [dependencies]
 async-trait = { workspace = true }
 file_type = { workspace = true }
-rsql_driver = { path = "../../rsql_driver", version = "0.19.1" }
-rsql_driver_https = { path = "../https", version = "0.19.1" }
+rsql_driver = { path = "../../rsql_driver", version = "0.19.2" }
+rsql_driver_https = { path = "../https", version = "0.19.2" }
 
 [dev-dependencies]
-rsql_driver_csv = { path = "../csv", version = "0.19.1" }
+rsql_driver_csv = { path = "../csv", version = "0.19.2" }
 tokio = { workspace = true, features = ["macros", "rt"] }
