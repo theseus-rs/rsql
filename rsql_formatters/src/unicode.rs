@@ -62,7 +62,7 @@ mod tests {
             ├────────┤
             │ 12,345 │
             ╰────────╯
-            1 row (5.678µs)
+            1 row (5µs 678ns)
         "};
         assert_eq!(unicode_output, expected);
         Ok(())

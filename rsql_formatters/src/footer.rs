@@ -3,6 +3,7 @@ use crate::error::Result;
 use crate::writers::Output;
 use crate::{FormatterOptions, Results};
 use colored::Colorize;
+use jiff::SignedDuration;
 use num_format::{Locale, ToFormattedString};
 use std::io::Write;
 use std::str::FromStr;
@@ -38,7 +39,11 @@ pub async fn write_footer(
         t!("rows", locale = locale, rows = rows).to_string()
     };
     let elapsed_display = if options.timer {
-        let elapsed = format!("{:?}", options.elapsed);
+        let elapsed = SignedDuration::new(
+            i64::try_from(options.elapsed.as_secs())?,
+            i32::try_from(options.elapsed.subsec_nanos())?,
+        );
+        let elapsed = format!("{elapsed:#}");
         t!("elapsed_format", locale = locale, elapsed = elapsed).to_string()
     } else {
         String::new()
