@@ -86,37 +86,38 @@ rsql --url "parquet://data.parquet" -- "SELECT column1, COUNT(*) FROM table GROU
 
 ### Databases
 
-- **PostgreSQL** (`postgresql://` / `postgres://`) - Including embedded PostgreSQL
-- **MySQL** / **MariaDB** (`mysql://` / `mariadb://`)
-- **SQLite** (`sqlite://` / `rusqlite://`)
-- **DuckDB** (`duckdb://`) - High-performance analytics
+- **ClickHouse** (`clickhouse://`)
 - **CockroachDB** (`cockroachdb://`)
-- **SQL Server** (`sqlserver://`)
+- **CrateDB** (`cratedb://`)
+- **DuckDB** (`duckdb://`) - High-performance analytics
+- **DynamoDB** (`dynamodb://`)
+- **LibSQL/Turso** (`libsql://`)
+- **MySQL** / **MariaDB** (`mysql://` / `mariadb://`)
+- **PostgreSQL** (`postgresql://` / `postgres://`) - Including embedded PostgreSQL
 - **Redshift** (`redshift://`)
 - **Snowflake** (`snowflake://`)
-- **CrateDB** (`cratedb://`)
-- **LibSQL/Turso** (`libsql://`)
-- **DynamoDB** (`dynamodb://`)
+- **SQL Server** (`sqlserver://`)
+- **SQLite** (`sqlite://` / `rusqlite://`)
 
 ### File Formats
 
-- **CSV/TSV** (`csv://` / `tsv://`) - Comma/tab-separated values
-- **Parquet** (`parquet://`) - Columnar storage format
 - **Arrow** (`arrow://`) - In-memory columnar format
 - **Avro** (`avro://`) - Binary serialization format
-- **ORC** (`orc://`) - Optimized row columnar format
+- **CSV/TSV** (`csv://` / `tsv://`) - Comma/tab-separated values
 - **Excel** (`excel://`) - .xlsx and .xls files
+- **Fixed Width** (`fwf://`) - Fixed-width format
 - **JSON/JSONL** (`json://` / `jsonl://`) - JSON documents
+- **ODS** (`ods://`) - OpenDocument Spreadsheet
+- **ORC** (`orc://`) - Optimized row columnar format
+- **Parquet** (`parquet://`) - Columnar storage format
 - **XML** (`xml://`) - XML documents
 - **YAML** (`yaml://`) - YAML documents
-- **ODS** (`ods://`) - OpenDocument Spreadsheet
-- **Fixed Width** (`fwf://`) - Fixed-width format
 
 ### Cloud & Remote
 
 - **FlightSQL** (`flightsql://`) - Apache Arrow Flight SQL
-- **S3** (`s3://`) - Amazon S3 and S3-compatible storage
 - **HTTP/HTTPS** (`http://` / `https://`) - Remote files
+- **S3** (`s3://`) - Amazon S3 and S3-compatible storage
 
 ### Compression
 
@@ -174,9 +175,9 @@ rsql --url "duckdb://" -- "
 Control output with `--format`:
 
 - `ascii` - ASCII table (default)
-- `json` - JSON format
 - `csv` - Comma-separated values
 - `html` - HTML table
+- `json` - JSON format
 - `markdown` - Markdown table
 - `xml` - XML format
 - `yaml` - YAML format
@@ -233,19 +234,19 @@ rsql --url "mysql://user:pass@localhost/db?charset=utf8mb4"
 
 ## 🔧 Features
 
-| Feature               | Description                                                                                                                                                                                                                      |
-|-----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Data Sources          | Arrow, Avro, CockroachDB, CrateDB, CSV, Delimited, DuckDB, DynamoDB, Excel, FlightSQL, FWF, JSON, JSONL, LibSQL (Turso), MariaDB, MySQL, ODS, ORC, Parquet, PostgreSQL, Redshift, Snowflake, SQLite3, SQL Server, TSV, XML, YAML |
-| Compression           | Brotli, Bzip2, Gzip, LZ4, XZ, Zstd                                                                                                                                                                                               |
-| Syntax Highlighting   | ✅ Full SQL syntax highlighting                                                                                                                                                                                                   |
-| Result Highlighting   | ✅ Color output for better readability                                                                                                                                                                                            |
-| Query Auto-completion | ✅ Smart completion for SQL keywords and table names                                                                                                                                                                              |
-| History               | ✅ Command history with search                                                                                                                                                                                                    |
-| SQL File Execution    | ✅ Execute .sql files directly                                                                                                                                                                                                    |
-| Embedded PostgreSQL   | ✅ No external PostgreSQL installation required                                                                                                                                                                                   |
-| Output Formats        | ascii, csv, expanded, html, json, jsonl, markdown, plain, psql, sqlite, tsv, unicode, xml, yaml                                                                                                                                  |
-| Localized Interface   | 40+ languages¹                                                                                                                                                                                                                   |
-| Key Bindings          | emacs, vi                                                                                                                                                                                                                        |
+| Feature               | Description                                                                                                                                                                                                                                  |
+|-----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Data Sources          | Arrow, Avro, ClickHouse, CockroachDB, CrateDB, CSV, Delimited, DuckDB, DynamoDB, Excel, FlightSQL, FWF, JSON, JSONL, LibSQL (Turso), MariaDB, MySQL, ODS, ORC, Parquet, PostgreSQL, Redshift, Snowflake, SQLite3, SQL Server, TSV, XML, YAML |
+| Compression           | Brotli, Bzip2, Gzip, LZ4, XZ, Zstd                                                                                                                                                                                                           |
+| Syntax Highlighting   | ✅ Full SQL syntax highlighting                                                                                                                                                                                                               |
+| Result Highlighting   | ✅ Color output for better readability                                                                                                                                                                                                        |
+| Query Auto-completion | ✅ Smart completion for SQL keywords and table names                                                                                                                                                                                          |
+| History               | ✅ Command history with search                                                                                                                                                                                                                |
+| SQL File Execution    | ✅ Execute .sql files directly                                                                                                                                                                                                                |
+| Embedded PostgreSQL   | ✅ No external PostgreSQL installation required                                                                                                                                                                                               |
+| Output Formats        | ascii, csv, expanded, html, json, jsonl, markdown, plain, psql, sqlite, tsv, unicode, xml, yaml                                                                                                                                              |
+| Localized Interface   | 40+ languages¹                                                                                                                                                                                                                               |
+| Key Bindings          | emacs, vi                                                                                                                                                                                                                                    |
 
 ¹ Computer translations; human translations welcome
 
@@ -257,6 +258,7 @@ rsql --url "mysql://user:pass@localhost/db?charset=utf8mb4"
 | avro (polars)      | `avro://<file>`                                                                                                                                                                  |
 | brotli¹            | `brotli://<file>`                                                                                                                                                                |
 | bzip2¹             | `bzip2://<file>`                                                                                                                                                                 |
+| clickhouse         | `clickhouse://<user>[:<password>]@<host>[:<port>]/<database>[?access_token=<token>][&scheme=<http\|https>]`                                                                      |
 | cockroachdb (sqlx) | `cockroachdb://<user>[:<password>]@<host>[:<port>]/<database>`                                                                                                                   |
 | cratedb (sqlx)     | `cratedb://<user>[:<password>]@<host>[:<port>]/<database>`                                                                                                                       |
 | csv (polars)       | `csv://<file>[?has_header=<true\|false>][&quote=<char>][&skip_rows=<n>]`                                                                                                         |

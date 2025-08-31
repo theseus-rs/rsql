@@ -17,6 +17,7 @@ rsql_driver_arrow = { path = "../drivers/arrow", optional = true, version = "0.1
 rsql_driver_avro = { path = "../drivers/avro", optional = true, version = "0.19.1" }
 rsql_driver_brotli = { path = "../drivers/brotli", optional = true, version = "0.19.1" }
 rsql_driver_bzip2 = { path = "../drivers/bzip2", optional = true, version = "0.19.1" }
+rsql_driver_clickhouse = { path = "../drivers/clickhouse", optional = true, version = "0.19.1" }
 rsql_driver_cockroachdb = { path = "../drivers/cockroachdb", optional = true, version = "0.19.1" }
 rsql_driver_cratedb = { path = "../drivers/cratedb", optional = true, version = "0.19.1" }
 rsql_driver_csv = { path = "../drivers/csv", optional = true, version = "0.19.1" }
@@ -69,6 +70,7 @@ all = [
     "driver-avro",
     "driver-brotli",
     "driver-bzip2",
+    "driver-clickhouse",
     "driver-cockroachdb",
     "driver-cratedb",
     "driver-csv",
@@ -151,6 +153,7 @@ driver-arrow = ["dep:rsql_driver_arrow"]
 driver-avro = ["dep:rsql_driver_avro"]
 driver-brotli = ["dep:rsql_driver_brotli"]
 driver-bzip2 = ["dep:rsql_driver_bzip2"]
+driver-clickhouse = ["dep:rsql_driver_clickhouse"]
 driver-cockroachdb = ["dep:rsql_driver_cockroachdb"]
 driver-cratedb = ["dep:rsql_driver_cratedb"]
 driver-csv = ["dep:rsql_driver_csv"]

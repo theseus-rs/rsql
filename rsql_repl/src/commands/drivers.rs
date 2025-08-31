@@ -87,6 +87,8 @@ mod tests {
             "brotli",
             #[cfg(feature = "driver-bzip2")]
             "bzip2",
+            #[cfg(feature = "driver-clickhouse")]
+            "clickhouse",
             #[cfg(feature = "driver-cockroachdb")]
             "cockroachdb",
             #[cfg(feature = "driver-cratedb")]
