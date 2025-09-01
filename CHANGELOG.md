@@ -192,6 +192,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Other
 - correct clippy lints
 
+## `rsql_driver_clickhouse` - [0.19.2](https://github.com/theseus-rs/rsql/releases/tag/rsql_driver_clickhouse-v0.19.2) - 2025-09-01
+
+### Added
+- add clickhouse driver
+
+### Other
+- rsql-v0.19.2
+
 ## `rsql_driver_cratedb` - [0.19.2](https://github.com/theseus-rs/rsql/compare/rsql_driver_cratedb-v0.19.1...rsql_driver_cratedb-v0.19.2) - 2025-09-01
 
 ### Other
