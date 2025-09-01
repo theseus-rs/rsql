@@ -63,6 +63,8 @@ impl DriverManager {
         Self::add(Arc::new(rsql_driver_brotli::Driver))?;
         #[cfg(feature = "driver-bzip2")]
         Self::add(Arc::new(rsql_driver_bzip2::Driver))?;
+        #[cfg(feature = "driver-clickhouse")]
+        Self::add(Arc::new(rsql_driver_clickhouse::Driver))?;
         #[cfg(feature = "driver-cockroachdb")]
         Self::add(Arc::new(rsql_driver_cockroachdb::Driver))?;
         #[cfg(feature = "driver-cratedb")]
@@ -195,6 +197,8 @@ mod tests {
         #[cfg(feature = "driver-brotli")]
         let driver_count = driver_count + 1;
         #[cfg(feature = "driver-bzip2")]
+        let driver_count = driver_count + 1;
+        #[cfg(feature = "driver-clickhouse")]
         let driver_count = driver_count + 1;
         #[cfg(feature = "driver-cockroachdb")]
         let driver_count = driver_count + 1;

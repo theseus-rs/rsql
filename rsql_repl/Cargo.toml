@@ -56,6 +56,7 @@ all-drivers = [
     "driver-avro",
     "driver-brotli",
     "driver-bzip2",
+    "driver-clickhouse",
     "driver-cockroachdb",
     "driver-cratedb",
     "driver-csv",
@@ -96,6 +97,7 @@ driver-arrow = ["rsql_drivers/driver-arrow"]
 driver-avro = ["rsql_drivers/driver-avro"]
 driver-brotli = ["rsql_drivers/driver-brotli"]
 driver-bzip2 = ["rsql_drivers/driver-bzip2"]
+driver-clickhouse = ["rsql_drivers/driver-clickhouse"]
 driver-cockroachdb = ["rsql_drivers/driver-cockroachdb"]
 driver-cratedb = ["rsql_drivers/driver-cratedb"]
 driver-csv = ["rsql_drivers/driver-csv"]
