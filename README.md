@@ -27,7 +27,7 @@ interface for all your data querying needs.
 - **Embedded Database**: Run PostgreSQL queries without external setup
 - **Multilingual**: Interface available in 40+ languages
 
-[demo.webm](https://github.com/user-attachments/assets/dfb09f20-fc87-45a5-9593-aaeb3233d5a5)
+[demo.webm](https://github.com/user-attachments/assets/613fdefb-753a-4bb2-acd2-66539d4f2068)
 
 ## 🚀 Quick Start
 
