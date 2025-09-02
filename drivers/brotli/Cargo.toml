@@ -14,12 +14,12 @@ version.workspace = true
 async-trait = { workspace = true }
 brotli = { workspace = true }
 file_type = { workspace = true }
-rsql_driver = { path = "../../rsql_driver", version = "0.19.2" }
+rsql_driver = { path = "../../rsql_driver", version = "0.19.3" }
 tempfile = { workspace = true }
 tracing = { workspace = true }
 url = { workspace = true }
 
 [dev-dependencies]
-rsql_driver_csv = { path = "../csv", version = "0.19.2" }
-rsql_driver_test_utils = { path = "../test_utils", version = "0.19.2" }
+rsql_driver_csv = { path = "../csv", version = "0.19.3" }
+rsql_driver_test_utils = { path = "../test_utils", version = "0.19.3" }
 tokio = { workspace = true, features = ["macros", "rt"] }
