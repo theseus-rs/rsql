@@ -6,7 +6,7 @@ fn database_url() -> String {
     dataset_url("lz4", "users.csv.lz4")
 }
 
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread")]
 async fn test_driver_connect() -> Result<()> {
     DriverManager::add(Arc::new(rsql_driver_csv::Driver))?;
     let database_url = database_url();
@@ -17,7 +17,7 @@ async fn test_driver_connect() -> Result<()> {
     Ok(())
 }
 
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread")]
 async fn test_connection_interface() -> Result<()> {
     DriverManager::add(Arc::new(rsql_driver_csv::Driver))?;
     let database_url = database_url();

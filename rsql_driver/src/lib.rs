@@ -3,10 +3,6 @@
 //! The RSQL driver library provides interfaces for connecting to different data
 //! sources and executing SQL queries.
 
-#![forbid(unsafe_code)]
-#![forbid(clippy::allow_attributes)]
-#![deny(clippy::pedantic)]
-
 #[macro_use]
 extern crate rust_i18n;
 

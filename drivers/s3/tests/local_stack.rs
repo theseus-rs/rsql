@@ -22,7 +22,7 @@ static ACCESS_KEY_ID: &str = "test";
 static SECRET_ACCESS_KEY: &str = "test";
 static REGION: &str = "us-east-1";
 
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread")]
 async fn test_s3_driver_local_stack() -> Result<()> {
     if env::var("CI").unwrap_or_default() == "true" && env::consts::OS != "linux" {
         eprintln!("Skipping CI test on non-linux platform");

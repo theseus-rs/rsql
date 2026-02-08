@@ -19,7 +19,7 @@ static ACCESS_KEY_ID: &str = "minioadmin";
 static SECRET_ACCESS_KEY: &str = "minioadmin";
 static REGION: &str = "us-east-1";
 
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread")]
 async fn test_s3_driver_minio() -> Result<()> {
     if env::var("CI").unwrap_or_default() == "true" && env::consts::OS != "linux" {
         eprintln!("Skipping CI test on non-linux platform");

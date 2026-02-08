@@ -18,4 +18,4 @@ rsql_driver_https = { path = "../https", version = "0.19.2" }
 
 [dev-dependencies]
 rsql_driver_csv = { path = "../csv", version = "0.19.2" }
-tokio = { workspace = true, features = ["macros", "rt"] }
+tokio = { workspace = true, features = ["macros", "rt", "rt-multi-thread"] }

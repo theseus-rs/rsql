@@ -67,9 +67,12 @@ impl Connection {
             .ok_or_else(|| InvalidUrl("Missing host".to_string()))?;
         let port = parsed_url.port().unwrap_or(31337);
         let connection_url = format!("{scheme}://{host}:{port}");
-        let service_client = FlightServiceClient::connect(connection_url)
+        let channel = Channel::from_shared(connection_url)
+            .map_err(|error| IoError(error.to_string()))?
+            .connect()
             .await
             .map_err(|error| IoError(error.to_string()))?;
+        let service_client = FlightServiceClient::new(channel);
         let mut client = FlightSqlServiceClient::new_from_inner(service_client);
         let username = parsed_url.username();
         let password = parsed_url
@@ -323,7 +326,7 @@ fn convert_arrow_to_value(
 
 /// Helper function to downcast an Arrow array to a specific type
 fn downcast_array<'a, T>(
-    column: &'a std::sync::Arc<(dyn arrow_array::Array + 'static)>,
+    column: &'a std::sync::Arc<dyn arrow_array::Array + 'static>,
 ) -> Result<&'a T>
 where
     T: 'static + std::any::Any,

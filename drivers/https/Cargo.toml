@@ -26,12 +26,12 @@ tokio = { workspace = true, features = ["fs"] }
 
 [dev-dependencies]
 rsql_driver_csv = { path = "../csv", version = "0.19.2" }
-tokio = { workspace = true, features = ["macros", "rt"] }
+tokio = { workspace = true, features = ["macros", "rt", "rt-multi-thread"] }
 
 [features]
 native-tls = [
     "reqwest/native-tls",
 ]
 rustls = [
-    "reqwest/rustls-tls-native-roots",
+    "reqwest/rustls",
 ]

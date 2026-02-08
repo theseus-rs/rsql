@@ -1,7 +1,8 @@
 use async_trait::async_trait;
 use file_type::FileType;
 use polars::io::SerReader;
-use polars::prelude::{IntoLazy, JsonLineReader};
+use polars::io::json::{JsonFormat, JsonReader};
+use polars::prelude::IntoLazy;
 use polars_sql::SQLContext;
 use rsql_driver::Error::{ConversionError, IoError};
 use rsql_driver::{Result, UrlExtension};
@@ -45,15 +46,16 @@ impl rsql_driver::Driver for Driver {
             None => NonZeroUsize::new(100),
         };
 
-        let data_frame = JsonLineReader::new(file)
+        let data_frame = JsonReader::new(file)
+            .with_json_format(JsonFormat::JsonLines)
             .infer_schema_len(infer_schema_length)
             .set_rechunk(true)
             .with_ignore_errors(ignore_errors)
             .finish()
-            .map_err(|error| IoError(error.to_string()))?;
+            .map_err(|error: polars::prelude::PolarsError| IoError(error.to_string()))?;
 
         let table_name = rsql_driver_polars::get_table_name(file_name)?;
-        let mut context = SQLContext::new();
+        let context = SQLContext::new();
         context.register(table_name.as_str(), data_frame.lazy());
 
         let connection = Connection::new(url, context).await?;
@@ -75,7 +77,7 @@ mod test {
         dataset_url("jsonl", "users.jsonl")
     }
 
-    #[tokio::test]
+    #[tokio::test(flavor = "multi_thread")]
     async fn test_driver_connect() -> Result<()> {
         let database_url = database_url();
         let driver_manager = crate::Driver;
@@ -85,7 +87,7 @@ mod test {
         Ok(())
     }
 
-    #[tokio::test]
+    #[tokio::test(flavor = "multi_thread")]
     async fn test_connection_interface() -> Result<()> {
         let database_url = database_url();
         let driver_manager = crate::Driver;
