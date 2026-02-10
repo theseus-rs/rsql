@@ -17,7 +17,7 @@
 formats. Whether you're working with databases, files, or cloud services, `rsql` provides a consistent and intuitive
 interface for all your data querying needs.
 
-## ✨ Highlights
+## Highlights
 
 - **Universal SQL Interface**: Query databases, files, and cloud services with standard SQL
 - **Rich Interactive Experience**: Syntax highlighting, auto-completion, and command history
@@ -29,7 +29,7 @@ interface for all your data querying needs.
 
 [demo.webm](https://github.com/user-attachments/assets/613fdefb-753a-4bb2-acd2-66539d4f2068)
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Installation
 
@@ -82,7 +82,7 @@ rsql --url "sqlite://database.db" -- "SELECT * FROM users LIMIT 10"
 rsql --url "parquet://data.parquet" -- "SELECT column1, COUNT(*) FROM table GROUP BY column1"
 ```
 
-## 📊 Supported Data Sources
+## Supported Data Sources
 
 ### Databases
 
@@ -123,7 +123,7 @@ rsql --url "parquet://data.parquet" -- "SELECT column1, COUNT(*) FROM table GROU
 
 Automatically handles: Gzip, Brotli, Bzip2, LZ4, XZ, Zstd
 
-## 🎯 Common Use Cases
+## Common Use Cases
 
 ### Database Operations
 
@@ -168,7 +168,7 @@ rsql --url "duckdb://" -- "
 "
 ```
 
-## 🛠️ Advanced Features
+## Advanced Features
 
 ### Output Formats
 
@@ -232,7 +232,7 @@ rsql --url "postgresql://user:pass@localhost/db?sslmode=require"
 rsql --url "mysql://user:pass@localhost/db?charset=utf8mb4"
 ```
 
-## 🔧 Features
+## Features
 
 | Feature               | Description                                                                                                                                                                                                                                  |
 |-----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -299,18 +299,14 @@ rsql --url "mysql://user:pass@localhost/db?charset=utf8mb4"
 ² `libsql` needs to be enabled with the `libsql` feature flag; it is disabled by default as it conflicts
 with `rusqlite`.
 
-## 🛡️ Safety
-
-These crates use `#![forbid(unsafe_code)]` to ensure everything is implemented in 100% safe Rust.
-
-## 📄 License
+## License
 
 Licensed under either of:
 
 - Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or <http://www.apache.org/licenses/LICENSE-2.0>)
 - MIT license ([LICENSE-MIT](LICENSE-MIT) or <http://opensource.org/licenses/MIT>)
 
-## 🤝 Contributing
+## Contributing
 
 Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the work by you, as
 defined in the Apache-2.0 license, shall be dual licensed as above, without any additional terms or conditions.

@@ -24,6 +24,7 @@ allow = [
     "LGPL-3.0-or-later",
     "MIT",
     "MPL-2.0",
+    "OpenSSL",
     "PostgreSQL",
     "Unicode-3.0",
     "WTFPL",
@@ -32,11 +33,13 @@ allow = [
 
 [advisories]
 ignore = [
-    "RUSTSEC-2023-0071",
-    "RUSTSEC-2024-0320",
-    "RUSTSEC-2024-0363",
-    "RUSTSEC-2024-0436",
-    "RUSTSEC-2025-0052",
+    { id = "RUSTSEC-2023-0071", reason = "rsa: potential key recovery through timing sidechannels" },
+    { id = "RUSTSEC-2024-0320", reason = "yaml-rust: unmaintained" },
+    { id = "RUSTSEC-2024-0363", reason = "sqlx: Binary Protocol Misinterpretation caused by Truncating or Overflowing Casts" },
+    { id = "RUSTSEC-2024-0436", reason = "paste: unmaintained" },
+    { id = "RUSTSEC-2025-0052", reason = "async-std: discontinued" },
+    { id = "RUSTSEC-2025-0134", reason = "rustls-pemfile: unmaintained" },
+    { id = "RUSTSEC-2025-0141", reason = "bincode: unmaintained" },
 ]
 
 # https://embarkstudios.github.io/cargo-deny/checks/bans/cfg.html
@@ -44,10 +47,3 @@ ignore = [
 deny = []
 multiple-versions = "deny"
 wildcards = "allow"
-
-[[licenses.clarify]]
-name = "ring"
-expression = "MIT AND ISC AND OpenSSL"
-license-files = [
-    { path = "LICENSE", hash = 0xbd0eed23 }
-]

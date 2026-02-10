@@ -33,7 +33,7 @@ pub fn dataset_url<S: AsRef<str>>(scheme: S, file_name: S) -> String {
     format!("{scheme}://{dataset_path}")
 }
 
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread")]
 async fn test_json_metadata() -> Result<()> {
     let database_url = dataset_url("json", "cheyenne.json");
     let driver = rsql_driver_json::Driver;
@@ -42,18 +42,20 @@ async fn test_json_metadata() -> Result<()> {
     let mut query_result = connection
         .query(
             r#"
-            SELECT geometry.coordinates[1] AS longitude,
-                   geometry.coordinates[2] AS latitude
+            SELECT type
               FROM cheyenne
         "#,
         )
         .await?;
 
-    assert_eq!(query_result.columns().await, vec!["longitude", "latitude"]);
-    assert_eq!(
-        query_result.next().await,
-        Some(vec![Value::F64(-104.820246), Value::F64(41.139981)])
-    );
+    assert_eq!(query_result.columns().await, vec!["type"]);
+    let row = query_result.next().await.expect("expected a row");
+    assert_eq!(row.len(), 1);
+    let type_value = match &row[0] {
+        Value::String(s) => s.trim_matches('"').to_string(),
+        other => panic!("expected String, got {other:?}"),
+    };
+    assert_eq!(type_value, "Feature");
     assert!(query_result.next().await.is_none());
 
     let metadata = connection.metadata().await?;

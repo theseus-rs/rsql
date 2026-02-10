@@ -5,7 +5,7 @@ fn database_url() -> String {
     dataset_url("avro", "users.avro")
 }
 
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread")]
 async fn test_driver_connect() -> Result<()> {
     let database_url = database_url();
     let driver = rsql_driver_avro::Driver;
@@ -15,7 +15,7 @@ async fn test_driver_connect() -> Result<()> {
     Ok(())
 }
 
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread")]
 async fn test_connection_interface() -> Result<()> {
     let database_url = database_url();
     let driver = rsql_driver_avro::Driver;

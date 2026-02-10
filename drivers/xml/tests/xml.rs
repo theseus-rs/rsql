@@ -6,7 +6,7 @@ fn database_url() -> String {
     dataset_url("xml", "users.xml")
 }
 
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread")]
 async fn test_driver_connect() -> Result<()> {
     let database_url = database_url();
     let driver = rsql_driver_xml::Driver;
@@ -16,19 +16,19 @@ async fn test_driver_connect() -> Result<()> {
     Ok(())
 }
 
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread")]
 async fn test_connection_interface() -> Result<()> {
     let database_url = database_url();
     let driver = rsql_driver_xml::Driver;
     let mut connection = driver.connect(&database_url).await?;
 
     let mut query_result = connection
-        .query(indoc! {r"
+        .query(indoc! {r#"
                 WITH cte_user AS (
-                    SELECT unnest(data.user) FROM users
+                    SELECT unnest("data"."user") AS "user" FROM users
                 )
-                SELECT user.* FROM cte_user
-            "})
+                SELECT "user".* FROM cte_user
+            "#})
         .await?;
 
     assert_eq!(query_result.columns().await, vec!["id", "name"]);

@@ -1,5 +1,3 @@
-#![forbid(unsafe_code)]
-#![deny(clippy::pedantic)]
 use rsql_drivers::{DriverManager, Result};
 
 /// Example of using the `DriverManager` to connect to a database.

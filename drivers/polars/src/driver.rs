@@ -2,7 +2,7 @@ use crate::metadata;
 use crate::value::ToValue;
 use async_trait::async_trait;
 use polars_sql::SQLContext;
-use rsql_driver::Error::{ConversionError, InvalidUrl, IoError};
+use rsql_driver::Error::{InvalidUrl, IoError};
 use rsql_driver::{MemoryQueryResult, Metadata, QueryResult, Result};
 use std::fmt::{Debug, Formatter};
 use std::path::Path;
@@ -86,19 +86,10 @@ impl rsql_driver::Connection for Connection {
         let mut rows = Vec::new();
 
         // Convert the data frame to a vector of rows
-        for data_frame_row in data_frame.iter() {
-            for (row, data) in data_frame_row.iter().enumerate() {
-                let row = if let Some(row) = rows.get_mut(row) {
-                    row
-                } else {
-                    let row = Vec::new();
-                    rows.push(row);
-                    rows.last_mut().ok_or(ConversionError(
-                        "Failed to convert DataFrame to QueryResult".to_string(),
-                    ))?
-                };
-                let value = data.to_value();
-                row.push(value);
+        for row_idx in 0..data_frame.height() {
+            if let Some(row_values) = data_frame.get(row_idx) {
+                let row: Vec<_> = row_values.iter().map(|v| v.to_value()).collect();
+                rows.push(row);
             }
         }
 
@@ -126,13 +117,13 @@ mod test {
     use polars::prelude::*;
     use rsql_driver::{Connection, Value};
 
-    #[tokio::test]
+    #[tokio::test(flavor = "multi_thread")]
     async fn test_connection() -> Result<()> {
         let ids = Series::new("id".into(), &[1i64, 2i64]);
         let names = Series::new("name".into(), &["John Doe", "Jane Smith"]);
-        let data_frame = DataFrame::new(vec![Column::from(ids), Column::from(names)])
+        let data_frame = DataFrame::new_infer_height(vec![Column::from(ids), Column::from(names)])
             .map_err(|error| IoError(error.to_string()))?;
-        let mut context = SQLContext::new();
+        let context = SQLContext::new();
         context.register("users", data_frame.lazy());
         let mut connection = super::Connection::new("polars://", context).await?;
 

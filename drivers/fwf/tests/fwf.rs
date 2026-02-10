@@ -5,7 +5,7 @@ fn database_url() -> String {
     dataset_url("fwf", "users.fwf")
 }
 
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread")]
 async fn test_driver_connect() -> Result<()> {
     let database_url = format!("{}?widths=4,15", database_url());
     let driver = rsql_driver_fwf::Driver;
@@ -15,7 +15,7 @@ async fn test_driver_connect() -> Result<()> {
     Ok(())
 }
 
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread")]
 async fn test_connection_interface() -> Result<()> {
     let database_url = format!("{}?widths=4,15&headers=id,name", database_url());
     let driver = rsql_driver_fwf::Driver;
