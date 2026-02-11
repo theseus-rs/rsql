@@ -1,8 +1,8 @@
 use async_trait::async_trait;
 use bit_vec::BitVec;
-use chrono::{Datelike, NaiveDate, NaiveDateTime, NaiveTime, Timelike, Utc};
 use file_type::FileType;
 use jiff::civil::{Date, DateTime, Time};
+use jiff::tz::TimeZone;
 use postgresql_embedded::{PostgreSQL, Settings, Status, VersionReq};
 use rsql_driver::Error::{InvalidUrl, IoError, UnsupportedColumnType};
 use rsql_driver::{MemoryQueryResult, Metadata, QueryResult, Result, StatementMetadata, Value};
@@ -254,23 +254,23 @@ impl Connection {
                     None => Value::Null,
                 }
             }
-            Type::DATE => {
-                Self::get_single(row, column_index, |v: NaiveDate| naive_date_to_value(v))?
-            }
+            Type::DATE => Self::get_single(row, column_index, |v: Date| Value::Date(v))?,
             Type::TIME | Type::TIMETZ => {
-                Self::get_single(row, column_index, |v: NaiveTime| naive_time_to_value(v))?
+                Self::get_single(row, column_index, |v: Time| Value::Time(v))?
             }
-            Type::TIMESTAMP => Self::get_single(row, column_index, |v: NaiveDateTime| {
-                naive_date_time_to_value(v)
-            })?,
+            Type::TIMESTAMP => {
+                Self::get_single(row, column_index, |v: DateTime| Value::DateTime(v))?
+            }
             Type::TIMESTAMPTZ => {
                 let system_time: Option<SystemTime> = row
                     .try_get(column_index)
                     .map_err(|error| IoError(error.to_string()))?;
                 match system_time {
                     Some(value) => {
-                        let date_time: chrono::DateTime<Utc> = value.into();
-                        naive_date_time_to_value(date_time.naive_utc())
+                        let timestamp = jiff::Timestamp::try_from(value)
+                            .map_err(|error| IoError(error.to_string()))?;
+                        let date_time = timestamp.to_zoned(TimeZone::UTC).datetime();
+                        Value::DateTime(date_time)
                     }
                     None => Value::Null,
                 }
@@ -334,73 +334,6 @@ impl Connection {
             .collect();
         bit_string
     }
-}
-
-fn naive_date_to_value(date: NaiveDate) -> Value {
-    let Ok(year) = i16::try_from(date.year()) else {
-        return Value::Null;
-    };
-    let Ok(month) = i8::try_from(date.month()) else {
-        return Value::Null;
-    };
-    let Ok(day) = i8::try_from(date.day()) else {
-        return Value::Null;
-    };
-    let Ok(date) = Date::new(year, month, day) else {
-        return Value::Null;
-    };
-    Value::Date(date)
-}
-
-fn naive_time_to_value(time: NaiveTime) -> Value {
-    let Ok(hour) = i8::try_from(time.hour()) else {
-        return Value::Null;
-    };
-    let Ok(minute) = i8::try_from(time.minute()) else {
-        return Value::Null;
-    };
-    let Ok(second) = i8::try_from(time.second()) else {
-        return Value::Null;
-    };
-    let Ok(nanosecond) = i32::try_from(time.nanosecond()) else {
-        return Value::Null;
-    };
-    let Ok(time) = Time::new(hour, minute, second, nanosecond) else {
-        return Value::Null;
-    };
-    Value::Time(time)
-}
-
-fn naive_date_time_to_value(date_time: NaiveDateTime) -> Value {
-    let Ok(year) = i16::try_from(date_time.year()) else {
-        return Value::Null;
-    };
-    let Ok(month) = i8::try_from(date_time.month()) else {
-        return Value::Null;
-    };
-    let Ok(day) = i8::try_from(date_time.day()) else {
-        return Value::Null;
-    };
-    let Ok(date) = Date::new(year, month, day) else {
-        return Value::Null;
-    };
-    let Ok(hour) = i8::try_from(date_time.hour()) else {
-        return Value::Null;
-    };
-    let Ok(minute) = i8::try_from(date_time.minute()) else {
-        return Value::Null;
-    };
-    let Ok(second) = i8::try_from(date_time.second()) else {
-        return Value::Null;
-    };
-    let Ok(nanosecond) = i32::try_from(date_time.nanosecond()) else {
-        return Value::Null;
-    };
-    let Ok(time) = Time::new(hour, minute, second, nanosecond) else {
-        return Value::Null;
-    };
-    let date_time = DateTime::from_parts(date, time);
-    Value::DateTime(date_time)
 }
 
 #[cfg(test)]
