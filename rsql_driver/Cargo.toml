@@ -15,6 +15,7 @@ anyhow = { workspace = true }
 async-trait = { workspace = true }
 base64 = { workspace = true }
 file_type = { workspace = true }
+i18n_inflector = { workspace = true }
 indexmap = { workspace = true, features = ["serde"] }
 jiff = { workspace = true, features = ["serde"] }
 mockall = { workspace = true }

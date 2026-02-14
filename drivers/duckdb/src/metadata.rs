@@ -1,7 +1,10 @@
 use indoc::indoc;
 use regex::Regex;
 use rsql_driver::Error::IoError;
-use rsql_driver::{Catalog, Column, Connection, Index, Metadata, Result, Schema, Table, Value};
+use rsql_driver::{
+    Catalog, Column, Connection, ForeignKey, Index, Metadata, PrimaryKey, Result, Schema, Table,
+    Value,
+};
 
 pub(crate) async fn get_metadata(connection: &mut dyn Connection) -> Result<Metadata> {
     let mut metadata = Metadata::with_dialect(connection.dialect());
@@ -75,6 +78,8 @@ async fn retrieve_schemas(connection: &mut dyn Connection, catalog: &mut Catalog
         if schema.current() {
             retrieve_tables(connection, &mut schema).await?;
             retrieve_indexes(connection, &mut schema).await?;
+            retrieve_primary_keys(connection, &mut schema).await?;
+            retrieve_foreign_keys(connection, &mut schema).await?;
         }
         catalog.add(schema);
     }
@@ -197,6 +202,125 @@ async fn retrieve_indexes(connection: &mut dyn Connection, schema: &mut Schema) 
     Ok(())
 }
 
+async fn retrieve_primary_keys(connection: &mut dyn Connection, schema: &mut Schema) -> Result<()> {
+    let sql = indoc! {r"
+            SELECT
+                kcu.table_name,
+                tc.constraint_name,
+                kcu.column_name
+            FROM
+                information_schema.table_constraints tc
+                JOIN information_schema.key_column_usage kcu
+                    ON tc.constraint_name = kcu.constraint_name
+                    AND tc.table_schema = kcu.table_schema
+            WHERE
+                tc.constraint_type = 'PRIMARY KEY'
+                AND tc.table_catalog = current_database()
+                AND tc.table_schema = current_schema()
+            ORDER BY
+                kcu.table_name,
+                tc.constraint_name,
+                kcu.ordinal_position
+        "};
+    let mut query_result = connection.query(sql).await?;
+
+    while let Some(row) = query_result.next().await {
+        let table_name = match row.first() {
+            Some(value) => value.to_string(),
+            None => continue,
+        };
+        let constraint_name = match row.get(1) {
+            Some(value) => value.to_string(),
+            None => continue,
+        };
+        let column_name = match row.get(2) {
+            Some(value) => value.to_string(),
+            None => continue,
+        };
+        let Some(table) = schema.get_mut(table_name) else {
+            continue;
+        };
+
+        if table.primary_key().is_some() {
+            continue;
+        }
+
+        let pk = PrimaryKey::new(constraint_name, vec![column_name], false);
+        table.set_primary_key(pk);
+    }
+
+    Ok(())
+}
+
+async fn retrieve_foreign_keys(connection: &mut dyn Connection, schema: &mut Schema) -> Result<()> {
+    let sql = indoc! {r"
+            SELECT
+                kcu.table_name,
+                kcu.constraint_name,
+                kcu.column_name,
+                ccu.table_name AS referenced_table_name,
+                ccu.column_name AS referenced_column_name
+            FROM
+                information_schema.table_constraints tc
+                JOIN information_schema.key_column_usage kcu
+                    ON tc.constraint_name = kcu.constraint_name
+                    AND tc.table_schema = kcu.table_schema
+                JOIN information_schema.constraint_column_usage ccu
+                    ON ccu.constraint_name = tc.constraint_name
+                    AND ccu.table_schema = tc.table_schema
+            WHERE
+                tc.constraint_type = 'FOREIGN KEY'
+                AND tc.table_catalog = current_database()
+                AND tc.table_schema = current_schema()
+            ORDER BY
+                kcu.table_name,
+                kcu.constraint_name,
+                kcu.ordinal_position
+        "};
+    let mut query_result = connection.query(sql).await?;
+
+    while let Some(row) = query_result.next().await {
+        let table_name = match row.first() {
+            Some(value) => value.to_string(),
+            None => continue,
+        };
+        let constraint_name = match row.get(1) {
+            Some(value) => value.to_string(),
+            None => continue,
+        };
+        let column_name = match row.get(2) {
+            Some(value) => value.to_string(),
+            None => continue,
+        };
+        let referenced_table = match row.get(3) {
+            Some(value) => value.to_string(),
+            None => continue,
+        };
+        let referenced_column = match row.get(4) {
+            Some(value) => value.to_string(),
+            None => continue,
+        };
+        let Some(table) = schema.get_mut(table_name) else {
+            continue;
+        };
+
+        if table.get_foreign_key(&constraint_name).is_some() {
+            continue;
+        }
+
+        let fk = ForeignKey::new(
+            constraint_name,
+            vec![column_name],
+            referenced_table,
+            vec![referenced_column],
+            false,
+        );
+        table.add_foreign_key(fk);
+    }
+
+    Ok(())
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -250,6 +374,9 @@ mod test {
         assert_eq!(email_index.name(), "contacts_email_idx");
         assert_eq!(email_index.columns(), ["email"]);
         assert!(email_index.unique());
+        let pk = contacts_table.primary_key().expect("primary key");
+        assert_eq!(pk.columns(), &["id".to_string()]);
+        assert!(!pk.inferred());
 
         let users_table = schema.get("users").expect("users table");
         assert_eq!(users_table.name(), "users");
@@ -270,6 +397,9 @@ mod test {
         assert_eq!(email_index.name(), "users_email_idx");
         assert_eq!(email_index.columns(), ["email"]);
         assert!(email_index.unique());
+        let pk = users_table.primary_key().expect("primary key");
+        assert_eq!(pk.columns(), &["id".to_string()]);
+        assert!(!pk.inferred());
 
         connection.close().await?;
         Ok(())

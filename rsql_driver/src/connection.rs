@@ -7,6 +7,7 @@ use sqlparser::ast::Statement;
 use sqlparser::dialect::{Dialect, GenericDialect};
 use sqlparser::parser::Parser;
 
+use i18n_inflector::language_rules;
 use jiff::civil::DateTime;
 use jiff::tz::Offset;
 use jiff::{Timestamp, ToSpan};
@@ -162,6 +163,7 @@ pub trait Connection: Debug + Send + Sync {
 #[derive(Debug)]
 pub struct CachedMetadataConnection {
     connection: Box<dyn Connection>,
+    locale: String,
     metadata: Option<Metadata>,
     timestamp: DateTime,
 }
@@ -172,9 +174,15 @@ impl CachedMetadataConnection {
         let now = Offset::UTC.to_datetime(Timestamp::now());
         Self {
             connection,
+            locale: "en".to_string(),
             metadata: None,
             timestamp: now,
         }
+    }
+
+    /// Sets the locale used for table name inference (singularization/pluralization).
+    pub fn set_locale<S: Into<String>>(&mut self, locale: S) {
+        self.locale = locale.into();
     }
 }
 
@@ -203,7 +211,14 @@ impl Connection for CachedMetadataConnection {
         if let Some(metadata) = &self.metadata {
             Ok(metadata.clone())
         } else {
-            let metadata = self.connection.metadata().await?;
+            let mut metadata = self.connection.metadata().await?;
+            let language_rules = match language_rules(&self.locale) {
+                Ok(rules) => rules,
+                Err(_) => language_rules("en")?,
+            };
+
+            metadata.infer_primary_keys(language_rules);
+            metadata.infer_foreign_keys(language_rules);
             self.metadata = Some(metadata.clone());
             Ok(metadata)
         }
