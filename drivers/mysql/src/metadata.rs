@@ -1,5 +1,8 @@
 use indoc::indoc;
-use rsql_driver::{Catalog, Column, Connection, Index, Metadata, Result, Schema, Table, Value};
+use rsql_driver::{
+    Catalog, Column, Connection, ForeignKey, Index, Metadata, PrimaryKey, Result, Schema, Table,
+    Value,
+};
 
 pub(crate) async fn get_metadata(connection: &mut dyn Connection) -> Result<Metadata> {
     let mut metadata = Metadata::with_dialect(connection.dialect());
@@ -78,6 +81,8 @@ async fn retrieve_schemas(connection: &mut dyn Connection, catalog: &mut Catalog
         if schema.current() {
             retrieve_tables(connection, &mut schema).await?;
             retrieve_indexes(connection, &mut schema).await?;
+            retrieve_primary_keys(connection, &mut schema).await?;
+            retrieve_foreign_keys(connection, &mut schema).await?;
         }
         catalog.add(schema);
     }
@@ -199,6 +204,113 @@ async fn retrieve_indexes(connection: &mut dyn Connection, schema: &mut Schema) 
             let index = Index::new(index_name, vec![column_name.clone()], unique);
             table.add_index(index);
         }
+    }
+
+    Ok(())
+}
+
+async fn retrieve_primary_keys(connection: &mut dyn Connection, schema: &mut Schema) -> Result<()> {
+    let sql = indoc! {r"
+            SELECT
+                kcu.TABLE_NAME,
+                kcu.CONSTRAINT_NAME,
+                kcu.COLUMN_NAME
+            FROM
+                information_schema.KEY_COLUMN_USAGE kcu
+            WHERE
+                kcu.TABLE_SCHEMA = database()
+                AND kcu.CONSTRAINT_NAME = 'PRIMARY'
+            ORDER BY
+                kcu.TABLE_NAME,
+                kcu.ORDINAL_POSITION
+        "};
+    let mut query_result = connection.query(sql).await?;
+
+    while let Some(row) = query_result.next().await {
+        let table_name = match row.first() {
+            Some(value) => value.to_string(),
+            None => continue,
+        };
+        let constraint_name = match row.get(1) {
+            Some(value) => value.to_string(),
+            None => continue,
+        };
+        let column_name = match row.get(2) {
+            Some(value) => value.to_string(),
+            None => continue,
+        };
+        let Some(table) = schema.get_mut(table_name) else {
+            continue;
+        };
+
+        if table.primary_key().is_some() {
+            continue;
+        }
+
+        let pk = PrimaryKey::new(constraint_name, vec![column_name], false);
+        table.set_primary_key(pk);
+    }
+
+    Ok(())
+}
+
+async fn retrieve_foreign_keys(connection: &mut dyn Connection, schema: &mut Schema) -> Result<()> {
+    let sql = indoc! {r"
+            SELECT
+                kcu.TABLE_NAME,
+                kcu.CONSTRAINT_NAME,
+                kcu.COLUMN_NAME,
+                kcu.REFERENCED_TABLE_NAME,
+                kcu.REFERENCED_COLUMN_NAME
+            FROM
+                information_schema.KEY_COLUMN_USAGE kcu
+            WHERE
+                kcu.TABLE_SCHEMA = database()
+                AND kcu.REFERENCED_TABLE_NAME IS NOT NULL
+            ORDER BY
+                kcu.TABLE_NAME,
+                kcu.CONSTRAINT_NAME,
+                kcu.ORDINAL_POSITION
+        "};
+    let mut query_result = connection.query(sql).await?;
+
+    while let Some(row) = query_result.next().await {
+        let table_name = match row.first() {
+            Some(value) => value.to_string(),
+            None => continue,
+        };
+        let constraint_name = match row.get(1) {
+            Some(value) => value.to_string(),
+            None => continue,
+        };
+        let column_name = match row.get(2) {
+            Some(value) => value.to_string(),
+            None => continue,
+        };
+        let referenced_table = match row.get(3) {
+            Some(value) => value.to_string(),
+            None => continue,
+        };
+        let referenced_column = match row.get(4) {
+            Some(value) => value.to_string(),
+            None => continue,
+        };
+        let Some(table) = schema.get_mut(table_name) else {
+            continue;
+        };
+
+        if table.get_foreign_key(&constraint_name).is_some() {
+            continue;
+        }
+
+        let fk = ForeignKey::new(
+            constraint_name,
+            vec![column_name],
+            referenced_table,
+            vec![referenced_column],
+            false,
+        );
+        table.add_foreign_key(fk);
     }
 
     Ok(())

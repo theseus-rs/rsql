@@ -38,19 +38,19 @@ arrow-array = "57.3.0"
 arrow-flight = "57.3.0"
 async-trait = "0.1.89"
 axoupdater = "0.9.1"
-aws-credential-types = { version = "1.2.11", features = ["hardcoded-credentials"] }
-aws-config = { version = "1.8.13", features = ["behavior-version-latest"] }
+aws-credential-types = { version = "1.2.12", features = ["hardcoded-credentials"] }
+aws-config = { version = "1.8.14", features = ["behavior-version-latest"] }
 # Required for cross builds: https://aws.github.io/aws-lc-rs/platform_support.html
 aws-lc-rs = { version = "1.15.4", features = ["bindgen"] }
-aws-sdk-dynamodb = { version = "1.104.0", features = ["behavior-version-latest"] }
-aws-sdk-s3 = { version = "1.122.0", features = ["behavior-version-latest"] }
+aws-sdk-dynamodb = { version = "1.105.0", features = ["behavior-version-latest"] }
+aws-sdk-s3 = { version = "1.123.0", features = ["behavior-version-latest"] }
 base64 = "0.22.1"
 bit-vec = "0.6.3"
 brotli = "8.0.2"
 bzip2 = "0.6.1"
 calamine = "0.33.0"
 chrono = "0.4.41"
-clap = "4.5.57"
+clap = "4.5.58"
 clap-stdin = "0.8.0"
 clearscreen = "4.0.3"
 clickhouse = "0.14.2"
@@ -65,13 +65,14 @@ duckdb = "1.4.4"
 file_type = "0.8.11"
 flate2 = "1.1.9"
 form_urlencoded = "1.2.2"
-futures-util = "0.3.31"
+futures-util = "0.3.32"
 getrandom = "0.3.3"
+i18n_inflector = "0.2.1"
 indexmap = "2.13.0"
-indicatif = "0.18.3"
+indicatif = "0.18.4"
 indoc = "2.0.7"
 inquire = "0.9.3"
-jiff = "0.2.19"
+jiff = "0.2.20"
 jwt-simple = { version = "0.12.14", default-features = false }
 liblzma = "0.4.5"
 libsql = "0.9.29"
@@ -95,12 +96,12 @@ serde_json = "1.0.149"
 serde_yaml = "0.9.34"
 sha2 = "0.10.8"
 sqlx = "0.7.4"
-sqlparser = "0.60.0"
+sqlparser = "0.61.0"
 supports-color = "3.0.2"
 sys-locale = "0.3.2"
 syntect = "5.3.0"
 tabled = "0.20.0"
-tempfile = "3.24.0"
+tempfile = "3.25.0"
 termbg = "0.6.2"
 test-log = "0.2.19"
 testcontainers = "0.26.3"

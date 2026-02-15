@@ -6,10 +6,7 @@ set -e
 root_dir="$(cd "$(dirname "$0")"; pwd)"
 echo "root_dir: $root_dir"
 cargo build --release
-# Ensure the built rsql binary is in the PATH
-rsql_file=$(which rsql)
-rsql_path=$(dirname "$rsql_file")
-cp "$root_dir/../target/release/rsql" "$rsql_path"
+ export PATH="$root_dir/../target/release:$PATH"
 
 # Function to process a single tape file
 process_tape_file() {

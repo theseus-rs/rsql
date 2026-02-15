@@ -1,8 +1,10 @@
 ## describe
 
-The `.describe` command provides detailed information about a table, including its columns, data types, and constraints.
-This is useful for understanding the structure of your data, especially when working with unfamiliar tables or preparing
-queries.
+The `.describe` command provides detailed information about a table, including its columns, data types,
+constraints, indexes, primary keys, and foreign key relationships. Primary keys and foreign keys are
+displayed with an "Inferred" column that indicates whether the relationship was declared in the database
+schema or inferred from column naming conventions (e.g., a `user_id` column referencing a `users` table,
+or a NOT NULL `id` column as a primary key).
 
 ### Usage
 
@@ -14,6 +16,7 @@ queries.
 
 - Use `.describe` to inspect table schemas before writing queries or performing data transformations.
 - Helpful for data exploration, debugging, and documentation.
+- Use to discover primary key and foreign key relationships, including inferred ones based on naming conventions.
 
 ### Examples
 
@@ -36,7 +39,11 @@ Describe the current table (if context is set):
 
 ### Related
 
-- See also: [tables](../tables/index.md), [schemas](../schemas/index.md), and [indexes](../indexes/index.md).
+- [schemas](../schemas/index.md)
+- [tables](../tables/index.md)
+- [indexes](../indexes/index.md)
+- [primary](../primary/index.md)
+- [foreign](../foreign/index.md)
 
 ### Demonstration
 
