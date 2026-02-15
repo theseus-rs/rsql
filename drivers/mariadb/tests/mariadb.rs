@@ -27,10 +27,16 @@ async fn test_mariadb_driver() -> anyhow::Result<()> {
 #[cfg(target_os = "linux")]
 async fn test_schema(connection: &mut dyn rsql_driver::Connection) -> anyhow::Result<()> {
     let _ = connection
-        .execute("CREATE TABLE contacts (id INT PRIMARY KEY, email VARCHAR(20))")
+        .execute(
+            "CREATE TABLE contacts (id INT PRIMARY KEY, email VARCHAR(20))",
+            &[],
+        )
         .await?;
     let _ = connection
-        .execute("CREATE TABLE users (id INT PRIMARY KEY, email VARCHAR(20))")
+        .execute(
+            "CREATE TABLE users (id INT PRIMARY KEY, email VARCHAR(20))",
+            &[],
+        )
         .await?;
 
     let metadata = connection.metadata().await?;

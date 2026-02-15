@@ -23,21 +23,24 @@ async fn test_connection_interface() -> Result<()> {
     let mut connection = driver.connect(&database_url).await?;
 
     let mut query_result = connection
-        .query(indoc! {r#"
+        .query(
+            indoc! {r#"
                 WITH cte_user AS (
                     SELECT unnest("data"."user") AS "user" FROM users
                 )
                 SELECT "user".* FROM cte_user
-            "#})
+            "#},
+            &[],
+        )
         .await?;
 
-    assert_eq!(query_result.columns().await, vec!["id", "name"]);
+    assert_eq!(query_result.columns(), vec!["id", "name"]);
     assert_eq!(
-        query_result.next().await,
+        query_result.next().await.cloned(),
         Some(vec![Value::I64(1), Value::String("John Doe".to_string())])
     );
     assert_eq!(
-        query_result.next().await,
+        query_result.next().await.cloned(),
         Some(vec![Value::I64(2), Value::String("Jane Smith".to_string())])
     );
     assert!(query_result.next().await.is_none());

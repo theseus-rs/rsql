@@ -9,21 +9,24 @@ async fn main() -> Result<()> {
     let mut connection = DriverManager::connect(database_url).await?;
 
     let _ = connection
-        .execute("CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT NOT NULL)")
+        .execute(
+            "CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT NOT NULL)",
+            &[],
+        )
         .await?;
 
     let _ = connection
-        .execute("INSERT INTO users (id, name) VALUES (1, 'John Doe')")
+        .execute("INSERT INTO users (id, name) VALUES (1, 'John Doe')", &[])
         .await?;
     let _ = connection
-        .execute("INSERT INTO users (id, name) VALUES (2, 'Jane Smith')")
+        .execute("INSERT INTO users (id, name) VALUES (2, 'Jane Smith')", &[])
         .await?;
 
     let mut query_result = connection
-        .query("SELECT id, name FROM users ORDER BY id")
+        .query("SELECT id, name FROM users ORDER BY id", &[])
         .await?;
 
-    let columns = query_result.columns().await;
+    let columns = query_result.columns();
     let column_names = columns.join(", ");
     println!("{column_names}");
 

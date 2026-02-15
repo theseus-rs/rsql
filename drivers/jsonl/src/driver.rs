@@ -94,16 +94,16 @@ mod test {
         let mut connection = driver_manager.connect(&database_url).await?;
 
         let mut query_result = connection
-            .query("SELECT id, name FROM users ORDER BY id")
+            .query("SELECT id, name FROM users ORDER BY id", &[])
             .await?;
 
-        assert_eq!(query_result.columns().await, vec!["id", "name"]);
+        assert_eq!(query_result.columns(), vec!["id", "name"]);
         assert_eq!(
-            query_result.next().await,
+            query_result.next().await.cloned(),
             Some(vec![Value::I64(1), Value::String("John Doe".to_string())])
         );
         assert_eq!(
-            query_result.next().await,
+            query_result.next().await.cloned(),
             Some(vec![Value::I64(2), Value::String("Jane Smith".to_string())])
         );
         assert!(query_result.next().await.is_none());

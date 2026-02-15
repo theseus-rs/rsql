@@ -44,7 +44,7 @@ pub(crate) async fn format_html(
     writer.write_event(Event::Start(BytesStart::new("table")))?;
     writer.write_event(Event::Start(BytesStart::new("thead")))?;
     writer.write_event(Event::Start(BytesStart::new("tr")))?;
-    for column in &query_result.columns().await {
+    for column in query_result.columns() {
         writer.write_event(Event::Start(BytesStart::new("th")))?;
         writer.write_event(Event::Text(BytesText::new(column.as_str())))?;
         writer.write_event(Event::End(BytesEnd::new("th")))?;
@@ -58,7 +58,7 @@ pub(crate) async fn format_html(
     while let Some(row) = query_result.next().await {
         writer.write_event(Event::Start(BytesStart::new("tr")))?;
 
-        for data in &row {
+        for data in row {
             if data.is_null() {
                 writer.write_event(Event::Empty(BytesStart::new("td")))?;
             } else {

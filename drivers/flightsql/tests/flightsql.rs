@@ -28,18 +28,18 @@ async fn test_driver() -> anyhow::Result<()> {
 #[cfg(target_os = "linux")]
 async fn test_connection_interface(connection: &mut dyn Connection) -> anyhow::Result<()> {
     let _ = connection
-        .execute("CREATE TABLE person (id INTEGER, name VARCHAR(20))")
+        .execute("CREATE TABLE person (id INTEGER, name VARCHAR(20))", &[])
         .await?;
 
     let rows = connection
-        .execute("INSERT INTO person (id, name) VALUES (1, 'foo')")
+        .execute("INSERT INTO person (id, name) VALUES (1, 'foo')", &[])
         .await?;
     assert_eq!(rows, 1);
 
-    let mut query_result = connection.query("SELECT id, name FROM person").await?;
-    assert_eq!(query_result.columns().await, vec!["id", "name"]);
+    let mut query_result = connection.query("SELECT id, name FROM person", &[]).await?;
+    assert_eq!(query_result.columns(), vec!["id", "name"]);
     assert_eq!(
-        query_result.next().await,
+        query_result.next().await.cloned(),
         Some(vec![Value::I32(1), Value::String("foo".to_string())])
     );
     assert!(query_result.next().await.is_none());
@@ -60,24 +60,24 @@ async fn test_data_types(connection: &mut dyn Connection) -> anyhow::Result<()> 
     let mut query_result = connection
         .query(
             "SELECT \
-            NULL AS \"null\",\
-            CAST(1 AS BOOL) AS bool,\
-            CAST(2 AS TINYINT) AS i8,\
-            CAST(3 AS SMALLINT) AS i16,\
-            CAST(4 AS INTEGER) AS i32,\
-            CAST(5 AS BIGINT) AS i64,\
-            CAST(6.0 AS FLOAT) AS f32,\
-            CAST(7.0 AS DOUBLE) AS f64,\
-            'foo' AS string,
-            CAST('baz' AS BINARY) AS bytes,\
-            CAST('2001-12-31' AS DATE) AS date,\
-            CAST('12:34:56' AS TIME) AS time,\
-            CAST('2001-12-31 12:34:56' AS TIMESTAMP) AS timestamp
-        ",
+            NULL AS \"null\", \
+            CAST(1 AS BOOL) AS bool, \
+            CAST(2 AS TINYINT) AS i8, \
+            CAST(3 AS SMALLINT) AS i16, \
+            CAST(4 AS INTEGER) AS i32, \
+            CAST(5 AS BIGINT) AS i64, \
+            CAST(6.0 AS FLOAT) AS f32, \
+            CAST(7.0 AS DOUBLE) AS f64, \
+            'foo' AS string, \
+            CAST('baz' AS BINARY) AS bytes, \
+            CAST('2001-12-31' AS DATE) AS date, \
+            CAST('12:34:56' AS TIME) AS time, \
+            CAST('2001-12-31 12:34:56' AS TIMESTAMP) AS timestamp",
+            &[],
         )
         .await?;
 
-    let columns = query_result.columns().await;
+    let columns = query_result.columns();
     assert_eq!(
         columns,
         vec![

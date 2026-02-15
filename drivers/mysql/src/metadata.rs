@@ -25,7 +25,7 @@ async fn retrieve_catalogs(connection: &mut dyn Connection, metadata: &mut Metad
         ORDER BY
             catalog_name
     "};
-    let mut query_result = connection.query(sql).await?;
+    let mut query_result = connection.query(sql, &[]).await?;
 
     while let Some(row) = query_result.next().await {
         let catalog_name = match row.first() {
@@ -65,7 +65,7 @@ async fn retrieve_schemas(connection: &mut dyn Connection, catalog: &mut Catalog
         ORDER BY
             schema_name
     "};
-    let mut query_result = connection.query(sql).await?;
+    let mut query_result = connection.query(sql, &[]).await?;
 
     while let Some(row) = query_result.next().await {
         let schema_name = match row.first() {
@@ -107,7 +107,7 @@ async fn retrieve_tables(connection: &mut dyn Connection, schema: &mut Schema) -
                 table_name,
                 ordinal_position
         "};
-    let mut query_result = connection.query(sql).await?;
+    let mut query_result = connection.query(sql, &[]).await?;
 
     while let Some(row) = query_result.next().await {
         let table_name = match row.first() {
@@ -175,7 +175,7 @@ async fn retrieve_indexes(connection: &mut dyn Connection, schema: &mut Schema) 
                 index_name,
                 seq_in_index
         "};
-    let mut query_result = connection.query(sql).await?;
+    let mut query_result = connection.query(sql, &[]).await?;
 
     while let Some(row) = query_result.next().await {
         let table_name = match row.first() {
@@ -224,7 +224,7 @@ async fn retrieve_primary_keys(connection: &mut dyn Connection, schema: &mut Sch
                 kcu.TABLE_NAME,
                 kcu.ORDINAL_POSITION
         "};
-    let mut query_result = connection.query(sql).await?;
+    let mut query_result = connection.query(sql, &[]).await?;
 
     while let Some(row) = query_result.next().await {
         let table_name = match row.first() {
@@ -272,7 +272,7 @@ async fn retrieve_foreign_keys(connection: &mut dyn Connection, schema: &mut Sch
                 kcu.CONSTRAINT_NAME,
                 kcu.ORDINAL_POSITION
         "};
-    let mut query_result = connection.query(sql).await?;
+    let mut query_result = connection.query(sql, &[]).await?;
 
     while let Some(row) = query_result.next().await {
         let table_name = match row.first() {

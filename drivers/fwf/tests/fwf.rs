@@ -22,19 +22,19 @@ async fn test_connection_interface() -> Result<()> {
     let mut connection = driver.connect(&database_url).await?;
 
     let mut query_result = connection
-        .query("SELECT id, name FROM users ORDER BY id")
+        .query("SELECT id, name FROM users ORDER BY id", &[])
         .await?;
 
-    assert_eq!(query_result.columns().await, vec!["id", "name"]);
+    assert_eq!(query_result.columns(), vec!["id", "name"]);
     assert_eq!(
-        query_result.next().await,
+        query_result.next().await.cloned(),
         Some(vec![
             Value::String("1".to_string()),
             Value::String("John Doe".to_string())
         ])
     );
     assert_eq!(
-        query_result.next().await,
+        query_result.next().await.cloned(),
         Some(vec![
             Value::String("2".to_string()),
             Value::String("Jane Smith".to_string())

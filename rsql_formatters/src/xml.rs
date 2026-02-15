@@ -42,12 +42,12 @@ pub(crate) async fn format_xml(
     let mut writer = Writer::new_with_indent(&mut raw_output, b' ', 2);
 
     writer.write_event(Event::Start(BytesStart::new("results")))?;
-    let columns: Vec<String> = query_result.columns().await;
+    let columns = query_result.columns().to_vec();
     let mut rows: u64 = 0;
 
     while let Some(row) = query_result.next().await {
         writer.write_event(Event::Start(BytesStart::new("row")))?;
-        for (c, data) in row.into_iter().enumerate() {
+        for (c, data) in row.iter().enumerate() {
             let column = columns.get(c).expect("column not found");
 
             if data.is_null() {

@@ -42,7 +42,7 @@ pub(crate) async fn format_json(
 
     let highlighter = Highlighter::new(options, "json");
     let mut json_rows: Vec<IndexMap<&String, Value>> = Vec::new();
-    let columns: Vec<String> = query_result.columns().await;
+    let columns = query_result.columns().to_vec();
     let mut rows: u64 = 0;
     while let Some(row) = query_result.next().await {
         let mut json_row: IndexMap<&String, Value> = IndexMap::new();
@@ -51,9 +51,9 @@ pub(crate) async fn format_json(
             writeln!(output)?;
         }
 
-        for (c, data) in row.into_iter().enumerate() {
+        for (c, data) in row.iter().enumerate() {
             let column = columns.get(c).expect("column not found");
-            if let Value::Bytes(ref _bytes) = data {
+            if let Value::Bytes(_bytes) = data {
                 let value = Value::String(data.to_string());
                 json_row.insert(column, value);
             } else {

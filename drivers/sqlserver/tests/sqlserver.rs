@@ -44,18 +44,18 @@ async fn test_sqlserver_driver() -> anyhow::Result<()> {
 #[cfg(target_os = "linux")]
 async fn test_connection_interface(connection: &mut dyn Connection) -> anyhow::Result<()> {
     let _ = connection
-        .execute("CREATE TABLE person (id INT, name VARCHAR(20))")
+        .execute("CREATE TABLE person (id INT, name VARCHAR(20))", &[])
         .await?;
 
     let rows = connection
-        .execute("INSERT INTO person (id, name) VALUES (1, 'foo')")
+        .execute("INSERT INTO person (id, name) VALUES (1, 'foo')", &[])
         .await?;
     assert_eq!(rows, 1);
 
-    let mut query_result = connection.query("SELECT id, name FROM person").await?;
-    assert_eq!(query_result.columns().await, vec!["id", "name"]);
+    let mut query_result = connection.query("SELECT id, name FROM person", &[]).await?;
+    assert_eq!(query_result.columns(), vec!["id", "name"]);
     assert_eq!(
-        query_result.next().await,
+        query_result.next().await.cloned(),
         Some(vec![Value::I32(1), Value::String("foo".to_string())])
     );
     assert!(query_result.next().await.is_none());
@@ -93,7 +93,7 @@ async fn test_data_types(connection: &mut dyn Connection) -> anyhow::Result<()> 
             datetime_type DATETIME
         )
     "};
-    let _ = connection.execute(sql).await?;
+    let _ = connection.execute(sql, &[]).await?;
 
     let sql = indoc! {r"
         INSERT INTO data_types (
@@ -110,7 +110,7 @@ async fn test_data_types(connection: &mut dyn Connection) -> anyhow::Result<()> 
              '2022-01-01', '14:30:00', '2022-01-01 14:30:00'
          )
     "};
-    let _ = connection.execute(sql).await?;
+    let _ = connection.execute(sql, &[]).await?;
 
     let sql = indoc! {r"
         SELECT nchar_type, char_type, nvarchar_type, varchar_type, ntext_type, text_type,
@@ -120,9 +120,9 @@ async fn test_data_types(connection: &mut dyn Connection) -> anyhow::Result<()> 
                date_type, time_type, datetime_type
           FROM data_types
     "};
-    let mut query_result = connection.query(sql).await?;
+    let mut query_result = connection.query(sql, &[]).await?;
     assert_eq!(
-        query_result.next().await,
+        query_result.next().await.cloned(),
         Some(vec![
             Value::String("a".to_string()),
             Value::String("a".to_string()),
@@ -176,10 +176,16 @@ async fn test_sqlserver_metadata() -> anyhow::Result<()> {
 #[cfg(target_os = "linux")]
 async fn test_schema(connection: &mut dyn Connection) -> anyhow::Result<()> {
     let _ = connection
-        .execute("CREATE TABLE contacts (id INT PRIMARY KEY, email VARCHAR(20))")
+        .execute(
+            "CREATE TABLE contacts (id INT PRIMARY KEY, email VARCHAR(20))",
+            &[],
+        )
         .await?;
     let _ = connection
-        .execute("CREATE TABLE users (id INT PRIMARY KEY, email VARCHAR(20))")
+        .execute(
+            "CREATE TABLE users (id INT PRIMARY KEY, email VARCHAR(20))",
+            &[],
+        )
         .await?;
 
     let metadata = connection.metadata().await?;

@@ -1,13 +1,13 @@
 use crate::metadata;
+use crate::results::DynamoDbQueryResult;
 use async_trait::async_trait;
 use aws_config::{AppName, Region};
 use aws_credential_types::Credentials;
 use aws_sdk_dynamodb::Client;
 use aws_sdk_dynamodb::types::AttributeValue;
 use file_type::FileType;
-use indexmap::IndexMap;
-use rsql_driver::Error::{IoError, UnsupportedColumnType};
-use rsql_driver::{MemoryQueryResult, Metadata, QueryResult, Result, Value};
+use rsql_driver::Error::IoError;
+use rsql_driver::{Metadata, QueryResult, Result, ToSql, Value};
 use std::collections::HashMap;
 use std::env;
 use url::Url;
@@ -129,16 +129,22 @@ impl rsql_driver::Connection for Connection {
         &self.url
     }
 
-    async fn execute(&mut self, sql: &str) -> Result<u64> {
+    async fn execute(&mut self, sql: &str, params: &[&dyn ToSql]) -> Result<u64> {
+        let values = rsql_driver::to_values(params);
+        let dynamo_params = to_dynamodb_params(&values);
         let mut rows: u64 = 0;
         let mut next_token = None;
 
         loop {
-            let result = self
+            let mut builder = self
                 .client
                 .execute_statement()
                 .statement(sql)
-                .set_next_token(next_token.clone())
+                .set_next_token(next_token.clone());
+            for param in &dynamo_params {
+                builder = builder.parameters(param.clone());
+            }
+            let result = builder
                 .send()
                 .await
                 .map_err(|error| IoError(format!("{error:?}")))?;
@@ -158,17 +164,23 @@ impl rsql_driver::Connection for Connection {
         Ok(rows)
     }
 
-    async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {
+    async fn query(&mut self, sql: &str, params: &[&dyn ToSql]) -> Result<Box<dyn QueryResult>> {
+        let values = rsql_driver::to_values(params);
+        let dynamo_params = to_dynamodb_params(&values);
         let mut columns = Vec::new();
-        let mut rows = Vec::new();
+        let mut items: Vec<HashMap<String, AttributeValue>> = Vec::new();
         let mut next_token: Option<String> = None;
 
         loop {
-            let result = self
+            let mut builder = self
                 .client
                 .execute_statement()
                 .statement(sql)
-                .set_next_token(next_token.clone())
+                .set_next_token(next_token.clone());
+            for param in &dynamo_params {
+                builder = builder.parameters(param.clone());
+            }
+            let result = builder
                 .send()
                 .await
                 .map_err(|error| IoError(format!("{error:?}")))?;
@@ -179,15 +191,7 @@ impl rsql_driver::Connection for Connection {
                         columns.push(column_name.to_string());
                     }
                 }
-                let mut row_data = Vec::new();
-                for column_name in &columns {
-                    let value = match item.get(column_name) {
-                        Some(attribute) => Self::convert_to_value(column_name, attribute)?,
-                        None => Value::Null,
-                    };
-                    row_data.push(value);
-                }
-                rows.push(row_data);
+                items.push(item.clone());
             }
 
             if let Some(token) = result.next_token() {
@@ -197,7 +201,7 @@ impl rsql_driver::Connection for Connection {
             }
         }
 
-        let query_result = MemoryQueryResult::new(columns, rows);
+        let query_result = DynamoDbQueryResult::new(columns, items);
         Ok(Box::new(query_result))
     }
 
@@ -206,85 +210,30 @@ impl rsql_driver::Connection for Connection {
     }
 }
 
-impl Connection {
-    fn convert_to_value(column_name: &str, attribute: &AttributeValue) -> Result<Value> {
-        let value = match attribute {
-            AttributeValue::B(value) => {
-                let value = value.as_ref().to_vec();
-                Value::Bytes(value)
+fn to_dynamodb_params(values: &[Value]) -> Vec<AttributeValue> {
+    values
+        .iter()
+        .map(|value| match value {
+            Value::Null => AttributeValue::Null(true),
+            Value::Bool(v) => AttributeValue::Bool(*v),
+            Value::I8(v) => AttributeValue::N(v.to_string()),
+            Value::I16(v) => AttributeValue::N(v.to_string()),
+            Value::I32(v) => AttributeValue::N(v.to_string()),
+            Value::I64(v) => AttributeValue::N(v.to_string()),
+            Value::I128(v) => AttributeValue::N(v.to_string()),
+            Value::U8(v) => AttributeValue::N(v.to_string()),
+            Value::U16(v) => AttributeValue::N(v.to_string()),
+            Value::U32(v) => AttributeValue::N(v.to_string()),
+            Value::U64(v) => AttributeValue::N(v.to_string()),
+            Value::U128(v) => AttributeValue::N(v.to_string()),
+            Value::F32(v) => AttributeValue::N(v.to_string()),
+            Value::F64(v) => AttributeValue::N(v.to_string()),
+            Value::String(v) => AttributeValue::S(v.clone()),
+            Value::Bytes(v) => {
+                AttributeValue::B(aws_sdk_dynamodb::primitives::Blob::new(v.clone()))
             }
-            AttributeValue::Bool(value) => Value::Bool(*value),
-            AttributeValue::Bs(values) => {
-                let values = values
-                    .iter()
-                    .map(|value| Value::Bytes(value.as_ref().to_vec()))
-                    .collect::<Vec<Value>>();
-                Value::Array(values)
-            }
-            AttributeValue::L(values) => {
-                let mut items = Vec::new();
-                for item in values {
-                    let value = Self::convert_to_value(column_name, item)?;
-                    items.push(value);
-                }
-                Value::Array(items)
-            }
-            AttributeValue::M(values) => {
-                let mut items = IndexMap::new();
-                for (key, value) in values {
-                    let key = Value::String(key.to_string());
-                    let value = Self::convert_to_value(column_name, value)?;
-                    items.insert(key, value);
-                }
-                Value::Map(items)
-            }
-            AttributeValue::N(value) => {
-                if value.contains('.') {
-                    let value: f64 = value
-                        .parse()
-                        .map_err(|error| IoError(format!("{error:?}")))?;
-                    Value::F64(value)
-                } else {
-                    let value: i128 = value
-                        .parse()
-                        .map_err(|error| IoError(format!("{error:?}")))?;
-                    Value::I128(value)
-                }
-            }
-            AttributeValue::Ns(values) => {
-                let mut items = Vec::new();
-                for value in values {
-                    let value = if value.contains('.') {
-                        let value: f64 = value
-                            .parse()
-                            .map_err(|error| IoError(format!("{error:?}")))?;
-                        Value::F64(value)
-                    } else {
-                        let value: i128 = value
-                            .parse()
-                            .map_err(|error| IoError(format!("{error:?}")))?;
-                        Value::I128(value)
-                    };
-                    items.push(value);
-                }
-                Value::Array(items)
-            }
-            AttributeValue::Null(_value) => Value::Null,
-            AttributeValue::S(value) => Value::String(value.to_string()),
-            AttributeValue::Ss(values) => {
-                let values = values
-                    .iter()
-                    .map(|value| Value::String(value.to_string()))
-                    .collect::<Vec<Value>>();
-                Value::Array(values)
-            }
-            _ => {
-                return Err(UnsupportedColumnType {
-                    column_name: column_name.to_string(),
-                    column_type: format!("{attribute:?}"),
-                });
-            }
-        };
-        Ok(value)
-    }
+            Value::Decimal(v) => AttributeValue::N(v.to_string()),
+            _ => AttributeValue::S(value.to_string()),
+        })
+        .collect()
 }

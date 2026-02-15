@@ -29,7 +29,7 @@ async fn retrieve_catalogs(connection: &mut dyn Connection, metadata: &mut Metad
         ORDER BY
             catalog_name
     "};
-    let mut query_result = connection.query(sql).await?;
+    let mut query_result = connection.query(sql, &[]).await?;
 
     while let Some(row) = query_result.next().await {
         let catalog_name = match row.first() {
@@ -64,7 +64,7 @@ async fn retrieve_schemas(connection: &mut dyn Connection, catalog: &mut Catalog
         ORDER BY
             schema_name
     "};
-    let mut query_result = connection.query(sql).await?;
+    let mut query_result = connection.query(sql, &[]).await?;
 
     while let Some(row) = query_result.next().await {
         let schema_name = match row.first() {
@@ -107,7 +107,7 @@ async fn retrieve_tables(connection: &mut dyn Connection, schema: &mut Schema) -
                 table_name,
                 ordinal_position
         "};
-    let mut query_result = connection.query(sql).await?;
+    let mut query_result = connection.query(sql, &[]).await?;
 
     while let Some(row) = query_result.next().await {
         let table_name = match row.first() {
@@ -180,7 +180,7 @@ async fn retrieve_indexes(connection: &mut dyn Connection, schema: &mut Schema) 
                 index_name,
                 array_position(ix.indkey, a.attnum)
         "};
-    let mut query_result = connection.query(sql).await?;
+    let mut query_result = connection.query(sql, &[]).await?;
 
     while let Some(row) = query_result.next().await {
         let table_name = match row.first() {
@@ -233,7 +233,7 @@ async fn retrieve_primary_keys(connection: &mut dyn Connection, schema: &mut Sch
                 tc.constraint_name,
                 kcu.ordinal_position
         "};
-    let mut query_result = connection.query(sql).await?;
+    let mut query_result = connection.query(sql, &[]).await?;
 
     while let Some(row) = query_result.next().await {
         let table_name = match row.first() {
@@ -288,7 +288,7 @@ async fn retrieve_foreign_keys(connection: &mut dyn Connection, schema: &mut Sch
                 tc.constraint_name,
                 kcu.ordinal_position
         "};
-    let mut query_result = connection.query(sql).await?;
+    let mut query_result = connection.query(sql, &[]).await?;
 
     while let Some(row) = query_result.next().await {
         let table_name = match row.first() {
@@ -354,6 +354,7 @@ mod test {
                         email VARCHAR(20) NULL UNIQUE
                     )
                 ",
+                &[],
             )
             .await?;
         let _ = connection
@@ -364,10 +365,11 @@ mod test {
                         email VARCHAR(20) NULL UNIQUE
                     )
                 ",
+                &[],
             )
             .await?;
         let _ = connection
-            .execute("CREATE INDEX users_emails ON users (id, email)")
+            .execute("CREATE INDEX users_emails ON users (id, email)", &[])
             .await?;
 
         let metadata = connection.metadata().await?;

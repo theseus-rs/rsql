@@ -1,11 +1,7 @@
 use async_trait::async_trait;
 use file_type::FileType;
 use rsql_driver::Error::IoError;
-use rsql_driver::{
-    MemoryQueryResult, Metadata, QueryResult, Result, StatementMetadata, UrlExtension, Value,
-};
-use rusqlite::Row;
-use rusqlite::types::ValueRef;
+use rsql_driver::{Metadata, QueryResult, Result, StatementMetadata, ToSql, UrlExtension, Value};
 use sqlparser::ast::Statement;
 use sqlparser::dialect::{Dialect, SQLiteDialect};
 use std::sync::{Arc, Mutex};
@@ -59,7 +55,9 @@ impl rsql_driver::Connection for Connection {
         &self.url
     }
 
-    async fn execute(&mut self, sql: &str) -> Result<u64> {
+    async fn execute(&mut self, sql: &str, params: &[&dyn ToSql]) -> Result<u64> {
+        let values = rsql_driver::to_values(params);
+        let rusqlite_params = to_rusqlite_params(&values);
         let connection = match self.connection.lock() {
             Ok(connection) => connection,
             Err(error) => return Err(IoError(error.to_string())),
@@ -68,12 +66,14 @@ impl rsql_driver::Connection for Connection {
             .prepare(sql)
             .map_err(|error| IoError(error.to_string()))?;
         let rows = statement
-            .execute([])
+            .execute(rusqlite::params_from_iter(rusqlite_params.iter()))
             .map_err(|error| IoError(error.to_string()))?;
         Ok(rows as u64)
     }
 
-    async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {
+    async fn query(&mut self, sql: &str, params: &[&dyn ToSql]) -> Result<Box<dyn QueryResult>> {
+        let values = rsql_driver::to_values(params);
+        let rusqlite_params = to_rusqlite_params(&values);
         let connection = match self.connection.lock() {
             Ok(connection) => connection,
             Err(error) => return Err(IoError(error.to_string())),
@@ -89,7 +89,7 @@ impl rsql_driver::Connection for Connection {
             .collect();
 
         let mut query_rows = statement
-            .query([])
+            .query(rusqlite::params_from_iter(rusqlite_params.iter()))
             .map_err(|error| IoError(error.to_string()))?;
         let mut rows = Vec::new();
         while let Some(query_row) = query_rows
@@ -98,13 +98,13 @@ impl rsql_driver::Connection for Connection {
         {
             let mut row = Vec::new();
             for (index, _column_name) in columns.iter().enumerate() {
-                let value = Self::convert_to_value(query_row, index)?;
+                let value = crate::results::convert_to_value(query_row, index)?;
                 row.push(value);
             }
             rows.push(row);
         }
 
-        let query_result = MemoryQueryResult::new(columns, rows);
+        let query_result = crate::results::RusqliteQueryResult::new(columns, rows);
         Ok(Box::new(query_result))
     }
 
@@ -131,24 +131,27 @@ impl rsql_driver::Connection for Connection {
     }
 }
 
-impl Connection {
-    fn convert_to_value(row: &Row, column_index: usize) -> Result<Value> {
-        let value = match row
-            .get_ref(column_index)
-            .map_err(|error| IoError(error.to_string()))?
-        {
-            ValueRef::Null => Value::Null,
-            ValueRef::Integer(value) => Value::I64(value),
-            ValueRef::Real(value) => Value::F64(value),
-            ValueRef::Text(value) => {
-                let value = String::from_utf8(value.to_vec())?;
-                Value::String(value)
-            }
-            ValueRef::Blob(value) => Value::Bytes(value.to_vec()),
-        };
-
-        Ok(value)
-    }
+fn to_rusqlite_params(values: &[Value]) -> Vec<rusqlite::types::Value> {
+    values
+        .iter()
+        .map(|value| match value {
+            Value::Null => rusqlite::types::Value::Null,
+            Value::Bool(v) => rusqlite::types::Value::Integer(i64::from(*v)),
+            Value::I8(v) => rusqlite::types::Value::Integer(i64::from(*v)),
+            Value::I16(v) => rusqlite::types::Value::Integer(i64::from(*v)),
+            Value::I32(v) => rusqlite::types::Value::Integer(i64::from(*v)),
+            Value::I64(v) => rusqlite::types::Value::Integer(*v),
+            Value::U8(v) => rusqlite::types::Value::Integer(i64::from(*v)),
+            Value::U16(v) => rusqlite::types::Value::Integer(i64::from(*v)),
+            Value::U32(v) => rusqlite::types::Value::Integer(i64::from(*v)),
+            Value::U64(v) => rusqlite::types::Value::Integer(*v as i64),
+            Value::F32(v) => rusqlite::types::Value::Real(f64::from(*v)),
+            Value::F64(v) => rusqlite::types::Value::Real(*v),
+            Value::String(v) => rusqlite::types::Value::Text(v.clone()),
+            Value::Bytes(v) => rusqlite::types::Value::Blob(v.clone()),
+            _ => rusqlite::types::Value::Text(value.to_string()),
+        })
+        .collect()
 }
 
 #[cfg(test)]
@@ -176,16 +179,16 @@ mod test {
         let mut connection = driver.connect(&database_url).await?;
 
         let mut query_result = connection
-            .query("SELECT id, name FROM users ORDER BY id")
+            .query("SELECT id, name FROM users ORDER BY id", &[])
             .await?;
 
-        assert_eq!(query_result.columns().await, vec!["id", "name"]);
+        assert_eq!(query_result.columns(), vec!["id", "name"]);
         assert_eq!(
-            query_result.next().await,
+            query_result.next().await.cloned(),
             Some(vec![Value::I64(1), Value::String("John Doe".to_string())])
         );
         assert_eq!(
-            query_result.next().await,
+            query_result.next().await.cloned(),
             Some(vec![Value::I64(2), Value::String("Jane Smith".to_string())])
         );
         assert!(query_result.next().await.is_none());
@@ -201,21 +204,26 @@ mod test {
         let mut connection = driver.connect(DATABASE_URL).await?;
 
         let _ = connection
-            .execute("CREATE TABLE t1(t TEXT, nu NUMERIC, i INTEGER, r REAL, no BLOB)")
+            .execute(
+                "CREATE TABLE t1(t TEXT, nu NUMERIC, i INTEGER, r REAL, no BLOB)",
+                &[],
+            )
             .await?;
 
         let rows = connection
-            .execute("INSERT INTO t1 (t, nu, i, r, no) VALUES ('foo', 123, 456, 789.123, x'2a')")
+            .execute(
+                "INSERT INTO t1 (t, nu, i, r, no) VALUES ('foo', 123, 456, 789.123, x'2a')",
+                &[],
+            )
             .await?;
         assert_eq!(rows, 1);
 
-        let mut query_result = connection.query("SELECT t, nu, i, r, no FROM t1").await?;
+        let mut query_result = connection
+            .query("SELECT t, nu, i, r, no FROM t1", &[])
+            .await?;
+        assert_eq!(query_result.columns(), vec!["t", "nu", "i", "r", "no"]);
         assert_eq!(
-            query_result.columns().await,
-            vec!["t", "nu", "i", "r", "no"]
-        );
-        assert_eq!(
-            query_result.next().await,
+            query_result.next().await.cloned(),
             Some(vec![
                 Value::String("foo".to_string()),
                 Value::I64(123),
@@ -233,10 +241,10 @@ mod test {
     async fn test_data_type(sql: &str) -> Result<Option<Value>> {
         let driver = crate::Driver;
         let mut connection = driver.connect(DATABASE_URL).await?;
-        let mut query_result = connection.query(sql).await?;
+        let mut query_result = connection.query(sql, &[]).await?;
         let mut value: Option<Value> = None;
 
-        assert_eq!(query_result.columns().await.len(), 1);
+        assert_eq!(query_result.columns().len(), 1);
 
         if let Some(row) = query_result.next().await {
             assert_eq!(row.len(), 1);
@@ -282,6 +290,47 @@ mod test {
             test_data_type("SELECT 'foo'").await?,
             Some(Value::String("foo".to_string()))
         );
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_execute_with_params() -> Result<()> {
+        let driver = crate::Driver;
+        let mut connection = driver.connect(DATABASE_URL).await?;
+
+        let _ = connection
+            .execute(
+                "CREATE TABLE test_params (id INTEGER, name TEXT, score REAL)",
+                &[],
+            )
+            .await?;
+
+        let rows = connection
+            .execute(
+                "INSERT INTO test_params (id, name, score) VALUES (?, ?, ?)",
+                &[&1i64, &"Alice", &95.5f64],
+            )
+            .await?;
+        assert_eq!(rows, 1);
+
+        let mut query_result = connection
+            .query(
+                "SELECT id, name, score FROM test_params WHERE id = ?",
+                &[&1i64],
+            )
+            .await?;
+
+        assert_eq!(
+            query_result.next().await.cloned(),
+            Some(vec![
+                Value::I64(1),
+                Value::String("Alice".to_string()),
+                Value::F64(95.5),
+            ])
+        );
+        assert!(query_result.next().await.is_none());
+
+        connection.close().await?;
         Ok(())
     }
 }

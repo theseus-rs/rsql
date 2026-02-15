@@ -70,7 +70,7 @@ impl<'a> SqlExecutor<'a> {
         let is_select = matches!(statement_metadata, StatementMetadata::Query);
 
         let results = if is_select {
-            let query_results = self.connection.query(sql).await?;
+            let query_results = self.connection.query(sql, &[]).await?;
 
             if limit == 0 {
                 Results::Query(query_results)
@@ -79,7 +79,7 @@ impl<'a> SqlExecutor<'a> {
                 Results::Query(Box::new(limit_query_result))
             }
         } else {
-            Results::Execute(self.connection.execute(sql).await?)
+            Results::Execute(self.connection.execute(sql, &[]).await?)
         };
 
         Ok(results)
@@ -99,7 +99,6 @@ impl Debug for SqlExecutor<'_> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use mockall::predicate::eq;
     use rsql_drivers::{MemoryQueryResult, MockConnection};
 
     #[tokio::test]
@@ -146,11 +145,11 @@ mod tests {
         let sql = "INSERT INTO foo";
         connection
             .expect_execute()
-            .with(eq(sql))
-            .returning(|_| Ok(42));
+            .with(sql, vec![])
+            .returning(|_, _| Ok(42));
         connection
             .expect_parse_sql()
-            .with(eq(sql))
+            .with(sql)
             .returning(|_| rsql_drivers::StatementMetadata::Unknown);
         let connection = &mut connection as &mut dyn Connection;
         let mut output = Output::default();
@@ -175,11 +174,11 @@ mod tests {
         let limit = 42;
         connection
             .expect_parse_sql()
-            .with(eq(sql))
+            .with(sql)
             .returning(|_| rsql_drivers::StatementMetadata::Query);
         connection
             .expect_query()
-            .returning(|_| Ok(Box::<MemoryQueryResult>::default()));
+            .returning(|_, _| Ok(Box::<MemoryQueryResult>::default()));
         let connection = &mut connection as &mut dyn Connection;
         let output = &mut Output::default();
 
@@ -199,12 +198,12 @@ mod tests {
         let sql = "INSERT INTO foo";
         connection
             .expect_parse_sql()
-            .with(eq(sql))
+            .with(sql)
             .returning(|_| rsql_drivers::StatementMetadata::DML);
         connection
             .expect_execute()
-            .with(eq(sql))
-            .returning(|_| Ok(42));
+            .with(sql, vec![])
+            .returning(|_, _| Ok(42));
         let connection = &mut connection as &mut dyn Connection;
         let output = &mut Output::default();
 

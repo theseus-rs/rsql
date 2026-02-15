@@ -24,7 +24,7 @@ async fn retrieve_catalogs(connection: &mut dyn Connection, metadata: &mut Metad
         FROM
             sys.databases;
     "};
-    let mut query_result = connection.query(sql).await?;
+    let mut query_result = connection.query(sql, &[]).await?;
 
     while let Some(row) = query_result.next().await {
         let catalog_name = match row.first() {
@@ -56,7 +56,7 @@ async fn retrieve_schemas(connection: &mut dyn Connection, catalog: &mut Catalog
         FROM
             sys.schemas;
     "};
-    let mut query_result = connection.query(sql).await?;
+    let mut query_result = connection.query(sql, &[]).await?;
 
     while let Some(row) = query_result.next().await {
         let schema_name = match row.first() {
@@ -96,7 +96,7 @@ async fn retrieve_tables(connection: &mut dyn Connection, schema: &mut Schema) -
                 table_name,
                 ordinal_position
         "};
-    let mut query_result = connection.query(sql).await?;
+    let mut query_result = connection.query(sql, &[]).await?;
 
     while let Some(row) = query_result.next().await {
         let table_name = match row.first() {
@@ -164,7 +164,7 @@ async fn retrieve_indexes(connection: &mut dyn Connection, schema: &mut Schema) 
                 i.name,
                 ic.key_ordinal
         "};
-    let mut query_result = connection.query(sql).await?;
+    let mut query_result = connection.query(sql, &[]).await?;
 
     while let Some(row) = query_result.next().await {
         let table_name = match row.first() {
@@ -216,7 +216,7 @@ async fn retrieve_primary_keys(connection: &mut dyn Connection, schema: &mut Sch
                 kc.name,
                 ic.key_ordinal
         "};
-    let mut query_result = connection.query(sql).await?;
+    let mut query_result = connection.query(sql, &[]).await?;
 
     while let Some(row) = query_result.next().await {
         let table_name = match row.first() {
@@ -266,7 +266,7 @@ async fn retrieve_foreign_keys(connection: &mut dyn Connection, schema: &mut Sch
                 fk.name,
                 fkc.constraint_column_id
         "};
-    let mut query_result = connection.query(sql).await?;
+    let mut query_result = connection.query(sql, &[]).await?;
 
     while let Some(row) = query_result.next().await {
         let table_name = match row.first() {

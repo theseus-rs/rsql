@@ -1,20 +1,19 @@
 use crate::SnowflakeError;
+use crate::results::{ColumnDefinition, SnowflakeQueryResult};
 use async_trait::async_trait;
 use base64::{Engine, engine::general_purpose::STANDARD};
 use file_type::FileType;
-use jiff::civil::{Date, DateTime, Time};
+use jiff::civil::DateTime;
 use jiff::tz::Offset;
 use jiff::{Timestamp, ToSpan};
 use jwt_simple::prelude::{Claims, Duration, RS256KeyPair, RS256PublicKey, RSAKeyPairLike};
 use reqwest::header::HeaderMap;
 use rsql_driver::Error::{InvalidUrl, IoError};
-use rsql_driver::{MemoryQueryResult, Metadata, QueryResult, Result, Row, Value};
+use rsql_driver::{Metadata, QueryResult, Result, ToSql, Value};
 use serde_json::json;
 use sha2::{Digest, Sha256};
 use sqlparser::dialect::{Dialect, SnowflakeDialect};
 use std::collections::HashMap;
-use std::fmt::Display;
-use std::str::FromStr;
 use url::Url;
 
 const DATE_FORMATS: (&str, &str) = ("YYYY-MM-DD", "%Y-%m-%d");
@@ -229,58 +228,45 @@ impl SnowflakeConnection {
     ///
     /// # Errors
     /// Errors if the request fails to receive a response
-    async fn request(&mut self, sql: &str) -> Result<reqwest::Response> {
+    async fn request_with_bindings(
+        &mut self,
+        sql: &str,
+        bindings: &serde_json::Value,
+    ) -> Result<reqwest::Response> {
         self.check_jwt_refresh()?;
+        let mut body = json!({
+            "statement": sql,
+            "timeout": 10,
+            "parameters": {
+                "DATE_OUTPUT_FORMAT": DATE_FORMATS.0,
+                "TIME_OUTPUT_FORMAT": TIME_FORMATS.0,
+                "TIMESTAMP_LTZ_OUTPUT_FORMAT": DATETIME_NO_TZ_FORMATS.0,
+                "TIMESTAMP_NTZ_OUTPUT_FORMAT": DATETIME_NO_TZ_FORMATS.0,
+                "TIMESTAMP_OUTPUT_FORMAT": DATETIME_NO_TZ_FORMATS.0,
+                "TIMESTAMP_TZ_OUTPUT_FORMAT": DATETIME_TZ_FORMATS.0,
+            }
+        });
+        if !bindings.is_null() {
+            body["bindings"] = bindings.clone();
+        }
         self.client
             .post(&self.base_url)
-            .body(
-                json!({
-                    "statement": sql,
-                    "timeout": 10,
-                    "parameters": {
-                        "DATE_OUTPUT_FORMAT": DATE_FORMATS.0,
-                        "TIME_OUTPUT_FORMAT": TIME_FORMATS.0,
-                        "TIMESTAMP_LTZ_OUTPUT_FORMAT": DATETIME_NO_TZ_FORMATS.0,
-                        "TIMESTAMP_NTZ_OUTPUT_FORMAT": DATETIME_NO_TZ_FORMATS.0,
-                        "TIMESTAMP_OUTPUT_FORMAT": DATETIME_NO_TZ_FORMATS.0,
-                        "TIMESTAMP_TZ_OUTPUT_FORMAT": DATETIME_TZ_FORMATS.0,
-                    }
-                })
-                .to_string(),
-            )
+            .body(body.to_string())
             .send()
             .await
             .map_err(SnowflakeError::Request)
             .map_err(|error| IoError(error.to_string()))
     }
 
-    /// Parse row data from snowflake response
-    ///
-    /// # Errors
-    /// Errors if the `result_data["data"]` is not an array or if the row data is not an array
-    fn parse_result_data(
-        result_data: &serde_json::Value,
-        column_definitions: &[ColumnDefinition],
-    ) -> Result<Vec<Row>> {
-        result_data["data"]
+    /// Extract raw JSON row data from snowflake response
+    fn extract_data_rows(result_data: &serde_json::Value) -> Result<Vec<serde_json::Value>> {
+        let data = result_data["data"]
             .as_array()
             .ok_or(SnowflakeError::ResponseContent(
                 "Snowflake Response missing row data".into(),
             ))
-            .map_err(|error| IoError(error.to_string()))?
-            .iter()
-            .map(|row| {
-                row.as_array()
-                    .ok_or(SnowflakeError::ResponseContent(
-                        "row data is not an array".into(),
-                    ))
-                    .map_err(|error| IoError(error.to_string()))?
-                    .iter()
-                    .zip(column_definitions.iter())
-                    .map(|(value, column)| column.convert_to_value(value))
-                    .collect::<Result<Vec<_>>>()
-            })
-            .collect::<Result<Vec<_>>>()
+            .map_err(|error| IoError(error.to_string()))?;
+        Ok(data.clone())
     }
 
     #[cfg(test)]
@@ -325,9 +311,11 @@ impl rsql_driver::Connection for SnowflakeConnection {
         &self.url
     }
 
-    async fn execute(&mut self, sql: &str) -> Result<u64> {
+    async fn execute(&mut self, sql: &str, params: &[&dyn ToSql]) -> Result<u64> {
+        let values = rsql_driver::to_values(params);
+        let bindings = to_snowflake_bindings(&values);
         let response = self
-            .request(sql)
+            .request_with_bindings(sql, &bindings)
             .await?
             .error_for_status()
             .map_err(SnowflakeError::Response)
@@ -353,9 +341,11 @@ impl rsql_driver::Connection for SnowflakeConnection {
         Ok(row_count)
     }
 
-    async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {
+    async fn query(&mut self, sql: &str, params: &[&dyn ToSql]) -> Result<Box<dyn QueryResult>> {
+        let values = rsql_driver::to_values(params);
+        let bindings = to_snowflake_bindings(&values);
         let response = self
-            .request(sql)
+            .request_with_bindings(sql, &bindings)
             .await?
             .error_for_status()
             .map_err(SnowflakeError::Response)
@@ -393,7 +383,7 @@ impl rsql_driver::Connection for SnowflakeConnection {
             .map(|value| value.name.clone())
             .collect();
 
-        let mut rows = Self::parse_result_data(&response_json, &column_definitions)?;
+        let mut data_rows = Self::extract_data_rows(&response_json)?;
         if partitions.len() > 1 {
             for i in 1..partitions.len() {
                 let response = self
@@ -411,14 +401,12 @@ impl rsql_driver::Connection for SnowflakeConnection {
                         ))
                     })
                     .map_err(|error| IoError(error.to_string()))?;
-                rows.extend(Self::parse_result_data(
-                    &response_json,
-                    &column_definitions,
-                )?);
+                data_rows.extend(Self::extract_data_rows(&response_json)?);
             }
         }
 
-        Ok(Box::new(MemoryQueryResult::new(column_names, rows)))
+        let query_result = SnowflakeQueryResult::new(column_names, column_definitions, data_rows);
+        Ok(Box::new(query_result))
     }
 
     async fn metadata(&mut self) -> Result<Metadata> {
@@ -430,95 +418,49 @@ impl rsql_driver::Connection for SnowflakeConnection {
     }
 }
 
-#[derive(Debug)]
-struct ColumnDefinition {
-    pub name: String,
-    snowflake_type: String,
-    scale: Option<u64>,
-}
-
-impl ColumnDefinition {
-    fn new(name: String, snowflake_type: String, scale: Option<u64>) -> Self {
-        Self {
-            name,
-            snowflake_type,
-            scale,
-        }
+fn to_snowflake_bindings(values: &[Value]) -> serde_json::Value {
+    if values.is_empty() {
+        return serde_json::Value::Null;
     }
-
-    fn translate_error(value: &str, error: impl Display) -> SnowflakeError {
-        SnowflakeError::ResponseContent(format!("could not parse {value}: {error}"))
-    }
-
-    fn convert_to_value(&self, value: &serde_json::Value) -> Result<Value> {
-        if let serde_json::Value::Null = value {
-            return Ok(Value::Null);
-        }
-        let value = value
-            .as_str()
-            .ok_or(SnowflakeError::ResponseContent(format!(
-                "row data contained non-string value before parsing {value}"
-            )))
-            .map_err(|error| IoError(error.to_string()))?;
-        Ok(match self.snowflake_type.to_lowercase().as_str() {
-            "fixed" => {
-                if self.scale.is_some() && self.scale.unwrap_or(0) > 0 {
-                    Value::F64(
-                        value
-                            .parse()
-                            .map_err(|e| Self::translate_error(value, e))
-                            .map_err(|error| IoError(error.to_string()))?,
-                    )
-                } else {
-                    Value::I64(
-                        value
-                            .parse()
-                            .map_err(|e| Self::translate_error(value, e))
-                            .map_err(|error| IoError(error.to_string()))?,
-                    )
-                }
+    let mut bindings = serde_json::Map::new();
+    for (i, value) in values.iter().enumerate() {
+        let (sf_type, sf_value) = match value {
+            Value::Null => ("TEXT", serde_json::Value::Null),
+            Value::Bool(v) => ("BOOLEAN", json!(v.to_string())),
+            Value::I8(v) => ("FIXED", json!(v.to_string())),
+            Value::I16(v) => ("FIXED", json!(v.to_string())),
+            Value::I32(v) => ("FIXED", json!(v.to_string())),
+            Value::I64(v) => ("FIXED", json!(v.to_string())),
+            Value::I128(v) => ("FIXED", json!(v.to_string())),
+            Value::U8(v) => ("FIXED", json!(v.to_string())),
+            Value::U16(v) => ("FIXED", json!(v.to_string())),
+            Value::U32(v) => ("FIXED", json!(v.to_string())),
+            Value::U64(v) => ("FIXED", json!(v.to_string())),
+            Value::U128(v) => ("FIXED", json!(v.to_string())),
+            Value::F32(v) => ("REAL", json!(v.to_string())),
+            Value::F64(v) => ("REAL", json!(v.to_string())),
+            Value::String(v) => ("TEXT", json!(v)),
+            Value::Bytes(v) => {
+                let hex_str: String = v.iter().map(|b| format!("{b:02x}")).collect();
+                ("BINARY", json!(hex_str))
             }
-            "boolean" => Value::Bool(
-                value
-                    .parse()
-                    .map_err(|e| Self::translate_error(value, e))
-                    .map_err(|error| IoError(error.to_string()))?,
-            ),
-            "date" => Value::Date(Date::from_str(value)?),
-            "time" => Value::Time(Time::from_str(value)?),
-            "timestamp_ntz" | "timestamp_ltz" | "timestamp_tz" => {
-                Value::DateTime(DateTime::from_str(value)?)
-            }
-            // includes "text" field for VARCHARs
-            _ => Value::String(value.to_string()),
-        })
+            Value::Decimal(v) => ("FIXED", json!(v.to_string())),
+            Value::Date(v) => ("DATE", json!(v.to_string())),
+            Value::Time(v) => ("TIME", json!(v.to_string())),
+            Value::DateTime(v) => ("TIMESTAMP_NTZ", json!(v.to_string())),
+            _ => ("TEXT", json!(value.to_string())),
+        };
+        let binding = json!({"type": sf_type, "value": sf_value});
+        bindings.insert((i + 1).to_string(), binding);
     }
-
-    fn try_from_value(value: &serde_json::Value) -> Result<Self> {
-        let name = value["name"]
-            .as_str()
-            .ok_or(SnowflakeError::ResponseContent(
-                "missing column name in response".into(),
-            ))
-            .map_err(|error| IoError(error.to_string()))?
-            .to_string();
-        let snowflake_type = value["type"]
-            .as_str()
-            .ok_or(SnowflakeError::ResponseContent(
-                "missing column type in response".into(),
-            ))
-            .map_err(|error| IoError(error.to_string()))?
-            .to_string();
-        let scale = value["scale"].as_u64();
-
-        Ok(Self::new(name, snowflake_type, scale))
-    }
+    serde_json::Value::Object(bindings)
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
     use jiff::civil;
+    use jiff::civil::{Date, Time};
     use rsql_driver::Connection;
     use serde_json::json;
     use wiremock::matchers::{method, path};
@@ -698,11 +640,11 @@ mod test {
 
         let mut result = connection
             .query(
-                "SELECT Int, Float, Boolean, Time, Date, DateTimeNTZ, DateTimeTZ, FROM table LIMIT 2",
+                "SELECT Int, Float, Boolean, Time, Date, DateTimeNTZ, DateTimeTZ, FROM table LIMIT 2", &[]
             )
             .await?;
         assert_eq!(
-            result.next().await,
+            result.next().await.cloned(),
             Some(vec![
                 Value::I64(1),
                 Value::F64(2.1),
@@ -720,7 +662,7 @@ mod test {
             ])
         );
         assert_eq!(
-            result.next().await,
+            result.next().await.cloned(),
             Some(vec![
                 Value::I64(2),
                 Value::F64(3.1),
@@ -971,5 +913,33 @@ mod test {
             ))
         );
         assert!(column.convert_to_value(&json!("not_a_datetime")).is_err());
+    }
+
+    #[test]
+    fn test_to_snowflake_bindings_empty() {
+        let result = to_snowflake_bindings(&[]);
+        assert!(result.is_null());
+    }
+
+    #[test]
+    fn test_to_snowflake_bindings_with_values() {
+        let values = vec![
+            Value::I32(42),
+            Value::String("hello".to_string()),
+            Value::Null,
+            Value::F64(1.5),
+            Value::Bool(true),
+        ];
+        let result = to_snowflake_bindings(&values);
+        assert_eq!(result["1"]["type"], "FIXED");
+        assert_eq!(result["1"]["value"], "42");
+        assert_eq!(result["2"]["type"], "TEXT");
+        assert_eq!(result["2"]["value"], "hello");
+        assert_eq!(result["3"]["type"], "TEXT");
+        assert!(result["3"]["value"].is_null());
+        assert_eq!(result["4"]["type"], "REAL");
+        assert_eq!(result["4"]["value"], "1.5");
+        assert_eq!(result["5"]["type"], "BOOLEAN");
+        assert_eq!(result["5"]["value"], "true");
     }
 }

@@ -1,23 +1,21 @@
+use crate::results::PostgresQueryResult;
 use async_trait::async_trait;
-use bit_vec::BitVec;
 use file_type::FileType;
-use jiff::civil::{Date, DateTime, Time};
-use jiff::tz::TimeZone;
 use postgresql_embedded::{PostgreSQL, Settings, Status, VersionReq};
-use rsql_driver::Error::{InvalidUrl, IoError, UnsupportedColumnType};
-use rsql_driver::{MemoryQueryResult, Metadata, QueryResult, Result, StatementMetadata, Value};
+use rsql_driver::Error::{InvalidUrl, IoError};
+use rsql_driver::{
+    Metadata, QueryResult, Result, StatementMetadata, ToSql, Value,
+    convert_to_numbered_placeholders,
+};
 use sqlparser::ast::Statement;
 use sqlparser::dialect::{Dialect, PostgreSqlDialect};
 use std::collections::HashMap;
 use std::path::PathBuf;
 use std::str::FromStr;
 use std::string::ToString;
-use std::time::SystemTime;
-use tokio_postgres::types::{FromSql, Type};
-use tokio_postgres::{Client, Column, NoTls, Row};
+use tokio_postgres::{Client, NoTls};
 use tracing::debug;
 use url::Url;
-use uuid::Uuid;
 
 const POSTGRESQL_EMBEDDED_VERSION: &str = "=18.2.0";
 
@@ -123,43 +121,48 @@ impl rsql_driver::Connection for Connection {
         &self.url
     }
 
-    async fn execute(&mut self, sql: &str) -> Result<u64> {
+    async fn execute(&mut self, sql: &str, params: &[&dyn ToSql]) -> Result<u64> {
+        let sql = convert_to_numbered_placeholders(sql);
+        let values = rsql_driver::to_values(params);
+        let pg_params = values_to_pg_params(&values);
+        let param_refs: Vec<&(dyn tokio_postgres::types::ToSql + Sync)> = pg_params
+            .iter()
+            .map(|p| p.as_ref() as &(dyn tokio_postgres::types::ToSql + Sync))
+            .collect();
         let rows = self
             .client
-            .execute(sql, &[])
+            .execute(&sql, &param_refs)
             .await
             .map_err(|error| IoError(error.to_string()))?;
         Ok(rows)
     }
 
-    async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {
+    async fn query(&mut self, sql: &str, params: &[&dyn ToSql]) -> Result<Box<dyn QueryResult>> {
+        let sql = convert_to_numbered_placeholders(sql);
+        let values = rsql_driver::to_values(params);
+        let pg_params = values_to_pg_params(&values);
+        let param_refs: Vec<&(dyn tokio_postgres::types::ToSql + Sync)> = pg_params
+            .iter()
+            .map(|p| p.as_ref() as &(dyn tokio_postgres::types::ToSql + Sync))
+            .collect();
         let statement = self
             .client
-            .prepare(sql)
+            .prepare(&sql)
             .await
             .map_err(|error| IoError(error.to_string()))?;
-        let query_columns = statement.columns();
-        let columns: Vec<String> = query_columns
+        let columns: Vec<String> = statement
+            .columns()
             .iter()
             .map(|column| column.name().to_string())
             .collect();
 
         let query_rows = self
             .client
-            .query(sql, &[])
+            .query(&sql, &param_refs)
             .await
             .map_err(|error| IoError(error.to_string()))?;
-        let mut rows = Vec::new();
-        for query_row in query_rows {
-            let mut row = Vec::new();
-            for (index, column) in query_columns.iter().enumerate() {
-                let value = Self::convert_to_value(&query_row, column, index)?;
-                row.push(value);
-            }
-            rows.push(row);
-        }
 
-        let query_result = MemoryQueryResult::new(columns, rows);
+        let query_result = PostgresQueryResult::new(columns, query_rows);
         Ok(Box::new(query_result))
     }
 
@@ -196,150 +199,45 @@ impl rsql_driver::Connection for Connection {
     }
 }
 
-impl Connection {
-    pub(crate) fn convert_to_value(
-        row: &Row,
-        column: &Column,
-        column_index: usize,
-    ) -> Result<Value> {
-        // https://www.postgresql.org/docs/current/datatype.html
-        let column_type = column.type_();
-        let value = match *column_type {
-            Type::BIT | Type::VARBIT => Self::get_single(row, column_index, |v: BitVec| {
-                Value::String(Self::bit_string(&v))
-            })?,
-            Type::BIT_ARRAY | Type::VARBIT_ARRAY => {
-                Self::get_array(row, column_index, |v: BitVec| {
-                    Value::String(Self::bit_string(&v))
-                })?
-            }
-            Type::BOOL => Self::get_single(row, column_index, |v: bool| Value::Bool(v))?,
-            Type::BOOL_ARRAY => Self::get_array(row, column_index, |v: bool| Value::Bool(v))?,
-            Type::INT2 => Self::get_single(row, column_index, |v: i16| Value::I16(v))?,
-            Type::INT2_ARRAY => Self::get_array(row, column_index, |v: i16| Value::I16(v))?,
-            Type::INT4 => Self::get_single(row, column_index, |v: i32| Value::I32(v))?,
-            Type::INT4_ARRAY => Self::get_array(row, column_index, |v: i32| Value::I32(v))?,
-            Type::INT8 => Self::get_single(row, column_index, |v: i64| Value::I64(v))?,
-            Type::INT8_ARRAY => Self::get_array(row, column_index, |v: i64| Value::I64(v))?,
-            Type::FLOAT4 => Self::get_single(row, column_index, |v: f32| Value::F32(v))?,
-            Type::FLOAT4_ARRAY => Self::get_array(row, column_index, |v: f32| Value::F32(v))?,
-            Type::FLOAT8 => Self::get_single(row, column_index, |v: f64| Value::F64(v))?,
-            Type::FLOAT8_ARRAY => Self::get_array(row, column_index, |v: f64| Value::F64(v))?,
-            Type::TEXT | Type::VARCHAR | Type::CHAR | Type::BPCHAR | Type::NAME => {
-                Self::get_single(row, column_index, |v: String| Value::String(v))?
-            }
-            Type::TEXT_ARRAY | Type::VARCHAR_ARRAY | Type::CHAR_ARRAY | Type::BPCHAR_ARRAY => {
-                Self::get_array(row, column_index, |v: String| Value::String(v))?
-            }
-            Type::NUMERIC => Self::get_single(row, column_index, |v: rust_decimal::Decimal| {
-                Value::Decimal(v)
-            })?,
-            Type::NUMERIC_ARRAY => {
-                Self::get_single(row, column_index, |v: rust_decimal::Decimal| {
-                    Value::Decimal(v)
-                })?
-            }
-            Type::JSON | Type::JSONB => {
-                Self::get_single(row, column_index, |v: serde_json::Value| Value::from(v))?
-            }
-            Type::JSON_ARRAY | Type::JSONB_ARRAY => {
-                Self::get_array(row, column_index, |v: serde_json::Value| Value::from(v))?
-            }
-            Type::BYTEA => {
-                let byte_value: Option<&[u8]> = row
-                    .try_get(column_index)
-                    .map_err(|error| IoError(error.to_string()))?;
-                match byte_value {
-                    Some(value) => Value::Bytes(value.to_vec()),
-                    None => Value::Null,
+fn values_to_pg_params(
+    values: &[Value],
+) -> Vec<Box<dyn tokio_postgres::types::ToSql + Sync + Send>> {
+    values
+        .iter()
+        .map(
+            |value| -> Box<dyn tokio_postgres::types::ToSql + Sync + Send> {
+                match value {
+                    Value::Null => Box::new(None::<String>),
+                    Value::Bool(v) => Box::new(*v),
+                    Value::I8(v) => Box::new(i16::from(*v)),
+                    Value::I16(v) => Box::new(*v),
+                    Value::I32(v) => Box::new(*v),
+                    Value::I64(v) => Box::new(*v),
+                    Value::U8(v) => Box::new(i16::from(*v)),
+                    Value::U16(v) => Box::new(i32::from(*v)),
+                    Value::U32(v) => Box::new(*v),
+                    Value::U64(v) => Box::new(*v as i64),
+                    Value::F32(v) => Box::new(*v),
+                    Value::F64(v) => Box::new(*v),
+                    Value::String(v) => Box::new(v.clone()),
+                    Value::Bytes(v) => Box::new(v.clone()),
+                    Value::Decimal(v) => Box::new(*v),
+                    Value::Date(v) => Box::new(*v),
+                    Value::Time(v) => Box::new(*v),
+                    Value::DateTime(v) => Box::new(*v),
+                    Value::Uuid(v) => Box::new(*v),
+                    _ => Box::new(value.to_string()),
                 }
-            }
-            Type::DATE => Self::get_single(row, column_index, |v: Date| Value::Date(v))?,
-            Type::TIME | Type::TIMETZ => {
-                Self::get_single(row, column_index, |v: Time| Value::Time(v))?
-            }
-            Type::TIMESTAMP => {
-                Self::get_single(row, column_index, |v: DateTime| Value::DateTime(v))?
-            }
-            Type::TIMESTAMPTZ => {
-                let system_time: Option<SystemTime> = row
-                    .try_get(column_index)
-                    .map_err(|error| IoError(error.to_string()))?;
-                match system_time {
-                    Some(value) => {
-                        let timestamp = jiff::Timestamp::try_from(value)
-                            .map_err(|error| IoError(error.to_string()))?;
-                        let date_time = timestamp.to_zoned(TimeZone::UTC).datetime();
-                        Value::DateTime(date_time)
-                    }
-                    None => Value::Null,
-                }
-            }
-            Type::OID => Self::get_single(row, column_index, |v: u32| Value::U32(v))?,
-            Type::OID_ARRAY => Self::get_array(row, column_index, |v: u32| Value::U32(v))?,
-            Type::UUID => Self::get_single(row, column_index, |v: Uuid| Value::Uuid(v))?,
-            Type::UUID_ARRAY => Self::get_array(row, column_index, |v: Uuid| Value::Uuid(v))?,
-            Type::VOID => Value::Null, // pg_sleep() returns void
-            _ => {
-                return Err(UnsupportedColumnType {
-                    column_name: column.name().to_string(),
-                    column_type: column_type.name().to_string(),
-                });
-            }
-        };
-
-        Ok(value)
-    }
-
-    fn get_single<'r, T: FromSql<'r>>(
-        row: &'r Row,
-        column_index: usize,
-        to_value: impl Fn(T) -> Value,
-    ) -> Result<Value> {
-        match row
-            .try_get::<_, Option<T>>(column_index)
-            .map_err(|error| IoError(error.to_string()))?
-            .map(to_value)
-        {
-            Some(value) => Ok(value),
-            None => Ok(Value::Null),
-        }
-    }
-
-    fn get_array<'r, T: FromSql<'r>>(
-        row: &'r Row,
-        column_index: usize,
-        to_value: impl Fn(T) -> Value,
-    ) -> Result<Value> {
-        let original_value_array = row
-            .try_get::<_, Option<Vec<T>>>(column_index)
-            .map_err(|error| IoError(error.to_string()))?;
-        let result = match original_value_array {
-            Some(value_array) => {
-                let mut values = vec![];
-                for value in value_array {
-                    values.push(to_value(value));
-                }
-                Value::Array(values)
-            }
-            None => Value::Null,
-        };
-        Ok(result)
-    }
-
-    fn bit_string(value: &BitVec) -> String {
-        let bit_string: String = value
-            .iter()
-            .map(|bit| if bit { '1' } else { '0' })
-            .collect();
-        bit_string
-    }
+            },
+        )
+        .collect()
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
     use jiff::Timestamp;
+    use jiff::civil::{Date, DateTime, Time};
     use rsql_driver::{Driver, Value};
     use serde_json::json;
 
@@ -360,18 +258,18 @@ mod test {
         let mut connection = driver.connect(DATABASE_URL).await?;
 
         let _ = connection
-            .execute("CREATE TABLE person (id INTEGER, name VARCHAR(20))")
+            .execute("CREATE TABLE person (id INTEGER, name VARCHAR(20))", &[])
             .await?;
 
         let rows = connection
-            .execute("INSERT INTO person (id, name) VALUES (1, 'foo')")
+            .execute("INSERT INTO person (id, name) VALUES (1, 'foo')", &[])
             .await?;
         assert_eq!(rows, 1);
 
-        let mut query_result = connection.query("SELECT id, name FROM person").await?;
-        assert_eq!(query_result.columns().await, vec!["id", "name"]);
+        let mut query_result = connection.query("SELECT id, name FROM person", &[]).await?;
+        assert_eq!(query_result.columns(), vec!["id", "name"]);
         assert_eq!(
-            query_result.next().await,
+            query_result.next().await.cloned(),
             Some(vec![Value::I32(1), Value::String("foo".to_string())])
         );
         assert!(query_result.next().await.is_none());
@@ -389,10 +287,10 @@ mod test {
         let driver = crate::Driver;
         let mut connection = driver.connect(DATABASE_URL).await?;
 
-        let mut query_result = connection.query(sql).await?;
+        let mut query_result = connection.query(sql, &[]).await?;
         let mut value: Option<Value> = None;
 
-        assert_eq!(query_result.columns().await.len(), 1);
+        assert_eq!(query_result.columns().len(), 1);
 
         if let Some(row) = query_result.next().await {
             assert_eq!(row.len(), 1);

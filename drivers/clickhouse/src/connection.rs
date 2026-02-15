@@ -1,13 +1,12 @@
 use crate::metadata;
+use crate::results::{ClickHouseQueryResult, parse_column_type};
 use async_trait::async_trait;
 use clickhouse::Client;
-use jiff::civil::{Date, DateTime};
 use rsql_driver::Error::{InvalidUrl, IoError};
-use rsql_driver::{MemoryQueryResult, Metadata, QueryResult, Result, Value};
+use rsql_driver::{Metadata, QueryResult, Result, ToSql, Value};
 use serde_json::Value as JsonValue;
 use std::collections::HashMap;
 use url::Url;
-use uuid::Uuid;
 
 const PACKAGE_NAME: &str = env!("CARGO_PKG_NAME");
 const PACKAGE_VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -67,19 +66,26 @@ impl rsql_driver::Connection for Connection {
         &self.url
     }
 
-    async fn execute(&mut self, sql: &str) -> Result<u64> {
-        self.client
-            .query(sql)
+    async fn execute(&mut self, sql: &str, params: &[&dyn ToSql]) -> Result<u64> {
+        let values = rsql_driver::to_values(params);
+        let mut query = self.client.query(sql);
+        for value in &values {
+            query = bind_clickhouse_value(query, value);
+        }
+        query
             .execute()
             .await
             .map_err(|error| IoError(error.to_string()))?;
         Ok(0)
     }
 
-    async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {
-        let mut response = self
-            .client
-            .query(sql)
+    async fn query(&mut self, sql: &str, params: &[&dyn ToSql]) -> Result<Box<dyn QueryResult>> {
+        let values = rsql_driver::to_values(params);
+        let mut query = self.client.query(sql);
+        for value in &values {
+            query = bind_clickhouse_value(query, value);
+        }
+        let mut response = query
             .fetch_bytes("JSON")
             .map_err(|error| IoError(error.to_string()))?;
 
@@ -92,7 +98,7 @@ impl rsql_driver::Connection for Connection {
         let json_response: JsonValue = serde_json::from_str(&json_str)
             .map_err(|error| IoError(format!("Failed to parse JSON response: {error:?}")))?;
 
-        let (columns, column_types): (Vec<String>, Vec<(Option<&str>, &str)>) = json_response
+        let (columns, column_types): (Vec<String>, Vec<(Option<String>, String)>) = json_response
             .get("meta")
             .and_then(|value| value.as_array())
             .map(|arr| {
@@ -100,33 +106,23 @@ impl rsql_driver::Connection for Connection {
                     .filter_map(|item| {
                         let column_name = item.get("name")?.as_str()?.to_string();
                         let column_type = item.get("type")?.as_str()?;
-                        let column_type = parse_column_type(column_type);
-                        Some((column_name, column_type))
+                        let (nullable, base_type) = parse_column_type(column_type);
+                        Some((
+                            column_name,
+                            (nullable.map(ToString::to_string), base_type.to_string()),
+                        ))
                     })
                     .unzip()
             })
             .unwrap_or_default();
 
-        let mut rows = Vec::new();
-        if let Some(data_array) = json_response.get("data").and_then(|value| value.as_array()) {
-            for row_json in data_array {
-                let Some(row_data) = row_json.as_object() else {
-                    continue;
-                };
-                let mut row = Vec::with_capacity(columns.len());
-                for (column_name, column_type) in columns.iter().zip(column_types.iter()) {
-                    let Some(value) = row_data.get(column_name) else {
-                        row.push(Value::Null);
-                        continue;
-                    };
-                    let converted_value = convert_json_to_value(column_type, value)?;
-                    row.push(converted_value);
-                }
-                rows.push(row);
-            }
-        }
+        let data_rows: Vec<JsonValue> = json_response
+            .get("data")
+            .and_then(|value| value.as_array())
+            .cloned()
+            .unwrap_or_default();
 
-        let query_result = MemoryQueryResult::new(columns, rows);
+        let query_result = ClickHouseQueryResult::new(columns, column_types, data_rows);
         Ok(Box::new(query_result))
     }
 
@@ -139,178 +135,29 @@ impl rsql_driver::Connection for Connection {
     }
 }
 
-fn parse_column_type(column_type: &str) -> (Option<&str>, &str) {
-    if let Some(start) = column_type.find('(')
-        && let Some(end) = column_type.rfind(')')
-    {
-        let container = &column_type[..start];
-        let inner = &column_type[start + 1..end];
-        return (Some(container), inner);
+fn bind_clickhouse_value(
+    query: clickhouse::query::Query,
+    value: &Value,
+) -> clickhouse::query::Query {
+    match value {
+        Value::Null => query.bind(Option::<String>::None),
+        Value::Bool(v) => query.bind(*v),
+        Value::I8(v) => query.bind(*v),
+        Value::I16(v) => query.bind(*v),
+        Value::I32(v) => query.bind(*v),
+        Value::I64(v) => query.bind(*v),
+        Value::I128(v) => query.bind(v.to_string()),
+        Value::U8(v) => query.bind(*v),
+        Value::U16(v) => query.bind(*v),
+        Value::U32(v) => query.bind(*v),
+        Value::U64(v) => query.bind(*v),
+        Value::U128(v) => query.bind(v.to_string()),
+        Value::F32(v) => query.bind(*v),
+        Value::F64(v) => query.bind(*v),
+        Value::String(v) => query.bind(v.clone()),
+        Value::Bytes(v) => query.bind(v.clone()),
+        _ => query.bind(value.to_string()),
     }
-    (None, column_type)
-}
-
-fn convert_json_to_value(
-    column_type: &(Option<&str>, &str),
-    json_value: &JsonValue,
-) -> Result<Value> {
-    let value = match column_type {
-        (Some("Array"), column_type) => {
-            if let Some(array) = json_value.as_array() {
-                let values = array
-                    .iter()
-                    .map(|item| {
-                        let column_type = parse_column_type(column_type);
-                        convert_json_to_value(&column_type, item)
-                    })
-                    .collect::<Result<Vec<Value>>>()?;
-                Value::Array(values)
-            } else {
-                Value::Null
-            }
-        }
-        (_, "Nothing") => Value::Null,
-        (_, "Bool") => {
-            if let Some(b) = json_value.as_bool() {
-                Value::Bool(b)
-            } else {
-                Value::Null
-            }
-        }
-        (_, "Int8") => {
-            if let Some(i) = json_value.as_i64() {
-                Value::I8(i as i8)
-            } else {
-                Value::Null
-            }
-        }
-        (_, "Int16") => {
-            if let Some(i) = json_value.as_i64() {
-                Value::I16(i as i16)
-            } else {
-                Value::Null
-            }
-        }
-        (_, "Int32") => {
-            if let Some(i) = json_value.as_i64() {
-                Value::I32(i as i32)
-            } else {
-                Value::Null
-            }
-        }
-        (_, "Int64") => {
-            if let Some(s) = json_value.as_str() {
-                let value = s
-                    .parse::<i64>()
-                    .map_err(|error| IoError(error.to_string()))?;
-                Value::I64(value)
-            } else {
-                Value::Null
-            }
-        }
-        (_, "Int128") => {
-            if let Some(s) = json_value.as_str() {
-                let value = s
-                    .parse::<i128>()
-                    .map_err(|error| IoError(error.to_string()))?;
-                Value::I128(value)
-            } else {
-                Value::Null
-            }
-        }
-        (_, "UInt8") => {
-            if let Some(i) = json_value.as_u64() {
-                Value::U8(i as u8)
-            } else {
-                Value::Null
-            }
-        }
-        (_, "UInt16") => {
-            if let Some(i) = json_value.as_u64() {
-                Value::U16(i as u16)
-            } else {
-                Value::Null
-            }
-        }
-        (_, "UInt32") => {
-            if let Some(i) = json_value.as_u64() {
-                Value::U32(i as u32)
-            } else {
-                Value::Null
-            }
-        }
-        (_, "UInt64") => {
-            if let Some(s) = json_value.as_str() {
-                let value = s
-                    .parse::<u64>()
-                    .map_err(|error| IoError(error.to_string()))?;
-                Value::U64(value)
-            } else {
-                Value::Null
-            }
-        }
-        (_, "UInt128") => {
-            if let Some(s) = json_value.as_str() {
-                let value = s
-                    .parse::<u128>()
-                    .map_err(|error| IoError(error.to_string()))?;
-                Value::U128(value)
-            } else {
-                Value::Null
-            }
-        }
-        (_, "Float32") => {
-            if let Some(f) = json_value.as_f64() {
-                Value::F32(f as f32)
-            } else {
-                Value::Null
-            }
-        }
-        (_, "Float64") => {
-            if let Some(f) = json_value.as_f64() {
-                Value::F64(f)
-            } else {
-                Value::Null
-            }
-        }
-        (_, "String" | "FixedString") => {
-            if let Some(s) = json_value.as_str() {
-                Value::String(s.to_string())
-            } else {
-                Value::Null
-            }
-        }
-        (_, "Date") => {
-            if let Some(s) = json_value.as_str() {
-                let date =
-                    Date::strptime("%Y-%m-%d", s).map_err(|error| IoError(error.to_string()))?;
-                Value::Date(date)
-            } else {
-                Value::Null
-            }
-        }
-        (_, "DateTime") => {
-            if let Some(s) = json_value.as_str() {
-                let date_time = DateTime::strptime("%Y-%m-%d %H:%M:%S", s)
-                    .map_err(|error| IoError(error.to_string()))?;
-                Value::DateTime(date_time)
-            } else {
-                Value::Null
-            }
-        }
-        (_, "UUID") => {
-            if let Some(s) = json_value.as_str() {
-                let uuid = Uuid::parse_str(s).map_err(|error| IoError(error.to_string()))?;
-                Value::Uuid(uuid)
-            } else {
-                Value::Null
-            }
-        }
-        _ => {
-            return Err(IoError(format!("Unsupported data type: {column_type:?}")));
-        }
-    };
-    Ok(value)
 }
 
 impl std::fmt::Debug for Connection {

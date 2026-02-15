@@ -56,9 +56,9 @@ async fn test_dynamodb_driver() -> Result<()> {
     let mut connection = driver.connect(database_url.as_str()).await?;
 
     let mut query_result = connection
-        .query("SELECT id, name FROM users WHERE id = 1")
+        .query("SELECT id, name FROM users WHERE id = 1", &[])
         .await?;
-    let columns = query_result.columns().await;
+    let columns = query_result.columns();
     assert!(columns.contains(&"id".to_string()));
     assert!(columns.contains(&"name".to_string()));
 
