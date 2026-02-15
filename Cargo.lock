@@ -7285,8 +7285,8 @@ dependencies = [
  "array-init",
  "bit-vec",
  "bytes",
- "chrono",
  "fallible-iterator 0.2.0",
+ "jiff",
  "postgres-protocol",
  "serde_core",
  "serde_json",
@@ -8717,7 +8717,6 @@ version = "0.19.2"
 dependencies = [
  "async-trait",
  "bit-vec",
- "chrono",
  "file_type",
  "jiff",
  "postgresql_embedded",
