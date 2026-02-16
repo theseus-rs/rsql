@@ -16,7 +16,7 @@ base64 = { workspace = true }
 file_type = { workspace = true }
 jiff = { workspace = true }
 jwt-simple = { workspace = true, default-features = false, features = ["pure-rust"] }
-reqwest = { workspace = true, features = ["json", "gzip"] }
+reqwest = { workspace = true, features = ["gzip", "json", "query"] }
 rsql_driver = { path = "../../rsql_driver", version = "0.19.3" }
 serde_json = { workspace = true, features = ["preserve_order"] }
 sha2 = { workspace = true }
