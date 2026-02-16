@@ -40,15 +40,15 @@ pub(crate) async fn format_yaml(
     };
 
     let mut yaml_rows: Vec<IndexMap<&String, Value>> = Vec::new();
-    let columns: Vec<String> = query_result.columns().await;
+    let columns = query_result.columns().to_vec();
     let mut rows: u64 = 0;
 
     while let Some(row) = query_result.next().await {
         let mut yaml_row: IndexMap<&String, Value> = IndexMap::new();
 
-        for (c, data) in row.into_iter().enumerate() {
+        for (c, data) in row.iter().enumerate() {
             let column = columns.get(c).expect("column not found");
-            if let Value::Bytes(ref _bytes) = data {
+            if let Value::Bytes(_bytes) = data {
                 let value = Value::String(data.to_string());
                 yaml_row.insert(column, value);
             } else {

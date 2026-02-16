@@ -140,7 +140,6 @@ impl Debug for Executor<'_> {
 mod tests {
     use super::*;
     use indoc::indoc;
-    use mockall::predicate::eq;
     use rsql_drivers::MockConnection;
 
     #[tokio::test]
@@ -397,11 +396,11 @@ mod tests {
         let input = "INSERT INTO foo";
         connection
             .expect_execute()
-            .with(eq(input))
-            .returning(|_| Ok(42));
+            .with(input, vec![])
+            .returning(|_, _| Ok(42));
         connection
             .expect_parse_sql()
-            .with(eq(input))
+            .with(input)
             .returning(|_| rsql_drivers::StatementMetadata::DML);
         let mut output = Output::default();
 

@@ -45,10 +45,11 @@ async fn test_json_metadata() -> Result<()> {
             SELECT type
               FROM cheyenne
         "#,
+            &[],
         )
         .await?;
 
-    assert_eq!(query_result.columns().await, vec!["type"]);
+    assert_eq!(query_result.columns(), vec!["type"]);
     let row = query_result.next().await.expect("expected a row");
     assert_eq!(row.len(), 1);
     let type_value = match &row[0] {

@@ -1,14 +1,14 @@
 use crate::metadata;
+use crate::results::SqlServerQueryResult;
 use async_trait::async_trait;
-use chrono::{Datelike, Timelike};
 use file_type::FileType;
 use futures_util::stream::TryStreamExt;
-use rsql_driver::Error::{InvalidUrl, IoError, UnsupportedColumnType};
-use rsql_driver::{MemoryQueryResult, Metadata, QueryResult, Result, Value};
+use rsql_driver::Error::{InvalidUrl, IoError};
+use rsql_driver::{Metadata, QueryResult, Result, ToSql, Value, convert_to_at_placeholders};
 use sqlparser::dialect::{Dialect, MsSqlDialect};
 use std::collections::HashMap;
 use std::string::ToString;
-use tiberius::{AuthMethod, Client, Column, Config, EncryptionLevel, QueryItem, Row};
+use tiberius::{AuthMethod, Client, Config, EncryptionLevel, Query, QueryItem, Row};
 use tokio::net::TcpStream;
 use tokio_util::compat::{Compat, TokioAsyncWriteCompatExt};
 use url::Url;
@@ -103,49 +103,54 @@ impl rsql_driver::Connection for Connection {
         &self.url
     }
 
-    async fn execute(&mut self, sql: &str) -> Result<u64> {
-        let result = self
-            .client
-            .execute(sql, &[])
+    async fn execute(&mut self, sql: &str, params: &[&dyn ToSql]) -> Result<u64> {
+        let sql = convert_to_at_placeholders(sql);
+        let values = rsql_driver::to_values(params);
+        let mut query = Query::new(sql);
+        for value in &values {
+            bind_tiberius_value(&mut query, value);
+        }
+        let result = query
+            .execute(&mut self.client)
             .await
             .map_err(|error| IoError(error.to_string()))?;
         let rows = result.rows_affected()[0];
         Ok(rows)
     }
 
-    async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {
-        let mut query_stream = self
-            .client
-            .query(sql, &[])
+    async fn query(&mut self, sql: &str, params: &[&dyn ToSql]) -> Result<Box<dyn QueryResult>> {
+        let sql = convert_to_at_placeholders(sql);
+        let values = rsql_driver::to_values(params);
+        let mut query = Query::new(sql);
+        for value in &values {
+            bind_tiberius_value(&mut query, value);
+        }
+        let mut query_stream = query
+            .query(&mut self.client)
             .await
             .map_err(|error| IoError(error.to_string()))?;
         let mut columns: Vec<String> = Vec::new();
 
-        let mut rows = Vec::new();
+        let mut native_rows: Vec<Row> = Vec::new();
         while let Some(item) = query_stream
             .try_next()
             .await
             .map_err(|error| IoError(error.to_string()))?
         {
-            if let QueryItem::Metadata(meta) = item {
-                if meta.result_index() == 0 {
+            match item {
+                QueryItem::Metadata(meta) if meta.result_index() == 0 => {
                     for column in meta.columns() {
                         columns.push(column.name().to_string());
                     }
                 }
-            } else if let QueryItem::Row(row) = item {
-                let mut row_data = Vec::new();
-                if row.result_index() == 0 {
-                    for (index, column) in row.columns().iter().enumerate() {
-                        let value = convert_to_value(&row, column, index)?;
-                        row_data.push(value);
-                    }
+                QueryItem::Row(row) if row.result_index() == 0 => {
+                    native_rows.push(row);
                 }
-                rows.push(row_data);
+                _ => {}
             }
         }
 
-        let query_result = MemoryQueryResult::new(columns, rows);
+        let query_result = SqlServerQueryResult::new(columns, native_rows);
         Ok(Box::new(query_result))
     }
 
@@ -158,119 +163,23 @@ impl rsql_driver::Connection for Connection {
     }
 }
 
-#[expect(clippy::same_functions_in_if_condition)]
-#[expect(clippy::too_many_lines)]
-fn convert_to_value(row: &Row, column: &Column, index: usize) -> Result<Value> {
-    let column_name = column.name();
-
-    if let Ok(value) = row.try_get(index) {
-        let value: Option<&str> = value;
-        match value {
-            Some(v) => Ok(Value::String(v.to_string())),
-            None => Ok(Value::Null),
-        }
-    } else if let Ok(value) = row.try_get(column_name) {
-        let value: Option<&[u8]> = value;
-        match value {
-            Some(v) => Ok(Value::Bytes(v.to_vec())),
-            None => Ok(Value::Null),
-        }
-    } else if let Ok(value) = row.try_get(column_name) {
-        let value: Option<u8> = value;
-        match value {
-            Some(v) => Ok(Value::U8(v)),
-            None => Ok(Value::Null),
-        }
-    } else if let Ok(value) = row.try_get(column_name) {
-        let value: Option<i16> = value;
-        match value {
-            Some(v) => Ok(Value::I16(v)),
-            None => Ok(Value::Null),
-        }
-    } else if let Ok(value) = row.try_get(column_name) {
-        let value: Option<i32> = value;
-        match value {
-            Some(v) => Ok(Value::I32(v)),
-            None => Ok(Value::Null),
-        }
-    } else if let Ok(value) = row.try_get(column_name) {
-        let value: Option<i64> = value;
-        match value {
-            Some(v) => Ok(Value::I64(v)),
-            None => Ok(Value::Null),
-        }
-    } else if let Ok(value) = row.try_get(column_name) {
-        let value: Option<f32> = value;
-        match value {
-            Some(v) => Ok(Value::F32(v)),
-            None => Ok(Value::Null),
-        }
-    } else if let Ok(value) = row.try_get(column_name) {
-        let value: Option<f64> = value;
-        match value {
-            Some(v) => Ok(Value::F64(v)),
-            None => Ok(Value::Null),
-        }
-    } else if let Ok(value) = row.try_get(column_name) {
-        let value: Option<bool> = value;
-        match value {
-            Some(v) => Ok(Value::Bool(v)),
-            None => Ok(Value::Null),
-        }
-    } else if let Ok(value) = row.try_get(column_name) {
-        let value: Option<rust_decimal::Decimal> = value;
-        match value {
-            Some(v) => Ok(Value::Decimal(v)),
-            None => Ok(Value::Null),
-        }
-    } else if let Ok(value) = row.try_get(column_name) {
-        let value: Option<chrono::NaiveDate> = value;
-        match value {
-            Some(v) => {
-                let year = i16::try_from(v.year())?;
-                let month = i8::try_from(v.month())?;
-                let day = i8::try_from(v.day())?;
-                let date = jiff::civil::date(year, month, day);
-                Ok(Value::Date(date))
-            }
-            None => Ok(Value::Null),
-        }
-    } else if let Ok(value) = row.try_get(column_name) {
-        let value: Option<chrono::NaiveTime> = value;
-        match value {
-            Some(v) => {
-                let hour = i8::try_from(v.hour())?;
-                let minute = i8::try_from(v.minute())?;
-                let second = i8::try_from(v.second())?;
-                let nanosecond = i32::try_from(v.nanosecond())?;
-                let time = jiff::civil::time(hour, minute, second, nanosecond);
-                Ok(Value::Time(time))
-            }
-            None => Ok(Value::Null),
-        }
-    } else if let Ok(value) = row.try_get(column_name) {
-        let value: Option<chrono::NaiveDateTime> = value;
-        match value {
-            Some(v) => {
-                let year = i16::try_from(v.year())?;
-                let month = i8::try_from(v.month())?;
-                let day = i8::try_from(v.day())?;
-                let hour = i8::try_from(v.hour())?;
-                let minute = i8::try_from(v.minute())?;
-                let second = i8::try_from(v.second())?;
-                let nanosecond = i32::try_from(v.nanosecond())?;
-                let date_time =
-                    jiff::civil::datetime(year, month, day, hour, minute, second, nanosecond);
-                Ok(Value::DateTime(date_time))
-            }
-            None => Ok(Value::Null),
-        }
-    } else {
-        let column_type = format!("{:?}", column.column_type());
-        let type_name = format!("{column_type:?}");
-        Err(UnsupportedColumnType {
-            column_name: column_name.to_string(),
-            column_type: type_name,
-        })
+fn bind_tiberius_value<'a>(query: &mut Query<'a>, value: &'a Value) {
+    match value {
+        Value::Null => query.bind(Option::<String>::None),
+        Value::Bool(v) => query.bind(*v),
+        Value::I8(v) => query.bind(i16::from(*v)),
+        Value::I16(v) => query.bind(*v),
+        Value::I32(v) => query.bind(*v),
+        Value::I64(v) => query.bind(*v),
+        Value::U8(v) => query.bind(*v),
+        Value::U16(v) => query.bind(i32::from(*v)),
+        Value::U32(v) => query.bind(i64::from(*v)),
+        Value::U64(v) => query.bind(*v as i64),
+        Value::F32(v) => query.bind(*v),
+        Value::F64(v) => query.bind(*v),
+        Value::String(v) => query.bind(v.as_str()),
+        Value::Bytes(v) => query.bind(v.as_slice()),
+        Value::Decimal(v) => query.bind(v.to_string()),
+        _ => query.bind(value.to_string()),
     }
 }

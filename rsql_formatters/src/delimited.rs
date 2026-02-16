@@ -34,13 +34,13 @@ async fn format_delimited(
             .from_writer(output);
 
         if options.header {
-            writer.write_record(query_result.columns().await)?;
+            writer.write_record(query_result.columns())?;
         }
 
         while let Some(row) = query_result.next().await {
             let mut csv_row: Vec<Vec<u8>> = Vec::new();
 
-            for data in &row {
+            for data in row {
                 let bytes = match data {
                     Value::Null => Vec::new(),
                     _ => Vec::from(data.to_string().as_bytes()),

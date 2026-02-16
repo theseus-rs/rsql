@@ -1,14 +1,13 @@
 use crate::metadata;
+use crate::results::SqliteQueryResult;
 use async_trait::async_trait;
 use file_type::FileType;
-use rsql_driver::Error::{IoError, UnsupportedColumnType};
-use rsql_driver::{
-    MemoryQueryResult, Metadata, QueryResult, Result, StatementMetadata, UrlExtension, Value,
-};
+use rsql_driver::Error::IoError;
+use rsql_driver::{Metadata, QueryResult, Result, StatementMetadata, ToSql, UrlExtension, Value};
 use sqlparser::ast::Statement;
 use sqlparser::dialect::{Dialect, SQLiteDialect};
-use sqlx::sqlite::{SqliteAutoVacuum, SqliteColumn, SqliteConnectOptions, SqliteRow};
-use sqlx::{Column, Row, SqlitePool, TypeInfo};
+use sqlx::sqlite::{SqliteArguments, SqliteAutoVacuum, SqliteConnectOptions};
+use sqlx::{Column, Row, Sqlite, SqlitePool};
 use std::collections::HashMap;
 use std::str::FromStr;
 use url::{Url, form_urlencoded};
@@ -76,8 +75,13 @@ impl rsql_driver::Connection for Connection {
         &self.url
     }
 
-    async fn execute(&mut self, sql: &str) -> Result<u64> {
-        let rows = sqlx::query(sql)
+    async fn execute(&mut self, sql: &str, params: &[&dyn ToSql]) -> Result<u64> {
+        let values = rsql_driver::to_values(params);
+        let mut query = sqlx::query(sql);
+        for value in &values {
+            query = bind_sqlite_value(query, value);
+        }
+        let rows = query
             .execute(&self.pool)
             .await
             .map_err(|error| IoError(error.to_string()))?
@@ -85,8 +89,13 @@ impl rsql_driver::Connection for Connection {
         Ok(rows)
     }
 
-    async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {
-        let query_rows = sqlx::query(sql)
+    async fn query(&mut self, sql: &str, params: &[&dyn ToSql]) -> Result<Box<dyn QueryResult>> {
+        let values = rsql_driver::to_values(params);
+        let mut query = sqlx::query(sql);
+        for value in &values {
+            query = bind_sqlite_value(query, value);
+        }
+        let query_rows = query
             .fetch_all(&self.pool)
             .await
             .map_err(|error| IoError(error.to_string()))?;
@@ -100,17 +109,7 @@ impl rsql_driver::Connection for Connection {
             })
             .unwrap_or_default();
 
-        let mut rows = Vec::new();
-        for row in query_rows {
-            let mut row_data = Vec::new();
-            for column in row.columns() {
-                let value = Self::convert_to_value(&row, column)?;
-                row_data.push(value);
-            }
-            rows.push(row_data);
-        }
-
-        let query_result = MemoryQueryResult::new(columns, rows);
+        let query_result = SqliteQueryResult::new(columns, query_rows);
         Ok(Box::new(query_result))
     }
 
@@ -142,98 +141,26 @@ impl rsql_driver::Connection for Connection {
     }
 }
 
-impl Connection {
-    fn convert_to_value(row: &SqliteRow, column: &SqliteColumn) -> Result<Value> {
-        let column_name = column.name();
-        let column_type = column.type_info();
-        let column_type_name = column_type.name();
-
-        match column_type_name {
-            "TEXT" => {
-                return match row
-                    .try_get(column_name)
-                    .map_err(|error| IoError(error.to_string()))?
-                {
-                    Some(v) => Ok(Value::String(v)),
-                    None => Ok(Value::Null),
-                };
-            }
-            // Not currently supported by sqlx
-            // "NUMERIC" => {
-            //     return match row.try_get(column_name)? {
-            //         Some(v) => Ok(Value::String(v)),
-            //         None => Ok(Value::Null),
-            //     };
-            // }
-            "INTEGER" => {
-                return match row
-                    .try_get(column_name)
-                    .map_err(|error| IoError(error.to_string()))?
-                {
-                    Some(v) => Ok(Value::I64(v)),
-                    None => Ok(Value::Null),
-                };
-            }
-            "REAL" => {
-                return match row
-                    .try_get(column_name)
-                    .map_err(|error| IoError(error.to_string()))?
-                {
-                    Some(v) => Ok(Value::F64(v)),
-                    None => Ok(Value::Null),
-                };
-            }
-            "BLOB" => {
-                return match row
-                    .try_get(column_name)
-                    .map_err(|error| IoError(error.to_string()))?
-                {
-                    Some(v) => Ok(Value::Bytes(v)),
-                    None => Ok(Value::Null),
-                };
-            }
-            _ => {}
-        }
-
-        if let Ok(value) = row.try_get::<Option<String>, &str>(column_name) {
-            match value {
-                Some(v) => Ok(Value::String(v)),
-                None => Ok(Value::Null),
-            }
-        } else if let Ok(value) = row.try_get::<Option<Vec<u8>>, &str>(column_name) {
-            match value {
-                Some(v) => Ok(Value::Bytes(v)),
-                None => Ok(Value::Null),
-            }
-        } else if let Ok(value) = row.try_get::<Option<i8>, &str>(column_name) {
-            match value {
-                Some(v) => Ok(Value::I8(v)),
-                None => Ok(Value::Null),
-            }
-        } else if let Ok(value) = row.try_get::<Option<i16>, &str>(column_name) {
-            match value {
-                Some(v) => Ok(Value::I16(v)),
-                None => Ok(Value::Null),
-            }
-        } else if let Ok(value) = row.try_get::<Option<i32>, &str>(column_name) {
-            match value {
-                Some(v) => Ok(Value::I32(v)),
-                None => Ok(Value::Null),
-            }
-        } else if let Ok(value) = row.try_get::<Option<f32>, &str>(column_name) {
-            match value {
-                Some(v) => Ok(Value::F32(v)),
-                None => Ok(Value::Null),
-            }
-        } else {
-            let column_type = column.type_info();
-            let type_name = format!("{column_type:?}");
-
-            Err(UnsupportedColumnType {
-                column_name: column_name.to_string(),
-                column_type: type_name,
-            })
-        }
+fn bind_sqlite_value<'q>(
+    query: sqlx::query::Query<'q, Sqlite, SqliteArguments<'q>>,
+    value: &'q Value,
+) -> sqlx::query::Query<'q, Sqlite, SqliteArguments<'q>> {
+    match value {
+        Value::Null => query.bind(None::<String>),
+        Value::Bool(v) => query.bind(*v),
+        Value::I8(v) => query.bind(i32::from(*v)),
+        Value::I16(v) => query.bind(i32::from(*v)),
+        Value::I32(v) => query.bind(*v),
+        Value::I64(v) => query.bind(*v),
+        Value::U8(v) => query.bind(i32::from(*v)),
+        Value::U16(v) => query.bind(i32::from(*v)),
+        Value::U32(v) => query.bind(i64::from(*v)),
+        Value::U64(v) => query.bind(*v as i64),
+        Value::F32(v) => query.bind(f64::from(*v)),
+        Value::F64(v) => query.bind(*v),
+        Value::String(v) => query.bind(v.as_str()),
+        Value::Bytes(v) => query.bind(v.as_slice()),
+        _ => query.bind(value.to_string()),
     }
 }
 
@@ -261,16 +188,16 @@ mod test {
         let mut connection = driver.connect(&database_url).await?;
 
         let mut query_result = connection
-            .query("SELECT id, name FROM users ORDER BY id")
+            .query("SELECT id, name FROM users ORDER BY id", &[])
             .await?;
 
-        assert_eq!(query_result.columns().await, vec!["id", "name"]);
+        assert_eq!(query_result.columns(), vec!["id", "name"]);
         assert_eq!(
-            query_result.next().await,
+            query_result.next().await.cloned(),
             Some(vec![Value::I64(1), Value::String("John Doe".to_string())])
         );
         assert_eq!(
-            query_result.next().await,
+            query_result.next().await.cloned(),
             Some(vec![Value::I64(2), Value::String("Jane Smith".to_string())])
         );
         assert!(query_result.next().await.is_none());
@@ -286,21 +213,26 @@ mod test {
         let mut connection = driver.connect(DATABASE_URL).await?;
 
         let _ = connection
-            .execute("CREATE TABLE t1(t TEXT, nu NUMERIC, i INTEGER, r REAL, no BLOB)")
+            .execute(
+                "CREATE TABLE t1(t TEXT, nu NUMERIC, i INTEGER, r REAL, no BLOB)",
+                &[],
+            )
             .await?;
 
         let rows = connection
-            .execute("INSERT INTO t1 (t, nu, i, r, no) VALUES ('foo', 123, 456, 789.123, x'2a')")
+            .execute(
+                "INSERT INTO t1 (t, nu, i, r, no) VALUES ('foo', 123, 456, 789.123, x'2a')",
+                &[],
+            )
             .await?;
         assert_eq!(rows, 1);
 
-        let mut query_result = connection.query("SELECT t, nu, i, r, no FROM t1").await?;
+        let mut query_result = connection
+            .query("SELECT t, nu, i, r, no FROM t1", &[])
+            .await?;
+        assert_eq!(query_result.columns(), vec!["t", "nu", "i", "r", "no"]);
         assert_eq!(
-            query_result.columns().await,
-            vec!["t", "nu", "i", "r", "no"]
-        );
-        assert_eq!(
-            query_result.next().await,
+            query_result.next().await.cloned(),
             Some(vec![
                 Value::String("foo".to_string()),
                 Value::I8(123),
@@ -317,10 +249,10 @@ mod test {
     async fn test_data_type(sql: &str) -> Result<Option<Value>> {
         let driver = crate::Driver;
         let mut connection = driver.connect(DATABASE_URL).await?;
-        let mut query_result = connection.query(sql).await?;
+        let mut query_result = connection.query(sql, &[]).await?;
         let mut value: Option<Value> = None;
 
-        assert_eq!(query_result.columns().await.len(), 1);
+        assert_eq!(query_result.columns().len(), 1);
 
         if let Some(row) = query_result.next().await {
             assert_eq!(row.len(), 1);
@@ -382,6 +314,85 @@ mod test {
             test_data_type("SELECT 'foo'").await?,
             Some(Value::String("foo".to_string()))
         );
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_execute_with_params() -> Result<()> {
+        let driver = crate::Driver;
+        let mut connection = driver.connect(DATABASE_URL).await?;
+
+        let _ = connection
+            .execute(
+                "CREATE TABLE test_params (id INTEGER, name TEXT, score REAL, data BLOB)",
+                &[],
+            )
+            .await?;
+
+        let rows = connection
+            .execute(
+                "INSERT INTO test_params (id, name, score, data) VALUES (?, ?, ?, ?)",
+                &[&1i64, &"Alice", &95.5f64, &vec![1u8, 2, 3] as &dyn ToSql],
+            )
+            .await?;
+        assert_eq!(rows, 1);
+
+        let mut query_result = connection
+            .query(
+                "SELECT id, name, score, data FROM test_params WHERE id = ?",
+                &[&1i64],
+            )
+            .await?;
+
+        assert_eq!(query_result.columns(), vec!["id", "name", "score", "data"]);
+        assert_eq!(
+            query_result.next().await.cloned(),
+            Some(vec![
+                Value::I64(1),
+                Value::String("Alice".to_string()),
+                Value::F64(95.5),
+                Value::Bytes(vec![1, 2, 3]),
+            ])
+        );
+        assert!(query_result.next().await.is_none());
+
+        connection.close().await?;
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_query_with_string_param() -> Result<()> {
+        let driver = crate::Driver;
+        let mut connection = driver.connect(DATABASE_URL).await?;
+
+        let _ = connection
+            .execute("CREATE TABLE test_str (id INTEGER, name TEXT)", &[])
+            .await?;
+
+        let _ = connection
+            .execute(
+                "INSERT INTO test_str (id, name) VALUES (?, ?)",
+                &[&1i64, &"Bob"],
+            )
+            .await?;
+        let _ = connection
+            .execute(
+                "INSERT INTO test_str (id, name) VALUES (?, ?)",
+                &[&2i64, &"Alice"],
+            )
+            .await?;
+
+        let mut query_result = connection
+            .query("SELECT id, name FROM test_str WHERE name = ?", &[&"Alice"])
+            .await?;
+
+        assert_eq!(
+            query_result.next().await.cloned(),
+            Some(vec![Value::I64(2), Value::String("Alice".to_string())])
+        );
+        assert!(query_result.next().await.is_none());
+
+        connection.close().await?;
         Ok(())
     }
 }

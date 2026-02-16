@@ -13,7 +13,7 @@ pub async fn get_metadata(connection: &mut dyn Connection) -> Result<Metadata> {
 
 async fn get_catalogs(connection: &mut dyn Connection) -> Result<Vec<Catalog>> {
     let query = "SELECT name FROM system.databases ORDER BY name";
-    let mut result = connection.query(query).await?;
+    let mut result = connection.query(query, &[]).await?;
     let mut catalogs = Vec::new();
 
     while let Some(row) = result.next().await {
@@ -45,7 +45,7 @@ async fn get_tables(connection: &mut dyn Connection, database_name: &str) -> Res
         database_name.replace("'", "''")
     );
 
-    let mut result = connection.query(&query).await?;
+    let mut result = connection.query(&query, &[]).await?;
     let mut tables = Vec::new();
 
     while let Some(row) = result.next().await {
@@ -85,7 +85,7 @@ async fn get_columns(
         table_name.replace("'", "''")
     );
 
-    let mut result = connection.query(&query).await?;
+    let mut result = connection.query(&query, &[]).await?;
     let mut columns = Vec::new();
 
     while let Some(row) = result.next().await {
@@ -135,7 +135,7 @@ async fn get_primary_key(
         table_name.replace("'", "''")
     );
 
-    let mut result = connection.query(&query).await?;
+    let mut result = connection.query(&query, &[]).await?;
     let primary_key_expr = if let Some(row) = result.next().await {
         match row.first() {
             Some(Value::String(expr)) => expr.clone(),
@@ -165,7 +165,7 @@ async fn get_primary_key_metadata(
         table_name.replace("'", "''")
     );
 
-    let mut result = connection.query(&query).await?;
+    let mut result = connection.query(&query, &[]).await?;
     let primary_key_expr = if let Some(row) = result.next().await {
         match row.first() {
             Some(Value::String(expr)) => expr.clone(),
@@ -199,7 +199,7 @@ async fn get_data_skipping_indexes(
         database_name.replace("'", "''"),
         table_name.replace("'", "''")
     );
-    let mut result = connection.query(&query).await?;
+    let mut result = connection.query(&query, &[]).await?;
     let mut indexes = Vec::new();
 
     while let Some(row) = result.next().await {

@@ -30,7 +30,7 @@ async fn retrieve_catalogs(connection: &mut dyn Connection, metadata: &mut Metad
 async fn retrieve_schemas(connection: &mut dyn Connection, catalog: &mut Catalog) -> Result<()> {
     let mut schemas = vec![];
     let sql = indoc! { "SELECT name FROM pragma_database_list ORDER BY name"};
-    let mut query_result = connection.query(sql).await?;
+    let mut query_result = connection.query(sql, &[]).await?;
 
     while let Some(row) = query_result.next().await {
         let database_name = match row.first() {
@@ -73,7 +73,7 @@ async fn retrieve_tables(connection: &mut dyn Connection, schema: &mut Schema) -
                 p.cid,
                 column_name
         "#};
-    let mut query_result = connection.query(sql).await?;
+    let mut query_result = connection.query(sql, &[]).await?;
 
     while let Some(row) = query_result.next().await {
         let table_name = match row.first() {
@@ -138,7 +138,7 @@ async fn retrieve_indexes(connection: &mut dyn Connection, schema: &mut Schema) 
                 il.seq,
                 ii.seqno
         "};
-    let mut query_result = connection.query(sql).await?;
+    let mut query_result = connection.query(sql, &[]).await?;
 
     while let Some(row) = query_result.next().await {
         let table_name = match row.first() {
@@ -184,7 +184,7 @@ async fn retrieve_primary_keys(connection: &mut dyn Connection, schema: &mut Sch
             "SELECT name, pk FROM pragma_table_info('{}') WHERE pk > 0 ORDER BY pk",
             table_name.replace('\'', "''")
         );
-        let mut query_result = connection.query(&sql).await?;
+        let mut query_result = connection.query(&sql, &[]).await?;
         let mut pk_columns = Vec::new();
 
         while let Some(row) = query_result.next().await {
@@ -219,7 +219,7 @@ async fn retrieve_foreign_keys(connection: &mut dyn Connection, schema: &mut Sch
             "SELECT * FROM pragma_foreign_key_list('{}')",
             table_name.replace('\'', "''")
         );
-        let mut query_result = connection.query(&sql).await?;
+        let mut query_result = connection.query(&sql, &[]).await?;
 
         while let Some(row) = query_result.next().await {
             let id = match row.first() {
@@ -277,6 +277,7 @@ mod test {
                         email VARCHAR(20) NULL UNIQUE
                     )
                 ",
+                &[],
             )
             .await?;
         let _ = connection
@@ -287,6 +288,7 @@ mod test {
                         email VARCHAR(20) NULL UNIQUE
                     )
                 ",
+                &[],
             )
             .await?;
 

@@ -29,12 +29,12 @@ impl crate::Formatter for Formatter {
         let mut rows: u64 = 0;
 
         if let Query(query_result) = results {
-            if query_result.columns().await.is_empty() {
+            if query_result.columns().is_empty() {
                 write_footer(options, results, 0, output).await?;
                 return Ok(());
             }
             let mut data: Vec<Vec<String>> = Vec::new();
-            data.push(query_result.columns().await);
+            data.push(query_result.columns().to_vec());
             rows = process_data(options, query_result, &mut data).await?;
             let locale = options.locale.clone();
             let table = ExtendedTable::from(data).template(move |index| {
@@ -61,7 +61,7 @@ async fn process_data(
     while let Some(row) = query_result.next().await {
         let mut row_data = Vec::new();
 
-        for data in &row {
+        for data in row {
             let data = match data {
                 Value::Null => "NULL".to_string(),
                 _ => data.to_formatted_string(&locale),

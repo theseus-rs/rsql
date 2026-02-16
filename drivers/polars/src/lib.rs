@@ -1,5 +1,6 @@
 mod driver;
 mod metadata;
+mod results;
 mod value;
 
 pub use driver::Connection;
