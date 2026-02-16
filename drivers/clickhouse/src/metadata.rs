@@ -1,4 +1,6 @@
-use rsql_driver::{Catalog, Column, Connection, Index, Metadata, Result, Schema, Table, Value};
+use rsql_driver::{
+    Catalog, Column, Connection, Index, Metadata, PrimaryKey, Result, Schema, Table, Value,
+};
 
 pub async fn get_metadata(connection: &mut dyn Connection) -> Result<Metadata> {
     let catalogs = get_catalogs(connection).await?;
@@ -11,7 +13,7 @@ pub async fn get_metadata(connection: &mut dyn Connection) -> Result<Metadata> {
 
 async fn get_catalogs(connection: &mut dyn Connection) -> Result<Vec<Catalog>> {
     let query = "SELECT name FROM system.databases ORDER BY name";
-    let mut result = connection.query(query).await?;
+    let mut result = connection.query(query, &[]).await?;
     let mut catalogs = Vec::new();
 
     while let Some(row) = result.next().await {
@@ -43,7 +45,7 @@ async fn get_tables(connection: &mut dyn Connection, database_name: &str) -> Res
         database_name.replace("'", "''")
     );
 
-    let mut result = connection.query(&query).await?;
+    let mut result = connection.query(&query, &[]).await?;
     let mut tables = Vec::new();
 
     while let Some(row) = result.next().await {
@@ -51,12 +53,16 @@ async fn get_tables(connection: &mut dyn Connection, database_name: &str) -> Res
         {
             let columns = get_columns(connection, database_name, name).await?;
             let indexes = get_indexes(connection, database_name, name).await?;
+            let primary_key = get_primary_key_metadata(connection, database_name, name).await?;
             let mut table = Table::new(name);
             for column in columns {
                 table.add_column(column);
             }
             for index in indexes {
                 table.add_index(index);
+            }
+            if let Some(pk) = primary_key {
+                table.set_primary_key(pk);
             }
             tables.push(table);
         }
@@ -79,7 +85,7 @@ async fn get_columns(
         table_name.replace("'", "''")
     );
 
-    let mut result = connection.query(&query).await?;
+    let mut result = connection.query(&query, &[]).await?;
     let mut columns = Vec::new();
 
     while let Some(row) = result.next().await {
@@ -129,7 +135,7 @@ async fn get_primary_key(
         table_name.replace("'", "''")
     );
 
-    let mut result = connection.query(&query).await?;
+    let mut result = connection.query(&query, &[]).await?;
     let primary_key_expr = if let Some(row) = result.next().await {
         match row.first() {
             Some(Value::String(expr)) => expr.clone(),
@@ -147,6 +153,41 @@ async fn get_primary_key(
     Ok(Index::new("PRIMARY", columns, true))
 }
 
+async fn get_primary_key_metadata(
+    connection: &mut dyn Connection,
+    database_name: &str,
+    table_name: &str,
+) -> Result<Option<PrimaryKey>> {
+    let query = format!(
+        "SELECT primary_key FROM system.tables
+         WHERE database = '{}' AND name = '{}'",
+        database_name.replace("'", "''"),
+        table_name.replace("'", "''")
+    );
+
+    let mut result = connection.query(&query, &[]).await?;
+    let primary_key_expr = if let Some(row) = result.next().await {
+        match row.first() {
+            Some(Value::String(expr)) => expr.clone(),
+            _ => String::new(),
+        }
+    } else {
+        String::new()
+    };
+
+    let columns: Vec<String> = primary_key_expr
+        .split(',')
+        .map(|column| column.trim().to_string())
+        .filter(|s| !s.is_empty())
+        .collect();
+
+    if columns.is_empty() {
+        Ok(None)
+    } else {
+        Ok(Some(PrimaryKey::new("PRIMARY".to_string(), columns, false)))
+    }
+}
+
 async fn get_data_skipping_indexes(
     connection: &mut dyn Connection,
     database_name: &str,
@@ -158,7 +199,7 @@ async fn get_data_skipping_indexes(
         database_name.replace("'", "''"),
         table_name.replace("'", "''")
     );
-    let mut result = connection.query(&query).await?;
+    let mut result = connection.query(&query, &[]).await?;
     let mut indexes = Vec::new();
 
     while let Some(row) = result.next().await {

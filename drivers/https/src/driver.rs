@@ -176,9 +176,9 @@ async fn create_header_tables(
     response_headers: &HashMap<String, String>,
 ) -> Result<()> {
     let request_header_sql = create_table_sql("request_headers", request_headers);
-    connection.execute(&request_header_sql).await?;
+    connection.execute(&request_header_sql, &[]).await?;
     let response_header_sql = create_table_sql("response_headers", response_headers);
-    connection.execute(&response_header_sql).await?;
+    connection.execute(&response_header_sql, &[]).await?;
     Ok(())
 }
 

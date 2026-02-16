@@ -44,16 +44,19 @@ async fn retrieve_schemas(connection: &mut PolarsConnection, catalog: &mut Catal
 
 async fn retrieve_tables(connection: &mut PolarsConnection, schema: &mut Schema) -> Result<()> {
     let context = connection.context();
-    let context = context.lock().await;
-    let table_map = context.get_table_map();
+    let mut context = context.lock().await;
+    let table_names = context.get_tables();
 
-    for (table_name, lazy_frame) in table_map {
+    for table_name in table_names {
+        let lazy_frame = context
+            .execute(&format!("SELECT * FROM \"{table_name}\" LIMIT 0"))
+            .map_err(|error| IoError(error.to_string()))?;
         let data_frame = lazy_frame
             .collect()
-            .map_err(|error| IoError(error.to_string()))?;
+            .map_err(|error: polars::prelude::PolarsError| IoError(error.to_string()))?;
         let data_frame_schema = data_frame.schema();
 
-        let mut table = Table::new(table_name);
+        let mut table = Table::new(&table_name);
         for field in data_frame_schema.iter_fields() {
             add_table_column(&mut table, &String::new(), &field);
         }
@@ -99,16 +102,16 @@ mod test {
     use polars_sql::SQLContext;
     use rsql_driver::Connection;
 
-    #[tokio::test]
+    #[tokio::test(flavor = "multi_thread")]
     async fn test_metadata() -> Result<()> {
         let ids = Series::new("id".into(), &[1i64, 2i64]);
         let names = Series::new("name".into(), &["John Doe", "Jane Smith"]);
-        let data_frame = DataFrame::new(vec![
+        let data_frame = DataFrame::new_infer_height(vec![
             polars::prelude::Column::from(ids),
             polars::prelude::Column::from(names),
         ])
         .map_err(|error| IoError(error.to_string()))?;
-        let mut context = SQLContext::new();
+        let context = SQLContext::new();
         context.register("users", data_frame.lazy());
         let mut connection = PolarsConnection::new("polars://", context).await?;
 

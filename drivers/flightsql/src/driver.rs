@@ -1,11 +1,10 @@
 use crate::metadata;
-use arrow_array::cast::__private::{DataType, TimeUnit};
+use crate::results::FlightSqlQueryResult;
+use arrow_array::cast::__private::DataType;
 use arrow_array::{
-    ArrayRef, BinaryArray, BooleanArray, Date32Array, Date64Array, Float32Array, Float64Array,
-    Int8Array, Int16Array, Int32Array, Int64Array, LargeStringArray, StringArray,
-    Time32MillisecondArray, Time32SecondArray, Time64MicrosecondArray, Time64NanosecondArray,
-    TimestampMicrosecondArray, TimestampMillisecondArray, TimestampNanosecondArray,
-    TimestampSecondArray, UInt8Array, UInt16Array, UInt32Array, UInt64Array,
+    ArrayRef, BinaryArray, BooleanArray, Float32Array, Float64Array, Int8Array, Int16Array,
+    Int32Array, Int64Array, RecordBatch, StringArray, UInt8Array, UInt16Array, UInt32Array,
+    UInt64Array,
 };
 use arrow_flight::FlightInfo;
 use arrow_flight::flight_service_client::FlightServiceClient;
@@ -13,17 +12,13 @@ use arrow_flight::sql::client::FlightSqlServiceClient;
 use async_trait::async_trait;
 use file_type::FileType;
 use futures_util::TryStreamExt;
-use jiff::ToSpan;
-use jiff::civil::{Date, DateTime, Time};
 use rsql_driver::Error::{InvalidUrl, IoError};
-use rsql_driver::{MemoryQueryResult, Metadata, QueryResult, Result, Value};
+use rsql_driver::{Metadata, QueryResult, Result, ToSql, Value};
 use std::collections::HashMap;
 use std::string::ToString;
+use std::sync::Arc;
 use tonic::transport::Channel;
 use url::Url;
-
-const EPOCH_DATE: Date = Date::constant(1970, 1, 1);
-const EPOCH_DATETIME: DateTime = DateTime::constant(1970, 1, 1, 0, 0, 0, 0);
 
 #[derive(Debug)]
 pub struct Driver;
@@ -67,9 +62,12 @@ impl Connection {
             .ok_or_else(|| InvalidUrl("Missing host".to_string()))?;
         let port = parsed_url.port().unwrap_or(31337);
         let connection_url = format!("{scheme}://{host}:{port}");
-        let service_client = FlightServiceClient::connect(connection_url)
+        let channel = Channel::from_shared(connection_url)
+            .map_err(|error| IoError(error.to_string()))?
+            .connect()
             .await
             .map_err(|error| IoError(error.to_string()))?;
+        let service_client = FlightServiceClient::new(channel);
         let mut client = FlightSqlServiceClient::new_from_inner(service_client);
         let username = parsed_url.username();
         let password = parsed_url
@@ -103,8 +101,8 @@ impl rsql_driver::Connection for Connection {
         &self.url
     }
 
-    async fn execute(&mut self, sql: &str) -> Result<u64> {
-        let mut query_result = self.query(sql).await?;
+    async fn execute(&mut self, sql: &str, params: &[&dyn ToSql]) -> Result<u64> {
+        let mut query_result = self.query(sql, params).await?;
         let mut rows = 0;
         while let Some(_row) = query_result.next().await {
             rows += 1;
@@ -112,12 +110,19 @@ impl rsql_driver::Connection for Connection {
         Ok(rows)
     }
 
-    async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {
+    async fn query(&mut self, sql: &str, params: &[&dyn ToSql]) -> Result<Box<dyn QueryResult>> {
+        let values = rsql_driver::to_values(params);
         let mut statement = self
             .client
             .prepare(sql.to_string(), None)
             .await
             .map_err(|error| IoError(error.to_string()))?;
+        if !values.is_empty() {
+            let batch = values_to_record_batch(&values)?;
+            statement
+                .set_parameters(batch)
+                .map_err(|error| IoError(error.to_string()))?;
+        }
         let flight_info = statement
             .execute()
             .await
@@ -130,6 +135,35 @@ impl rsql_driver::Connection for Connection {
     async fn metadata(&mut self) -> Result<Metadata> {
         metadata::get_metadata(self).await
     }
+}
+
+fn values_to_record_batch(values: &[Value]) -> Result<RecordBatch> {
+    let columns: Vec<(String, ArrayRef)> = values
+        .iter()
+        .enumerate()
+        .map(|(i, value)| {
+            let name = format!("param{}", i + 1);
+            let array: ArrayRef = match value {
+                Value::Null => Arc::new(StringArray::from(vec![None::<&str>])),
+                Value::Bool(v) => Arc::new(BooleanArray::from(vec![*v])),
+                Value::I8(v) => Arc::new(Int8Array::from(vec![*v])),
+                Value::I16(v) => Arc::new(Int16Array::from(vec![*v])),
+                Value::I32(v) => Arc::new(Int32Array::from(vec![*v])),
+                Value::I64(v) => Arc::new(Int64Array::from(vec![*v])),
+                Value::U8(v) => Arc::new(UInt8Array::from(vec![*v])),
+                Value::U16(v) => Arc::new(UInt16Array::from(vec![*v])),
+                Value::U32(v) => Arc::new(UInt32Array::from(vec![*v])),
+                Value::U64(v) => Arc::new(UInt64Array::from(vec![*v])),
+                Value::F32(v) => Arc::new(Float32Array::from(vec![*v])),
+                Value::F64(v) => Arc::new(Float64Array::from(vec![*v])),
+                Value::String(v) => Arc::new(StringArray::from(vec![v.as_str()])),
+                Value::Bytes(v) => Arc::new(BinaryArray::from_vec(vec![v.as_slice()])),
+                _ => Arc::new(StringArray::from(vec![value.to_string().as_str()])),
+            };
+            (name, array)
+        })
+        .collect();
+    RecordBatch::try_from_iter(columns).map_err(|error| IoError(error.to_string()))
 }
 
 /// Converts a `FlightInfo` object to a `QueryResult` by fetching the data
@@ -156,181 +190,17 @@ pub(crate) async fn convert_flight_info_to_query_result(
         .do_get(ticket)
         .await
         .map_err(|error| IoError(error.to_string()))?;
-    let batches: Vec<_> = flight_data
+    let batches: Vec<RecordBatch> = flight_data
         .try_collect()
         .await
         .map_err(|error| IoError(error.to_string()))?;
 
-    let mut rows = Vec::new();
-    for batch in batches {
-        let number_of_rows = batch.num_rows();
-        for row_index in 0..number_of_rows {
-            let mut row = Vec::new();
-            for (column_index, field) in schema.fields.iter().enumerate() {
-                let column = batch.column(column_index);
-                let value = convert_arrow_to_value(column, row_index, field.data_type())?;
-                row.push(value);
-            }
-            rows.push(row);
-        }
-    }
+    let field_types: Vec<DataType> = schema
+        .fields
+        .iter()
+        .map(|field| field.data_type().clone())
+        .collect();
 
-    let query_result = MemoryQueryResult::new(columns, rows);
+    let query_result = FlightSqlQueryResult::new(columns, field_types, batches);
     Ok(Box::new(query_result))
-}
-
-/// Converts an Arrow array value at the specified row index to the appropriate rsql Value type
-#[expect(clippy::too_many_lines)]
-fn convert_arrow_to_value(
-    column: &ArrayRef,
-    row_index: usize,
-    data_type: &DataType,
-) -> Result<Value> {
-    if column.is_null(row_index) {
-        return Ok(Value::Null);
-    }
-
-    let value = match data_type {
-        DataType::Null => Value::Null,
-        DataType::Binary => {
-            let array = downcast_array::<BinaryArray>(column)?;
-            let bytes = array.value(row_index);
-            Value::Bytes(bytes.to_vec())
-        }
-        DataType::Boolean => {
-            let array = downcast_array::<BooleanArray>(column)?;
-            Value::Bool(array.value(row_index))
-        }
-        DataType::Int8 => {
-            let array = downcast_array::<Int8Array>(column)?;
-            Value::I8(array.value(row_index))
-        }
-        DataType::Int16 => {
-            let array = downcast_array::<Int16Array>(column)?;
-            Value::I16(array.value(row_index))
-        }
-        DataType::Int32 => {
-            let array = downcast_array::<Int32Array>(column)?;
-            Value::I32(array.value(row_index))
-        }
-        DataType::Int64 => {
-            let array = downcast_array::<Int64Array>(column)?;
-            Value::I64(array.value(row_index))
-        }
-        DataType::UInt8 => {
-            let array = downcast_array::<UInt8Array>(column)?;
-            Value::U8(array.value(row_index))
-        }
-        DataType::UInt16 => {
-            let array = downcast_array::<UInt16Array>(column)?;
-            Value::U16(array.value(row_index))
-        }
-        DataType::UInt32 => {
-            let array = downcast_array::<UInt32Array>(column)?;
-            Value::U32(array.value(row_index))
-        }
-        DataType::UInt64 => {
-            let array = downcast_array::<UInt64Array>(column)?;
-            Value::U64(array.value(row_index))
-        }
-        DataType::Float32 => {
-            let array = downcast_array::<Float32Array>(column)?;
-            Value::F32(array.value(row_index))
-        }
-        DataType::Float64 => {
-            let array = downcast_array::<Float64Array>(column)?;
-            Value::F64(array.value(row_index))
-        }
-        DataType::Utf8 => {
-            let array = downcast_array::<StringArray>(column)?;
-            Value::String(array.value(row_index).to_string())
-        }
-        DataType::LargeUtf8 => {
-            let array = downcast_array::<LargeStringArray>(column)?;
-            Value::String(array.value(row_index).to_string())
-        }
-        DataType::Date32 => {
-            let array = downcast_array::<Date32Array>(column)?;
-            let days_since_epoch = array.value(row_index).days();
-            let date = EPOCH_DATE + days_since_epoch;
-            Value::Date(date)
-        }
-        DataType::Date64 => {
-            let array = downcast_array::<Date64Array>(column)?;
-            let milliseconds_since_epoch = array.value(row_index).milliseconds();
-            let date = EPOCH_DATE + milliseconds_since_epoch;
-            Value::Date(date)
-        }
-        DataType::Time32(TimeUnit::Second) => {
-            let array = downcast_array::<Time32SecondArray>(column)?;
-            let time_seconds = array.value(row_index).seconds();
-            let time = Time::MIN + time_seconds;
-            Value::Time(time)
-        }
-        DataType::Time32(TimeUnit::Millisecond) => {
-            let array = downcast_array::<Time32MillisecondArray>(column)?;
-            let time_milliseconds = array.value(row_index).milliseconds();
-            let time = Time::MIN + time_milliseconds;
-            Value::Time(time)
-        }
-        DataType::Time64(TimeUnit::Microsecond) => {
-            let array = downcast_array::<Time64MicrosecondArray>(column)?;
-            let time_microseconds = array.value(row_index).microseconds();
-            let time = Time::MIN + time_microseconds;
-            Value::Time(time)
-        }
-        DataType::Time64(TimeUnit::Nanosecond) => {
-            let array = downcast_array::<Time64NanosecondArray>(column)?;
-            let time_nanoseconds = array.value(row_index).nanoseconds();
-            let time = Time::MIN + time_nanoseconds;
-            Value::Time(time)
-        }
-        DataType::Timestamp(TimeUnit::Second, _timezone) => {
-            let array = downcast_array::<TimestampSecondArray>(column)?;
-            let seconds_since_epoch = array.value(row_index).seconds();
-            let datetime = EPOCH_DATETIME + seconds_since_epoch;
-            // TODO: implement timezone handling
-            Value::DateTime(datetime)
-        }
-        DataType::Timestamp(TimeUnit::Millisecond, _timezone) => {
-            let array = downcast_array::<TimestampMillisecondArray>(column)?;
-            let milliseconds_since_epoch = array.value(row_index).milliseconds();
-            let datetime = EPOCH_DATETIME + milliseconds_since_epoch;
-            // TODO: implement timezone handling
-            Value::DateTime(datetime)
-        }
-        DataType::Timestamp(TimeUnit::Microsecond, _timezone) => {
-            let array = downcast_array::<TimestampMicrosecondArray>(column)?;
-            let microseconds_since_epoch = array.value(row_index).microseconds();
-            let datetime = EPOCH_DATETIME + microseconds_since_epoch;
-            // TODO: implement timezone handling
-            Value::DateTime(datetime)
-        }
-        DataType::Timestamp(TimeUnit::Nanosecond, _timezone) => {
-            let array = downcast_array::<TimestampNanosecondArray>(column)?;
-            let nanseconds_since_epoch = array.value(row_index).nanoseconds();
-            let datetime = EPOCH_DATETIME + nanseconds_since_epoch;
-            // TODO: implement timezone handling
-            Value::DateTime(datetime)
-        }
-        _ => {
-            return Err(IoError(format!("Unsupported data type: {data_type:?}")));
-        }
-    };
-
-    Ok(value)
-}
-
-/// Helper function to downcast an Arrow array to a specific type
-fn downcast_array<'a, T>(
-    column: &'a std::sync::Arc<(dyn arrow_array::Array + 'static)>,
-) -> Result<&'a T>
-where
-    T: 'static + std::any::Any,
-{
-    let array_type_name = std::any::type_name::<T>();
-    column
-        .as_any()
-        .downcast_ref::<T>()
-        .ok_or_else(|| IoError(format!("Failed to downcast {array_type_name} array")))
 }

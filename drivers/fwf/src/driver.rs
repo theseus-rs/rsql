@@ -83,10 +83,11 @@ impl rsql_driver::Driver for Driver {
             })
             .collect::<Vec<Column>>();
 
-        let data_frame = DataFrame::new(columns).map_err(|error| IoError(error.to_string()))?;
+        let data_frame =
+            DataFrame::new_infer_height(columns).map_err(|error| IoError(error.to_string()))?;
 
         let table_name = rsql_driver_polars::get_table_name(file_name)?;
-        let mut context = SQLContext::new();
+        let context = SQLContext::new();
         context.register(table_name.as_str(), data_frame.lazy());
 
         let connection = Connection::new(url, context).await?;

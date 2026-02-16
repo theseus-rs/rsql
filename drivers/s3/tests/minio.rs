@@ -19,7 +19,7 @@ static ACCESS_KEY_ID: &str = "minioadmin";
 static SECRET_ACCESS_KEY: &str = "minioadmin";
 static REGION: &str = "us-east-1";
 
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread")]
 async fn test_s3_driver_minio() -> Result<()> {
     if env::var("CI").unwrap_or_default() == "true" && env::consts::OS != "linux" {
         eprintln!("Skipping CI test on non-linux platform");
@@ -49,16 +49,16 @@ async fn test_s3_driver_minio() -> Result<()> {
     let mut connection = driver.connect(database_url.as_str()).await?;
 
     let mut query_result = connection
-        .query("SELECT id, name FROM users ORDER BY id")
+        .query("SELECT id, name FROM users ORDER BY id", &[])
         .await?;
 
-    assert_eq!(query_result.columns().await, vec!["id", "name"]);
+    assert_eq!(query_result.columns(), vec!["id", "name"]);
     assert_eq!(
-        query_result.next().await,
+        query_result.next().await.cloned(),
         Some(vec![Value::I64(1), Value::String("John Doe".to_string())])
     );
     assert_eq!(
-        query_result.next().await,
+        query_result.next().await.cloned(),
         Some(vec![Value::I64(2), Value::String("Jane Smith".to_string())])
     );
     assert!(query_result.next().await.is_none());

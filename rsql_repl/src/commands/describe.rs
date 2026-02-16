@@ -50,6 +50,27 @@ impl ShellCommand for Command {
         let index_unique_label = t!("describe_unique", locale = locale).to_string();
         let indexes_column_labels = vec![index_label, index_columns_label, index_unique_label];
         let mut indexes_column_rows = Vec::new();
+
+        let pk_label = t!("describe_primary_key", locale = locale).to_string();
+        let pk_columns_label = t!("describe_columns", locale = locale).to_string();
+        let pk_inferred_label = t!("describe_inferred", locale = locale).to_string();
+        let pk_column_labels = vec![pk_label, pk_columns_label, pk_inferred_label];
+        let mut pk_rows = Vec::new();
+
+        let fk_label = t!("describe_foreign_key", locale = locale).to_string();
+        let fk_columns_label = t!("describe_columns", locale = locale).to_string();
+        let fk_ref_table_label = t!("describe_referenced_table", locale = locale).to_string();
+        let fk_ref_columns_label = t!("describe_referenced_columns", locale = locale).to_string();
+        let fk_inferred_label = t!("describe_inferred", locale = locale).to_string();
+        let fk_column_labels = vec![
+            fk_label,
+            fk_columns_label,
+            fk_ref_table_label,
+            fk_ref_columns_label,
+            fk_inferred_label,
+        ];
+        let mut fk_rows = Vec::new();
+
         let mut table: Option<&Table> = None;
 
         if let Some(catalog) = metadata.current_catalog()
@@ -88,6 +109,39 @@ impl ShellCommand for Command {
                 ];
                 indexes_column_rows.push(row);
             }
+
+            let list_delimiter_fk = t!("list_delimiter", locale = locale);
+
+            if let Some(pk) = table.primary_key() {
+                let list_delimiter_pk = t!("list_delimiter", locale = locale);
+                let inferred = if pk.inferred() {
+                    t!("yes", locale = locale).to_string()
+                } else {
+                    t!("no", locale = locale).to_string()
+                };
+                let row = vec![
+                    Value::String(pk.name().to_string()),
+                    Value::String(pk.columns().join(&*list_delimiter_pk)),
+                    Value::String(inferred),
+                ];
+                pk_rows.push(row);
+            }
+
+            for fk in table.foreign_keys() {
+                let inferred = if fk.inferred() {
+                    t!("yes", locale = locale).to_string()
+                } else {
+                    t!("no", locale = locale).to_string()
+                };
+                let row = vec![
+                    Value::String(fk.name().to_string()),
+                    Value::String(fk.columns().join(&*list_delimiter_fk)),
+                    Value::String(fk.referenced_table().to_string()),
+                    Value::String(fk.referenced_columns().join(&*list_delimiter_fk)),
+                    Value::String(inferred),
+                ];
+                fk_rows.push(row);
+            }
         } else {
             return Err(InvalidOption {
                 command_name: self.name(locale).to_string(),
@@ -99,6 +153,10 @@ impl ShellCommand for Command {
         let mut table_results = Results::Query(Box::new(query_result));
         let query_result = MemoryQueryResult::new(indexes_column_labels, indexes_column_rows);
         let mut indexes_results = Results::Query(Box::new(query_result));
+        let query_result = MemoryQueryResult::new(pk_column_labels, pk_rows);
+        let mut pk_results = Results::Query(Box::new(query_result));
+        let query_result = MemoryQueryResult::new(fk_column_labels, fk_rows);
+        let mut fk_results = Results::Query(Box::new(query_result));
 
         let formatter_options = &mut configuration.get_formatter_options();
         let result_format = &configuration.results_format;
@@ -126,6 +184,20 @@ impl ShellCommand for Command {
             .format(formatter_options, &mut indexes_results, output)
             .await?;
 
+        let primary_keys_label = t!("describe_primary_keys", locale = locale).to_string();
+        writeln!(output)?;
+        writeln!(output, "{primary_keys_label}")?;
+        formatter
+            .format(formatter_options, &mut pk_results, output)
+            .await?;
+
+        let foreign_keys_label = t!("describe_foreign_keys", locale = locale).to_string();
+        writeln!(output)?;
+        writeln!(output, "{foreign_keys_label}")?;
+        formatter
+            .format(formatter_options, &mut fk_results, output)
+            .await?;
+
         formatter_options.header = header;
         formatter_options.footer = footer;
         Ok(LoopCondition::Continue)
@@ -141,7 +213,9 @@ mod tests {
     use indoc::indoc;
     use rsql_core::Configuration;
     use rsql_driver::Catalog;
-    use rsql_drivers::{Column, Index, Metadata, MockConnection, Schema, Table};
+    use rsql_drivers::{
+        Column, ForeignKey, Index, Metadata, MockConnection, PrimaryKey, Schema, Table,
+    };
     use rsql_formatters::FormatterManager;
     use rustyline::history::DefaultHistory;
     use std::default;
@@ -226,6 +300,14 @@ mod tests {
         table.add_column(Column::new("name", "TEXT", false, None));
         table.add_index(Index::new("users_id_idx", vec!["id"], true));
         table.add_index(Index::new("users_name_idx", vec!["name"], false));
+        table.set_primary_key(PrimaryKey::new("users_pkey", vec!["id"], false));
+        table.add_foreign_key(ForeignKey::new(
+            "fk_users_org",
+            vec!["org_id"],
+            "organizations",
+            vec!["id"],
+            false,
+        ));
         schema.add(table);
         catalog.add(schema);
         metadata.add(catalog);
@@ -260,6 +342,16 @@ mod tests {
              ----------------+---------+--------
               users_id_idx   | id      | Yes    
               users_name_idx | name    | No     
+             
+             Primary Key
+              Primary Key | Columns | Inferred 
+             -------------+---------+----------
+              users_pkey  | id      | No       
+             
+             Foreign Keys
+              Foreign Key  | Columns | Referenced Table | Referenced Columns | Inferred 
+             --------------+---------+------------------+--------------------+----------
+              fk_users_org | org_id  | organizations    | id                 | No       
         "};
         assert_eq!(contents, expected);
 

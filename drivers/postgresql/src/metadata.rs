@@ -1,5 +1,8 @@
 use indoc::indoc;
-use rsql_driver::{Catalog, Column, Connection, Index, Metadata, Result, Schema, Table, Value};
+use rsql_driver::{
+    Catalog, Column, Connection, ForeignKey, Index, Metadata, PrimaryKey, Result, Schema, Table,
+    Value,
+};
 
 /// Retrieves the metadata from the database.
 ///
@@ -26,7 +29,7 @@ async fn retrieve_catalogs(connection: &mut dyn Connection, metadata: &mut Metad
         ORDER BY
             catalog_name
     "};
-    let mut query_result = connection.query(sql).await?;
+    let mut query_result = connection.query(sql, &[]).await?;
 
     while let Some(row) = query_result.next().await {
         let catalog_name = match row.first() {
@@ -61,7 +64,7 @@ async fn retrieve_schemas(connection: &mut dyn Connection, catalog: &mut Catalog
         ORDER BY
             schema_name
     "};
-    let mut query_result = connection.query(sql).await?;
+    let mut query_result = connection.query(sql, &[]).await?;
 
     while let Some(row) = query_result.next().await {
         let schema_name = match row.first() {
@@ -77,6 +80,8 @@ async fn retrieve_schemas(connection: &mut dyn Connection, catalog: &mut Catalog
         if schema.current() {
             retrieve_tables(connection, &mut schema).await?;
             retrieve_indexes(connection, &mut schema).await?;
+            retrieve_primary_keys(connection, &mut schema).await?;
+            retrieve_foreign_keys(connection, &mut schema).await?;
         }
         catalog.add(schema);
     }
@@ -102,7 +107,7 @@ async fn retrieve_tables(connection: &mut dyn Connection, schema: &mut Schema) -
                 table_name,
                 ordinal_position
         "};
-    let mut query_result = connection.query(sql).await?;
+    let mut query_result = connection.query(sql, &[]).await?;
 
     while let Some(row) = query_result.next().await {
         let table_name = match row.first() {
@@ -175,7 +180,7 @@ async fn retrieve_indexes(connection: &mut dyn Connection, schema: &mut Schema) 
                 index_name,
                 array_position(ix.indkey, a.attnum)
         "};
-    let mut query_result = connection.query(sql).await?;
+    let mut query_result = connection.query(sql, &[]).await?;
 
     while let Some(row) = query_result.next().await {
         let table_name = match row.first() {
@@ -209,6 +214,125 @@ async fn retrieve_indexes(connection: &mut dyn Connection, schema: &mut Schema) 
     Ok(())
 }
 
+async fn retrieve_primary_keys(connection: &mut dyn Connection, schema: &mut Schema) -> Result<()> {
+    let sql = indoc! {r"
+            SELECT
+                kcu.table_name,
+                tc.constraint_name,
+                kcu.column_name
+            FROM
+                information_schema.table_constraints tc
+                JOIN information_schema.key_column_usage kcu
+                    ON tc.constraint_name = kcu.constraint_name
+                    AND tc.table_schema = kcu.table_schema
+            WHERE
+                tc.constraint_type = 'PRIMARY KEY'
+                AND tc.table_schema = current_schema()
+            ORDER BY
+                kcu.table_name,
+                tc.constraint_name,
+                kcu.ordinal_position
+        "};
+    let mut query_result = connection.query(sql, &[]).await?;
+
+    while let Some(row) = query_result.next().await {
+        let table_name = match row.first() {
+            Some(value) => value.to_string(),
+            None => continue,
+        };
+        let constraint_name = match row.get(1) {
+            Some(value) => value.to_string(),
+            None => continue,
+        };
+        let column_name = match row.get(2) {
+            Some(value) => value.to_string(),
+            None => continue,
+        };
+        let Some(table) = schema.get_mut(table_name) else {
+            continue;
+        };
+
+        if let Some(pk) = table.primary_key() {
+            // Multi-column PK: already captured by first row
+            let _ = pk;
+        } else {
+            let pk = PrimaryKey::new(constraint_name, vec![column_name], false);
+            table.set_primary_key(pk);
+        }
+    }
+
+    Ok(())
+}
+
+async fn retrieve_foreign_keys(connection: &mut dyn Connection, schema: &mut Schema) -> Result<()> {
+    let sql = indoc! {r"
+            SELECT
+                kcu.table_name,
+                tc.constraint_name,
+                kcu.column_name,
+                ccu.table_name AS referenced_table_name,
+                ccu.column_name AS referenced_column_name
+            FROM
+                information_schema.table_constraints tc
+                JOIN information_schema.key_column_usage kcu
+                    ON tc.constraint_name = kcu.constraint_name
+                    AND tc.table_schema = kcu.table_schema
+                JOIN information_schema.constraint_column_usage ccu
+                    ON ccu.constraint_name = tc.constraint_name
+                    AND ccu.table_schema = tc.table_schema
+            WHERE
+                tc.constraint_type = 'FOREIGN KEY'
+                AND tc.table_schema = current_schema()
+            ORDER BY
+                kcu.table_name,
+                tc.constraint_name,
+                kcu.ordinal_position
+        "};
+    let mut query_result = connection.query(sql, &[]).await?;
+
+    while let Some(row) = query_result.next().await {
+        let table_name = match row.first() {
+            Some(value) => value.to_string(),
+            None => continue,
+        };
+        let constraint_name = match row.get(1) {
+            Some(value) => value.to_string(),
+            None => continue,
+        };
+        let column_name = match row.get(2) {
+            Some(value) => value.to_string(),
+            None => continue,
+        };
+        let referenced_table = match row.get(3) {
+            Some(value) => value.to_string(),
+            None => continue,
+        };
+        let referenced_column = match row.get(4) {
+            Some(value) => value.to_string(),
+            None => continue,
+        };
+        let Some(table) = schema.get_mut(table_name) else {
+            continue;
+        };
+
+        if table.get_foreign_key(&constraint_name).is_some() {
+            // Multi-column FK: columns already captured by first row
+            continue;
+        }
+
+        let fk = ForeignKey::new(
+            constraint_name,
+            vec![column_name],
+            referenced_table,
+            vec![referenced_column],
+            false,
+        );
+        table.add_foreign_key(fk);
+    }
+
+    Ok(())
+}
+
 #[cfg(not(target_os = "windows"))]
 #[cfg(test)]
 mod test {
@@ -230,6 +354,7 @@ mod test {
                         email VARCHAR(20) NULL UNIQUE
                     )
                 ",
+                &[],
             )
             .await?;
         let _ = connection
@@ -240,10 +365,11 @@ mod test {
                         email VARCHAR(20) NULL UNIQUE
                     )
                 ",
+                &[],
             )
             .await?;
         let _ = connection
-            .execute("CREATE INDEX users_emails ON users (id, email)")
+            .execute("CREATE INDEX users_emails ON users (id, email)", &[])
             .await?;
 
         let metadata = connection.metadata().await?;
@@ -272,6 +398,10 @@ mod test {
         assert_eq!(primary_key_index.name(), "contacts_pkey");
         assert_eq!(primary_key_index.columns(), ["id"]);
         assert!(primary_key_index.unique());
+        let pk = contacts_table.primary_key().expect("primary key");
+        assert_eq!(pk.name(), "contacts_pkey");
+        assert_eq!(pk.columns(), &["id".to_string()]);
+        assert!(!pk.inferred());
         let email_index = contacts_table
             .get_index("contacts_email_key")
             .expect("index");
@@ -298,6 +428,10 @@ mod test {
         assert_eq!(primary_key_index.name(), "users_pkey");
         assert_eq!(primary_key_index.columns(), ["id"]);
         assert!(primary_key_index.unique());
+        let pk = users_table.primary_key().expect("primary key");
+        assert_eq!(pk.name(), "users_pkey");
+        assert_eq!(pk.columns(), &["id".to_string()]);
+        assert!(!pk.inferred());
         let email_index = users_table.get_index("users_email_key").expect("index");
         assert_eq!(email_index.name(), "users_email_key");
         assert_eq!(email_index.columns(), ["email"]);

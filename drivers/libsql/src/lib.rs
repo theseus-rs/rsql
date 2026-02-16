@@ -1,8 +1,5 @@
-#![forbid(unsafe_code)]
-#![forbid(clippy::allow_attributes)]
-#![deny(clippy::pedantic)]
-
 mod driver;
 mod metadata;
+mod results;
 
 pub use driver::Driver;

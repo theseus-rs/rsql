@@ -184,6 +184,7 @@ impl Default for CommandManager {
         commands.add(Box::new(crate::commands::echo::Command));
         commands.add(Box::new(crate::commands::exit::Command));
         commands.add(Box::new(crate::commands::footer::Command));
+        commands.add(Box::new(crate::commands::foreign::Command));
         commands.add(Box::new(crate::commands::format::Command));
         commands.add(Box::new(crate::commands::header::Command));
         commands.add(Box::new(crate::commands::help::Command));
@@ -192,6 +193,7 @@ impl Default for CommandManager {
         commands.add(Box::new(crate::commands::limit::Command));
         commands.add(Box::new(crate::commands::locale::Command));
         commands.add(Box::new(crate::commands::output::Command));
+        commands.add(Box::new(crate::commands::primary::Command));
         commands.add(Box::new(crate::commands::print::Command));
         commands.add(Box::new(crate::commands::quit::Command));
         commands.add(Box::new(crate::commands::read::Command));
@@ -277,6 +279,6 @@ mod tests {
     fn test_command_manager_default() {
         let command_manager = CommandManager::default();
 
-        assert_eq!(command_manager.commands.len(), 29);
+        assert_eq!(command_manager.commands.len(), 31);
     }
 }

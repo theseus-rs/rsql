@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use file_type::FileType;
 use rsql_driver::Error::InvalidUrl;
-use rsql_driver::{Metadata, QueryResult, Result};
+use rsql_driver::{Metadata, QueryResult, Result, ToSql};
 use rsql_driver_postgresql::Connection as PgConnection;
 use url::Url;
 
@@ -48,12 +48,12 @@ impl rsql_driver::Connection for Connection {
         &self.url
     }
 
-    async fn execute(&mut self, sql: &str) -> Result<u64> {
-        self.inner.execute(sql).await
+    async fn execute(&mut self, sql: &str, params: &[&dyn ToSql]) -> Result<u64> {
+        self.inner.execute(sql, params).await
     }
 
-    async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {
-        self.inner.query(sql).await
+    async fn query(&mut self, sql: &str, params: &[&dyn ToSql]) -> Result<Box<dyn QueryResult>> {
+        self.inner.query(sql, params).await
     }
 
     async fn close(&mut self) -> Result<()> {

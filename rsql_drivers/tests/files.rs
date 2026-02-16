@@ -1,12 +1,14 @@
+#[allow(unused_imports)]
 use indoc::indoc;
 use rsql_driver::{Driver, Result, Value};
+#[allow(unused_imports)]
 use rsql_driver_test_utils::dataset_url;
 use rsql_drivers::DriverManager;
 
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread")]
 async fn test_file_drivers() -> Result<()> {
     DriverManager::initialize()?;
-    let database_urls = vec![
+    let database_urls: Vec<(String, Option<&str>)> = vec![
         #[cfg(feature = "driver-arrow")]
         (dataset_url("file", "users.arrow"), None),
         #[cfg(feature = "driver-avro")]
@@ -42,12 +44,12 @@ async fn test_file_drivers() -> Result<()> {
         #[cfg(feature = "driver-xml")]
         (
             dataset_url("file", "users.xml"),
-            Some(indoc! {r"
+            Some(indoc! {r#"
                 WITH cte_user AS (
-                    SELECT unnest(data.user) FROM users
+                    SELECT unnest("data"."user") AS "user" FROM users
                 )
-                SELECT user.* FROM cte_user
-            "}),
+                SELECT "user".* FROM cte_user
+            "#}),
         ),
         #[cfg(feature = "driver-xz")]
         (dataset_url("file", "users.csv.xz"), None),
@@ -67,15 +69,15 @@ async fn test_file_driver(database_url: &str, sql: Option<&str>) -> Result<()> {
     let driver = rsql_driver_file::Driver;
     let mut connection = driver.connect(database_url).await?;
 
-    let mut query_result = connection.query(sql).await?;
+    let mut query_result = connection.query(sql, &[]).await?;
 
-    assert_eq!(query_result.columns().await, vec!["id", "name"]);
+    assert_eq!(query_result.columns(), vec!["id", "name"]);
     assert_eq!(
-        query_result.next().await,
+        query_result.next().await.cloned(),
         Some(vec![Value::I64(1), Value::String("John Doe".to_string())])
     );
     assert_eq!(
-        query_result.next().await,
+        query_result.next().await.cloned(),
         Some(vec![Value::I64(2), Value::String("Jane Smith".to_string())])
     );
     assert!(query_result.next().await.is_none());

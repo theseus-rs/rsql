@@ -1,18 +1,11 @@
 use crate::metadata;
 use async_trait::async_trait;
-use duckdb::Row;
-use duckdb::types::{TimeUnit, ValueRef};
 use file_type::FileType;
-use jiff::ToSpan;
-use jiff::civil::{Date, DateTime, Time};
-use rsql_driver::Error::{IoError, UnsupportedColumnType};
-use rsql_driver::{
-    MemoryQueryResult, Metadata, QueryResult, Result, StatementMetadata, UrlExtension, Value,
-};
+use rsql_driver::Error::IoError;
+use rsql_driver::{Metadata, QueryResult, Result, StatementMetadata, ToSql, UrlExtension, Value};
 use sqlparser::ast::Statement;
 use sqlparser::dialect::{Dialect, DuckDbDialect};
 use std::sync::{Arc, Mutex};
-use std::time::Duration;
 use url::Url;
 
 #[derive(Debug)]
@@ -63,18 +56,22 @@ impl rsql_driver::Connection for Connection {
         &self.url
     }
 
-    async fn execute(&mut self, sql: &str) -> Result<u64> {
+    async fn execute(&mut self, sql: &str, params: &[&dyn ToSql]) -> Result<u64> {
+        let values = rsql_driver::to_values(params);
+        let duckdb_params = to_duckdb_params(&values);
         let connection = match self.connection.lock() {
             Ok(connection) => connection,
             Err(error) => return Err(IoError(format!("Error: {error:?}"))),
         };
         let rows = connection
-            .execute(sql, [])
+            .execute(sql, duckdb::params_from_iter(duckdb_params.iter()))
             .map_err(|error| IoError(error.to_string()))?;
         Ok(rows as u64)
     }
 
-    async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {
+    async fn query(&mut self, sql: &str, params: &[&dyn ToSql]) -> Result<Box<dyn QueryResult>> {
+        let values = rsql_driver::to_values(params);
+        let duckdb_params = to_duckdb_params(&values);
         let connection = match self.connection.lock() {
             Ok(connection) => connection,
             Err(error) => return Err(IoError(format!("Error: {error:?}"))),
@@ -84,7 +81,7 @@ impl rsql_driver::Connection for Connection {
             .prepare(sql)
             .map_err(|error| IoError(error.to_string()))?;
         let mut query_rows = statement
-            .query([])
+            .query(duckdb::params_from_iter(duckdb_params.iter()))
             .map_err(|error| IoError(error.to_string()))?;
         let columns = query_rows.as_ref().expect("no rows").column_names();
         let mut rows = Vec::new();
@@ -95,13 +92,13 @@ impl rsql_driver::Connection for Connection {
             let mut row = Vec::new();
             for (index, _column_name) in columns.iter().enumerate() {
                 let column_name = columns.get(index).expect("no column");
-                let value = Self::convert_to_value(query_row, column_name, index)?;
+                let value = crate::results::convert_to_value(query_row, column_name, index)?;
                 row.push(value);
             }
             rows.push(row);
         }
 
-        let query_result = MemoryQueryResult::new(columns, rows);
+        let query_result = crate::results::DuckDbQueryResult::new(columns, rows);
         Ok(Box::new(query_result))
     }
 
@@ -130,77 +127,35 @@ impl rsql_driver::Connection for Connection {
     }
 }
 
-impl Connection {
-    fn convert_to_value(row: &Row, column_name: &String, column_index: usize) -> Result<Value> {
-        let value_ref = row
-            .get_ref(column_index)
-            .map_err(|error| IoError(error.to_string()))?;
-        let value = match value_ref {
-            ValueRef::Null => Value::Null,
-            ValueRef::Boolean(value) => Value::Bool(value),
-            ValueRef::TinyInt(value) => Value::I8(value),
-            ValueRef::SmallInt(value) => Value::I16(value),
-            ValueRef::Int(value) => Value::I32(value),
-            ValueRef::BigInt(value) => Value::I64(value),
-            ValueRef::HugeInt(value) => Value::I128(value),
-            ValueRef::UTinyInt(value) => Value::U8(value),
-            ValueRef::USmallInt(value) => Value::U16(value),
-            ValueRef::UInt(value) => Value::U32(value),
-            ValueRef::UBigInt(value) => Value::U64(value),
-            ValueRef::Float(value) => Value::F32(value),
-            ValueRef::Double(value) => Value::F64(value),
-            ValueRef::Decimal(value) => Value::String(value.to_string()),
-            ValueRef::Text(value) => {
-                let value = String::from_utf8(value.to_vec())?;
-                Value::String(value)
-            }
-            ValueRef::Blob(value) => Value::Bytes(value.to_vec()),
-            ValueRef::Date32(value) => {
-                let days = i64::from(value).days();
-                let start_date = Date::new(1970, 1, 1)?.checked_add(days)?;
-                Value::Date(start_date)
-            }
-            ValueRef::Time64(unit, value) => {
-                let start_time = Time::new(0, 0, 0, 0)?;
-                let duration = match unit {
-                    TimeUnit::Second => Duration::from_secs(u64::try_from(value)?),
-                    TimeUnit::Millisecond => Duration::from_millis(u64::try_from(value)?),
-                    TimeUnit::Microsecond => Duration::from_micros(u64::try_from(value)?),
-                    TimeUnit::Nanosecond => Duration::from_nanos(u64::try_from(value)?),
-                };
-                let time = start_time.checked_add(duration)?;
-                Value::Time(time)
-            }
-            ValueRef::Timestamp(unit, value) => {
-                let start_date = Date::new(1970, 1, 1)?;
-                let start_time = Time::new(0, 0, 0, 0)?;
-                let start_date_time = DateTime::from_parts(start_date, start_time);
-                let duration = match unit {
-                    TimeUnit::Second => Duration::from_secs(u64::try_from(value)?),
-                    TimeUnit::Millisecond => Duration::from_millis(u64::try_from(value)?),
-                    TimeUnit::Microsecond => Duration::from_micros(u64::try_from(value)?),
-                    TimeUnit::Nanosecond => Duration::from_nanos(u64::try_from(value)?),
-                };
-                let date_time = start_date_time.checked_add(duration)?;
-                Value::DateTime(date_time)
-            }
-            _ => {
-                let data_type = value_ref.data_type();
-                return Err(UnsupportedColumnType {
-                    column_name: column_name.to_string(),
-                    column_type: data_type.to_string(),
-                });
-            }
-        };
-
-        Ok(value)
-    }
+fn to_duckdb_params(values: &[Value]) -> Vec<duckdb::types::Value> {
+    values
+        .iter()
+        .map(|value| match value {
+            Value::Null => duckdb::types::Value::Null,
+            Value::Bool(v) => duckdb::types::Value::Boolean(*v),
+            Value::I8(v) => duckdb::types::Value::TinyInt(*v),
+            Value::I16(v) => duckdb::types::Value::SmallInt(*v),
+            Value::I32(v) => duckdb::types::Value::Int(*v),
+            Value::I64(v) => duckdb::types::Value::BigInt(*v),
+            Value::I128(v) => duckdb::types::Value::HugeInt(*v),
+            Value::U8(v) => duckdb::types::Value::UTinyInt(*v),
+            Value::U16(v) => duckdb::types::Value::USmallInt(*v),
+            Value::U32(v) => duckdb::types::Value::UInt(*v),
+            Value::U64(v) => duckdb::types::Value::UBigInt(*v),
+            Value::F32(v) => duckdb::types::Value::Float(*v),
+            Value::F64(v) => duckdb::types::Value::Double(*v),
+            Value::String(v) => duckdb::types::Value::Text(v.clone()),
+            Value::Bytes(v) => duckdb::types::Value::Blob(v.clone()),
+            _ => duckdb::types::Value::Text(value.to_string()),
+        })
+        .collect()
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
     use indoc::indoc;
+    use jiff::civil::DateTime;
     use rsql_driver::Driver;
     use rsql_driver_test_utils::dataset_url;
 
@@ -222,16 +177,16 @@ mod test {
         let mut connection = driver.connect(&database_url).await?;
 
         let mut query_result = connection
-            .query("SELECT id, name FROM users ORDER BY id")
+            .query("SELECT id, name FROM users ORDER BY id", &[])
             .await?;
 
-        assert_eq!(query_result.columns().await, vec!["id", "name"]);
+        assert_eq!(query_result.columns(), vec!["id", "name"]);
         assert_eq!(
-            query_result.next().await,
+            query_result.next().await.cloned(),
             Some(vec![Value::I64(1), Value::String("John Doe".to_string())])
         );
         assert_eq!(
-            query_result.next().await,
+            query_result.next().await.cloned(),
             Some(vec![Value::I64(2), Value::String("Jane Smith".to_string())])
         );
         assert!(query_result.next().await.is_none());
@@ -267,7 +222,7 @@ mod test {
                 timestamp_type TIMESTAMP
             )
         "};
-        let _ = connection.execute(sql).await?;
+        let _ = connection.execute(sql, &[]).await?;
 
         let sql = indoc! {r"
             INSERT INTO data_types (
@@ -284,7 +239,7 @@ mod test {
                  '2022-01-01', '14:30:00', '2022-01-01 14:30:00'
             )
         "};
-        let _ = connection.execute(sql).await?;
+        let _ = connection.execute(sql, &[]).await?;
 
         let sql = indoc! {r"
             SELECT varchar_type, blob_type, bool_type, bit_type,
@@ -294,7 +249,7 @@ mod test {
                    date_type, time_type, timestamp_type
               FROM data_types
         "};
-        let mut query_result = connection.query(sql).await?;
+        let mut query_result = connection.query(sql, &[]).await?;
 
         if let Some(row) = query_result.next().await {
             assert_eq!(
@@ -369,6 +324,47 @@ mod test {
             let statement_meta = connection.parse_sql(sql);
             assert!(matches!(statement_meta, StatementMetadata::DDL));
         }
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_execute_with_params() -> Result<()> {
+        let driver = crate::Driver;
+        let mut connection = driver.connect(DATABASE_URL).await?;
+
+        let _ = connection
+            .execute(
+                "CREATE TABLE test_params (id INTEGER, name VARCHAR, score DOUBLE)",
+                &[],
+            )
+            .await?;
+
+        let rows = connection
+            .execute(
+                "INSERT INTO test_params (id, name, score) VALUES (?, ?, ?)",
+                &[&1i32, &"Alice", &95.5f64],
+            )
+            .await?;
+        assert_eq!(rows, 1);
+
+        let mut query_result = connection
+            .query(
+                "SELECT id, name, score FROM test_params WHERE id = ?",
+                &[&1i32],
+            )
+            .await?;
+
+        assert_eq!(
+            query_result.next().await.cloned(),
+            Some(vec![
+                Value::I32(1),
+                Value::String("Alice".to_string()),
+                Value::F64(95.5),
+            ])
+        );
+        assert!(query_result.next().await.is_none());
+
+        connection.close().await?;
         Ok(())
     }
 }

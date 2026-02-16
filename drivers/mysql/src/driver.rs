@@ -1,13 +1,12 @@
 use crate::metadata;
+use crate::results::MySqlQueryResult;
 use async_trait::async_trait;
-use chrono::{Datelike, NaiveDate, NaiveDateTime, NaiveTime, Timelike};
 use file_type::FileType;
-use rsql_driver::Error::{InvalidUrl, IoError, UnsupportedColumnType};
-use rsql_driver::{MemoryQueryResult, Metadata, QueryResult, Result, Value};
+use rsql_driver::Error::{InvalidUrl, IoError};
+use rsql_driver::{Metadata, QueryResult, Result, ToSql, Value};
 use sqlparser::dialect::{Dialect, MySqlDialect};
-use sqlx::mysql::{MySqlColumn, MySqlConnectOptions, MySqlRow};
-use sqlx::types::time::OffsetDateTime;
-use sqlx::{Column, MySqlPool, Row};
+use sqlx::mysql::{MySqlArguments, MySqlConnectOptions};
+use sqlx::{Column, MySql, MySqlPool, Row};
 use std::str::FromStr;
 use std::string::ToString;
 use url::Url;
@@ -61,8 +60,13 @@ impl rsql_driver::Connection for Connection {
         &self.url
     }
 
-    async fn execute(&mut self, sql: &str) -> Result<u64> {
-        let rows = sqlx::query(sql)
+    async fn execute(&mut self, sql: &str, params: &[&dyn ToSql]) -> Result<u64> {
+        let values = rsql_driver::to_values(params);
+        let mut query = sqlx::query(sql);
+        for value in &values {
+            query = bind_mysql_value(query, value);
+        }
+        let rows = query
             .execute(&self.pool)
             .await
             .map_err(|error| IoError(error.to_string()))?
@@ -70,8 +74,13 @@ impl rsql_driver::Connection for Connection {
         Ok(rows)
     }
 
-    async fn query(&mut self, sql: &str) -> Result<Box<dyn QueryResult>> {
-        let query_rows = sqlx::query(sql)
+    async fn query(&mut self, sql: &str, params: &[&dyn ToSql]) -> Result<Box<dyn QueryResult>> {
+        let values = rsql_driver::to_values(params);
+        let mut query = sqlx::query(sql);
+        for value in &values {
+            query = bind_mysql_value(query, value);
+        }
+        let query_rows = query
             .fetch_all(&self.pool)
             .await
             .map_err(|error| IoError(error.to_string()))?;
@@ -85,17 +94,7 @@ impl rsql_driver::Connection for Connection {
             })
             .unwrap_or_default();
 
-        let mut rows = Vec::new();
-        for row in query_rows {
-            let mut row_data = Vec::new();
-            for column in row.columns() {
-                let value = Self::convert_to_value(&row, column)?;
-                row_data.push(value);
-            }
-            rows.push(row_data);
-        }
-
-        let query_result = MemoryQueryResult::new(columns, rows);
+        let query_result = MySqlQueryResult::new(columns, query_rows);
         Ok(Box::new(query_result))
     }
 
@@ -113,131 +112,25 @@ impl rsql_driver::Connection for Connection {
     }
 }
 
-impl Connection {
-    #[expect(clippy::too_many_lines)]
-    fn convert_to_value(row: &MySqlRow, column: &MySqlColumn) -> Result<Value> {
-        let column_name = column.name();
-
-        if let Ok(value) = row.try_get::<Option<String>, &str>(column_name) {
-            match value {
-                Some(v) => Ok(Value::String(v)),
-                None => Ok(Value::Null),
-            }
-        } else if let Ok(value) = row.try_get::<Option<Vec<u8>>, &str>(column_name) {
-            match value {
-                Some(v) => Ok(Value::Bytes(v)),
-                None => Ok(Value::Null),
-            }
-        } else if let Ok(value) = row.try_get::<Option<i16>, &str>(column_name) {
-            match value {
-                Some(v) => Ok(Value::I16(v)),
-                None => Ok(Value::Null),
-            }
-        } else if let Ok(value) = row.try_get::<Option<i32>, &str>(column_name) {
-            match value {
-                Some(v) => Ok(Value::I32(v)),
-                None => Ok(Value::Null),
-            }
-        } else if let Ok(value) = row.try_get::<Option<i64>, &str>(column_name) {
-            match value {
-                Some(v) => Ok(Value::I64(v)),
-                None => Ok(Value::Null),
-            }
-        } else if let Ok(value) = row.try_get::<Option<u64>, &str>(column_name) {
-            match value {
-                Some(v) => Ok(Value::U64(v)),
-                None => Ok(Value::Null),
-            }
-        } else if let Ok(value) = row.try_get::<Option<f32>, &str>(column_name) {
-            match value {
-                Some(v) => Ok(Value::F32(v)),
-                None => Ok(Value::Null),
-            }
-        } else if let Ok(value) = row.try_get::<Option<f64>, &str>(column_name) {
-            match value {
-                Some(v) => Ok(Value::F64(v)),
-                None => Ok(Value::Null),
-            }
-        } else if let Ok(value) = row.try_get::<Option<rust_decimal::Decimal>, &str>(column_name) {
-            match value {
-                Some(v) => Ok(Value::Decimal(v)),
-                None => Ok(Value::Null),
-            }
-        } else if let Ok(value) = row.try_get::<Option<bool>, &str>(column_name) {
-            match value {
-                Some(v) => Ok(Value::Bool(v)),
-                None => Ok(Value::Null),
-            }
-        } else if let Ok(value) = row.try_get::<Option<NaiveDate>, &str>(column_name) {
-            match value {
-                Some(v) => {
-                    let year = i16::try_from(v.year())?;
-                    let month = i8::try_from(v.month())?;
-                    let day = i8::try_from(v.day())?;
-                    let date = jiff::civil::date(year, month, day);
-                    Ok(Value::Date(date))
-                }
-                None => Ok(Value::Null),
-            }
-        } else if let Ok(value) = row.try_get::<Option<NaiveTime>, &str>(column_name) {
-            match value {
-                Some(v) => {
-                    let hour = i8::try_from(v.hour())?;
-                    let minute = i8::try_from(v.minute())?;
-                    let second = i8::try_from(v.second())?;
-                    let nanosecond = i32::try_from(v.nanosecond())?;
-                    let time = jiff::civil::time(hour, minute, second, nanosecond);
-                    Ok(Value::Time(time))
-                }
-                None => Ok(Value::Null),
-            }
-        } else if let Ok(value) = row.try_get::<Option<NaiveDateTime>, &str>(column_name) {
-            match value {
-                Some(v) => {
-                    let year = i16::try_from(v.year())?;
-                    let month = i8::try_from(v.month())?;
-                    let day = i8::try_from(v.day())?;
-                    let hour = i8::try_from(v.hour())?;
-                    let minute = i8::try_from(v.minute())?;
-                    let second = i8::try_from(v.second())?;
-                    let nanosecond = i32::try_from(v.nanosecond())?;
-                    let date_time =
-                        jiff::civil::datetime(year, month, day, hour, minute, second, nanosecond);
-                    Ok(Value::DateTime(date_time))
-                }
-                None => Ok(Value::Null),
-            }
-        } else if let Ok(value) = row.try_get::<Option<OffsetDateTime>, &str>(column_name) {
-            match value {
-                Some(v) => {
-                    let date = v.date();
-                    let time = v.time();
-                    let year = i16::try_from(date.year())?;
-                    let month: u8 = date.month().into();
-                    let month = i8::try_from(month)?;
-                    let day = i8::try_from(date.day())?;
-                    let hour = i8::try_from(time.hour())?;
-                    let minute = i8::try_from(time.minute())?;
-                    let second = i8::try_from(time.second())?;
-                    let nanosecond = i32::try_from(time.nanosecond())?;
-                    let date_time =
-                        jiff::civil::datetime(year, month, day, hour, minute, second, nanosecond);
-                    Ok(Value::DateTime(date_time))
-                }
-                None => Ok(Value::Null),
-            }
-        } else if let Ok(value) = row.try_get::<Option<serde_json::Value>, &str>(column_name) {
-            match value {
-                Some(v) => Ok(Value::from(v)),
-                None => Ok(Value::Null),
-            }
-        } else {
-            let column_type = column.type_info();
-            let type_name = format!("{column_type:?}");
-            Err(UnsupportedColumnType {
-                column_name: column_name.to_string(),
-                column_type: type_name,
-            })
-        }
+fn bind_mysql_value<'q>(
+    query: sqlx::query::Query<'q, MySql, MySqlArguments>,
+    value: &'q Value,
+) -> sqlx::query::Query<'q, MySql, MySqlArguments> {
+    match value {
+        Value::Null => query.bind(None::<String>),
+        Value::Bool(v) => query.bind(*v),
+        Value::I8(v) => query.bind(i16::from(*v)),
+        Value::I16(v) => query.bind(*v),
+        Value::I32(v) => query.bind(*v),
+        Value::I64(v) => query.bind(*v),
+        Value::U8(v) => query.bind(i16::from(*v)),
+        Value::U16(v) => query.bind(i32::from(*v)),
+        Value::U32(v) => query.bind(i64::from(*v)),
+        Value::U64(v) => query.bind(*v),
+        Value::F32(v) => query.bind(*v),
+        Value::F64(v) => query.bind(*v),
+        Value::String(v) => query.bind(v.as_str()),
+        Value::Bytes(v) => query.bind(v.as_slice()),
+        _ => query.bind(value.to_string()),
     }
 }

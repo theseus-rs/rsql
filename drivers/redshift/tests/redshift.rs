@@ -18,7 +18,7 @@ async fn test_redshift_driver() -> anyhow::Result<()> {
         .await?;
     assert_eq!(database_url, connection.url().as_str());
 
-    let mut query_result = connection.query("SELECT 'foo'::TEXT").await?;
+    let mut query_result = connection.query("SELECT 'foo'::TEXT", &[]).await?;
     let row = query_result.next().await.expect("no row");
     let value = row.first().expect("no value");
 

@@ -18,4 +18,4 @@ rsql_driver_excel = { path = "../excel", version = "0.19.3" }
 
 [dev-dependencies]
 rsql_driver_test_utils = { path = "../test_utils", version = "0.19.3" }
-tokio = { workspace = true, features = ["macros", "rt"] }
+tokio = { workspace = true, features = ["macros", "rt", "rt-multi-thread"] }

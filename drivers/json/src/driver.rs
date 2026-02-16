@@ -53,7 +53,7 @@ impl rsql_driver::Driver for Driver {
             .map_err(|error| IoError(error.to_string()))?;
 
         let table_name = rsql_driver_polars::get_table_name(file_name)?;
-        let mut context = SQLContext::new();
+        let context = SQLContext::new();
         context.register(table_name.as_str(), data_frame.lazy());
 
         let connection = Connection::new(url, context).await?;
@@ -75,7 +75,7 @@ mod test {
         dataset_url("json", "users.json")
     }
 
-    #[tokio::test]
+    #[tokio::test(flavor = "multi_thread")]
     async fn test_driver_connect() -> Result<()> {
         let database_url = database_url();
         let driver = crate::Driver;
@@ -85,23 +85,23 @@ mod test {
         Ok(())
     }
 
-    #[tokio::test]
+    #[tokio::test(flavor = "multi_thread")]
     async fn test_connection_interface() -> Result<()> {
         let database_url = database_url();
         let driver = crate::Driver;
         let mut connection = driver.connect(&database_url).await?;
 
         let mut query_result = connection
-            .query("SELECT id, name FROM users ORDER BY id")
+            .query("SELECT id, name FROM users ORDER BY id", &[])
             .await?;
 
-        assert_eq!(query_result.columns().await, vec!["id", "name"]);
+        assert_eq!(query_result.columns(), vec!["id", "name"]);
         assert_eq!(
-            query_result.next().await,
+            query_result.next().await.cloned(),
             Some(vec![Value::I64(1), Value::String("John Doe".to_string())])
         );
         assert_eq!(
-            query_result.next().await,
+            query_result.next().await.cloned(),
             Some(vec![Value::I64(2), Value::String("Jane Smith".to_string())])
         );
         assert!(query_result.next().await.is_none());

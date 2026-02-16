@@ -21,7 +21,7 @@ pub async fn format(
     let mut rows: u64 = 0;
 
     if let Query(query_result) = results {
-        if query_result.columns().await.is_empty() {
+        if query_result.columns().is_empty() {
             write_footer(options, results, 0, output).await?;
             return Ok(());
         }
@@ -29,7 +29,7 @@ pub async fn format(
         let mut builder = Builder::default();
 
         if options.header {
-            builder.push_record(query_result.columns().await);
+            builder.push_record(query_result.columns());
         }
 
         let cells;
@@ -65,8 +65,8 @@ async fn process_data(
     while let Some(row) = query_result.next().await {
         let mut row_data = Vec::new();
 
-        for (column, data) in row.into_iter().enumerate() {
-            let data = if data == Value::Null {
+        for (column, data) in row.iter().enumerate() {
+            let data = if *data == Value::Null {
                 "NULL".to_string()
             } else {
                 if data.is_numeric() {

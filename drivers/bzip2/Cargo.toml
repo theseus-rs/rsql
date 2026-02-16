@@ -22,4 +22,4 @@ url = { workspace = true }
 [dev-dependencies]
 rsql_driver_csv = { path = "../csv", version = "0.19.3" }
 rsql_driver_test_utils = { path = "../test_utils", version = "0.19.3" }
-tokio = { workspace = true, features = ["macros", "rt"] }
+tokio = { workspace = true, features = ["macros", "rt", "rt-multi-thread"] }

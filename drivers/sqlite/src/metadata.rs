@@ -1,5 +1,7 @@
 use indoc::indoc;
-use rsql_driver::{Catalog, Column, Connection, Index, Metadata, Result, Schema, Table};
+use rsql_driver::{
+    Catalog, Column, Connection, ForeignKey, Index, Metadata, PrimaryKey, Result, Schema, Table,
+};
 
 /// Retrieves the metadata from the database.
 ///
@@ -28,7 +30,7 @@ async fn retrieve_catalogs(connection: &mut dyn Connection, metadata: &mut Metad
 async fn retrieve_schemas(connection: &mut dyn Connection, catalog: &mut Catalog) -> Result<()> {
     let mut schemas = vec![];
     let sql = indoc! { "SELECT name FROM pragma_database_list ORDER BY name"};
-    let mut query_result = connection.query(sql).await?;
+    let mut query_result = connection.query(sql, &[]).await?;
 
     while let Some(row) = query_result.next().await {
         let database_name = match row.first() {
@@ -44,6 +46,8 @@ async fn retrieve_schemas(connection: &mut dyn Connection, catalog: &mut Catalog
         if schema.current() {
             retrieve_tables(connection, &mut schema).await?;
             retrieve_indexes(connection, &mut schema).await?;
+            retrieve_primary_keys(connection, &mut schema).await?;
+            retrieve_foreign_keys(connection, &mut schema).await?;
         }
         catalog.add(schema);
     }
@@ -69,7 +73,7 @@ async fn retrieve_tables(connection: &mut dyn Connection, schema: &mut Schema) -
                 p.cid,
                 column_name
         "#};
-    let mut query_result = connection.query(sql).await?;
+    let mut query_result = connection.query(sql, &[]).await?;
 
     while let Some(row) = query_result.next().await {
         let table_name = match row.first() {
@@ -134,7 +138,7 @@ async fn retrieve_indexes(connection: &mut dyn Connection, schema: &mut Schema) 
                 il.seq,
                 ii.seqno
         "};
-    let mut query_result = connection.query(sql).await?;
+    let mut query_result = connection.query(sql, &[]).await?;
 
     while let Some(row) = query_result.next().await {
         let table_name = match row.first() {
@@ -168,6 +172,91 @@ async fn retrieve_indexes(connection: &mut dyn Connection, schema: &mut Schema) 
     Ok(())
 }
 
+async fn retrieve_primary_keys(connection: &mut dyn Connection, schema: &mut Schema) -> Result<()> {
+    let table_names: Vec<String> = schema
+        .tables()
+        .iter()
+        .map(|t| t.name().to_string())
+        .collect();
+
+    for table_name in table_names {
+        let sql = format!(
+            "SELECT name, pk FROM pragma_table_info('{}') WHERE pk > 0 ORDER BY pk",
+            table_name.replace('\'', "''")
+        );
+        let mut query_result = connection.query(&sql, &[]).await?;
+        let mut pk_columns = Vec::new();
+
+        while let Some(row) = query_result.next().await {
+            let column_name = match row.first() {
+                Some(value) => value.to_string(),
+                None => continue,
+            };
+            pk_columns.push(column_name);
+        }
+
+        if !pk_columns.is_empty()
+            && let Some(table) = schema.get_mut(&table_name)
+        {
+            let pk_name = format!("{table_name}_pkey");
+            let pk = PrimaryKey::new(pk_name, pk_columns, false);
+            table.set_primary_key(pk);
+        }
+    }
+
+    Ok(())
+}
+
+async fn retrieve_foreign_keys(connection: &mut dyn Connection, schema: &mut Schema) -> Result<()> {
+    let table_names: Vec<String> = schema
+        .tables()
+        .iter()
+        .map(|t| t.name().to_string())
+        .collect();
+
+    for table_name in table_names {
+        let sql = format!(
+            "SELECT * FROM pragma_foreign_key_list('{}')",
+            table_name.replace('\'', "''")
+        );
+        let mut query_result = connection.query(&sql, &[]).await?;
+
+        while let Some(row) = query_result.next().await {
+            let id = match row.first() {
+                Some(value) => value.to_string(),
+                None => continue,
+            };
+            let referenced_table = match row.get(2) {
+                Some(value) => value.to_string(),
+                None => continue,
+            };
+            let from_column = match row.get(3) {
+                Some(value) => value.to_string(),
+                None => continue,
+            };
+            let to_column = match row.get(4) {
+                Some(value) => value.to_string(),
+                None => continue,
+            };
+
+            let fk_name = format!("{table_name}_{from_column}_fk_{id}");
+
+            if let Some(table) = schema.get_mut(&table_name) {
+                let fk = ForeignKey::new(
+                    fk_name,
+                    vec![from_column],
+                    referenced_table,
+                    vec![to_column],
+                    false,
+                );
+                table.add_foreign_key(fk);
+            }
+        }
+    }
+
+    Ok(())
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -188,6 +277,7 @@ mod test {
                         email VARCHAR(20) NULL UNIQUE
                     )
                 ",
+                &[],
             )
             .await?;
         let _ = connection
@@ -198,6 +288,7 @@ mod test {
                         email VARCHAR(20) NULL UNIQUE
                     )
                 ",
+                &[],
             )
             .await?;
 
@@ -229,6 +320,10 @@ mod test {
         assert_eq!(email_index.name(), "sqlite_autoindex_contacts_1");
         assert_eq!(email_index.columns(), ["email"]);
         assert!(email_index.unique());
+        let pk = contacts_table.primary_key().expect("primary key");
+        assert_eq!(pk.name(), "contacts_pkey");
+        assert_eq!(pk.columns(), &["id".to_string()]);
+        assert!(!pk.inferred());
 
         let users_table = schema.get("users").expect("users table");
         assert_eq!(users_table.name(), "users");
@@ -251,6 +346,10 @@ mod test {
         assert_eq!(email_index.name(), "sqlite_autoindex_users_1");
         assert_eq!(email_index.columns(), ["email"]);
         assert!(email_index.unique());
+        let pk = users_table.primary_key().expect("primary key");
+        assert_eq!(pk.name(), "users_pkey");
+        assert_eq!(pk.columns(), &["id".to_string()]);
+        assert!(!pk.inferred());
 
         connection.close().await?;
         Ok(())

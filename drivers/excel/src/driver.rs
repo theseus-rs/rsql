@@ -59,7 +59,7 @@ impl rsql_driver::Driver for Driver {
             .parse::<usize>()
             .map_err(|error| ConversionError(error.to_string()))?;
 
-        let mut context = SQLContext::new();
+        let context = SQLContext::new();
         #[cfg(target_family = "wasm")]
         let data = std::fs::read(&file_name)?;
         #[cfg(not(target_family = "wasm"))]

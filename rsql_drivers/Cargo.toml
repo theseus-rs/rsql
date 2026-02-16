@@ -61,8 +61,9 @@ getrandom = { workspace = true, features = ["wasm_js"] }
 
 [dev-dependencies]
 indoc = { workspace = true }
+rsql_driver_file = { path = "../drivers/file", version = "0.19.3" }
 rsql_driver_test_utils = { path = "../drivers/test_utils", version = "0.19.3" }
-tokio = { workspace = true, features = ["macros", "rt"] }
+tokio = { workspace = true, features = ["macros", "rt", "rt-multi-thread"] }
 
 [features]
 all = [
