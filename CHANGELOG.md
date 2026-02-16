@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## `rsql_cli` - [0.19.3](https://github.com/theseus-rs/rsql/compare/v0.19.2...v0.19.3) - 2025-09-02
+
+### Added
+- implement primary and foreign key constraint support
+
+### Other
+- update default postgresql embedded version to 18.2.0
+- update postgres driver to use jiff instead of chrono
+- update to rust 1.92.0
+- update demos
+
 ## `rsql_cli` - [0.19.2](https://github.com/theseus-rs/rsql/compare/v0.19.1...v0.19.2) - 2025-09-01
 
 ### Added

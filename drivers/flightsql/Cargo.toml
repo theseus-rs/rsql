@@ -17,7 +17,7 @@ async-trait = { workspace = true }
 file_type = { workspace = true }
 futures-util = { workspace = true }
 jiff = { workspace = true }
-rsql_driver = { path = "../../rsql_driver", version = "0.19.2" }
+rsql_driver = { path = "../../rsql_driver", version = "0.19.3" }
 tonic = { workspace = true }
 url = { workspace = true }
 
