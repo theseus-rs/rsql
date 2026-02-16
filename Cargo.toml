@@ -41,7 +41,7 @@ axoupdater = "0.9.1"
 aws-credential-types = { version = "1.2.12", features = ["hardcoded-credentials"] }
 aws-config = { version = "1.8.14", features = ["behavior-version-latest"] }
 # Required for cross builds: https://aws.github.io/aws-lc-rs/platform_support.html
-aws-lc-rs = { version = "1.15.4", features = ["bindgen"] }
+aws-lc-rs = { version = "1.13.1", features = ["bindgen"] }
 aws-sdk-dynamodb = { version = "1.105.0", features = ["behavior-version-latest"] }
 aws-sdk-s3 = { version = "1.123.0", features = ["behavior-version-latest"] }
 base64 = "0.22.1"
