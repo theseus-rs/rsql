@@ -239,11 +239,8 @@ async fn retrieve_primary_keys(connection: &mut dyn Connection, schema: &mut Sch
         .collect();
 
     for table_name in table_names {
-        let sql = format!(
-            "SELECT name, pk FROM pragma_table_info('{}') WHERE pk > 0 ORDER BY pk",
-            table_name.replace('\'', "''")
-        );
-        let mut query_result = connection.query(&sql, &[]).await?;
+        let sql = "SELECT name, pk FROM pragma_table_info(?) WHERE pk > 0 ORDER BY pk";
+        let mut query_result = connection.query(sql, &[&table_name]).await?;
         let mut pk_columns = Vec::new();
 
         while let Some(row) = query_result.next().await {
@@ -274,11 +271,8 @@ async fn retrieve_foreign_keys(connection: &mut dyn Connection, schema: &mut Sch
         .collect();
 
     for table_name in table_names {
-        let sql = format!(
-            "SELECT * FROM pragma_foreign_key_list('{}')",
-            table_name.replace('\'', "''")
-        );
-        let mut query_result = connection.query(&sql, &[]).await?;
+        let sql = "SELECT * FROM pragma_foreign_key_list(?)";
+        let mut query_result = connection.query(sql, &[&table_name]).await?;
 
         while let Some(row) = query_result.next().await {
             let id = match row.first() {
