@@ -44,12 +44,10 @@ async fn get_schemas(connection: &mut dyn Connection, database_name: &str) -> Re
 }
 
 async fn get_views(connection: &mut dyn Connection, database_name: &str) -> Result<Vec<View>> {
-    let query = format!(
-        "SELECT name FROM system.tables WHERE database = '{}' AND engine = 'View' ORDER BY name",
-        database_name.replace("'", "''")
-    );
+    let query =
+        "SELECT name FROM system.tables WHERE database = ? AND engine = 'View' ORDER BY name";
 
-    let mut result = connection.query(&query, &[]).await?;
+    let mut result = connection.query(query, &[&database_name]).await?;
     let mut views = Vec::new();
 
     while let Some(row) = result.next().await {
@@ -67,12 +65,12 @@ async fn get_views(connection: &mut dyn Connection, database_name: &str) -> Resu
 }
 
 async fn get_tables(connection: &mut dyn Connection, database_name: &str) -> Result<Vec<Table>> {
-    let query = format!(
-        "SELECT name, engine FROM system.tables WHERE database = '{}' ORDER BY name",
-        database_name.replace("'", "''")
-    );
+    let query = "SELECT name, engine \
+        FROM system.tables \
+        WHERE database = ? \
+        ORDER BY name";
 
-    let mut result = connection.query(&query, &[]).await?;
+    let mut result = connection.query(query, &[&database_name]).await?;
     let mut tables = Vec::new();
 
     while let Some(row) = result.next().await {
@@ -103,16 +101,14 @@ async fn get_columns(
     database_name: &str,
     table_name: &str,
 ) -> Result<Vec<Column>> {
-    let query = format!(
-        "SELECT name, type, default_kind, default_expression, is_in_primary_key
-         FROM system.columns
-         WHERE database = '{}' AND table = '{}'
-         ORDER BY position",
-        database_name.replace("'", "''"),
-        table_name.replace("'", "''")
-    );
+    let query = "SELECT name, type, default_kind, default_expression, is_in_primary_key \
+         FROM system.columns \
+         WHERE database = ? AND table = ? \
+         ORDER BY position";
 
-    let mut result = connection.query(&query, &[]).await?;
+    let mut result = connection
+        .query(query, &[&database_name, &table_name])
+        .await?;
     let mut columns = Vec::new();
 
     while let Some(row) = result.next().await {
@@ -155,14 +151,12 @@ async fn get_primary_key(
     database_name: &str,
     table_name: &str,
 ) -> Result<Index> {
-    let query = format!(
-        "SELECT primary_key FROM system.tables
-         WHERE database = '{}' AND name = '{}'",
-        database_name.replace("'", "''"),
-        table_name.replace("'", "''")
-    );
+    let query = "SELECT primary_key FROM system.tables \
+         WHERE database = ? AND name = ?";
 
-    let mut result = connection.query(&query, &[]).await?;
+    let mut result = connection
+        .query(query, &[&database_name, &table_name])
+        .await?;
     let primary_key_expr = if let Some(row) = result.next().await {
         match row.first() {
             Some(Value::String(expr)) => expr.clone(),
@@ -185,14 +179,12 @@ async fn get_primary_key_metadata(
     database_name: &str,
     table_name: &str,
 ) -> Result<Option<PrimaryKey>> {
-    let query = format!(
-        "SELECT primary_key FROM system.tables
-         WHERE database = '{}' AND name = '{}'",
-        database_name.replace("'", "''"),
-        table_name.replace("'", "''")
-    );
+    let query = "SELECT primary_key FROM system.tables \
+         WHERE database = ? AND name = ?";
 
-    let mut result = connection.query(&query, &[]).await?;
+    let mut result = connection
+        .query(query, &[&database_name, &table_name])
+        .await?;
     let primary_key_expr = if let Some(row) = result.next().await {
         match row.first() {
             Some(Value::String(expr)) => expr.clone(),
@@ -220,13 +212,11 @@ async fn get_data_skipping_indexes(
     database_name: &str,
     table_name: &str,
 ) -> Result<Vec<Index>> {
-    let query = format!(
-        "SELECT name, expr, type FROM system.data_skipping_indices
-         WHERE database = '{}' AND table = '{}'",
-        database_name.replace("'", "''"),
-        table_name.replace("'", "''")
-    );
-    let mut result = connection.query(&query, &[]).await?;
+    let query = "SELECT name, expr, type FROM system.data_skipping_indices \
+         WHERE database = ? AND table = ?";
+    let mut result = connection
+        .query(query, &[&database_name, &table_name])
+        .await?;
     let mut indexes = Vec::new();
 
     while let Some(row) = result.next().await {

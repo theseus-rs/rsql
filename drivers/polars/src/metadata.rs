@@ -48,8 +48,9 @@ async fn retrieve_tables(connection: &mut PolarsConnection, schema: &mut Schema)
     let table_names = context.get_tables();
 
     for table_name in table_names {
+        let safe_table_name = table_name.replace('"', "\"\"");
         let lazy_frame = context
-            .execute(&format!("SELECT * FROM \"{table_name}\" LIMIT 0"))
+            .execute(&format!("SELECT * FROM \"{safe_table_name}\" LIMIT 0"))
             .map_err(|error| IoError(error.to_string()))?;
         let data_frame = lazy_frame
             .collect()

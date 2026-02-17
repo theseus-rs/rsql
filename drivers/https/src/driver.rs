@@ -183,6 +183,10 @@ async fn create_header_tables(
 }
 
 fn create_table_sql(table_name: &str, headers: &HashMap<String, String>) -> String {
+    let safe_table_name: String = table_name
+        .chars()
+        .filter(|c| c.is_alphanumeric() || *c == '_')
+        .collect();
     let columns = headers
         .iter()
         .map(|(key, value)| {
@@ -192,5 +196,5 @@ fn create_table_sql(table_name: &str, headers: &HashMap<String, String>) -> Stri
         })
         .collect::<Vec<String>>()
         .join(" UNION ");
-    format!("CREATE TABLE {table_name} AS {columns}")
+    format!("CREATE TABLE \"{safe_table_name}\" AS {columns}")
 }
