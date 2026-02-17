@@ -1,5 +1,5 @@
 use rsql_driver::{
-    Catalog, Column, Connection, Index, Metadata, PrimaryKey, Result, Schema, Table, Value,
+    Catalog, Column, Connection, Index, Metadata, PrimaryKey, Result, Schema, Table, Value, View,
 };
 
 pub async fn get_metadata(connection: &mut dyn Connection) -> Result<Metadata> {
@@ -32,11 +32,38 @@ async fn get_catalogs(connection: &mut dyn Connection) -> Result<Vec<Catalog>> {
 
 async fn get_schemas(connection: &mut dyn Connection, database_name: &str) -> Result<Vec<Schema>> {
     let tables = get_tables(connection, database_name).await?;
+    let views = get_views(connection, database_name).await?;
     let mut schema = Schema::new("default", true);
     for table in tables {
         schema.add(table);
     }
+    for view in views {
+        schema.add_view(view);
+    }
     Ok(vec![schema])
+}
+
+async fn get_views(connection: &mut dyn Connection, database_name: &str) -> Result<Vec<View>> {
+    let query = format!(
+        "SELECT name FROM system.tables WHERE database = '{}' AND engine = 'View' ORDER BY name",
+        database_name.replace("'", "''")
+    );
+
+    let mut result = connection.query(&query, &[]).await?;
+    let mut views = Vec::new();
+
+    while let Some(row) = result.next().await {
+        if let Some(Value::String(name)) = row.first() {
+            let columns = get_columns(connection, database_name, name).await?;
+            let mut view = View::new(name);
+            for column in columns {
+                view.add_column(column);
+            }
+            views.push(view);
+        }
+    }
+
+    Ok(views)
 }
 
 async fn get_tables(connection: &mut dyn Connection, database_name: &str) -> Result<Vec<Table>> {

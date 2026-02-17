@@ -90,7 +90,6 @@ mod tests {
     use rsql_drivers::MockConnection;
     use rsql_formatters::FormatterManager;
     use rustyline::history::{DefaultHistory, History};
-    use std::default;
     use std::default::Default;
 
     #[test]
@@ -171,7 +170,7 @@ mod tests {
     async fn test_execute_set_on() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
             history: false,
-            ..default::Default::default()
+            ..Default::default()
         };
         let options = CommandOptions {
             configuration,
@@ -194,7 +193,7 @@ mod tests {
     async fn test_execute_set_off() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
             history: true,
-            ..default::Default::default()
+            ..Default::default()
         };
         let options = CommandOptions {
             configuration,

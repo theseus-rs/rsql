@@ -29,7 +29,7 @@ Exit the CLI:
 
 ### Related
 
-- See also: [exit](../exit/index.md) for exiting with a status code.
+- [exit](../exit/index.md) for exiting with a status code
 
 ### Demonstration
 

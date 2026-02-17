@@ -23,7 +23,7 @@ pub use connection::{
 pub use driver::{Driver, MockDriver};
 pub use driver_manager::DriverManager;
 pub use error::{Error, Result};
-pub use metadata::{Catalog, Column, ForeignKey, Index, Metadata, PrimaryKey, Schema, Table};
+pub use metadata::{Catalog, Column, ForeignKey, Index, Metadata, PrimaryKey, Schema, Table, View};
 pub use to_sql::{ToSql, to_values};
 pub use url::UrlExtension;
 pub use value::Value;

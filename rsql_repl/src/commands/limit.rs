@@ -51,7 +51,6 @@ mod tests {
     use rsql_drivers::MockConnection;
     use rsql_formatters::FormatterManager;
     use rustyline::history::DefaultHistory;
-    use std::default;
 
     #[test]
     fn test_name() {
@@ -76,7 +75,7 @@ mod tests {
         let mut output = Output::default();
         let configuration = &mut Configuration {
             results_limit: 1234,
-            ..default::Default::default()
+            ..Default::default()
         };
         let options = CommandOptions {
             configuration,
@@ -100,7 +99,7 @@ mod tests {
     async fn test_execute_limit_500_millis() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
             results_limit: 0,
-            ..default::Default::default()
+            ..Default::default()
         };
         let options = CommandOptions {
             configuration,

@@ -31,8 +31,6 @@ impl ToggleShellCommand for Command {
 
 #[cfg(test)]
 mod tests {
-    use std::default;
-
     use crate::commands::{CommandManager, CommandOptions, LoopCondition, ShellCommand};
     use crate::writers::Output;
     use rsql_core::Configuration;
@@ -64,7 +62,7 @@ mod tests {
         let mut output = Output::default();
         let configuration = &mut Configuration {
             bail_on_error: bail,
-            ..default::Default::default()
+            ..Default::default()
         };
         let options = CommandOptions {
             configuration,
@@ -103,7 +101,7 @@ mod tests {
     async fn test_execute_set_on() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
             bail_on_error: false,
-            ..default::Default::default()
+            ..Default::default()
         };
         let options = CommandOptions {
             configuration,
@@ -126,7 +124,7 @@ mod tests {
     async fn test_execute_set_off() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
             bail_on_error: true,
-            ..default::Default::default()
+            ..Default::default()
         };
         let options = CommandOptions {
             configuration,

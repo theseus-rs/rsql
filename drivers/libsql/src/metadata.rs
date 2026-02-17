@@ -1,6 +1,7 @@
 use indoc::indoc;
 use rsql_driver::{
     Catalog, Column, Connection, ForeignKey, Index, Metadata, PrimaryKey, Result, Schema, Table,
+    View,
 };
 
 pub(crate) async fn get_metadata(connection: &mut dyn Connection) -> Result<Metadata> {
@@ -41,11 +42,73 @@ async fn retrieve_schemas(connection: &mut dyn Connection, catalog: &mut Catalog
     for mut schema in schemas {
         if schema.current() {
             retrieve_tables(connection, &mut schema).await?;
+            retrieve_views(connection, &mut schema).await?;
             retrieve_indexes(connection, &mut schema).await?;
             retrieve_primary_keys(connection, &mut schema).await?;
             retrieve_foreign_keys(connection, &mut schema).await?;
         }
         catalog.add(schema);
+    }
+
+    Ok(())
+}
+
+async fn retrieve_views(connection: &mut dyn Connection, schema: &mut Schema) -> Result<()> {
+    let sql = indoc! { r#"
+            SELECT
+                m.name AS view_name,
+                p.name AS column_name,
+                p.type AS column_type,
+                p."notnull" AS not_null,
+                p.dflt_value AS default_value
+            FROM
+                sqlite_master m
+                LEFT OUTER JOIN pragma_table_info((m.name)) p ON m.name <> p.name
+            WHERE
+                m.type = 'view'
+            ORDER BY
+                view_name,
+                p.cid,
+                column_name
+        "#};
+    let mut query_result = connection.query(sql, &[]).await?;
+
+    while let Some(row) = query_result.next().await {
+        let view_name = match row.first() {
+            Some(value) => value.to_string(),
+            None => continue,
+        };
+        let column_name = match row.get(1) {
+            Some(value) => value.to_string(),
+            None => continue,
+        };
+        let column_type = match row.get(2) {
+            Some(value) => value.to_string(),
+            None => continue,
+        };
+        let not_null = match row.get(3) {
+            Some(value) => value.to_string() == "1",
+            None => continue,
+        };
+        let default_value = match row.get(4) {
+            Some(value) => {
+                if value.is_null() {
+                    None
+                } else {
+                    Some(value.to_string())
+                }
+            }
+            None => continue,
+        };
+
+        let column = Column::new(column_name, column_type, not_null, default_value);
+        if let Some(view) = schema.get_view_mut(&view_name) {
+            view.add_column(column);
+        } else {
+            let mut view = View::new(view_name);
+            view.add_column(column);
+            schema.add_view(view);
+        }
     }
 
     Ok(())

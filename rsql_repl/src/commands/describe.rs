@@ -1,7 +1,7 @@
 use crate::commands::Error::{InvalidOption, MissingArguments};
 use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use async_trait::async_trait;
-use rsql_drivers::{MemoryQueryResult, Table, Value};
+use rsql_drivers::{MemoryQueryResult, Table, Value, View};
 use rsql_formatters::Results;
 use rust_i18n::t;
 
@@ -36,7 +36,7 @@ impl ShellCommand for Command {
         }
 
         let metadata = options.connection.metadata().await?;
-        let table_name = &options.input[1];
+        let object_name = &options.input[1];
 
         let column_label = t!("describe_column", locale = locale).to_string();
         let type_label = t!("describe_type", locale = locale).to_string();
@@ -72,29 +72,48 @@ impl ShellCommand for Command {
         let mut fk_rows = Vec::new();
 
         let mut table: Option<&Table> = None;
+        let mut view: Option<&View> = None;
 
         if let Some(catalog) = metadata.current_catalog()
             && let Some(schema) = catalog.current_schema()
         {
-            table = schema.get(table_name);
+            table = schema.get(object_name);
+            if table.is_none() {
+                view = schema.get_view(object_name);
+            }
         }
 
-        if let Some(table) = table {
-            for column in table.columns() {
-                let nullable = if column.not_null() {
-                    t!("no", locale = locale).to_string()
-                } else {
-                    t!("yes", locale = locale).to_string()
-                };
-                let row = vec![
-                    Value::String(column.name().to_string()),
-                    Value::String(column.data_type().to_string()),
-                    Value::String(nullable),
-                    Value::String(column.default().unwrap_or("").to_string()),
-                ];
-                table_column_rows.push(row);
-            }
+        let is_view = view.is_some();
 
+        // Collect columns from either a table or a view
+        let columns_iter: Vec<&rsql_drivers::Column> = if let Some(table) = table {
+            table.columns()
+        } else if let Some(view) = view {
+            view.columns()
+        } else {
+            return Err(InvalidOption {
+                command_name: self.name(locale).to_string(),
+                option: object_name.to_string(),
+            });
+        };
+
+        for column in columns_iter {
+            let nullable = if column.not_null() {
+                t!("no", locale = locale).to_string()
+            } else {
+                t!("yes", locale = locale).to_string()
+            };
+            let row = vec![
+                Value::String(column.name().to_string()),
+                Value::String(column.data_type().to_string()),
+                Value::String(nullable),
+                Value::String(column.default().unwrap_or("").to_string()),
+            ];
+            table_column_rows.push(row);
+        }
+
+        // Only collect indexes, primary keys, and foreign keys for tables (not views)
+        if let Some(table) = table {
             let list_delimiter = t!("list_delimiter", locale = locale);
             for index in table.indexes() {
                 let unique = if index.unique() {
@@ -142,21 +161,10 @@ impl ShellCommand for Command {
                 ];
                 fk_rows.push(row);
             }
-        } else {
-            return Err(InvalidOption {
-                command_name: self.name(locale).to_string(),
-                option: table_name.to_string(),
-            });
         }
 
         let query_result = MemoryQueryResult::new(table_column_labels, table_column_rows);
         let mut table_results = Results::Query(Box::new(query_result));
-        let query_result = MemoryQueryResult::new(indexes_column_labels, indexes_column_rows);
-        let mut indexes_results = Results::Query(Box::new(query_result));
-        let query_result = MemoryQueryResult::new(pk_column_labels, pk_rows);
-        let mut pk_results = Results::Query(Box::new(query_result));
-        let query_result = MemoryQueryResult::new(fk_column_labels, fk_rows);
-        let mut fk_results = Results::Query(Box::new(query_result));
 
         let formatter_options = &mut configuration.get_formatter_options();
         let result_format = &configuration.results_format;
@@ -177,26 +185,35 @@ impl ShellCommand for Command {
             .format(formatter_options, &mut table_results, output)
             .await?;
 
-        let indexes_label = t!("describe_indexes", locale = locale).to_string();
-        writeln!(output)?;
-        writeln!(output, "{indexes_label}")?;
-        formatter
-            .format(formatter_options, &mut indexes_results, output)
-            .await?;
+        if !is_view {
+            let query_result = MemoryQueryResult::new(indexes_column_labels, indexes_column_rows);
+            let mut indexes_results = Results::Query(Box::new(query_result));
+            let query_result = MemoryQueryResult::new(pk_column_labels, pk_rows);
+            let mut pk_results = Results::Query(Box::new(query_result));
+            let query_result = MemoryQueryResult::new(fk_column_labels, fk_rows);
+            let mut fk_results = Results::Query(Box::new(query_result));
 
-        let primary_keys_label = t!("describe_primary_keys", locale = locale).to_string();
-        writeln!(output)?;
-        writeln!(output, "{primary_keys_label}")?;
-        formatter
-            .format(formatter_options, &mut pk_results, output)
-            .await?;
+            let indexes_label = t!("describe_indexes", locale = locale).to_string();
+            writeln!(output)?;
+            writeln!(output, "{indexes_label}")?;
+            formatter
+                .format(formatter_options, &mut indexes_results, output)
+                .await?;
 
-        let foreign_keys_label = t!("describe_foreign_keys", locale = locale).to_string();
-        writeln!(output)?;
-        writeln!(output, "{foreign_keys_label}")?;
-        formatter
-            .format(formatter_options, &mut fk_results, output)
-            .await?;
+            let primary_keys_label = t!("describe_primary_keys", locale = locale).to_string();
+            writeln!(output)?;
+            writeln!(output, "{primary_keys_label}")?;
+            formatter
+                .format(formatter_options, &mut pk_results, output)
+                .await?;
+
+            let foreign_keys_label = t!("describe_foreign_keys", locale = locale).to_string();
+            writeln!(output)?;
+            writeln!(output, "{foreign_keys_label}")?;
+            formatter
+                .format(formatter_options, &mut fk_results, output)
+                .await?;
+        }
 
         formatter_options.header = header;
         formatter_options.footer = footer;
@@ -214,11 +231,10 @@ mod tests {
     use rsql_core::Configuration;
     use rsql_driver::Catalog;
     use rsql_drivers::{
-        Column, ForeignKey, Index, Metadata, MockConnection, PrimaryKey, Schema, Table,
+        Column, ForeignKey, Index, Metadata, MockConnection, PrimaryKey, Schema, Table, View,
     };
     use rsql_formatters::FormatterManager;
     use rustyline::history::DefaultHistory;
-    use std::default;
 
     #[test]
     fn test_name() {
@@ -229,13 +245,13 @@ mod tests {
     #[test]
     fn test_args() {
         let args = Command.args("en");
-        assert_eq!(args, "[table]");
+        assert_eq!(args, "[table|view]");
     }
 
     #[test]
     fn test_description() {
         let description = Command.description("en");
-        assert_eq!(description, "Describe a table in the schema");
+        assert_eq!(description, "Describe a table or view in the schema");
     }
 
     #[tokio::test]
@@ -289,7 +305,7 @@ mod tests {
         let configuration = &mut Configuration {
             color: false,
             results_format: "psql".to_string(),
-            ..default::Default::default()
+            ..Default::default()
         };
         let mut metadata = Metadata::default();
         let mut catalog = Catalog::new("default", true);
@@ -352,6 +368,54 @@ mod tests {
               Foreign Key  | Columns | Referenced Table | Referenced Columns | Inferred 
              --------------+---------+------------------+--------------------+----------
               fk_users_org | org_id  | organizations    | id                 | No       
+        "};
+        assert_eq!(contents, expected);
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_execute_view() -> anyhow::Result<()> {
+        let configuration = &mut Configuration {
+            color: false,
+            results_format: "psql".to_string(),
+            ..Default::default()
+        };
+        let mut metadata = Metadata::default();
+        let mut catalog = Catalog::new("default", true);
+        let mut schema = Schema::new("default", true);
+        let view_name = "active_users";
+        let mut view = View::new(view_name);
+        view.add_column(Column::new("id", "INTEGER", true, None));
+        view.add_column(Column::new("name", "TEXT", false, None));
+        schema.add_view(view);
+        catalog.add(schema);
+        metadata.add(catalog);
+
+        let mock_connection = &mut MockConnection::new();
+        mock_connection
+            .expect_metadata()
+            .returning(move || Ok(metadata.clone()));
+        let mut output = Output::default();
+        let options = CommandOptions {
+            configuration,
+            command_manager: &CommandManager::default(),
+            formatter_manager: &FormatterManager::default(),
+            connection: mock_connection,
+            history: &DefaultHistory::new(),
+            input: vec![".describe".to_string(), view_name.to_string()],
+            output: &mut output,
+        };
+
+        let result = Command.execute(options).await?;
+
+        assert_eq!(result, LoopCondition::Continue);
+        let contents = output.to_string().replace("\r\n", "\n");
+        let expected = indoc! {r"
+              Column |  Type   | Not null | Default 
+             --------+---------+----------+---------
+              id     | INTEGER | No       |         
+              name   | TEXT    | Yes      |         
         "};
         assert_eq!(contents, expected);
 
