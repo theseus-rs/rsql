@@ -7,6 +7,83 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## `rsql_cli` - [0.19.4](https://github.com/theseus-rs/rsql/compare/v0.19.3...v0.19.4) - 2026-02-17
+
+### Added
+- add views command
+
+### Fixed
+- update drivers to use bind variables for internal queries
+
+## `rsql_repl` - [0.19.4](https://github.com/theseus-rs/rsql/compare/rsql_repl-v0.19.3...rsql_repl-v0.19.4) - 2026-02-17
+
+### Added
+- add views command
+
+## `rsql_drivers` - [0.19.4](https://github.com/theseus-rs/rsql/compare/rsql_drivers-v0.19.3...rsql_drivers-v0.19.4) - 2026-02-17
+
+### Added
+- add views command
+
+## `rsql_driver_sqlserver` - [0.19.4](https://github.com/theseus-rs/rsql/compare/rsql_driver_sqlserver-v0.19.3...rsql_driver_sqlserver-v0.19.4) - 2026-02-17
+
+### Added
+- add views command
+
+## `rsql_driver_sqlite` - [0.19.4](https://github.com/theseus-rs/rsql/compare/rsql_driver_sqlite-v0.19.3...rsql_driver_sqlite-v0.19.4) - 2026-02-17
+
+### Added
+- add views command
+
+### Fixed
+- update drivers to use bind variables for internal queries
+
+## `rsql_driver_mysql` - [0.19.4](https://github.com/theseus-rs/rsql/compare/rsql_driver_mysql-v0.19.3...rsql_driver_mysql-v0.19.4) - 2026-02-17
+
+### Added
+- add views command
+
+## `rsql_driver_libsql` - [0.19.4](https://github.com/theseus-rs/rsql/compare/rsql_driver_libsql-v0.19.3...rsql_driver_libsql-v0.19.4) - 2026-02-17
+
+### Added
+- add views command
+
+### Fixed
+- update drivers to use bind variables for internal queries
+
+## `rsql_driver_https` - [0.19.4](https://github.com/theseus-rs/rsql/compare/rsql_driver_https-v0.19.3...rsql_driver_https-v0.19.4) - 2026-02-17
+
+### Fixed
+- update drivers to use bind variables for internal queries
+
+## `rsql_driver_duckdb` - [0.19.4](https://github.com/theseus-rs/rsql/compare/rsql_driver_duckdb-v0.19.3...rsql_driver_duckdb-v0.19.4) - 2026-02-17
+
+### Added
+- add views command
+
+## `rsql_driver_postgresql` - [0.19.4](https://github.com/theseus-rs/rsql/compare/rsql_driver_postgresql-v0.19.3...rsql_driver_postgresql-v0.19.4) - 2026-02-17
+
+### Added
+- add views command
+
+## `rsql_driver_clickhouse` - [0.19.4](https://github.com/theseus-rs/rsql/compare/rsql_driver_clickhouse-v0.19.3...rsql_driver_clickhouse-v0.19.4) - 2026-02-17
+
+### Added
+- add views command
+
+### Fixed
+- update drivers to use bind variables for internal queries
+
+## `rsql_driver_polars` - [0.19.4](https://github.com/theseus-rs/rsql/compare/rsql_driver_polars-v0.19.3...rsql_driver_polars-v0.19.4) - 2026-02-17
+
+### Fixed
+- update drivers to use bind variables for internal queries
+
+## `rsql_driver` - [0.19.4](https://github.com/theseus-rs/rsql/compare/rsql_driver-v0.19.3...rsql_driver-v0.19.4) - 2026-02-17
+
+### Added
+- add views command
+
 ## `rsql_cli` - [0.19.3](https://github.com/theseus-rs/rsql/compare/v0.19.2...v0.19.3) - 2025-09-02
 
 ### Added
