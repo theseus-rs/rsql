@@ -195,7 +195,7 @@ rsql --url "postgresql://..." --format csv --delimiter ";"
 rsql --url "..." --format expanded
 ```
 
-## 📚 Examples
+## Examples
 
 ### File Format Examples
 
@@ -249,7 +249,7 @@ rsql --url "mysql://user:pass@localhost/db?charset=utf8mb4"
 
 ¹ Computer translations; human translations welcome
 
-## 🔗 Connection URLs
+## Connection URLs
 
 | Driver             | URL                                                                                                                                                                              |
 |--------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|

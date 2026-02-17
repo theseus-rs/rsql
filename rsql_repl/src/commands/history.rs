@@ -2,9 +2,8 @@ use crate::commands::Error::InvalidOption;
 use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use async_trait::async_trait;
 use colored::Colorize;
-use num_format::{Locale, ToFormattedString};
+use rsql_drivers::ValueFormatter;
 use rust_i18n::t;
-use std::str::FromStr;
 
 /// Show the history of the shell
 #[derive(Debug, Default)]
@@ -33,9 +32,9 @@ impl ShellCommand for Command {
 
         if options.input.len() <= 1 {
             let history = if options.configuration.history {
+                let value_formatter = ValueFormatter::new(locale);
                 for (i, entry) in options.history.iter().enumerate() {
-                    let num_locale = Locale::from_str(locale).unwrap_or(Locale::en);
-                    let index = (i + 1).to_formatted_string(&num_locale);
+                    let index = value_formatter.format_integer(i + 1);
                     let mut entry = entry.to_string();
                     if options.configuration.color {
                         entry = entry.dimmed().to_string();

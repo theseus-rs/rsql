@@ -1,13 +1,95 @@
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
+use icu::calendar::Date as IcuDate;
+use icu::datetime::DateTimeFormatter;
+use icu::datetime::fieldsets;
+use icu::decimal::DecimalFormatter;
+use icu::decimal::input::Decimal as IcuDecimal;
+use icu::locale::Locale as IcuLocale;
+use icu::time::DateTime as IcuDateTime;
+use icu::time::Time as IcuTime;
 use indexmap::IndexMap;
 use jiff::civil::{Date, DateTime, Time};
-use num_format::{Locale, ToFormattedString};
+use jiff_icu::ConvertFrom;
 use rust_decimal::Decimal;
 use serde::{Serialize, Serializer};
 use std::fmt;
 use std::hash::{Hash, Hasher};
+use std::str::FromStr;
 use uuid::Uuid;
+
+/// Caches ICU formatters for a given locale to avoid repeated construction.
+#[derive(Debug)]
+pub struct ValueFormatter {
+    locale_name: String,
+    decimal_formatter: DecimalFormatter,
+    date_formatter: DateTimeFormatter<fieldsets::YMD>,
+    time_formatter: DateTimeFormatter<fieldsets::T>,
+    datetime_formatter: DateTimeFormatter<fieldsets::YMDT>,
+}
+
+impl ValueFormatter {
+    /// Create a new `ValueFormatter` for the given locale string (e.g. "en", "de", "fr").
+    /// Falls back to "en" if the locale cannot be parsed.
+    pub fn new(locale: &str) -> Self {
+        let icu_locale = IcuLocale::from_str(locale)
+            .unwrap_or_else(|_| IcuLocale::from_str("en").expect("en locale should always parse"));
+        let locale_name = locale.to_string();
+
+        let decimal_formatter = DecimalFormatter::try_new((&icu_locale).into(), Default::default())
+            .expect("decimal formatter should be created");
+        let date_formatter =
+            DateTimeFormatter::try_new((&icu_locale).into(), fieldsets::YMD::medium())
+                .expect("date formatter should be created");
+        let time_formatter =
+            DateTimeFormatter::try_new((&icu_locale).into(), fieldsets::T::medium())
+                .expect("time formatter should be created");
+        let datetime_formatter =
+            DateTimeFormatter::try_new((&icu_locale).into(), fieldsets::YMDT::medium())
+                .expect("datetime formatter should be created");
+
+        Self {
+            locale_name,
+            decimal_formatter,
+            date_formatter,
+            time_formatter,
+            datetime_formatter,
+        }
+    }
+
+    /// Get the locale name string.
+    #[must_use]
+    pub fn locale_name(&self) -> &str {
+        &self.locale_name
+    }
+
+    /// Format an integer using the cached decimal formatter.
+    #[must_use]
+    pub fn format_integer<T: Into<IcuDecimal>>(&self, value: T) -> String {
+        self.decimal_formatter.format_to_string(&value.into())
+    }
+
+    /// Format a jiff Date using the cached date formatter.
+    #[must_use]
+    pub fn format_date(&self, value: &Date) -> String {
+        let icu_date = IcuDate::convert_from(*value);
+        self.date_formatter.format(&icu_date).to_string()
+    }
+
+    /// Format a jiff Time using the cached time formatter.
+    #[must_use]
+    pub fn format_time(&self, value: &Time) -> String {
+        let icu_time = IcuTime::convert_from(*value);
+        self.time_formatter.format(&icu_time).to_string()
+    }
+
+    /// Format a jiff DateTime using the cached datetime formatter.
+    #[must_use]
+    pub fn format_datetime(&self, value: &DateTime) -> String {
+        let icu_dt = IcuDateTime::convert_from(*value);
+        self.datetime_formatter.format(&icu_dt).to_string()
+    }
+}
 
 #[derive(Clone, Debug)]
 pub enum Value {
@@ -38,49 +120,62 @@ pub enum Value {
 
 impl Value {
     #[must_use]
-    pub fn to_formatted_string(&self, locale: &Locale) -> String {
+    pub fn to_formatted_string(&self, formatter: &ValueFormatter) -> String {
         match self {
             Value::Null => "null".to_string(),
             Value::Bool(value) => value.to_string(),
             Value::Bytes(bytes) => STANDARD.encode(bytes),
-            Value::I8(value) => value.to_formatted_string(locale),
-            Value::I16(value) => value.to_formatted_string(locale),
-            Value::I32(value) => value.to_formatted_string(locale),
-            Value::I64(value) => value.to_formatted_string(locale),
-            Value::I128(value) => value.to_formatted_string(locale),
-            Value::U8(value) => value.to_formatted_string(locale),
-            Value::U16(value) => value.to_formatted_string(locale),
-            Value::U32(value) => value.to_formatted_string(locale),
-            Value::U64(value) => value.to_formatted_string(locale),
-            Value::U128(value) => value.to_formatted_string(locale),
+            Value::I8(value) => formatter.format_integer(*value),
+            Value::I16(value) => formatter.format_integer(*value),
+            Value::I32(value) => formatter.format_integer(*value),
+            Value::I64(value) => formatter.format_integer(*value),
+            Value::I128(value) => formatter.format_integer(*value),
+            Value::U8(value) => formatter.format_integer(*value),
+            Value::U16(value) => formatter.format_integer(*value),
+            Value::U32(value) => formatter.format_integer(*value),
+            Value::U64(value) => formatter.format_integer(*value),
+            Value::U128(value) => formatter.format_integer(*value),
             Value::F32(value) => value.to_string(),
             Value::F64(value) => value.to_string(),
             Value::String(value) => value.to_string(),
             Value::Decimal(value) => value.to_string(),
-            Value::Date(value) => value.to_string(),
-            Value::Time(value) => value.to_string(),
-            Value::DateTime(value) => value.to_string(),
+            Value::Date(value) => {
+                // TODO: add localized date formatting
+                // formatter.format_date(value)
+                value.to_string()
+            }
+            Value::Time(value) => {
+                // TODO: add localized time formatting
+                // formatter.format_time(value)
+                value.to_string()
+            }
+            Value::DateTime(value) => {
+                // TODO: add localized datetime formatting
+                // formatter.format_datetime(value)
+                value.to_string()
+            }
             Value::Uuid(value) => value.to_string(),
             Value::Array(value) => {
-                let list_delimiter = t!("list_delimiter", locale = locale.name()).to_string();
+                let locale = formatter.locale_name();
+                let list_delimiter = t!("list_delimiter", locale = locale).to_string();
                 value
                     .iter()
-                    .map(|value| value.to_formatted_string(locale))
+                    .map(|value| value.to_formatted_string(formatter))
                     .collect::<Vec<String>>()
                     .join(list_delimiter.as_str())
             }
             Value::Map(value) => {
-                let key_value_delimiter =
-                    t!("key_value_delimiter", locale = locale.name()).to_string();
-                let list_delimiter = t!("list_delimiter", locale = locale.name()).to_string();
+                let locale = formatter.locale_name();
+                let key_value_delimiter = t!("key_value_delimiter", locale = locale).to_string();
+                let list_delimiter = t!("list_delimiter", locale = locale).to_string();
                 value
                     .iter()
                     .map(|(key, value)| {
                         format!(
                             "{}{}{}",
-                            key.to_formatted_string(locale),
+                            key.to_formatted_string(formatter),
                             key_value_delimiter,
-                            value.to_formatted_string(locale)
+                            value.to_formatted_string(formatter)
                         )
                     })
                     .collect::<Vec<String>>()
@@ -371,32 +466,32 @@ impl From<String> for Value {
     }
 }
 
-impl From<rust_decimal::Decimal> for Value {
-    fn from(value: rust_decimal::Decimal) -> Self {
+impl From<Decimal> for Value {
+    fn from(value: Decimal) -> Self {
         Value::Decimal(value)
     }
 }
 
-impl From<jiff::civil::Date> for Value {
-    fn from(value: jiff::civil::Date) -> Self {
+impl From<Date> for Value {
+    fn from(value: Date) -> Self {
         Value::Date(value)
     }
 }
 
-impl From<jiff::civil::Time> for Value {
-    fn from(value: jiff::civil::Time) -> Self {
+impl From<Time> for Value {
+    fn from(value: Time) -> Self {
         Value::Time(value)
     }
 }
 
-impl From<jiff::civil::DateTime> for Value {
-    fn from(value: jiff::civil::DateTime) -> Self {
+impl From<DateTime> for Value {
+    fn from(value: DateTime) -> Self {
         Value::DateTime(value)
     }
 }
 
-impl From<uuid::Uuid> for Value {
-    fn from(value: uuid::Uuid) -> Self {
+impl From<Uuid> for Value {
+    fn from(value: Uuid) -> Self {
         Value::Uuid(value)
     }
 }
@@ -456,30 +551,37 @@ mod tests {
     use std::str::FromStr;
     use uuid::Uuid;
 
+    fn en_formatter() -> ValueFormatter {
+        ValueFormatter::new("en")
+    }
+
     #[test]
     fn test_null() {
+        let fmt = en_formatter();
         assert!(Value::Null.is_null());
         assert!(!Value::Null.is_numeric());
-        assert_eq!(Value::Null.to_formatted_string(&Locale::en), "null");
+        assert_eq!(Value::Null.to_formatted_string(&fmt), "null");
         assert_eq!(Value::Null.to_string(), "null");
         assert_eq!(json!(Value::Null), json!(serde_json::Value::Null));
     }
 
     #[test]
     fn test_bool() {
+        let fmt = en_formatter();
         assert!(!Value::Bool(true).is_null());
         assert!(!Value::Bool(true).is_numeric());
-        assert_eq!(Value::Bool(true).to_formatted_string(&Locale::en), "true");
+        assert_eq!(Value::Bool(true).to_formatted_string(&fmt), "true");
         assert_eq!(Value::Bool(true).to_string(), "true");
         assert_eq!(json!(Value::Bool(true)), json!(true));
     }
 
     #[test]
     fn test_bytes() {
+        let fmt = en_formatter();
         assert!(!Value::Bytes(vec![114, 117, 115, 116]).is_null());
         assert!(!Value::Bytes(vec![114, 117, 115, 116]).is_numeric());
         assert_eq!(
-            Value::Bytes(vec![114, 117, 115, 116]).to_formatted_string(&Locale::en),
+            Value::Bytes(vec![114, 117, 115, 116]).to_formatted_string(&fmt),
             "cnVzdA=="
         );
         assert_eq!(
@@ -499,10 +601,11 @@ mod tests {
 
     #[test]
     fn test_i8() {
+        let fmt = en_formatter();
         assert!(!Value::I8(i8::MIN).is_null());
         assert!(Value::I8(i8::MIN).is_numeric());
-        assert_eq!(Value::I8(i8::MIN).to_formatted_string(&Locale::en), "-128");
-        assert_eq!(Value::I8(i8::MAX).to_formatted_string(&Locale::en), "127");
+        assert_eq!(Value::I8(i8::MIN).to_formatted_string(&fmt), "-128");
+        assert_eq!(Value::I8(i8::MAX).to_formatted_string(&fmt), "127");
 
         assert_eq!(Value::I8(i8::MIN).to_string(), "-128");
         assert_eq!(Value::I8(i8::MAX).to_string(), "127");
@@ -513,16 +616,11 @@ mod tests {
 
     #[test]
     fn test_i16() {
+        let fmt = en_formatter();
         assert!(!Value::I16(i16::MIN).is_null());
         assert!(Value::I16(i16::MIN).is_numeric());
-        assert_eq!(
-            Value::I16(i16::MIN).to_formatted_string(&Locale::en),
-            "-32,768"
-        );
-        assert_eq!(
-            Value::I16(i16::MAX).to_formatted_string(&Locale::en),
-            "32,767"
-        );
+        assert_eq!(Value::I16(i16::MIN).to_formatted_string(&fmt), "-32,768");
+        assert_eq!(Value::I16(i16::MAX).to_formatted_string(&fmt), "32,767");
 
         assert_eq!(Value::I16(i16::MIN).to_string(), "-32768");
         assert_eq!(Value::I16(i16::MAX).to_string(), "32767");
@@ -533,14 +631,15 @@ mod tests {
 
     #[test]
     fn test_i32() {
+        let fmt = en_formatter();
         assert!(!Value::I32(i32::MIN).is_null());
         assert!(Value::I32(i32::MIN).is_numeric());
         assert_eq!(
-            Value::I32(i32::MIN).to_formatted_string(&Locale::en),
+            Value::I32(i32::MIN).to_formatted_string(&fmt),
             "-2,147,483,648"
         );
         assert_eq!(
-            Value::I32(i32::MAX).to_formatted_string(&Locale::en),
+            Value::I32(i32::MAX).to_formatted_string(&fmt),
             "2,147,483,647"
         );
 
@@ -553,14 +652,15 @@ mod tests {
 
     #[test]
     fn test_i64() {
+        let fmt = en_formatter();
         assert!(!Value::I64(i64::MIN).is_null());
         assert!(Value::I64(i64::MIN).is_numeric());
         assert_eq!(
-            Value::I64(i64::MIN).to_formatted_string(&Locale::en),
+            Value::I64(i64::MIN).to_formatted_string(&fmt),
             "-9,223,372,036,854,775,808"
         );
         assert_eq!(
-            Value::I64(i64::MAX).to_formatted_string(&Locale::en),
+            Value::I64(i64::MAX).to_formatted_string(&fmt),
             "9,223,372,036,854,775,807"
         );
 
@@ -573,14 +673,15 @@ mod tests {
 
     #[test]
     fn test_i128() {
+        let fmt = en_formatter();
         assert!(!Value::I128(i128::MIN).is_null());
         assert!(Value::I128(i128::MIN).is_numeric());
         assert_eq!(
-            Value::I128(i128::MIN).to_formatted_string(&Locale::en),
+            Value::I128(i128::MIN).to_formatted_string(&fmt),
             "-170,141,183,460,469,231,731,687,303,715,884,105,728"
         );
         assert_eq!(
-            Value::I128(i128::MAX).to_formatted_string(&Locale::en),
+            Value::I128(i128::MAX).to_formatted_string(&fmt),
             "170,141,183,460,469,231,731,687,303,715,884,105,727"
         );
 
@@ -596,31 +697,31 @@ mod tests {
 
     #[test]
     fn test_u8() {
+        let fmt = en_formatter();
         assert!(!Value::U8(u8::MAX).is_null());
         assert!(Value::U8(u8::MAX).is_numeric());
-        assert_eq!(Value::U8(u8::MAX).to_formatted_string(&Locale::en), "255");
+        assert_eq!(Value::U8(u8::MAX).to_formatted_string(&fmt), "255");
         assert_eq!(Value::U8(u8::MAX).to_string(), "255");
         assert_eq!(json!(Value::U8(u8::MAX)), json!(u8::MAX));
     }
 
     #[test]
     fn test_u16() {
+        let fmt = en_formatter();
         assert!(!Value::U16(u16::MAX).is_null());
         assert!(Value::U16(u16::MAX).is_numeric());
-        assert_eq!(
-            Value::U16(u16::MAX).to_formatted_string(&Locale::en),
-            "65,535"
-        );
+        assert_eq!(Value::U16(u16::MAX).to_formatted_string(&fmt), "65,535");
         assert_eq!(Value::U16(u16::MAX).to_string(), "65535");
         assert_eq!(json!(Value::U16(u16::MAX)), json!(u16::MAX));
     }
 
     #[test]
     fn test_u32() {
+        let fmt = en_formatter();
         assert!(!Value::U32(u32::MAX).is_null());
         assert!(Value::U32(u32::MAX).is_numeric());
         assert_eq!(
-            Value::U32(u32::MAX).to_formatted_string(&Locale::en),
+            Value::U32(u32::MAX).to_formatted_string(&fmt),
             "4,294,967,295"
         );
         assert_eq!(Value::U32(u32::MAX).to_string(), "4294967295");
@@ -629,10 +730,11 @@ mod tests {
 
     #[test]
     fn test_u64() {
+        let fmt = en_formatter();
         assert!(!Value::U64(u64::MAX).is_null());
         assert!(Value::U64(u64::MAX).is_numeric());
         assert_eq!(
-            Value::U64(u64::MAX).to_formatted_string(&Locale::en),
+            Value::U64(u64::MAX).to_formatted_string(&fmt),
             "18,446,744,073,709,551,615"
         );
         assert_eq!(Value::U64(u64::MAX).to_string(), "18446744073709551615");
@@ -641,10 +743,11 @@ mod tests {
 
     #[test]
     fn test_u128() {
+        let fmt = en_formatter();
         assert!(!Value::U128(u128::MAX).is_null());
         assert!(Value::U128(u128::MAX).is_numeric());
         assert_eq!(
-            Value::U128(u128::MAX).to_formatted_string(&Locale::en),
+            Value::U128(u128::MAX).to_formatted_string(&fmt),
             "340,282,366,920,938,463,463,374,607,431,768,211,455"
         );
         assert_eq!(
@@ -655,11 +758,12 @@ mod tests {
 
     #[test]
     fn test_f32() {
+        let fmt = en_formatter();
         assert!(!Value::F32(12_345.678).is_null());
         assert!(Value::F32(12_345.678).is_numeric());
         assert!(
             Value::F32(12_345.678)
-                .to_formatted_string(&Locale::en)
+                .to_formatted_string(&fmt)
                 .starts_with("12345.")
         );
         assert!(Value::F32(12_345.678).to_string().starts_with("12345."));
@@ -668,11 +772,12 @@ mod tests {
 
     #[test]
     fn test_f64() {
+        let fmt = en_formatter();
         assert!(!Value::F64(12_345.678_90).is_null());
         assert!(Value::F64(12_345.678_90).is_numeric());
         assert!(
             Value::F64(12_345.678_90)
-                .to_formatted_string(&Locale::en)
+                .to_formatted_string(&fmt)
                 .starts_with("12345.")
         );
         assert!(Value::F64(12_345.678_90).to_string().starts_with("12345."));
@@ -681,10 +786,11 @@ mod tests {
 
     #[test]
     fn test_string() {
+        let fmt = en_formatter();
         assert!(!Value::String("foo".to_string()).is_null());
         assert!(!Value::String("foo".to_string()).is_numeric());
         assert_eq!(
-            Value::String("foo".to_string()).to_formatted_string(&Locale::en),
+            Value::String("foo".to_string()).to_formatted_string(&fmt),
             "foo"
         );
         assert_eq!(Value::String("foo".to_string()).to_string(), "foo");
@@ -696,11 +802,12 @@ mod tests {
 
     #[test]
     fn test_decimal() {
+        let fmt = en_formatter();
         let decimal = rust_decimal::Decimal::from_str("12345.6789").expect("Invalid decimal");
         assert!(!Value::Decimal(decimal).is_null());
         assert!(Value::Decimal(decimal).is_numeric());
         assert_eq!(
-            Value::Decimal(decimal).to_formatted_string(&Locale::en),
+            Value::Decimal(decimal).to_formatted_string(&fmt),
             "12345.6789"
         );
         assert_eq!(Value::Decimal(decimal).to_string(), "12345.6789");
@@ -712,24 +819,23 @@ mod tests {
 
     #[test]
     fn test_date() {
+        let fmt = en_formatter();
         let date = jiff::civil::date(2000, 12, 31);
         assert!(!Value::Date(date).is_null());
         assert!(!Value::Date(date).is_numeric());
-        assert_eq!(
-            Value::Date(date).to_formatted_string(&Locale::en),
-            "2000-12-31"
-        );
+        assert_eq!(Value::Date(date).to_formatted_string(&fmt), "2000-12-31");
         assert_eq!(Value::Date(date).to_string(), "2000-12-31");
         assert_eq!(json!(Value::Date(date)), json!("2000-12-31"));
     }
 
     #[test]
     fn test_time() {
+        let fmt = en_formatter();
         let time = jiff::civil::time(12, 13, 14, 15);
         assert!(!Value::Time(time).is_null());
         assert!(!Value::Time(time).is_numeric());
         assert_eq!(
-            Value::Time(time).to_formatted_string(&Locale::en),
+            Value::Time(time).to_formatted_string(&fmt),
             "12:13:14.000000015"
         );
         assert_eq!(Value::Time(time).to_string(), "12:13:14.000000015");
@@ -738,13 +844,14 @@ mod tests {
 
     #[test]
     fn test_datetime() {
+        let fmt = en_formatter();
         let date = civil::date(2000, 12, 31);
         let time = civil::time(12, 13, 14, 15);
         let date_time = DateTime::from_parts(date, time);
         assert!(!Value::DateTime(date_time).is_null());
         assert!(!Value::DateTime(date_time).is_numeric());
         assert_eq!(
-            Value::DateTime(date_time).to_formatted_string(&Locale::en),
+            Value::DateTime(date_time).to_formatted_string(&fmt),
             "2000-12-31T12:13:14.000000015"
         );
         assert_eq!(
@@ -759,11 +866,12 @@ mod tests {
 
     #[test]
     fn test_uuid() -> Result<()> {
+        let fmt = en_formatter();
         let uuid = "acf5b3e3-4099-4f34-81c7-5803cbc87a2d";
         assert!(!Value::Uuid(Uuid::from_str(uuid)?).is_null());
         assert!(!Value::Uuid(Uuid::from_str(uuid)?).is_numeric());
         assert_eq!(
-            Value::Uuid(Uuid::from_str(uuid)?).to_formatted_string(&Locale::en),
+            Value::Uuid(Uuid::from_str(uuid)?).to_formatted_string(&fmt),
             uuid
         );
         assert_eq!(Value::Uuid(Uuid::from_str(uuid)?).to_string(), uuid);
@@ -773,6 +881,7 @@ mod tests {
 
     #[test]
     fn test_array() -> Result<()> {
+        let fmt = en_formatter();
         let array = vec![
             Value::Null,
             Value::Bool(true),
@@ -795,7 +904,7 @@ mod tests {
             Value::Uuid(Uuid::from_str("acf5b3e3-4099-4f34-81c7-5803cbc87a2d")?),
         ];
         assert_eq!(
-            Value::Array(array.clone()).to_formatted_string(&Locale::en),
+            Value::Array(array.clone()).to_formatted_string(&fmt),
             "null, true, 1, 2, 3, 12,345, 128, 5, 6, 7, 8, 128, 9.1, 10.42, foo, 2000-12-31, 12:13:14.000000015, 2000-12-31T12:13:14.000000015, acf5b3e3-4099-4f34-81c7-5803cbc87a2d"
         );
         assert_eq!(
@@ -808,13 +917,14 @@ mod tests {
 
     #[test]
     fn test_map() {
+        let fmt = en_formatter();
         let mut map = IndexMap::new();
         map.insert(Value::String("foo".to_string()), Value::I32(123));
         map.insert(Value::String("bar".to_string()), Value::I32(456));
         map.insert(Value::String("baz".to_string()), Value::I32(789));
         assert_eq!(
             "foo=123, bar=456, baz=789",
-            Value::Map(map.clone()).to_formatted_string(&Locale::en)
+            Value::Map(map.clone()).to_formatted_string(&fmt)
         );
         assert_eq!(
             "foo=123, bar=456, baz=789",

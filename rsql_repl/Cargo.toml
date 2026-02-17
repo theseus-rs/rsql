@@ -17,9 +17,9 @@ clap = { workspace = true, features = ["derive", "env"] }
 clap-stdin = { workspace = true, features = ["tokio"] }
 clearscreen = { workspace = true }
 colored = { workspace = true }
+icu = { workspace = true }
 indicatif = { workspace = true }
 indoc = { workspace = true }
-num-format = { workspace = true }
 regex = { workspace = true }
 rsql_core = { path = "../rsql_core", version = "0.19.3" }
 rsql_driver = { path = "../rsql_driver", version = "0.19.3" }
