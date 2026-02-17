@@ -198,13 +198,14 @@ impl Catalog {
     }
 }
 
-/// Schema contains the table, column, index, primary key, and foreign key definitions for a
+/// Schema contains the table, view, column, index, primary key, and foreign key definitions for a
 /// schema in a data source.
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct Schema {
     name: String,
     current: bool,
     tables: IndexMap<String, Table>,
+    views: IndexMap<String, View>,
 }
 
 impl Schema {
@@ -214,6 +215,7 @@ impl Schema {
             name: name.into(),
             current,
             tables: IndexMap::new(),
+            views: IndexMap::new(),
         }
     }
 
@@ -255,6 +257,30 @@ impl Schema {
     #[must_use]
     pub fn tables(&self) -> Vec<&Table> {
         let values: Vec<&Table> = self.tables.values().collect();
+        values
+    }
+
+    /// Adds a view to the schema.
+    pub fn add_view(&mut self, view: View) {
+        self.views.insert(view.name.clone(), view);
+    }
+
+    /// Returns the view with the specified name.
+    pub fn get_view<S: Into<String>>(&self, name: S) -> Option<&View> {
+        let name = name.into();
+        self.views.get(&name)
+    }
+
+    /// Returns the mutable view with the specified name.
+    pub fn get_view_mut<S: Into<String>>(&mut self, name: S) -> Option<&mut View> {
+        let name = name.into();
+        self.views.get_mut(&name)
+    }
+
+    /// Returns the views in the schema.
+    #[must_use]
+    pub fn views(&self) -> Vec<&View> {
+        let values: Vec<&View> = self.views.values().collect();
         values
     }
 
@@ -491,6 +517,53 @@ impl Table {
     pub fn foreign_keys(&self) -> Vec<&ForeignKey> {
         let values: Vec<&ForeignKey> = self.foreign_keys.values().collect();
         values
+    }
+}
+
+/// View contains the column definitions for a view in a schema.
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct View {
+    name: String,
+    columns: IndexMap<String, Column>,
+}
+
+impl View {
+    /// Creates a new View instance.
+    pub fn new<S: Into<String>>(name: S) -> Self {
+        Self {
+            name: name.into(),
+            columns: IndexMap::new(),
+        }
+    }
+
+    /// Returns the name of the view.
+    #[must_use]
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    /// Adds a column to the view.
+    pub fn add_column(&mut self, column: Column) {
+        self.columns.insert(column.name.clone(), column);
+    }
+
+    /// Returns the columns of the view.
+    #[must_use]
+    pub fn columns(&self) -> Vec<&Column> {
+        let values: Vec<&Column> = self.columns.values().collect();
+        values
+    }
+
+    /// Returns the column with the specified name.
+    pub fn get_column<S: Into<String>>(&self, name: S) -> Option<&Column> {
+        let name = name.into();
+        self.columns.get(&name)
+    }
+
+    /// Returns the mutable column with the specified name.
+    pub fn get_column_mut<S: Into<String>>(&mut self, name: S) -> Option<&mut Column> {
+        let name = name.into();
+        self.columns.get_mut(&name)
     }
 }
 
@@ -778,12 +851,32 @@ mod test {
         let mut db = Schema::new("default", true);
         assert_eq!(db.name(), "default");
         assert_eq!(db.tables().len(), 0);
+        assert_eq!(db.views().len(), 0);
 
         let table = Table::new("users");
         db.add(table.clone());
         assert_eq!(db.tables().len(), 1);
         assert!(db.get("users").is_some());
         assert!(db.get_mut("users").is_some());
+
+        let view = View::new("active_users");
+        db.add_view(view);
+        assert_eq!(db.views().len(), 1);
+        assert!(db.get_view("active_users").is_some());
+        assert!(db.get_view_mut("active_users").is_some());
+    }
+
+    #[test]
+    fn test_view() {
+        let mut view = View::new("active_users");
+        assert_eq!(view.name(), "active_users");
+        assert_eq!(view.columns().len(), 0);
+
+        let column = Column::new("id", "INTEGER", false, None);
+        view.add_column(column);
+        assert_eq!(view.columns().len(), 1);
+        assert!(view.get_column("id").is_some());
+        assert!(view.get_column_mut("id").is_some());
     }
 
     #[test]

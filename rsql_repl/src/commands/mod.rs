@@ -31,6 +31,7 @@ pub mod system;
 pub mod tables;
 pub mod tee;
 pub mod timer;
+pub mod views;
 
 pub use command::{
     CommandManager, CommandOptions, LoopCondition, ShellCommand, ToggleShellCommand,

@@ -79,7 +79,6 @@ mod tests {
     use rsql_drivers::MockConnection;
     use rsql_formatters::FormatterManager;
     use rustyline::history::DefaultHistory;
-    use std::default;
 
     #[test]
     fn test_name() {
@@ -103,7 +102,7 @@ mod tests {
         let mut output = Output::default();
         let configuration = &mut Configuration {
             echo: echo.clone(),
-            ..default::Default::default()
+            ..Default::default()
         };
         let options = CommandOptions {
             configuration,
@@ -147,7 +146,7 @@ mod tests {
     async fn test_execute_set_on() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
             echo: EchoMode::Off,
-            ..default::Default::default()
+            ..Default::default()
         };
         let options = CommandOptions {
             configuration,
@@ -170,7 +169,7 @@ mod tests {
     async fn test_execute_set_prompt() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
             echo: EchoMode::Off,
-            ..default::Default::default()
+            ..Default::default()
         };
         let options = CommandOptions {
             configuration,
@@ -193,7 +192,7 @@ mod tests {
     async fn test_execute_set_off() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
             echo: EchoMode::On,
-            ..default::Default::default()
+            ..Default::default()
         };
         let options = CommandOptions {
             configuration,

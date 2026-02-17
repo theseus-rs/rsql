@@ -73,7 +73,6 @@ mod tests {
     use rsql_drivers::MockConnection;
     use rsql_formatters::FormatterManager;
     use rustyline::history::DefaultHistory;
-    use std::default;
 
     #[test]
     fn test_name() {
@@ -98,7 +97,7 @@ mod tests {
         let mut output = Output::default();
         let configuration = &mut Configuration {
             results_format: "unicode".to_string(),
-            ..default::Default::default()
+            ..Default::default()
         };
         let options = CommandOptions {
             configuration,
@@ -156,7 +155,7 @@ mod tests {
     async fn test_execute_set_ascii() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
             results_format: "unicode".to_string(),
-            ..default::Default::default()
+            ..Default::default()
         };
         let options = CommandOptions {
             configuration,
@@ -179,7 +178,7 @@ mod tests {
     async fn test_execute_set_unicode() -> anyhow::Result<()> {
         let configuration = &mut Configuration {
             results_format: "ascii".to_string(),
-            ..default::Default::default()
+            ..Default::default()
         };
         let options = CommandOptions {
             configuration,

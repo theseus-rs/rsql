@@ -1,20 +1,20 @@
 ## describe
 
-The `.describe` command provides detailed information about a table, including its columns, data types,
-constraints, indexes, primary keys, and foreign key relationships. Primary keys and foreign keys are
-displayed with an "Inferred" column that indicates whether the relationship was declared in the database
-schema or inferred from column naming conventions (e.g., a `user_id` column referencing a `users` table,
-or a NOT NULL `id` column as a primary key).
+The `.describe` command provides detailed information about a table or view, including its columns and data types.
+For tables, it also displays constraints, indexes, primary keys, and foreign key relationships. Primary keys and
+foreign keys are displayed with an "Inferred" column that indicates whether the relationship was declared in the
+database schema or inferred from column naming conventions (e.g., a `user_id` column referencing a `users` table,
+or a NOT NULL `id` column as a primary key). When describing a view, only columns are displayed.
 
 ### Usage
 
 ```text
-.describe [table]
+.describe [table|view]
 ```
 
 ### When to use
 
-- Use `.describe` to inspect table schemas before writing queries or performing data transformations.
+- Use `.describe` to inspect table or view schemas before writing queries or performing data transformations.
 - Helpful for data exploration, debugging, and documentation.
 - Use to discover primary key and foreign key relationships, including inferred ones based on naming conventions.
 
@@ -26,6 +26,12 @@ Describe the table named `users`:
 .describe users
 ```
 
+Describe the view named `user_emails`:
+
+```text
+.describe user_emails
+```
+
 Describe the current table (if context is set):
 
 ```text
@@ -34,13 +40,14 @@ Describe the current table (if context is set):
 
 ### Troubleshooting
 
-- If you receive an error, ensure the table name is correct and you have access permissions.
-- Some data sources may require fully qualified table names (e.g., `schema.table`).
+- If you receive an error, ensure the table or view name is correct, and you have access permissions.
+- Some data sources may require fully qualified names (e.g., `schema.table`).
 
 ### Related
 
 - [schemas](../schemas/index.md)
 - [tables](../tables/index.md)
+- [views](../views/index.md)
 - [indexes](../indexes/index.md)
 - [primary](../primary/index.md)
 - [foreign](../foreign/index.md)

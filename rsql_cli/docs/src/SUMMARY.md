@@ -38,6 +38,7 @@
     - [tables](chapter2/tables/index.md)
     - [tee](chapter2/tee/index.md)
     - [timer](chapter2/timer/index.md)
+    - [views](chapter2/views/index.md)
 
 - [Appendix](appendix/index.md)
     - [A - Configuration File (rsql.toml)](appendix/rsql-toml.md)
