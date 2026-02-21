@@ -17,10 +17,10 @@ anyhow = { workspace = true }
 async-trait = { workspace = true }
 colored = { workspace = true }
 csv = { workspace = true, optional = true }
+icu = { workspace = true }
 indexmap = { workspace = true, features = ["serde"] }
 indoc = { workspace = true }
 jiff = { workspace = true }
-num-format = { workspace = true }
 quick-xml = { workspace = true, features = ["serialize"], optional = true }
 rsql_drivers = { path = "../rsql_drivers", version = "0.19.3" }
 rust-i18n = { workspace = true }

@@ -27,6 +27,7 @@ pub use metadata::{Catalog, Column, ForeignKey, Index, Metadata, PrimaryKey, Sch
 pub use to_sql::{ToSql, to_values};
 pub use url::UrlExtension;
 pub use value::Value;
+pub use value::ValueFormatter;
 
 use rust_i18n::i18n;
 

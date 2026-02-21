@@ -215,6 +215,7 @@ mod tests {
     use super::*;
     use rsql_drivers::MockConnection;
     use rustyline::history::FileHistory;
+    use std::collections::HashMap;
 
     #[test]
     fn test_debug() {
@@ -280,5 +281,26 @@ mod tests {
     fn test_command_manager_default() {
         let command_manager = CommandManager::default();
         assert_eq!(command_manager.commands.len(), 32);
+    }
+
+    #[test]
+    fn test_commands_unique_for_each_locale() {
+        let command_manager = CommandManager::default();
+        let locales = available_locales!();
+
+        for locale in &locales {
+            let mut names = HashMap::new();
+            for command in command_manager.iter() {
+                let name = command.name(locale);
+                assert!(
+                    !name.contains(' '),
+                    "Command name \"{name}\" in locale \"{locale}\" contains a space"
+                );
+                assert!(
+                    names.insert(name.clone(), command).is_none(),
+                    "Duplicate command name \"{name}\" in locale \"{locale}\""
+                );
+            }
+        }
     }
 }

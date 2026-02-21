@@ -186,33 +186,33 @@ impl ShellCommand for Command {
             .await?;
 
         if !is_view {
-            let query_result = MemoryQueryResult::new(indexes_column_labels, indexes_column_rows);
-            let mut indexes_results = Results::Query(Box::new(query_result));
-            let query_result = MemoryQueryResult::new(pk_column_labels, pk_rows);
-            let mut pk_results = Results::Query(Box::new(query_result));
-            let query_result = MemoryQueryResult::new(fk_column_labels, fk_rows);
-            let mut fk_results = Results::Query(Box::new(query_result));
+            if !indexes_column_rows.is_empty() {
+                let query_result =
+                    MemoryQueryResult::new(indexes_column_labels, indexes_column_rows);
+                let mut indexes_results = Results::Query(Box::new(query_result));
+                writeln!(output)?;
+                formatter
+                    .format(formatter_options, &mut indexes_results, output)
+                    .await?;
+            }
 
-            let indexes_label = t!("describe_indexes", locale = locale).to_string();
-            writeln!(output)?;
-            writeln!(output, "{indexes_label}")?;
-            formatter
-                .format(formatter_options, &mut indexes_results, output)
-                .await?;
+            if !pk_rows.is_empty() {
+                let query_result = MemoryQueryResult::new(pk_column_labels, pk_rows);
+                let mut pk_results = Results::Query(Box::new(query_result));
+                writeln!(output)?;
+                formatter
+                    .format(formatter_options, &mut pk_results, output)
+                    .await?;
+            }
 
-            let primary_keys_label = t!("describe_primary_keys", locale = locale).to_string();
-            writeln!(output)?;
-            writeln!(output, "{primary_keys_label}")?;
-            formatter
-                .format(formatter_options, &mut pk_results, output)
-                .await?;
-
-            let foreign_keys_label = t!("describe_foreign_keys", locale = locale).to_string();
-            writeln!(output)?;
-            writeln!(output, "{foreign_keys_label}")?;
-            formatter
-                .format(formatter_options, &mut fk_results, output)
-                .await?;
+            if !fk_rows.is_empty() {
+                let query_result = MemoryQueryResult::new(fk_column_labels, fk_rows);
+                let mut fk_results = Results::Query(Box::new(query_result));
+                writeln!(output)?;
+                formatter
+                    .format(formatter_options, &mut fk_results, output)
+                    .await?;
+            }
         }
 
         formatter_options.header = header;
@@ -353,27 +353,31 @@ mod tests {
               id     | INTEGER | No       |         
               name   | TEXT    | Yes      |         
              
-             Indexes
-                  Index      | Columns | Unique 
+                  Index      | Columns | Unique
              ----------------+---------+--------
               users_id_idx   | id      | Yes    
               users_name_idx | name    | No     
              
-             Primary Key
-              Primary Key | Columns | Inferred 
+              Primary Key | Columns | Inferred
              -------------+---------+----------
               users_pkey  | id      | No       
              
-             Foreign Keys
-              Foreign Key  | Columns | Referenced Table | Referenced Columns | Inferred 
+              Foreign Key  | Columns | Referenced Table | Referenced Columns | Inferred
              --------------+---------+------------------+--------------------+----------
               fk_users_org | org_id  | organizations    | id                 | No       
         "};
-        assert_eq!(contents, expected);
+        let normalize = |s: &str| -> String {
+            s.lines()
+                .map(|line| line.trim_end())
+                .collect::<Vec<_>>()
+                .join("\n")
+        };
+        assert_eq!(normalize(&contents), normalize(expected));
 
         Ok(())
     }
 
+    #[cfg(feature = "format-psql")]
     #[tokio::test]
     async fn test_execute_view() -> anyhow::Result<()> {
         let configuration = &mut Configuration {

@@ -25,8 +25,8 @@ impl ShellCommand for Command {
             .map(|driver| driver.identifier().to_string())
             .collect::<Vec<_>>()
             .join(list_delimiter.as_str());
-        let drivers_options = t!("drivers_options", locale = locale, drivers = drivers).to_string();
-        writeln!(options.output, "{drivers_options}")?;
+        let drivers_setting = t!("drivers_setting", locale = locale, drivers = drivers).to_string();
+        writeln!(options.output, "{drivers_setting}")?;
 
         Ok(LoopCondition::Continue)
     }

@@ -111,14 +111,14 @@ mod tests {
             formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![".locale".to_string(), "en-GB".to_string()],
+            input: vec![".locale".to_string(), "de".to_string()],
             output: &mut Output::default(),
         };
 
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        assert_eq!(configuration.locale, "en-GB".to_string());
+        assert_eq!(configuration.locale, "de".to_string());
         Ok(())
     }
 

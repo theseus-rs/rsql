@@ -19,7 +19,7 @@ impl ShellCommand for Command {
         let prompt = t!("echo_prompt", locale = locale).to_string();
         let off = t!("off", locale = locale).to_string();
         t!(
-            "echo_argument",
+            "on_prompt_off_argument",
             locale = locale,
             on = on,
             prompt = prompt,

@@ -5,9 +5,7 @@ use crate::footer::write_footer;
 use crate::formatter::FormatterOptions;
 use crate::writers::Output;
 use async_trait::async_trait;
-use num_format::{Locale, ToFormattedString};
-use rsql_drivers::{QueryResult, Value};
-use std::str::FromStr;
+use rsql_drivers::{QueryResult, Value, ValueFormatter};
 use tabled::tables::ExtendedTable;
 
 /// A formatter for expanded tables
@@ -38,8 +36,8 @@ impl crate::Formatter for Formatter {
             rows = process_data(options, query_result, &mut data).await?;
             let locale = options.locale.clone();
             let table = ExtendedTable::from(data).template(move |index| {
-                let format_locale = Locale::from_str(&locale).unwrap_or(Locale::en);
-                let record = (index + 1).to_formatted_string(&format_locale);
+                let value_formatter = ValueFormatter::new(&locale);
+                let record = value_formatter.format_integer(index + 1);
                 t!("expanded_record", locale = &locale, record = record).to_string()
             });
 
@@ -56,15 +54,20 @@ async fn process_data(
     query_result: &mut Box<dyn QueryResult>,
     data: &mut Vec<Vec<String>>,
 ) -> Result<u64> {
-    let locale = Locale::from_str(options.locale.as_str()).unwrap_or(Locale::en);
-    let mut rows: u64 = 0;
+    let mut raw_rows: Vec<Vec<Value>> = Vec::new();
     while let Some(row) = query_result.next().await {
+        raw_rows.push(row.clone());
+    }
+
+    let value_formatter = ValueFormatter::new(options.locale.as_str());
+    let mut rows: u64 = 0;
+    for row in raw_rows {
         let mut row_data = Vec::new();
 
         for data in row {
             let data = match data {
                 Value::Null => "NULL".to_string(),
-                _ => data.to_formatted_string(&locale),
+                _ => data.to_formatted_string(&value_formatter),
             };
 
             row_data.push(data);
