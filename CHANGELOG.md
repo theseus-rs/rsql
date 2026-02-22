@@ -7,6 +7,140 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## `rsql_cli` - [0.19.4](https://github.com/theseus-rs/rsql/compare/v0.19.3...v0.19.4) - 2026-02-22
+
+### Added
+- add additional language localization
+- add views command
+
+### Fixed
+- update drivers to use bind variables for internal queries
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_repl` - [0.19.4](https://github.com/theseus-rs/rsql/compare/rsql_repl-v0.19.3...rsql_repl-v0.19.4) - 2026-02-22
+
+### Added
+- add additional language localization
+- add views command
+
+## `rsql_core` - [0.19.4](https://github.com/theseus-rs/rsql/compare/rsql_core-v0.19.3...rsql_core-v0.19.4) - 2026-02-22
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_formatters` - [0.19.4](https://github.com/theseus-rs/rsql/compare/rsql_formatters-v0.19.3...rsql_formatters-v0.19.4) - 2026-02-22
+
+### Added
+- add additional language localization
+
+## `rsql_drivers` - [0.19.4](https://github.com/theseus-rs/rsql/compare/rsql_drivers-v0.19.3...rsql_drivers-v0.19.4) - 2026-02-22
+
+### Added
+- add additional language localization
+- add views command
+
+## `rsql_driver_xz` - [0.19.4](https://github.com/theseus-rs/rsql/compare/rsql_driver_xz-v0.19.3...rsql_driver_xz-v0.19.4) - 2026-02-22
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_xml` - [0.19.4](https://github.com/theseus-rs/rsql/compare/rsql_driver_xml-v0.19.3...rsql_driver_xml-v0.19.4) - 2026-02-22
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_sqlserver` - [0.19.4](https://github.com/theseus-rs/rsql/compare/rsql_driver_sqlserver-v0.19.3...rsql_driver_sqlserver-v0.19.4) - 2026-02-22
+
+### Added
+- add views command
+
+## `rsql_driver_sqlite` - [0.19.4](https://github.com/theseus-rs/rsql/compare/rsql_driver_sqlite-v0.19.3...rsql_driver_sqlite-v0.19.4) - 2026-02-22
+
+### Added
+- add views command
+
+### Fixed
+- update drivers to use bind variables for internal queries
+
+## `rsql_driver_redshift` - [0.19.4](https://github.com/theseus-rs/rsql/compare/rsql_driver_redshift-v0.19.3...rsql_driver_redshift-v0.19.4) - 2026-02-22
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_postgres` - [0.19.4](https://github.com/theseus-rs/rsql/compare/rsql_driver_postgres-v0.19.3...rsql_driver_postgres-v0.19.4) - 2026-02-22
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_mariadb` - [0.19.4](https://github.com/theseus-rs/rsql/compare/rsql_driver_mariadb-v0.19.3...rsql_driver_mariadb-v0.19.4) - 2026-02-22
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_mysql` - [0.19.4](https://github.com/theseus-rs/rsql/compare/rsql_driver_mysql-v0.19.3...rsql_driver_mysql-v0.19.4) - 2026-02-22
+
+### Added
+- add views command
+
+## `rsql_driver_libsql` - [0.19.4](https://github.com/theseus-rs/rsql/compare/rsql_driver_libsql-v0.19.3...rsql_driver_libsql-v0.19.4) - 2026-02-22
+
+### Added
+- add views command
+
+### Fixed
+- update drivers to use bind variables for internal queries
+
+## `rsql_driver_https` - [0.19.4](https://github.com/theseus-rs/rsql/compare/rsql_driver_https-v0.19.3...rsql_driver_https-v0.19.4) - 2026-02-22
+
+### Fixed
+- update drivers to use bind variables for internal queries
+
+## `rsql_driver_flightsql` - [0.19.4](https://github.com/theseus-rs/rsql/compare/rsql_driver_flightsql-v0.19.3...rsql_driver_flightsql-v0.19.4) - 2026-02-22
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_duckdb` - [0.19.4](https://github.com/theseus-rs/rsql/compare/rsql_driver_duckdb-v0.19.3...rsql_driver_duckdb-v0.19.4) - 2026-02-22
+
+### Added
+- add views command
+
+## `rsql_driver_cratedb` - [0.19.4](https://github.com/theseus-rs/rsql/compare/rsql_driver_cratedb-v0.19.3...rsql_driver_cratedb-v0.19.4) - 2026-02-22
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_cockroachdb` - [0.19.4](https://github.com/theseus-rs/rsql/compare/rsql_driver_cockroachdb-v0.19.3...rsql_driver_cockroachdb-v0.19.4) - 2026-02-22
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_postgresql` - [0.19.4](https://github.com/theseus-rs/rsql/compare/rsql_driver_postgresql-v0.19.3...rsql_driver_postgresql-v0.19.4) - 2026-02-22
+
+### Added
+- add views command
+
+## `rsql_driver_clickhouse` - [0.19.4](https://github.com/theseus-rs/rsql/compare/rsql_driver_clickhouse-v0.19.3...rsql_driver_clickhouse-v0.19.4) - 2026-02-22
+
+### Added
+- add views command
+
+### Fixed
+- update drivers to use bind variables for internal queries
+
+## `rsql_driver_polars` - [0.19.4](https://github.com/theseus-rs/rsql/compare/rsql_driver_polars-v0.19.3...rsql_driver_polars-v0.19.4) - 2026-02-22
+
+### Fixed
+- update drivers to use bind variables for internal queries
+
+## `rsql_driver` - [0.19.4](https://github.com/theseus-rs/rsql/compare/rsql_driver-v0.19.3...rsql_driver-v0.19.4) - 2026-02-22
+
+### Added
+- add additional language localization
+- add views command
+
 ## `rsql_cli` - [0.19.3](https://github.com/theseus-rs/rsql/compare/v0.19.2...v0.19.3) - 2025-09-02
 
 ### Added
