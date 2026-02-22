@@ -15,7 +15,7 @@ async-trait = { workspace = true }
 clickhouse = { workspace = true }
 file_type = { workspace = true }
 jiff = { workspace = true, features = ["serde"] }
-rsql_driver = { path = "../../rsql_driver", version = "0.19.3" }
+rsql_driver = { path = "../../rsql_driver", version = "0.19.4" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 uuid = { workspace = true }

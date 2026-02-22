@@ -13,9 +13,9 @@ version.workspace = true
 [dependencies]
 async-trait = { workspace = true }
 file_type = { workspace = true }
-rsql_driver = { path = "../../rsql_driver", version = "0.19.3" }
-rsql_driver_excel = { path = "../excel", version = "0.19.3" }
+rsql_driver = { path = "../../rsql_driver", version = "0.19.4" }
+rsql_driver_excel = { path = "../excel", version = "0.19.4" }
 
 [dev-dependencies]
-rsql_driver_test_utils = { path = "../test_utils", version = "0.19.3" }
+rsql_driver_test_utils = { path = "../test_utils", version = "0.19.4" }
 tokio = { workspace = true, features = ["macros", "rt", "rt-multi-thread"] }
