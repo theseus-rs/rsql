@@ -146,10 +146,10 @@ mod tests {
 
     #[tokio::test]
     async fn test_execute_unicode_format_de() -> anyhow::Result<()> {
-        let contents = test_execute(false, ".", "de", "hilfe").await?;
+        let contents = test_execute(false, ".", "de", "Hilfe").await?;
         let expected = indoc! {r"
-            .fußzeile ein|aus  Ergebnisfuß aktivieren oder deaktivieren
-            .hilfe             Diese Hilfemeldung anzeigen
+            .Fußzeile ein|aus  Ergebnisfußzeile aktivieren oder deaktivieren
+            .Hilfe             Diese Hilfe-Nachricht anzeigen
         "};
         assert_eq!(contents, expected);
         Ok(())

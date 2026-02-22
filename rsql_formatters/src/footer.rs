@@ -4,9 +4,8 @@ use crate::writers::Output;
 use crate::{FormatterOptions, Results};
 use colored::Colorize;
 use jiff::SignedDuration;
-use num_format::{Locale, ToFormattedString};
+use rsql_drivers::ValueFormatter;
 use std::io::Write;
-use std::str::FromStr;
 
 /// Display the footer of the result set.
 /// This includes the number of rows returned and the elapsed time.
@@ -29,8 +28,8 @@ pub async fn write_footer(
         Query(_query_result) => (options.rows, query_rows),
     };
     let locale = &options.locale;
-    let num_locale = Locale::from_str(locale).unwrap_or(Locale::en);
-    let rows = rows_affected.to_formatted_string(&num_locale);
+    let value_formatter = ValueFormatter::new(locale);
+    let rows = value_formatter.format_integer(rows_affected);
     let rows_label = if !display_rows {
         String::new()
     } else if rows_affected == 1 {

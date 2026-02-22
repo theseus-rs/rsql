@@ -4,9 +4,7 @@ use crate::error::Result;
 use crate::footer::write_footer;
 use crate::formatter::FormatterOptions;
 use crate::writers::Output;
-use num_format::Locale;
-use rsql_drivers::{QueryResult, Value};
-use std::str::FromStr;
+use rsql_drivers::{QueryResult, Value, ValueFormatter};
 use tabled::builder::Builder;
 use tabled::settings::object::{Cell, Rows};
 use tabled::settings::{Alignment, Theme};
@@ -59,10 +57,15 @@ async fn process_data(
     query_result: &mut Box<dyn QueryResult>,
     builder: &mut Builder,
 ) -> Result<(u64, Vec<Cell>)> {
-    let locale = Locale::from_str(options.locale.as_str()).unwrap_or(Locale::en);
     let mut rows: u64 = 0;
     let mut cells = Vec::new();
+    let mut raw_rows: Vec<Vec<Value>> = Vec::new();
     while let Some(row) = query_result.next().await {
+        raw_rows.push(row.clone());
+    }
+
+    let value_formatter = ValueFormatter::new(options.locale.as_str());
+    for row in &raw_rows {
         let mut row_data = Vec::new();
 
         for (column, data) in row.iter().enumerate() {
@@ -74,7 +77,7 @@ async fn process_data(
                     let cell = Cell::new(usize::try_from(row)?, column);
                     cells.push(cell);
                 }
-                data.to_formatted_string(&locale)
+                data.to_formatted_string(&value_formatter)
             };
 
             row_data.push(data);

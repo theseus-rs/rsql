@@ -104,7 +104,7 @@ mod tests {
     #[tokio::test]
     async fn test_execute_read_file() -> anyhow::Result<()> {
         let mut file = NamedTempFile::new()?;
-        write!(file, ".locale en-GB")?;
+        write!(file, ".locale de")?;
         let path = file.as_ref().to_string_lossy().to_string();
 
         let configuration = &mut Configuration {
@@ -124,7 +124,7 @@ mod tests {
         let result = Command.execute(options).await?;
 
         assert_eq!(result, LoopCondition::Continue);
-        assert_eq!(configuration.locale, "en-GB".to_string());
+        assert_eq!(configuration.locale, "de".to_string());
         Ok(())
     }
 

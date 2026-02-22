@@ -1,8 +1,7 @@
 use crate::commands::{CommandOptions, LoopCondition, Result, ShellCommand};
 use async_trait::async_trait;
-use num_format::{Locale, ToFormattedString};
+use rsql_drivers::ValueFormatter;
 use rust_i18n::t;
-use std::str::FromStr;
 
 /// Command to limit the number of rows returned by a query.
 #[derive(Debug, Default)]
@@ -26,11 +25,8 @@ impl ShellCommand for Command {
         let locale = options.configuration.locale.as_str();
 
         if options.input.len() <= 1 {
-            let num_locale = Locale::from_str(locale).unwrap_or(Locale::en);
-            let limit = options
-                .configuration
-                .results_limit
-                .to_formatted_string(&num_locale);
+            let value_formatter = ValueFormatter::new(locale);
+            let limit = value_formatter.format_integer(options.configuration.results_limit);
             let limit_setting = t!("limit_setting", locale = locale, limit = limit).to_string();
             writeln!(options.output, "{limit_setting}")?;
             return Ok(LoopCondition::Continue);
