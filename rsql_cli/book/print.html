@@ -1,0 +1,1874 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js oranda-dark">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>rsql</title>
+        <meta name="robots" content="noindex" />
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+        <link rel="stylesheet" href="oranda-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "oranda-dark" : "oranda-dark";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('orandamdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('orandamdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('orandamdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('oranda-dark')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction/index.html">Introduction</a></li><li class="chapter-item expanded "><a href="chapter1/index.html"><strong aria-hidden="true">1.</strong> Getting Started</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="chapter1/installation.html"><strong aria-hidden="true">1.1.</strong> Installation</a></li><li class="chapter-item expanded "><a href="chapter1/first-query.html"><strong aria-hidden="true">1.2.</strong> First Query</a></li></ol></li><li class="chapter-item expanded "><a href="chapter2/index.html"><strong aria-hidden="true">2.</strong> Commands</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="chapter2/bail/index.html"><strong aria-hidden="true">2.1.</strong> bail</a></li><li class="chapter-item expanded "><a href="chapter2/catalogs/index.html"><strong aria-hidden="true">2.2.</strong> catalogs</a></li><li class="chapter-item expanded "><a href="chapter2/changes/index.html"><strong aria-hidden="true">2.3.</strong> changes</a></li><li class="chapter-item expanded "><a href="chapter2/clear/index.html"><strong aria-hidden="true">2.4.</strong> clear</a></li><li class="chapter-item expanded "><a href="chapter2/color/index.html"><strong aria-hidden="true">2.5.</strong> color</a></li><li class="chapter-item expanded "><a href="chapter2/completions/index.html"><strong aria-hidden="true">2.6.</strong> completions</a></li><li class="chapter-item expanded "><a href="chapter2/describe/index.html"><strong aria-hidden="true">2.7.</strong> describe</a></li><li class="chapter-item expanded "><a href="chapter2/drivers/index.html"><strong aria-hidden="true">2.8.</strong> drivers</a></li><li class="chapter-item expanded "><a href="chapter2/echo/index.html"><strong aria-hidden="true">2.9.</strong> echo</a></li><li class="chapter-item expanded "><a href="chapter2/exit/index.html"><strong aria-hidden="true">2.10.</strong> exit</a></li><li class="chapter-item expanded "><a href="chapter2/footer/index.html"><strong aria-hidden="true">2.11.</strong> footer</a></li><li class="chapter-item expanded "><a href="chapter2/foreign/index.html"><strong aria-hidden="true">2.12.</strong> foreign</a></li><li class="chapter-item expanded "><a href="chapter2/format/index.html"><strong aria-hidden="true">2.13.</strong> format</a></li><li class="chapter-item expanded "><a href="chapter2/header/index.html"><strong aria-hidden="true">2.14.</strong> header</a></li><li class="chapter-item expanded "><a href="chapter2/help/index.html"><strong aria-hidden="true">2.15.</strong> help</a></li><li class="chapter-item expanded "><a href="chapter2/history/index.html"><strong aria-hidden="true">2.16.</strong> history</a></li><li class="chapter-item expanded "><a href="chapter2/indexes/index.html"><strong aria-hidden="true">2.17.</strong> indexes</a></li><li class="chapter-item expanded "><a href="chapter2/limit/index.html"><strong aria-hidden="true">2.18.</strong> limit</a></li><li class="chapter-item expanded "><a href="chapter2/locale/index.html"><strong aria-hidden="true">2.19.</strong> locale</a></li><li class="chapter-item expanded "><a href="chapter2/output/index.html"><strong aria-hidden="true">2.20.</strong> output</a></li><li class="chapter-item expanded "><a href="chapter2/primary/index.html"><strong aria-hidden="true">2.21.</strong> primary</a></li><li class="chapter-item expanded "><a href="chapter2/print/index.html"><strong aria-hidden="true">2.22.</strong> print</a></li><li class="chapter-item expanded "><a href="chapter2/quit/index.html"><strong aria-hidden="true">2.23.</strong> quit</a></li><li class="chapter-item expanded "><a href="chapter2/read/index.html"><strong aria-hidden="true">2.24.</strong> read</a></li><li class="chapter-item expanded "><a href="chapter2/rows/index.html"><strong aria-hidden="true">2.25.</strong> rows</a></li><li class="chapter-item expanded "><a href="chapter2/schemas/index.html"><strong aria-hidden="true">2.26.</strong> schemas</a></li><li class="chapter-item expanded "><a href="chapter2/sleep/index.html"><strong aria-hidden="true">2.27.</strong> sleep</a></li><li class="chapter-item expanded "><a href="chapter2/system/index.html"><strong aria-hidden="true">2.28.</strong> system</a></li><li class="chapter-item expanded "><a href="chapter2/tables/index.html"><strong aria-hidden="true">2.29.</strong> tables</a></li><li class="chapter-item expanded "><a href="chapter2/tee/index.html"><strong aria-hidden="true">2.30.</strong> tee</a></li><li class="chapter-item expanded "><a href="chapter2/timer/index.html"><strong aria-hidden="true">2.31.</strong> timer</a></li><li class="chapter-item expanded "><a href="chapter2/views/index.html"><strong aria-hidden="true">2.32.</strong> views</a></li></ol></li><li class="chapter-item expanded "><a href="appendix/index.html"><strong aria-hidden="true">3.</strong> Appendix</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="appendix/rsql-toml.html"><strong aria-hidden="true">3.1.</strong> A - Configuration File (rsql.toml)</a></li><li class="chapter-item expanded "><a href="appendix/supported-locales.html"><strong aria-hidden="true">3.2.</strong> B - Supported Locales</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="oranda-dark">Oranda Dark</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="oranda-light">Oranda Light</button></li>
+
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">rsql</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
+<p>Welcome to <code>rsql</code>, a powerful and flexible command-line SQL interface for working with data from a wide variety of
+sources. Whether you are a data engineer, analyst, or developer, <code>rsql</code> is designed to make querying, transforming, and
+exploring data fast and productive.</p>
+<h2 id="what-is-rsql"><a class="header" href="#what-is-rsql">What is rsql?</a></h2>
+<p><code>rsql</code> is a cross-platform CLI tool that connects to many different databases and file formats, including relational
+databases (PostgreSQL, MySQL, MariaDB, SQL Server, CockroachDB, Redshift, Snowflake, DuckDB, LibSQL, SQLite, and more),
+as well as data files (CSV, JSON, Parquet, Arrow, Avro, Excel, XML, YAML, and others). It supports both local and remote
+data sources.</p>
+<h2 id="why-use-rsql"><a class="header" href="#why-use-rsql">Why use rsql?</a></h2>
+<ul>
+<li><strong>Unified SQL interface:</strong> Query many data sources with a consistent SQL syntax and experience.</li>
+<li><strong>Automation:</strong> Integrate with scripts and automation pipelines for data processing.</li>
+<li><strong>Productivity:</strong> Features like smart completions, history, and formatting make interactive work efficient.</li>
+<li><strong>Portability:</strong> Works on Linux, macOS, and Windows, with support for multiple CPU architectures.</li>
+<li><strong>Extensibility:</strong> Easily configure output formats, themes, and behaviors to fit your workflow.</li>
+</ul>
+<h2 id="when-to-use-rsql"><a class="header" href="#when-to-use-rsql">When to use rsql?</a></h2>
+<ul>
+<li>When you need to quickly query or transform data from different sources without switching tools.</li>
+<li>When you want to automate data tasks in scripts or CI/CD pipelines.</li>
+<li>When you need a lightweight, installable SQL client for local or remote databases.</li>
+<li>When you want to explore, analyze, or export data in various formats.</li>
+</ul>
+<p>Continue to <a href="introduction/../chapter1/index.html">Getting Started</a> for a quick setup and usage guide.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="getting-started"><a class="header" href="#getting-started">Getting Started</a></h1>
+<p>Welcome to the rsql quick start guide! This section will help you install rsql, run your first query, and learn best
+practices for using the CLI efficiently.</p>
+<h2 id="quick-start"><a class="header" href="#quick-start">Quick Start</a></h2>
+<ol>
+<li><strong>Install rsql</strong>
+<ul>
+<li>See the <a href="chapter1/./installation.html">Installation</a> section for platform-specific instructions.</li>
+</ul>
+</li>
+<li><strong>Run your first query</strong>
+<ul>
+<li>Try a simple query against a supported database or file. See <a href="chapter1/./first-query.html">First Query</a> for examples.</li>
+</ul>
+</li>
+<li><strong>Explore configuration</strong>
+<ul>
+<li>Customize rsql using the <code>rsql.toml</code> file. See the <a href="chapter1/../appendix/rsql-toml.html">Configuration File</a> appendix for
+details.</li>
+</ul>
+</li>
+<li><strong>Set your locale</strong>
+<ul>
+<li>Use the <code>.locale</code> command to set your preferred language and number formatting.
+See <a href="chapter1/../appendix/supported-locales.html">Supported Locales</a>.</li>
+</ul>
+</li>
+</ol>
+<h2 id="best-practices"><a class="header" href="#best-practices">Best Practices</a></h2>
+<ul>
+<li><strong>Leverage command history and smart completions</strong> to speed up interactive work.</li>
+<li><strong>Use output formats</strong> (CSV, JSON, Markdown, etc.) to integrate with other tools or reporting workflows.</li>
+<li><strong>Check the <a href="chapter1/../appendix/index.html#faq--tips--tricks">FAQ &amp; Tips</a></strong> for troubleshooting and advanced usage.</li>
+</ul>
+<p>Ready to get started? Continue to <a href="chapter1/./installation.html">Installation</a> or jump to <a href="chapter1/./first-query.html">First Query</a>.</p>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="installation"><a class="header" href="#installation">Installation</a></h2>
+<p>To install rsql, use one of the commands below, or navigate to the <a href="https://theseus-rs.github.io/rsql/rsql_cli/">rsql</a>
+site and select an installation method. If you are attempting to install on a platform not
+listed on the project site, you can find additional builds attached to
+the <a href="https://github.com/theseus-rs/rsql/releases/latest">latest release</a>.</p>
+<h3 id="linux--macos"><a class="header" href="#linux--macos">Linux / MacOS</a></h3>
+<p>You can install rsql using the provided installer script, which will download the latest release and set it up for you.</p>
+<pre><code class="language-shell">curl --proto '=https' --tlsv1.2 -LsSf https://github.com/theseus-rs/rsql/releases/latest/download/rsql_cli-installer.sh | sh
+</code></pre>
+<p>Alternatively, you can use <a href="https://brew.sh/">Homebrew</a>:</p>
+<pre><code class="language-shell">brew install rsql
+</code></pre>
+<h3 id="windows"><a class="header" href="#windows">Windows</a></h3>
+<pre><code class="language-shell">irm https://github.com/theseus-rs/rsql/releases/latest/download/rsql_cli-installer.ps1 | iex
+</code></pre>
+<h3 id="troubleshooting-installation"><a class="header" href="#troubleshooting-installation">Troubleshooting Installation</a></h3>
+<ul>
+<li><strong>Permission denied:</strong> If you see a permission error, try running the installer with <code>sudo</code> (Linux/MacOS) or as
+Administrator (Windows).</li>
+<li><strong>Command not found:</strong> Ensure the install directory is in your <code>PATH</code>. You may need to restart your terminal or add
+the install location to your shell profile.</li>
+<li><strong>Antivirus/Defender blocks installer:</strong> Temporarily disable or whitelist the installer if you trust the source.</li>
+<li><strong>Unsupported platform:</strong> Check the <a href="https://github.com/theseus-rs/rsql/releases/latest">latest release page</a> for
+additional builds or open an issue for your platform.</li>
+<li><strong>Network issues:</strong> If the installer fails to download, check your internet connection and proxy/firewall settings.</li>
+</ul>
+<p>For more help, see the <a href="chapter1/../appendix/index.html#faq--tips--tricks">FAQ</a> or open an issue on
+the <a href="https://github.com/theseus-rs/rsql/issues">GitHub repository</a>.</p>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="first-query"><a class="header" href="#first-query">First Query</a></h2>
+<p>The following examples show how to run a simple query using the <code>rsql</code> CLI tool for different data sources. Replace
+placeholders (e.g., <code>&lt;user&gt;</code>, <code>&lt;host&gt;</code>, <code>&lt;database&gt;</code>) with your actual connection details.</p>
+<h3 id="cockroachdb"><a class="header" href="#cockroachdb">CockroachDB</a></h3>
+<pre><code class="language-shell">rsql --url &quot;cockroachdb://&lt;user[:password]&gt;@&lt;host&gt;[:&lt;port&gt;]/&lt;database&gt;&quot; -- &quot;SELECT version();&quot;
+</code></pre>
+<h3 id="duckdb-in-memory-or-file"><a class="header" href="#duckdb-in-memory-or-file">DuckDB (in-memory or file)</a></h3>
+<pre><code class="language-shell"># In-memory
+rsql --url &quot;duckdb://&quot; -- &quot;SELECT version();&quot;
+# File-based
+rsql --url &quot;duckdb:///path/to/file.duckdb&quot; -- &quot;SELECT COUNT(*) FROM my_table;&quot;
+</code></pre>
+<h3 id="libsql-in-memory"><a class="header" href="#libsql-in-memory">LibSQL (in-memory)</a></h3>
+<pre><code class="language-shell">rsql --url &quot;libsql://?memory=true&quot; -- &quot;SELECT sqlite_version();&quot;
+</code></pre>
+<h3 id="mariadb"><a class="header" href="#mariadb">MariaDB</a></h3>
+<pre><code class="language-shell">rsql --url &quot;mariadb://&lt;user&gt;[:&lt;password&gt;]@&lt;host&gt;[:&lt;port&gt;]/&lt;database&gt;&quot; -- &quot;SELECT version();&quot;
+</code></pre>
+<h3 id="mysql"><a class="header" href="#mysql">MySQL</a></h3>
+<pre><code class="language-shell">rsql --url &quot;mysql://&lt;user&gt;[:&lt;password&gt;]@&lt;host&gt;[:&lt;port&gt;]/&lt;database&gt;&quot; -- &quot;SELECT version();&quot;
+</code></pre>
+<h3 id="postgres-embedded-or-remote"><a class="header" href="#postgres-embedded-or-remote">Postgres (embedded or remote)</a></h3>
+<pre><code class="language-shell">rsql --url &quot;postgres://?embedded=true&quot; -- &quot;SELECT version();&quot;
+rsql --url &quot;postgres://&lt;user&gt;:&lt;password&gt;@&lt;host&gt;:&lt;port&gt;/&lt;database&gt;&quot; -- &quot;SELECT COUNT(*) FROM my_table;&quot;
+</code></pre>
+<h3 id="postgresql-embedded-or-remote"><a class="header" href="#postgresql-embedded-or-remote">PostgreSQL (embedded or remote)</a></h3>
+<pre><code class="language-shell">rsql --url &quot;postgresql://?embedded=true&quot; -- &quot;SELECT version();&quot;
+rsql --url &quot;postgresql://&lt;user&gt;:&lt;password&gt;@&lt;host&gt;:&lt;port&gt;/&lt;database&gt;&quot; -- &quot;SELECT COUNT(*) FROM my_table;&quot;
+</code></pre>
+<h3 id="redshift"><a class="header" href="#redshift">Redshift</a></h3>
+<pre><code class="language-shell">rsql --url &quot;redshift://&lt;user[:password]&gt;@&lt;host&gt;[:&lt;port&gt;]/&lt;database&gt;&quot; -- &quot;SELECT version();&quot;
+</code></pre>
+<h3 id="rusqlite"><a class="header" href="#rusqlite">Rusqlite</a></h3>
+<pre><code class="language-shell">rsql --url &quot;rusqlite://&quot; -- &quot;SELECT sqlite_version();&quot;
+</code></pre>
+<h3 id="snowflake"><a class="header" href="#snowflake">Snowflake</a></h3>
+<pre><code class="language-shell">rsql --url &quot;snowflake://&lt;user&gt;@&lt;account&gt;.snowflakecomputing.com/[?private_key_file=pkey_file&amp;public_key_file=pubkey_file]&quot; -- &quot;SELECT CURRENT_VERSION();&quot;
+# Or with token
+rsql --url &quot;snowflake://&lt;user&gt;[:&lt;token&gt;]@&lt;account&gt;.snowflakecomputing.com/&quot; -- &quot;SELECT CURRENT_VERSION();&quot;
+</code></pre>
+<h3 id="querying-data-files-csv-parquet-etc"><a class="header" href="#querying-data-files-csv-parquet-etc">Querying Data Files (CSV, Parquet, etc.)</a></h3>
+<pre><code class="language-shell">rsql --url &quot;csv:///path/to/data.csv&quot; -- &quot;SELECT * FROM data LIMIT 5;&quot;
+rsql --url &quot;parquet:///path/to/data.parquet&quot; -- &quot;SELECT column1, column2 FROM data WHERE column3 &gt; 100;&quot;
+</code></pre>
+<h3 id="sqlite"><a class="header" href="#sqlite">Sqlite</a></h3>
+<pre><code class="language-shell">rsql --url &quot;sqlite://&quot; -- &quot;SELECT sqlite_version();&quot;
+</code></pre>
+<h3 id="tips"><a class="header" href="#tips">Tips</a></h3>
+<ul>
+<li>Use the <code>--format</code> option or <code>.format</code> command to change output format (e.g., CSV, JSON).</li>
+<li>Use <code>.help</code> for a list of available commands.</li>
+<li>For more advanced examples, see the <a href="chapter1/../appendix/index.html#tips--tricks">FAQ &amp; Tips</a>.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="commands"><a class="header" href="#commands">Commands</a></h1>
+<p>Commands are the primary way to interact with the rsql CLI. A command is a single word that is used
+to perform a specific action preceded by the command identifier (eg: <code>.help</code>). The commands are
+localized for each supported language. A shortened version of the command can be used as long as it
+is unique. For example, <code>.desc</code> can be used in place of <code>.describe</code>.</p>
+<h3 id="demonstration"><a class="header" href="#demonstration">Demonstration</a></h3>
+<video width="640" height="480" controls>
+  <source src="./demo.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="bail"><a class="header" href="#bail">bail</a></h2>
+<p>The <code>.bail</code> command controls how rsql handles errors during command execution. By default, rsql continues processing
+after an error, which is useful for running scripts or multiple commands in a session. Enabling bail mode (<code>on</code>) will
+cause rsql to immediately exit on the first error, which is helpful for automation, CI/CD, or when you want to ensure no
+further actions are taken after a failure.</p>
+<h3 id="usage"><a class="header" href="#usage">Usage</a></h3>
+<pre><code class="language-text">.bail &lt;on|off&gt;
+</code></pre>
+<h3 id="when-to-use"><a class="header" href="#when-to-use">When to use</a></h3>
+<ul>
+<li><strong>Enable bail</strong> (<code>on</code>) when running scripts where any error should halt execution.</li>
+<li><strong>Disable bail</strong> (<code>off</code>) for interactive sessions or when you want to review multiple errors in one run.</li>
+</ul>
+<h3 id="examples"><a class="header" href="#examples">Examples</a></h3>
+<p>Show the current bail setting:</p>
+<pre><code class="language-text">.bail
+</code></pre>
+<p>Enable bail on first error (recommended for automation):</p>
+<pre><code class="language-text">.bail on
+</code></pre>
+<p>Disable bail on first error (recommended for exploration):</p>
+<pre><code class="language-text">.bail off
+</code></pre>
+<h3 id="troubleshooting"><a class="header" href="#troubleshooting">Troubleshooting</a></h3>
+<ul>
+<li>If your script stops unexpectedly, check if <code>.bail on</code> is set.</li>
+<li>If errors are being ignored, ensure <code>.bail off</code> is not set unintentionally.</li>
+</ul>
+<h3 id="related"><a class="header" href="#related">Related</a></h3>
+<ul>
+<li>See the <code>bail_on_error</code> option in <a href="chapter2/bail/../../appendix/rsql-toml.html">rsql.toml configuration</a>.</li>
+<li>For error handling in scripts, see <a href="chapter2/bail/../../chapter1/index.html#best-practices">Best Practices</a>.</li>
+</ul>
+<h3 id="demonstration-1"><a class="header" href="#demonstration-1">Demonstration</a></h3>
+<video width="640" height="480" controls>
+  <source src="./demo.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="catalogs"><a class="header" href="#catalogs">catalogs</a></h2>
+<p>The <code>.catalogs</code> command lists all catalogs available in the connected data source. Catalogs are top-level containers for
+schemas and tables, and are especially relevant in enterprise databases or cloud data warehouses.</p>
+<h3 id="usage-1"><a class="header" href="#usage-1">Usage</a></h3>
+<pre><code class="language-text">.catalogs
+</code></pre>
+<h3 id="when-to-use-1"><a class="header" href="#when-to-use-1">When to use</a></h3>
+<ul>
+<li>Use <code>.catalogs</code> to discover available catalogs when connecting to complex or multi-tenant databases.</li>
+<li>Helpful for exploring unfamiliar data sources or verifying access permissions.</li>
+</ul>
+<h3 id="examples-1"><a class="header" href="#examples-1">Examples</a></h3>
+<p>List all catalogs in the current data source:</p>
+<pre><code class="language-text">.catalogs
+</code></pre>
+<h3 id="troubleshooting-1"><a class="header" href="#troubleshooting-1">Troubleshooting</a></h3>
+<ul>
+<li>If no catalogs are listed, ensure your connection has the necessary permissions.</li>
+<li>Some databases may not support catalogs; in that case, this command may return an empty result.</li>
+</ul>
+<h3 id="related-1"><a class="header" href="#related-1">Related</a></h3>
+<ul>
+<li>See also: <a href="chapter2/catalogs/../schemas/index.html">schemas</a> and <a href="chapter2/catalogs/../tables/index.html">tables</a> commands for further exploration.</li>
+</ul>
+<h3 id="demonstration-2"><a class="header" href="#demonstration-2">Demonstration</a></h3>
+<video width="640" height="480" controls>
+  <source src="./demo.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="changes"><a class="header" href="#changes">changes</a></h2>
+<p>The <code>.changes</code> command toggles the display of the number of rows affected by SQL statements (such as INSERT, UPDATE,
+DELETE). This feedback is useful for verifying the impact of your queries, especially in data modification or ETL
+workflows.</p>
+<h3 id="usage-2"><a class="header" href="#usage-2">Usage</a></h3>
+<pre><code class="language-text">.changes &lt;on|off&gt;
+</code></pre>
+<h3 id="when-to-use-2"><a class="header" href="#when-to-use-2">When to use</a></h3>
+<ul>
+<li>Enable <code>.changes on</code> to always see how many rows were changed by your queries—helpful for auditing and debugging.</li>
+<li>Disable <code>.changes off</code> for a cleaner output if you do not need this information.</li>
+</ul>
+<h3 id="examples-2"><a class="header" href="#examples-2">Examples</a></h3>
+<p>Show the current changes setting:</p>
+<pre><code class="language-text">.changes
+</code></pre>
+<p>Turn on the rows changed display:</p>
+<pre><code class="language-text">.changes on
+</code></pre>
+<p>Turn off the rows changed display:</p>
+<pre><code class="language-text">.changes off
+</code></pre>
+<h3 id="troubleshooting-2"><a class="header" href="#troubleshooting-2">Troubleshooting</a></h3>
+<ul>
+<li>If you do not see row change counts, ensure <code>.changes on</code> is set.</li>
+<li>Some drivers or read-only queries may not report row changes.</li>
+</ul>
+<h3 id="related-2"><a class="header" href="#related-2">Related</a></h3>
+<ul>
+<li>See the <code>changes</code> option in <a href="chapter2/changes/../../appendix/rsql-toml.html">rsql.toml configuration</a>.</li>
+<li>For output customization, see <a href="chapter2/changes/../format/index.html">format</a> and <a href="chapter2/changes/../footer/index.html">footer</a>.</li>
+</ul>
+<h3 id="demonstration-3"><a class="header" href="#demonstration-3">Demonstration</a></h3>
+<video width="640" height="480" controls>
+  <source src="./demo.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="clear"><a class="header" href="#clear">clear</a></h2>
+<p>The <code>.clear</code> command clears the terminal screen, providing a clean workspace. This is especially useful during long
+interactive sessions or when you want to remove clutter from previous outputs.</p>
+<h3 id="usage-3"><a class="header" href="#usage-3">Usage</a></h3>
+<pre><code class="language-text">.clear
+</code></pre>
+<h3 id="when-to-use-3"><a class="header" href="#when-to-use-3">When to use</a></h3>
+<ul>
+<li>Use <code>.clear</code> to reset your terminal view before running new queries or demos.</li>
+<li>Helpful for presentations or screen recordings.</li>
+</ul>
+<h3 id="examples-3"><a class="header" href="#examples-3">Examples</a></h3>
+<p>Clear the screen:</p>
+<pre><code class="language-text">.clear
+</code></pre>
+<h3 id="troubleshooting-3"><a class="header" href="#troubleshooting-3">Troubleshooting</a></h3>
+<ul>
+<li>If the screen does not clear, ensure your terminal supports ANSI escape codes.</li>
+<li>On some platforms, the effect may vary depending on the terminal emulator.</li>
+</ul>
+<h3 id="related-3"><a class="header" href="#related-3">Related</a></h3>
+<ul>
+<li>For managing output, see <a href="chapter2/clear/../format/index.html">format</a> and <a href="chapter2/clear/../footer/index.html">footer</a>.</li>
+</ul>
+<h3 id="demonstration-4"><a class="header" href="#demonstration-4">Demonstration</a></h3>
+<video width="640" height="480" controls>
+  <source src="./demo.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="color"><a class="header" href="#color">color</a></h2>
+<p>The <code>.color</code> command controls whether rsql outputs color text in the terminal. Color output improves readability,
+especially for large result sets or when distinguishing between different types of output. By default, color is enabled.</p>
+<h3 id="usage-4"><a class="header" href="#usage-4">Usage</a></h3>
+<pre><code class="language-text">.color &lt;on|off&gt;
+</code></pre>
+<h3 id="when-to-use-4"><a class="header" href="#when-to-use-4">When to use</a></h3>
+<ul>
+<li>Enable color (<code>on</code>) for interactive use, demos, or when you want visually distinct output.</li>
+<li>Disable color (<code>off</code>) for scripts, logs, or when redirecting output to files where ANSI codes are undesirable.</li>
+</ul>
+<h3 id="examples-4"><a class="header" href="#examples-4">Examples</a></h3>
+<p>Show the current color setting:</p>
+<pre><code class="language-text">.color
+</code></pre>
+<p>Enable color output:</p>
+<pre><code class="language-text">.color on
+</code></pre>
+<p>Disable color output:</p>
+<pre><code class="language-text">.color off
+</code></pre>
+<h3 id="troubleshooting-4"><a class="header" href="#troubleshooting-4">Troubleshooting</a></h3>
+<ul>
+<li>If you see strange characters in redirected output, try <code>.color off</code>.</li>
+<li>Some terminals may not support color; in that case, disabling color is recommended.</li>
+</ul>
+<h3 id="related-4"><a class="header" href="#related-4">Related</a></h3>
+<ul>
+<li>See the <code>color</code> option in <a href="chapter2/color/../../appendix/rsql-toml.html">rsql.toml configuration</a>.</li>
+<li>For output customization, see <a href="chapter2/color/../format/index.html">format</a>.</li>
+</ul>
+<h3 id="demonstration-5"><a class="header" href="#demonstration-5">Demonstration</a></h3>
+<video width="640" height="480" controls>
+  <source src="./demo.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="completions"><a class="header" href="#completions">completions</a></h2>
+<p>The <code>.completions</code> command enables or disables smart command and SQL completions in rsql. Smart completions help you
+write commands and queries faster by suggesting keywords, table names, and more as you type. By default, completions are
+enabled.</p>
+<h3 id="usage-5"><a class="header" href="#usage-5">Usage</a></h3>
+<pre><code class="language-text">.completions &lt;on|off&gt;
+</code></pre>
+<h3 id="when-to-use-5"><a class="header" href="#when-to-use-5">When to use</a></h3>
+<ul>
+<li>Enable completions (<code>on</code>) for interactive sessions to boost productivity and reduce typos.</li>
+<li>Disable completions (<code>off</code>) if you prefer manual entry or experience issues with suggestions.</li>
+</ul>
+<h3 id="examples-5"><a class="header" href="#examples-5">Examples</a></h3>
+<p>Show the current completions setting:</p>
+<pre><code class="language-text">.completions
+</code></pre>
+<p>Enable completions:</p>
+<pre><code class="language-text">.completions on
+</code></pre>
+<p>Disable completions:</p>
+<pre><code class="language-text">.completions off
+</code></pre>
+<h3 id="troubleshooting-5"><a class="header" href="#troubleshooting-5">Troubleshooting</a></h3>
+<ul>
+<li>If completions are not working, ensure <code>.completions on</code> is set and your terminal supports interactive input.</li>
+<li>Some drivers or remote sessions may limit available suggestions.</li>
+</ul>
+<h3 id="related-5"><a class="header" href="#related-5">Related</a></h3>
+<ul>
+<li>See the <code>smart.completions</code> option in <a href="chapter2/completions/../../appendix/rsql-toml.html">rsql.toml configuration</a>.</li>
+<li>For command history, see <a href="chapter2/completions/../history/index.html">history</a>.</li>
+</ul>
+<h3 id="demonstration-6"><a class="header" href="#demonstration-6">Demonstration</a></h3>
+<video width="640" height="480" controls>
+  <source src="./demo.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="describe"><a class="header" href="#describe">describe</a></h2>
+<p>The <code>.describe</code> command provides detailed information about a table or view, including its columns and data types.
+For tables, it also displays constraints, indexes, primary keys, and foreign key relationships. Primary keys and
+foreign keys are displayed with an &quot;Inferred&quot; column that indicates whether the relationship was declared in the
+database schema or inferred from column naming conventions (e.g., a <code>user_id</code> column referencing a <code>users</code> table,
+or a NOT NULL <code>id</code> column as a primary key). When describing a view, only columns are displayed.</p>
+<h3 id="usage-6"><a class="header" href="#usage-6">Usage</a></h3>
+<pre><code class="language-text">.describe [table|view]
+</code></pre>
+<h3 id="when-to-use-6"><a class="header" href="#when-to-use-6">When to use</a></h3>
+<ul>
+<li>Use <code>.describe</code> to inspect table or view schemas before writing queries or performing data transformations.</li>
+<li>Helpful for data exploration, debugging, and documentation.</li>
+<li>Use to discover primary key and foreign key relationships, including inferred ones based on naming conventions.</li>
+</ul>
+<h3 id="examples-6"><a class="header" href="#examples-6">Examples</a></h3>
+<p>Describe the table named <code>users</code>:</p>
+<pre><code class="language-text">.describe users
+</code></pre>
+<p>Describe the view named <code>user_emails</code>:</p>
+<pre><code class="language-text">.describe user_emails
+</code></pre>
+<p>Describe the current table (if context is set):</p>
+<pre><code class="language-text">.describe
+</code></pre>
+<h3 id="troubleshooting-6"><a class="header" href="#troubleshooting-6">Troubleshooting</a></h3>
+<ul>
+<li>If you receive an error, ensure the table or view name is correct, and you have access permissions.</li>
+<li>Some data sources may require fully qualified names (e.g., <code>schema.table</code>).</li>
+</ul>
+<h3 id="related-6"><a class="header" href="#related-6">Related</a></h3>
+<ul>
+<li><a href="chapter2/describe/../schemas/index.html">schemas</a></li>
+<li><a href="chapter2/describe/../tables/index.html">tables</a></li>
+<li><a href="chapter2/describe/../views/index.html">views</a></li>
+<li><a href="chapter2/describe/../indexes/index.html">indexes</a></li>
+<li><a href="chapter2/describe/../primary/index.html">primary</a></li>
+<li><a href="chapter2/describe/../foreign/index.html">foreign</a></li>
+</ul>
+<h3 id="demonstration-7"><a class="header" href="#demonstration-7">Demonstration</a></h3>
+<video width="640" height="480" controls>
+  <source src="./demo.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="drivers"><a class="header" href="#drivers">drivers</a></h2>
+<h3 id="usage-7"><a class="header" href="#usage-7">Usage</a></h3>
+<pre><code class="language-text">.drivers
+</code></pre>
+<h3 id="description"><a class="header" href="#description">Description</a></h3>
+<p>The drivers command displays the available data drivers.</p>
+<div class="table-wrapper"><table><thead><tr><th>Driver</th><th>Description</th><th>URL</th></tr></thead><tbody>
+<tr><td><code>arrow</code></td><td>Arrow IPC provided by <a href="https://github.com/pola-rs/polars">Polars</a></td><td><code>arrow://&lt;file&gt;</code></td></tr>
+<tr><td><code>avro</code></td><td>Avro provided by <a href="https://github.com/pola-rs/polars">Polars</a></td><td><code>avro://&lt;file&gt;</code></td></tr>
+<tr><td><code>brotli</code></td><td>Brotli compressed file</td><td><code>brotli://&lt;file&gt;</code></td></tr>
+<tr><td><code>bzip2</code></td><td>Bzip2 compressed file</td><td><code>bzip2://&lt;file&gt;</code></td></tr>
+<tr><td><code>clickhouse</code></td><td>ClickHouse</td><td><code>clickhouse://&lt;user&gt;[:&lt;password&gt;]@&lt;host&gt;[:&lt;port&gt;]/&lt;database&gt;[?access_token=&lt;token&gt;][&amp;scheme=&lt;http\|https&gt;]</code></td></tr>
+<tr><td><code>cockroachdb</code></td><td>CockroachDB provided by <a href="https://github.com/launchbadge/sqlx">SQLx</a></td><td><code>cockroachdb://&lt;user&gt;[:&lt;password&gt;]@&lt;host&gt;[:&lt;port&gt;]/&lt;database&gt;</code></td></tr>
+<tr><td><code>cratedb</code></td><td>CrateDB provided by <a href="https://github.com/launchbadge/sqlx">SQLx</a></td><td><code>cratedb://&lt;user&gt;[:&lt;password&gt;]@&lt;host&gt;[:&lt;port&gt;]/&lt;database&gt;</code></td></tr>
+<tr><td><code>csv</code></td><td>Comma Separated Value (CSV) provided by <a href="https://github.com/pola-rs/polars">Polars</a></td><td><code>csv://&lt;file&gt;[?has_header=&lt;true\|false&gt;][&amp;quote=&lt;char&gt;][&amp;skip_rows=&lt;n&gt;]</code></td></tr>
+<tr><td><code>delimited</code></td><td>Delimited provided by <a href="https://github.com/pola-rs/polars">Polars</a></td><td><code>delimited://&lt;file&gt;[?separator=&lt;char&gt;][&amp;has_header=&lt;true\|false&gt;][&amp;quote=&lt;char&gt;][&amp;skip_rows=&lt;n&gt;]</code></td></tr>
+<tr><td><code>duckdb</code></td><td>DuckDB provided by <a href="https://duckdb.org/">DuckDB</a></td><td><code>duckdb://[&lt;file&gt;]</code></td></tr>
+<tr><td><code>dynamodb</code></td><td>DynamoDB</td><td><code>dynamodb://[&lt;access_key_id&gt;:&lt;secret_access_key&gt;@]&lt;host&gt;[:&lt;port&gt;]&gt;[?region=&lt;region&gt;][&amp;session_token=&lt;token&gt;][&amp;scheme=&lt;http\|https&gt;]</code></td></tr>
+<tr><td><code>excel</code></td><td>Excel</td><td><code>excel://&lt;file&gt;[?has_header=&lt;true\|false&gt;][&amp;skip_rows=&lt;n&gt;]</code></td></tr>
+<tr><td><code>file</code></td><td>File</td><td><code>file://&lt;file&gt;</code></td></tr>
+<tr><td><code>flightsql</code></td><td>FlightSQL</td><td><code>flightsql://&lt;user&gt;[:&lt;password&gt;]@&lt;host&gt;[:&lt;port&gt;][?scheme=&lt;http\|https&gt;]</code></td></tr>
+<tr><td><code>fwf</code></td><td>Fixed Width Format</td><td><code>fwf://&lt;file&gt;?widths=&lt;widths&gt;[&amp;headers=&lt;headers&gt;]</code></td></tr>
+<tr><td><code>gzip</code></td><td>Gzip compressed file</td><td><code>gzip://&lt;file&gt;</code></td></tr>
+<tr><td><code>http</code></td><td>HTTP</td><td><code>http://&lt;path&gt;[?_headers=&lt;headers&gt;]</code></td></tr>
+<tr><td><code>https</code></td><td>HTTPS</td><td><code>https://&lt;path&gt;[?_headers=&lt;headers&gt;]</code></td></tr>
+<tr><td><code>json</code></td><td>JSON provided by <a href="https://github.com/pola-rs/polars">Polars</a></td><td><code>json://&lt;file&gt;</code></td></tr>
+<tr><td><code>jsonl</code></td><td>JSONL provided by <a href="https://github.com/pola-rs/polars">Polars</a></td><td><code>jsonl://&lt;file&gt;</code></td></tr>
+<tr><td><code>libsql</code></td><td>LibSQL provided by <a href="https://github.com/tursodatabase/libsql">Turso</a></td><td><code>libsql://&lt;host&gt;?[&lt;memory=true&gt;][&amp;file=&lt;database_file&gt;][&amp;auth_token=&lt;token&gt;]</code></td></tr>
+<tr><td><code>lz4</code></td><td>LZ4 compressed file</td><td><code>lz4://&lt;file&gt;</code></td></tr>
+<tr><td><code>mariadb</code></td><td>MariaDB provided by <a href="https://github.com/launchbadge/sqlx">SQLx</a></td><td><code>mariadb://&lt;user&gt;[:&lt;password&gt;]@&lt;host&gt;[:&lt;port&gt;]/&lt;database&gt;</code></td></tr>
+<tr><td><code>mysql</code></td><td>MySQL provided by <a href="https://github.com/launchbadge/sqlx">SQLx</a></td><td><code>mysql://&lt;user&gt;[:&lt;password&gt;]@&lt;host&gt;[:&lt;port&gt;]/&lt;database&gt;</code></td></tr>
+<tr><td><code>ods</code></td><td>OpenDocument Spreadsheet</td><td><code>ods://&lt;file&gt;[?has_header=&lt;true\|false&gt;][&amp;skip_rows=&lt;n&gt;]</code></td></tr>
+<tr><td><code>orc</code></td><td>Optimized Row Columnar (ORC)</td><td><code>orc://&lt;file&gt;</code></td></tr>
+<tr><td><code>parquet</code></td><td>Parquet provided by <a href="https://github.com/pola-rs/polars">Polars</a></td><td><code>parquet://&lt;file&gt;</code></td></tr>
+<tr><td><code>postgres</code></td><td>PostgreSQL provided by <a href="https://github.com/sfackler/rust-postgres">rust-postgres</a></td><td><code>postgres://&lt;user&gt;[:&lt;password&gt;]@&lt;host&gt;[:&lt;port&gt;]/&lt;database&gt;?&lt;embedded=true&gt;</code></td></tr>
+<tr><td><code>postgresql</code></td><td>PostgreSQL provided by <a href="https://github.com/launchbadge/sqlx">SQLx</a></td><td><code>postgresql://&lt;user&gt;[:&lt;password&gt;]@&lt;host&gt;[:&lt;port&gt;]/&lt;database&gt;?&lt;embedded=true&gt;</code></td></tr>
+<tr><td><code>redshift</code></td><td>Redshift provided by <a href="https://github.com/launchbadge/sqlx">SQLx</a></td><td><code>redshift://&lt;user&gt;[:&lt;password&gt;]@&lt;host&gt;[:&lt;port&gt;]/&lt;database&gt;</code></td></tr>
+<tr><td><code>rusqlite</code></td><td>SQLite provided by <a href="https://github.com/rusqlite/rusqlite?tab=readme-ov-file#rusqlite">Rusqlite</a></td><td><code>rusqlite://[&lt;file&gt;]</code></td></tr>
+<tr><td><code>s3</code></td><td>Simple Storage Service (S3)</td><td><code>s3://[&lt;access_key_id&gt;:&lt;secret_access_key&gt;@]&lt;host&gt;[:&lt;port&gt;]/&lt;bucket&gt;/&lt;object&gt;[?region=&lt;region&gt;][&amp;session_token=&lt;token&gt;][&amp;force_path_style=(true\|false)][&amp;scheme=&lt;http\|https&gt;]</code></td></tr>
+<tr><td><code>snowflake</code></td><td>Snowflake provided by <a href="https://docs.snowflake.com/en/developer-guide/sql-api/index">Snowflake SQL API</a></td><td><code>snowflake://&lt;user&gt;[:&lt;token&gt;]@&lt;account&gt;.snowflakecomputing.com/[?private_key_file=pkey_file&amp;public_key_file=pubkey_file]</code></td></tr>
+<tr><td><code>sqlite</code></td><td>SQLite provided by <a href="https://github.com/launchbadge/sqlx">SQLx</a></td><td><code>sqlite://[&lt;file&gt;]</code></td></tr>
+<tr><td><code>sqlserver</code></td><td>SQL Server provided by <a href="https://github.com/prisma/tiberius">Tiberius</a></td><td><code>sqlserver://&lt;user&gt;[:&lt;password&gt;]@&lt;host&gt;[:&lt;port&gt;]/&lt;database&gt;</code></td></tr>
+<tr><td><code>tsv</code></td><td>Tab Separated Value (TSV) provided by <a href="https://github.com/pola-rs/polars">Polars</a></td><td><code>tsv://&lt;file&gt;[?has_header=&lt;true\|false&gt;][&amp;quote=&lt;char&gt;][&amp;skip_rows=&lt;n&gt;]</code></td></tr>
+<tr><td><code>xml</code></td><td>Extensible Markup Language (XML) provided by <a href="https://github.com/pola-rs/polars">Polars</a></td><td><code>xml://&lt;file&gt;</code></td></tr>
+<tr><td><code>xz</code></td><td>XZ compressed file</td><td><code>xz://&lt;file&gt;</code></td></tr>
+<tr><td><code>yaml</code></td><td>Extensible Markup Language (YAML) provided by <a href="https://github.com/pola-rs/polars">Polars</a></td><td><code>yaml://&lt;file&gt;</code></td></tr>
+<tr><td><code>zstd</code></td><td>Zstd compressed file</td><td><code>zstd://&lt;file&gt;</code></td></tr>
+</tbody></table>
+</div>
+<h3 id="examples-7"><a class="header" href="#examples-7">Examples</a></h3>
+<p>Show the available drivers:</p>
+<pre><code class="language-text">.drivers
+</code></pre>
+<h3 id="demonstration-8"><a class="header" href="#demonstration-8">Demonstration</a></h3>
+<video width="640" height="480" controls>
+  <source src="./demo.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="echo"><a class="header" href="#echo">echo</a></h2>
+<p>The <code>.echo</code> command controls whether rsql echoes executed commands (and optionally the prompt) to the output. This is
+useful for logging, debugging, or when you want to keep a record of all commands run in a session. By default, echo is
+off.</p>
+<h3 id="usage-8"><a class="header" href="#usage-8">Usage</a></h3>
+<pre><code class="language-text">.echo &lt;on|prompt|off&gt;
+</code></pre>
+<h3 id="when-to-use-7"><a class="header" href="#when-to-use-7">When to use</a></h3>
+<ul>
+<li>Enable echo (<code>on</code>) to log all commands for auditing or script debugging.</li>
+<li>Use <code>prompt</code> to echo both the prompt and commands, which is helpful for creating reproducible session logs.</li>
+<li>Disable echo (<code>off</code>) for a cleaner interactive experience.</li>
+</ul>
+<h3 id="examples-8"><a class="header" href="#examples-8">Examples</a></h3>
+<p>Show the current echo setting:</p>
+<pre><code class="language-text">.echo
+</code></pre>
+<p>Enable echoing commands:</p>
+<pre><code class="language-text">.echo on
+</code></pre>
+<p>Enable echoing the prompt and commands:</p>
+<pre><code class="language-text">.echo prompt
+</code></pre>
+<p>Disable echoing commands:</p>
+<pre><code class="language-text">.echo off
+</code></pre>
+<h3 id="troubleshooting-7"><a class="header" href="#troubleshooting-7">Troubleshooting</a></h3>
+<ul>
+<li>If your logs are missing commands, ensure <code>.echo on</code> or <code>.echo prompt</code> is set.</li>
+<li>For interactive use, keep echo off to avoid clutter.</li>
+</ul>
+<h3 id="related-7"><a class="header" href="#related-7">Related</a></h3>
+<ul>
+<li>See the <code>echo</code> option in <a href="chapter2/echo/../../appendix/rsql-toml.html">rsql.toml configuration</a>.</li>
+<li>For output redirection, see <a href="chapter2/echo/../output/index.html">output</a> and <a href="chapter2/echo/../tee/index.html">tee</a>.</li>
+</ul>
+<h3 id="demonstration-9"><a class="header" href="#demonstration-9">Demonstration</a></h3>
+<video width="640" height="480" controls>
+  <source src="./demo.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="exit"><a class="header" href="#exit">exit</a></h2>
+<p>The <code>.exit</code> command immediately terminates the rsql session. You can optionally provide an exit code, which is useful
+for scripting and automation to indicate success or failure to the calling process.</p>
+<h3 id="usage-9"><a class="header" href="#usage-9">Usage</a></h3>
+<pre><code class="language-text">.exit [code]
+</code></pre>
+<h3 id="when-to-use-8"><a class="header" href="#when-to-use-8">When to use</a></h3>
+<ul>
+<li>Use <code>.exit</code> to leave the CLI at any time.</li>
+<li>Provide a non-zero exit code (e.g., <code>.exit 1</code>) to signal an error in scripts or CI/CD pipelines.</li>
+</ul>
+<h3 id="examples-9"><a class="header" href="#examples-9">Examples</a></h3>
+<p>Exit the shell with a status code of 0 (success):</p>
+<pre><code class="language-text">.exit
+</code></pre>
+<p>Exit the shell with a status code of 1 (failure):</p>
+<pre><code class="language-text">.exit 1
+</code></pre>
+<h3 id="troubleshooting-8"><a class="header" href="#troubleshooting-8">Troubleshooting</a></h3>
+<ul>
+<li>If the shell does not exit as expected, check for background processes or pending operations.</li>
+<li>In scripts, use <code>.exit &lt;code&gt;</code> to control flow based on success or failure.</li>
+</ul>
+<h3 id="related-8"><a class="header" href="#related-8">Related</a></h3>
+<ul>
+<li>For quitting without specifying a code, see <a href="chapter2/exit/../quit/index.html">quit</a>.</li>
+<li>For error handling, see <a href="chapter2/exit/../bail/index.html">bail</a>.</li>
+</ul>
+<h3 id="demonstration-10"><a class="header" href="#demonstration-10">Demonstration</a></h3>
+<video width="640" height="480" controls>
+  <source src="./demo.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="footer"><a class="header" href="#footer">footer</a></h2>
+<p>The <code>.footer</code> command controls whether rsql displays a footer after query results. The footer typically shows summary
+information such as row counts, execution time, and other metadata. By default, the footer is displayed.</p>
+<h3 id="usage-10"><a class="header" href="#usage-10">Usage</a></h3>
+<pre><code class="language-text">.footer &lt;on|off&gt;
+</code></pre>
+<h3 id="when-to-use-9"><a class="header" href="#when-to-use-9">When to use</a></h3>
+<ul>
+<li>Enable the footer (<code>on</code>) to see summary information after each query—useful for data analysis and performance
+monitoring.</li>
+<li>Disable the footer (<code>off</code>) for a cleaner output, especially when exporting results or scripting.</li>
+</ul>
+<h3 id="examples-10"><a class="header" href="#examples-10">Examples</a></h3>
+<p>Show the current footer setting:</p>
+<pre><code class="language-text">.footer
+</code></pre>
+<p>Enable the footer:</p>
+<pre><code class="language-text">.footer on
+</code></pre>
+<p>Disable the footer:</p>
+<pre><code class="language-text">.footer off
+</code></pre>
+<h3 id="troubleshooting-9"><a class="header" href="#troubleshooting-9">Troubleshooting</a></h3>
+<ul>
+<li>If you do not see summary information, ensure <code>.footer on</code> is set.</li>
+<li>For minimal output, use <code>.footer off</code> in combination with <code>.header off</code> and <code>.changes off</code>.</li>
+</ul>
+<h3 id="related-9"><a class="header" href="#related-9">Related</a></h3>
+<ul>
+<li>See the <code>footer</code> option in <a href="chapter2/footer/../../appendix/rsql-toml.html">rsql.toml configuration</a>.</li>
+<li>For output customization, see <a href="chapter2/footer/../format/index.html">format</a>, <a href="chapter2/footer/../header/index.html">header</a>,
+and <a href="chapter2/footer/../changes/index.html">changes</a>.</li>
+</ul>
+<h3 id="demonstration-11"><a class="header" href="#demonstration-11">Demonstration</a></h3>
+<video width="640" height="480" controls>
+  <source src="./demo.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="foreign"><a class="header" href="#foreign">foreign</a></h2>
+<p>The <code>.foreign</code> command displays foreign key information for tables in your connected database. Foreign keys
+define relationships between tables and are essential for understanding data models.</p>
+<h3 id="usage-11"><a class="header" href="#usage-11">Usage</a></h3>
+<pre><code class="language-text">.foreign [table]
+</code></pre>
+<h3 id="when-to-use-10"><a class="header" href="#when-to-use-10">When to use</a></h3>
+<ul>
+<li>Use <code>.foreign</code> to list all foreign keys in the database.</li>
+<li>Specify a table (e.g., <code>.foreign orders</code>) to see foreign keys for that specific table.</li>
+<li>Use to understand table relationships, which is essential for writing joins and maintaining referential
+integrity.</li>
+</ul>
+<h3 id="examples-11"><a class="header" href="#examples-11">Examples</a></h3>
+<p>Display the foreign keys for all tables:</p>
+<pre><code class="language-text">.foreign
+</code></pre>
+<p>Display the foreign keys for the <code>orders</code> table:</p>
+<pre><code class="language-text">.foreign orders
+</code></pre>
+<h3 id="output"><a class="header" href="#output">Output</a></h3>
+<p>The output includes:</p>
+<ul>
+<li><strong>Table</strong> — the table name</li>
+<li><strong>Foreign Key</strong> — the constraint name</li>
+<li><strong>Columns</strong> — the local column(s) in the foreign key</li>
+<li><strong>Referenced Table</strong> — the table being referenced</li>
+<li><strong>Referenced Columns</strong> — the column(s) in the referenced table</li>
+<li><strong>Inferred</strong> — whether the foreign key was declared in the schema or inferred from naming conventions
+(e.g., a <code>user_id</code> column referencing a <code>users</code> table with an <code>id</code> column)</li>
+</ul>
+<h3 id="troubleshooting-10"><a class="header" href="#troubleshooting-10">Troubleshooting</a></h3>
+<ul>
+<li>If no foreign keys are shown, ensure your database supports foreign key metadata and you have the
+necessary permissions.</li>
+<li>Some file-based or NoSQL data sources may not support foreign keys natively; inferred keys may still
+be displayed.</li>
+</ul>
+<h3 id="related-10"><a class="header" href="#related-10">Related</a></h3>
+<ul>
+<li><a href="chapter2/foreign/../describe/index.html">describe</a> for full table structure</li>
+<li><a href="chapter2/foreign/../primary/index.html">primary</a> for primary keys</li>
+<li><a href="chapter2/foreign/../indexes/index.html">indexes</a> for index information</li>
+</ul>
+<h3 id="demonstration-12"><a class="header" href="#demonstration-12">Demonstration</a></h3>
+<video width="640" height="480" controls>
+  <source src="./demo.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="format"><a class="header" href="#format">format</a></h2>
+<p>The <code>.format</code> command sets the output format for query results in rsql. This allows you to tailor the display for
+readability, data export, or integration with other tools. The default format is <code>psql</code>, but many formats are available
+for different use cases.</p>
+<h3 id="usage-12"><a class="header" href="#usage-12">Usage</a></h3>
+<pre><code class="language-text">.format [format]
+</code></pre>
+<h3 id="available-formats"><a class="header" href="#available-formats">Available Formats</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Format</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>ascii</code></td><td>ASCII characters to draw a table</td></tr>
+<tr><td><code>csv</code></td><td><a href="https://www.ietf.org/rfc/rfc4180.txt">Comma Separated Values (CSV)</a></td></tr>
+<tr><td><code>expanded</code></td><td><a href="https://www.postgresql.org/docs/current/app-psql.html">PostgreSQL Expanded Format</a></td></tr>
+<tr><td><code>html</code></td><td><a href="https://html.spec.whatwg.org/multipage/">HyperText Markup Language (HTML)</a></td></tr>
+<tr><td><code>json</code></td><td><a href="https://datatracker.ietf.org/doc/html/rfc8259">JavaScript Object Notation (JSON)</a></td></tr>
+<tr><td><code>jsonl</code></td><td><a href="https://jsonlines.org/">JSON Lines (JSONL)</a></td></tr>
+<tr><td><code>markdown</code></td><td><a href="https://www.markdownguide.org/extended-syntax/#tables">Markdown</a></td></tr>
+<tr><td><code>plain</code></td><td>Column based layout</td></tr>
+<tr><td><code>psql</code></td><td><a href="https://www.postgresql.org/docs/current/app-psql.html">PostgreSQL Standard Format</a></td></tr>
+<tr><td><code>sqlite</code></td><td>SQLite formatted table</td></tr>
+<tr><td><code>tsv</code></td><td><a href="https://en.wikipedia.org/wiki/Tab-separated_values">Tab Separated Values (TSV)</a></td></tr>
+<tr><td><code>unicode</code></td><td>Unicode characters to draw a table</td></tr>
+<tr><td><code>xml</code></td><td><a href="https://www.w3.org/TR/xml11/">Extensible Markup Language (XML)</a></td></tr>
+<tr><td><code>yaml</code></td><td><a href="https://yaml.org/spec/1.2.2/">YAML Ain’t Markup Language (YAML)</a></td></tr>
+</tbody></table>
+</div>
+<h3 id="when-to-use-11"><a class="header" href="#when-to-use-11">When to use</a></h3>
+<ul>
+<li>Use <code>unicode</code>, <code>ascii</code>, or <code>psql</code> for interactive exploration.</li>
+<li>Use <code>csv</code>, <code>tsv</code>, <code>json</code>, <code>jsonl</code>, <code>xml</code>, or <code>yaml</code> for exporting data or integrating with other tools.</li>
+<li>Use <code>markdown</code> or <code>html</code> for documentation or reporting.</li>
+<li>Use <code>expanded</code> for wide tables or when you want each row displayed vertically.</li>
+</ul>
+<h3 id="examples-12"><a class="header" href="#examples-12">Examples</a></h3>
+<p>Show the current format mode:</p>
+<pre><code class="language-text">.format
+</code></pre>
+<p>Set the format mode to <code>ascii</code>:</p>
+<pre><code class="language-text">.format ascii
+</code></pre>
+<p>Set the format mode to <code>json</code> for machine-readable output:</p>
+<pre><code class="language-text">.format json
+</code></pre>
+<h3 id="troubleshooting-11"><a class="header" href="#troubleshooting-11">Troubleshooting</a></h3>
+<ul>
+<li>If output looks garbled in your terminal, try switching to <code>ascii</code> or <code>plain</code>.</li>
+<li>For large exports, prefer <code>csv</code>, <code>tsv</code>, or <code>jsonl</code> for best performance.</li>
+</ul>
+<h3 id="related-11"><a class="header" href="#related-11">Related</a></h3>
+<ul>
+<li>See the <code>format</code> option in <a href="chapter2/format/../../appendix/rsql-toml.html">rsql.toml configuration</a>.</li>
+<li>For header/footer control, see <a href="chapter2/format/../header/index.html">header</a> and <a href="chapter2/format/../footer/index.html">footer</a>.</li>
+</ul>
+<h3 id="demonstration-13"><a class="header" href="#demonstration-13">Demonstration</a></h3>
+<video width="640" height="480" controls>
+  <source src="./demo.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="header"><a class="header" href="#header">header</a></h2>
+<p>The <code>.header</code> command controls whether rsql displays a header row (column names) above query results. By default, the
+header is displayed, making it easier to interpret data, especially for wide tables or unfamiliar queries.</p>
+<h3 id="usage-13"><a class="header" href="#usage-13">Usage</a></h3>
+<pre><code class="language-text">.header &lt;on|off&gt;
+</code></pre>
+<h3 id="when-to-use-12"><a class="header" href="#when-to-use-12">When to use</a></h3>
+<ul>
+<li>Enable the header (<code>on</code>) for interactive exploration, data analysis, or when sharing results with others.</li>
+<li>Disable the header (<code>off</code>) for minimal output, such as when exporting data for further processing.</li>
+</ul>
+<h3 id="examples-13"><a class="header" href="#examples-13">Examples</a></h3>
+<p>Show the current header setting:</p>
+<pre><code class="language-text">.header
+</code></pre>
+<p>Enable the header:</p>
+<pre><code class="language-text">.header on
+</code></pre>
+<p>Disable the header:</p>
+<pre><code class="language-text">.header off
+</code></pre>
+<h3 id="troubleshooting-12"><a class="header" href="#troubleshooting-12">Troubleshooting</a></h3>
+<ul>
+<li>If you do not see column names, ensure <code>.header on</code> is set.</li>
+<li>For scripting or exporting, use <code>.header off</code> to avoid extra lines in output files.</li>
+</ul>
+<h3 id="related-12"><a class="header" href="#related-12">Related</a></h3>
+<ul>
+<li>See the <code>header</code> option in <a href="chapter2/header/../../appendix/rsql-toml.html">rsql.toml configuration</a>.</li>
+<li>For output customization, see <a href="chapter2/header/../format/index.html">format</a>, <a href="chapter2/header/../footer/index.html">footer</a>,
+and <a href="chapter2/header/../changes/index.html">changes</a>.</li>
+</ul>
+<h3 id="demonstration-14"><a class="header" href="#demonstration-14">Demonstration</a></h3>
+<video width="640" height="480" controls>
+  <source src="./demo.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="help"><a class="header" href="#help">help</a></h2>
+<p>The <code>.help</code> command displays a list of available commands and their usage in rsql. This is your go-to resource for
+learning about built-in commands, their syntax, and quick tips for usage.</p>
+<h3 id="usage-14"><a class="header" href="#usage-14">Usage</a></h3>
+<pre><code class="language-text">.help
+</code></pre>
+<h3 id="when-to-use-13"><a class="header" href="#when-to-use-13">When to use</a></h3>
+<ul>
+<li>Use <code>.help</code> if you forget a command or want to discover new features.</li>
+<li>Helpful for onboarding new users or troubleshooting command syntax.</li>
+</ul>
+<h3 id="examples-14"><a class="header" href="#examples-14">Examples</a></h3>
+<p>Show the help information:</p>
+<pre><code class="language-text">.help
+</code></pre>
+<h3 id="troubleshooting-13"><a class="header" href="#troubleshooting-13">Troubleshooting</a></h3>
+<ul>
+<li>If you do not see the expected help output, ensure you are running the latest version of rsql.</li>
+<li>For detailed documentation, see the <a href="chapter2/help/../index.html">Commands</a> section or
+the <a href="chapter2/help/../../appendix/index.html#faq--tips--tricks">FAQ &amp; Tips</a>.</li>
+</ul>
+<h3 id="related-13"><a class="header" href="#related-13">Related</a></h3>
+<ul>
+<li>For command-specific help, see the documentation for each command in <a href="chapter2/help/../index.html">Commands</a>.</li>
+</ul>
+<h3 id="demonstration-15"><a class="header" href="#demonstration-15">Demonstration</a></h3>
+<video width="640" height="480" controls>
+  <source src="./demo.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="history"><a class="header" href="#history">history</a></h2>
+<p>The <code>.history</code> command manages and displays the command history in rsql. This feature helps you recall, repeat, or edit
+previous commands, improving productivity in interactive sessions. You can also enable or disable history tracking as
+needed.</p>
+<h3 id="usage-15"><a class="header" href="#usage-15">Usage</a></h3>
+<pre><code class="language-text">.history &lt;on|off&gt;
+</code></pre>
+<h3 id="when-to-use-14"><a class="header" href="#when-to-use-14">When to use</a></h3>
+<ul>
+<li>Use <code>.history</code> to review or search previous commands.</li>
+<li>Enable history (<code>on</code>) to keep a record of your session for future reference.</li>
+<li>Disable history (<code>off</code>) for privacy or when working with sensitive data.</li>
+</ul>
+<h3 id="examples-15"><a class="header" href="#examples-15">Examples</a></h3>
+<p>Show the current history setting and display the history:</p>
+<pre><code class="language-text">.history
+</code></pre>
+<p>Enable history tracking:</p>
+<pre><code class="language-text">.history on
+</code></pre>
+<p>Disable history tracking:</p>
+<pre><code class="language-text">.history off
+</code></pre>
+<h3 id="troubleshooting-14"><a class="header" href="#troubleshooting-14">Troubleshooting</a></h3>
+<ul>
+<li>If commands are not being saved, ensure <code>.history on</code> is set and your configuration allows history.</li>
+<li>For privacy, use <code>.history off</code> or clear the history file manually.</li>
+</ul>
+<h3 id="related-14"><a class="header" href="#related-14">Related</a></h3>
+<ul>
+<li>See the <code>history.enabled</code> and <code>history.limit</code> options in <a href="chapter2/history/../../appendix/rsql-toml.html">rsql.toml configuration</a>.</li>
+<li>For command recall, use arrow keys or search shortcuts in your terminal.</li>
+</ul>
+<h3 id="demonstration-16"><a class="header" href="#demonstration-16">Demonstration</a></h3>
+<video width="640" height="480" controls>
+  <source src="./demo.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="indexes"><a class="header" href="#indexes">indexes</a></h2>
+<p>The <code>.indexes</code> command displays index information for tables in your connected database. Indexes are critical for query
+performance and data integrity, so this command is useful for database tuning, troubleshooting, and schema exploration.</p>
+<h3 id="usage-16"><a class="header" href="#usage-16">Usage</a></h3>
+<pre><code class="language-text">.indexes [table]
+</code></pre>
+<h3 id="when-to-use-15"><a class="header" href="#when-to-use-15">When to use</a></h3>
+<ul>
+<li>Use <code>.indexes</code> to list all indexes in the database, helping you understand how queries are optimized.</li>
+<li>Specify a table (e.g., <code>.indexes users</code>) to see indexes relevant to that table, which is helpful for performance
+tuning or debugging slow queries.</li>
+</ul>
+<h3 id="examples-16"><a class="header" href="#examples-16">Examples</a></h3>
+<p>Display the indexes for all tables:</p>
+<pre><code class="language-text">.indexes
+</code></pre>
+<p>Display the indexes for the <code>users</code> table:</p>
+<pre><code class="language-text">.indexes users
+</code></pre>
+<h3 id="troubleshooting-15"><a class="header" href="#troubleshooting-15">Troubleshooting</a></h3>
+<ul>
+<li>If no indexes are shown, ensure your database supports index metadata and you have the necessary permissions.</li>
+<li>Some file-based or NoSQL data sources may not support indexes.</li>
+</ul>
+<h3 id="related-15"><a class="header" href="#related-15">Related</a></h3>
+<ul>
+<li>See also: <a href="chapter2/indexes/../describe/index.html">describe</a> for table structure, <a href="chapter2/indexes/../tables/index.html">tables</a> for table listing,
+and <a href="chapter2/indexes/../schemas/index.html">schemas</a> for schema exploration.</li>
+</ul>
+<h3 id="demonstration-17"><a class="header" href="#demonstration-17">Demonstration</a></h3>
+<video width="640" height="480" controls>
+  <source src="./demo.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="limit"><a class="header" href="#limit">limit</a></h2>
+<p>The <code>.limit</code> command sets the maximum number of rows displayed for query results in rsql. This is useful for controlling
+output size, especially when working with large datasets or when you want to preview data without overwhelming your
+terminal.</p>
+<h3 id="usage-17"><a class="header" href="#usage-17">Usage</a></h3>
+<pre><code class="language-text">.limit [rows]
+</code></pre>
+<h3 id="when-to-use-16"><a class="header" href="#when-to-use-16">When to use</a></h3>
+<ul>
+<li>Use <code>.limit 10</code> to preview a small sample of your data.</li>
+<li>Use <code>.limit 0</code> to remove the row limit and display all results (be cautious with large tables).</li>
+<li>Adjust the limit for exporting, reporting, or interactive exploration.</li>
+</ul>
+<h3 id="examples-17"><a class="header" href="#examples-17">Examples</a></h3>
+<p>Display the current limit setting:</p>
+<pre><code class="language-text">.limit
+</code></pre>
+<p>Set row limit to unlimited (all rows):</p>
+<pre><code class="language-text">.limit 0
+</code></pre>
+<p>Set row limit to 10:</p>
+<pre><code class="language-text">.limit 10
+</code></pre>
+<h3 id="troubleshooting-16"><a class="header" href="#troubleshooting-16">Troubleshooting</a></h3>
+<ul>
+<li>If you see fewer rows than expected, check the current limit setting.</li>
+<li>For very large tables, avoid <code>.limit 0</code> unless you are sure your terminal and system can handle the output.</li>
+</ul>
+<h3 id="related-16"><a class="header" href="#related-16">Related</a></h3>
+<ul>
+<li>See the <code>limit</code> option in <a href="chapter2/limit/../../appendix/rsql-toml.html">rsql.toml configuration</a>.</li>
+<li>For output customization, see <a href="chapter2/limit/../format/index.html">format</a>, <a href="chapter2/limit/../header/index.html">header</a>,
+and <a href="chapter2/limit/../footer/index.html">footer</a>.</li>
+</ul>
+<h3 id="demonstration-18"><a class="header" href="#demonstration-18">Demonstration</a></h3>
+<video width="640" height="480" controls>
+  <source src="./demo.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="locale"><a class="header" href="#locale">locale</a></h2>
+<p>The <code>.locale</code> command sets or displays the current locale used by rsql for formatting numbers, dates, and messages. This
+is useful for international users or when you want to match output to a specific language or regional format.</p>
+<h3 id="usage-18"><a class="header" href="#usage-18">Usage</a></h3>
+<pre><code class="language-text">.locale [locale]
+</code></pre>
+<h3 id="when-to-use-17"><a class="header" href="#when-to-use-17">When to use</a></h3>
+<ul>
+<li>Use <code>.locale</code> to check the current locale setting.</li>
+<li>Set a specific locale (e.g., <code>.locale en-GB</code>) to change language and number formatting.</li>
+<li>Useful for multi-language environments, demos, or when sharing results with users in different regions.</li>
+</ul>
+<h3 id="description-1"><a class="header" href="#description-1">Description</a></h3>
+<p>The locale command sets the locale for the CLI. The locale is used to display numeric values in the specified locale.
+The default locale is determined by the system settings, or the <code>en</code> locale if the system settings can not be
+determined.</p>
+<h3 id="examples-18"><a class="header" href="#examples-18">Examples</a></h3>
+<p>Show the current locale setting:</p>
+<pre><code class="language-text">.locale
+</code></pre>
+<p>Set the locale to British English:</p>
+<pre><code class="language-text">.locale en-GB
+</code></pre>
+<p>Set the locale to French:</p>
+<pre><code class="language-text">.locale fr
+</code></pre>
+<h3 id="troubleshooting-17"><a class="header" href="#troubleshooting-17">Troubleshooting</a></h3>
+<ul>
+<li>If you see untranslated or garbled text, ensure your locale is supported (
+see <a href="chapter2/locale/../../appendix/supported-locales.html">Supported Locales</a>).</li>
+<li>Some output (such as database errors) may not be localized if not supported by the driver.</li>
+</ul>
+<h3 id="related-17"><a class="header" href="#related-17">Related</a></h3>
+<ul>
+<li>See the <code>locale</code> option in <a href="chapter2/locale/../../appendix/rsql-toml.html">rsql.toml configuration</a>.</li>
+<li>For contributing translations, see [Supported Locales](../../appendix/supported-local</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="output-1"><a class="header" href="#output-1">output</a></h2>
+<p>The <code>.output</code> command redirects the output of rsql commands to a file or the system clipboard, instead of the default
+stdout (console). This is useful for saving results, sharing data, or integrating with other tools.</p>
+<h3 id="usage-19"><a class="header" href="#usage-19">Usage</a></h3>
+<pre><code class="language-text">.output [filename|clipboard]
+</code></pre>
+<h3 id="when-to-use-18"><a class="header" href="#when-to-use-18">When to use</a></h3>
+<ul>
+<li>Use <code>.output output.txt</code> to save results to a file for later analysis or sharing.</li>
+<li>Use <code>.output clipboard</code> to copy results directly to your system clipboard (supported platforms only).</li>
+<li>Use <code>.output</code> with no arguments to reset output to the console.</li>
+</ul>
+<h3 id="examples-19"><a class="header" href="#examples-19">Examples</a></h3>
+<p>Redirect output to the system clipboard:</p>
+<pre><code class="language-text">.output clipboard
+</code></pre>
+<p>Redirect output to a file named <code>output.txt</code>:</p>
+<pre><code class="language-text">.output output.txt
+</code></pre>
+<p>Reset output to the console:</p>
+<pre><code class="language-text">.output
+</code></pre>
+<h3 id="troubleshooting-18"><a class="header" href="#troubleshooting-18">Troubleshooting</a></h3>
+<ul>
+<li>If the clipboard option does not work, ensure your platform supports clipboard integration.</li>
+<li>If the file cannot be written, check file permissions and available disk space.</li>
+</ul>
+<h3 id="related-18"><a class="header" href="#related-18">Related</a></h3>
+<ul>
+<li>For splitting output to multiple destinations, see <a href="chapter2/output/../tee/index.html">tee</a>.</li>
+<li>For changing output format, see <a href="chapter2/output/../format/index.html">format</a>.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="primary"><a class="header" href="#primary">primary</a></h2>
+<p>The <code>.primary</code> command displays primary key information for tables in your connected database. Primary keys
+identify unique rows in a table and are critical for data integrity.</p>
+<h3 id="usage-20"><a class="header" href="#usage-20">Usage</a></h3>
+<pre><code class="language-text">.primary [table]
+</code></pre>
+<h3 id="when-to-use-19"><a class="header" href="#when-to-use-19">When to use</a></h3>
+<ul>
+<li>Use <code>.primary</code> to list all primary keys in the database.</li>
+<li>Specify a table (e.g., <code>.primary users</code>) to see the primary key for that specific table.</li>
+<li>Use to understand how tables are uniquely identified, which is essential for joins and data integrity.</li>
+</ul>
+<h3 id="examples-20"><a class="header" href="#examples-20">Examples</a></h3>
+<p>Display the primary keys for all tables:</p>
+<pre><code class="language-text">.primary
+</code></pre>
+<p>Display the primary key for the <code>users</code> table:</p>
+<pre><code class="language-text">.primary users
+</code></pre>
+<h3 id="output-2"><a class="header" href="#output-2">Output</a></h3>
+<p>The output includes:</p>
+<ul>
+<li><strong>Table</strong> — the table name</li>
+<li><strong>Primary Key</strong> — the constraint name</li>
+<li><strong>Columns</strong> — the column(s) that make up the primary key</li>
+<li><strong>Inferred</strong> — whether the primary key was declared in the schema or inferred from naming conventions
+(e.g., a NOT NULL column named <code>id</code>)</li>
+</ul>
+<h3 id="troubleshooting-19"><a class="header" href="#troubleshooting-19">Troubleshooting</a></h3>
+<ul>
+<li>If no primary keys are shown, ensure your database supports primary key metadata and you have the
+necessary permissions.</li>
+<li>Some file-based or NoSQL data sources may not support primary keys natively; inferred keys may still
+be displayed.</li>
+</ul>
+<h3 id="related-19"><a class="header" href="#related-19">Related</a></h3>
+<ul>
+<li><a href="chapter2/primary/../describe/index.html">describe</a> for full table structure</li>
+<li><a href="chapter2/primary/../foreign/index.html">foreign</a> for foreign keys</li>
+<li><a href="chapter2/primary/../indexes/index.html">indexes</a> for index information</li>
+</ul>
+<h3 id="demonstration-19"><a class="header" href="#demonstration-19">Demonstration</a></h3>
+<video width="640" height="480" controls>
+  <source src="./demo.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="print"><a class="header" href="#print">print</a></h2>
+<p>The <code>.print</code> command outputs a message to the current output destination (console, file, or clipboard if redirected).
+This is useful for adding comments, separators, or debugging information in scripts and interactive sessions.</p>
+<h3 id="usage-21"><a class="header" href="#usage-21">Usage</a></h3>
+<pre><code class="language-text">.print [string]
+</code></pre>
+<h3 id="when-to-use-20"><a class="header" href="#when-to-use-20">When to use</a></h3>
+<ul>
+<li>Use <code>.print</code> to display custom messages, progress updates, or script annotations.</li>
+<li>Helpful for marking sections in output files or logs.</li>
+</ul>
+<h3 id="examples-21"><a class="header" href="#examples-21">Examples</a></h3>
+<p>Print a message to the output:</p>
+<pre><code class="language-text">.print &quot;hello, world!&quot;
+</code></pre>
+<p>Print a separator line:</p>
+<pre><code class="language-text">.print &quot;--------------------&quot;
+</code></pre>
+<h3 id="troubleshooting-20"><a class="header" href="#troubleshooting-20">Troubleshooting</a></h3>
+<ul>
+<li>If you do not see the message, check if output is redirected (see <code>.output</code>).</li>
+<li>Ensure your string is properly quoted if it contains spaces or special characters.</li>
+</ul>
+<h3 id="related-20"><a class="header" href="#related-20">Related</a></h3>
+<ul>
+<li>For output redirection, see <a href="chapter2/print/../output/index.html">output</a> and <a href="chapter2/print/../tee/index.html">tee</a>.</li>
+</ul>
+<h3 id="demonstration-20"><a class="header" href="#demonstration-20">Demonstration</a></h3>
+<video width="640" height="480" controls>
+  <source src="./demo.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="quit"><a class="header" href="#quit">quit</a></h2>
+<p>The <code>.quit</code> command immediately exits the rsql CLI session. It is functionally equivalent to <code>.exit</code> but does not accept
+an exit code. Use this command to leave the CLI at any time.</p>
+<h3 id="usage-22"><a class="header" href="#usage-22">Usage</a></h3>
+<pre><code class="language-text">.quit
+</code></pre>
+<h3 id="when-to-use-21"><a class="header" href="#when-to-use-21">When to use</a></h3>
+<ul>
+<li>Use <code>.quit</code> to end your session quickly and cleanly.</li>
+<li>Useful for interactive sessions or when you want to ensure all resources are released.</li>
+</ul>
+<h3 id="examples-22"><a class="header" href="#examples-22">Examples</a></h3>
+<p>Exit the CLI:</p>
+<pre><code class="language-text">.quit
+</code></pre>
+<h3 id="troubleshooting-21"><a class="header" href="#troubleshooting-21">Troubleshooting</a></h3>
+<ul>
+<li>If the CLI does not exit, check for background operations or pending queries.</li>
+<li>For scripting or automation, prefer <code>.exit</code> if you need to specify an exit code.</li>
+</ul>
+<h3 id="related-21"><a class="header" href="#related-21">Related</a></h3>
+<ul>
+<li><a href="chapter2/quit/../exit/index.html">exit</a> for exiting with a status code</li>
+</ul>
+<h3 id="demonstration-21"><a class="header" href="#demonstration-21">Demonstration</a></h3>
+<video width="640" height="480" controls>
+  <source src="./demo.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="read"><a class="header" href="#read">read</a></h2>
+<h3 id="usage-23"><a class="header" href="#usage-23">Usage</a></h3>
+<pre><code class="language-text">.read [filename]
+</code></pre>
+<h3 id="description-2"><a class="header" href="#description-2">Description</a></h3>
+<p>Read and execute SQL commands from a file. The file must contain valid SQL commands.
+Multi-line SQL statements should be terminated with a semicolon (<code>;</code>).</p>
+<h3 id="examples-23"><a class="header" href="#examples-23">Examples</a></h3>
+<p>Read and execute SQL commands from a file named <code>commands.sql</code>:</p>
+<pre><code class="language-text">.read commands.sql
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="rows"><a class="header" href="#rows">rows</a></h2>
+<p>The <code>.rows</code> command toggles the display of the number of rows returned by a query in rsql. This is useful for quickly
+verifying the size of your result set, especially when filtering or aggregating data.</p>
+<h3 id="usage-24"><a class="header" href="#usage-24">Usage</a></h3>
+<pre><code class="language-text">.rows &lt;on|off&gt;
+</code></pre>
+<h3 id="when-to-use-22"><a class="header" href="#when-to-use-22">When to use</a></h3>
+<ul>
+<li>Enable <code>.rows on</code> to always see how many rows your queries return—helpful for data validation and exploration.</li>
+<li>Disable <code>.rows off</code> for a cleaner output, especially when exporting results or scripting.</li>
+</ul>
+<h3 id="examples-24"><a class="header" href="#examples-24">Examples</a></h3>
+<p>Show the current rows setting:</p>
+<pre><code class="language-text">.rows
+</code></pre>
+<p>Turn on the rows returned display:</p>
+<pre><code class="language-text">.rows on
+</code></pre>
+<p>Turn off the rows returned display:</p>
+<pre><code class="language-text">.rows off
+</code></pre>
+<h3 id="troubleshooting-22"><a class="header" href="#troubleshooting-22">Troubleshooting</a></h3>
+<ul>
+<li>If you do not see row counts, ensure <code>.rows on</code> is set.</li>
+<li>For minimal output, use <code>.rows off</code> in combination with <code>.header off</code> and <code>.footer off</code>.</li>
+</ul>
+<h3 id="related-22"><a class="header" href="#related-22">Related</a></h3>
+<ul>
+<li>See the <code>rows</code> option in <a href="chapter2/rows/../../appendix/rsql-toml.html">rsql.toml configuration</a>.</li>
+<li>For output customization, see <a href="chapter2/rows/../format/index.html">format</a>, <a href="chapter2/rows/../header/index.html">header</a>,
+and <a href="chapter2/rows/../footer/index.html">footer</a>.</li>
+</ul>
+<h3 id="demonstration-22"><a class="header" href="#demonstration-22">Demonstration</a></h3>
+<video width="640" height="480" controls>
+  <source src="./demo.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="schemas"><a class="header" href="#schemas">schemas</a></h2>
+<p>The <code>.schemas</code> command lists all schemas available in the connected data source. Schemas are logical containers for
+tables, views, and other database objects, and are especially important in multi-tenant or enterprise databases.</p>
+<h3 id="usage-25"><a class="header" href="#usage-25">Usage</a></h3>
+<pre><code class="language-text">.schemas
+</code></pre>
+<h3 id="when-to-use-23"><a class="header" href="#when-to-use-23">When to use</a></h3>
+<ul>
+<li>Use <code>.schemas</code> to discover available schemas when connecting to complex databases.</li>
+<li>Helpful for exploring unfamiliar data sources, organizing queries, or verifying access permissions.</li>
+</ul>
+<h3 id="examples-25"><a class="header" href="#examples-25">Examples</a></h3>
+<p>List all schemas in the current data source:</p>
+<pre><code class="language-text">.schemas
+</code></pre>
+<h3 id="troubleshooting-23"><a class="header" href="#troubleshooting-23">Troubleshooting</a></h3>
+<ul>
+<li>If no schemas are listed, ensure your connection has the necessary permissions.</li>
+<li>Some databases may not support schemas; in that case, this command may return an empty result.</li>
+</ul>
+<h3 id="related-23"><a class="header" href="#related-23">Related</a></h3>
+<ul>
+<li>See also: <a href="chapter2/schemas/../catalogs/index.html">catalogs</a> and <a href="chapter2/schemas/../tables/index.html">tables</a> for further exploration.</li>
+</ul>
+<h3 id="demonstration-23"><a class="header" href="#demonstration-23">Demonstration</a></h3>
+<video width="640" height="480" controls>
+  <source src="./demo.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="sleep"><a class="header" href="#sleep">sleep</a></h2>
+<h3 id="usage-26"><a class="header" href="#usage-26">Usage</a></h3>
+<pre><code class="language-text">.sleep &lt;seconds&gt;
+</code></pre>
+<h3 id="description-3"><a class="header" href="#description-3">Description</a></h3>
+<p>The sleep command pauses the CLI for the specified number of seconds. This command is can be used in scripts
+to simulate delayed user interaction with a data source.</p>
+<h3 id="examples-26"><a class="header" href="#examples-26">Examples</a></h3>
+<p>Sleep for 1 second:</p>
+<pre><code class="language-text">.sleep
+</code></pre>
+<p>Sleep for 3 seconds:</p>
+<pre><code class="language-text">.sleep 3
+</code></pre>
+<p>Sleep for .5 seconds:</p>
+<pre><code class="language-text">.sleep .5
+</code></pre>
+<h3 id="demonstration-24"><a class="header" href="#demonstration-24">Demonstration</a></h3>
+<video width="640" height="480" controls>
+  <source src="./demo.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="system"><a class="header" href="#system">system</a></h2>
+<p>The <code>.system</code> command executes an operating system command from within rsql. This is useful for running shell commands,
+inspecting the environment, or integrating with other tools without leaving the CLI.</p>
+<h3 id="usage-27"><a class="header" href="#usage-27">Usage</a></h3>
+<pre><code class="language-text">.system command [args]
+</code></pre>
+<h3 id="description-4"><a class="header" href="#description-4">Description</a></h3>
+<p>The system command executes the specified operating system command. The command and any optional arguments are passed
+to the operating system shell for execution. The output of the command is displayed to the defined output.</p>
+<h3 id="when-to-use-24"><a class="header" href="#when-to-use-24">When to use</a></h3>
+<ul>
+<li>Use <code>.system</code> to run shell commands (e.g., <code>ls</code>, <code>pwd</code>, <code>cat file.txt</code>) without leaving rsql.</li>
+<li>Helpful for automation, scripting, or when you need to check files, directories, or system status during a session.</li>
+</ul>
+<h3 id="examples-27"><a class="header" href="#examples-27">Examples</a></h3>
+<p>Print the current working directory:</p>
+<pre><code class="language-text">.system pwd
+</code></pre>
+<p>List the current directory:</p>
+<pre><code class="language-text">.system ls -l
+</code></pre>
+<p>Run a script or external tool:</p>
+<pre><code class="language-text">.system ./myscript.sh arg1 arg2
+</code></pre>
+<h3 id="troubleshooting-24"><a class="header" href="#troubleshooting-24">Troubleshooting</a></h3>
+<ul>
+<li>If a command fails, check the syntax and ensure the command exists in your system's PATH.</li>
+<li>Output is sent to the current output destination (see <code>.output</code>).</li>
+<li>Some commands may behave differently depending on your OS (macOS, Linux, Windows).</li>
+</ul>
+<h3 id="related-24"><a class="header" href="#related-24">Related</a></h3>
+<ul>
+<li>For output redirection, see <a href="chapter2/system/../output/index.html">output</a> and <a href="chapter2/system/../tee/index.html">tee</a>.</li>
+<li>For scripting, see <a href="chapter2/system/../read/index.html">read</a> and <a href="chapter2/system/../sleep/index.html">sleep</a>.</li>
+</ul>
+<h3 id="demonstration-25"><a class="header" href="#demonstration-25">Demonstration</a></h3>
+<video width="640" height="480" controls>
+  <source src="./demo.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="tables"><a class="header" href="#tables">tables</a></h2>
+<p>The <code>.tables</code> command lists all tables available in the current schema or data source. This is essential for data
+exploration, query building, and verifying your access to specific tables.</p>
+<h3 id="usage-28"><a class="header" href="#usage-28">Usage</a></h3>
+<pre><code class="language-text">.tables
+</code></pre>
+<h3 id="when-to-use-25"><a class="header" href="#when-to-use-25">When to use</a></h3>
+<ul>
+<li>Use <code>.tables</code> to discover available tables before writing queries.</li>
+<li>Helpful for exploring unfamiliar databases, verifying schema changes, or onboarding new users.</li>
+</ul>
+<h3 id="examples-28"><a class="header" href="#examples-28">Examples</a></h3>
+<p>List all tables in the current schema:</p>
+<pre><code class="language-text">.tables
+</code></pre>
+<h3 id="troubleshooting-25"><a class="header" href="#troubleshooting-25">Troubleshooting</a></h3>
+<ul>
+<li>If no tables are listed, ensure you are connected to the correct schema and have the necessary permissions.</li>
+<li>Some data sources may require you to set the schema context first.</li>
+</ul>
+<h3 id="related-25"><a class="header" href="#related-25">Related</a></h3>
+<ul>
+<li>See also: <a href="chapter2/tables/../schemas/index.html">schemas</a> for schema selection and <a href="chapter2/tables/../describe/index.html">describe</a> for table details.</li>
+</ul>
+<h3 id="demonstration-26"><a class="header" href="#demonstration-26">Demonstration</a></h3>
+<video width="640" height="480" controls>
+  <source src="./demo.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="tee"><a class="header" href="#tee">tee</a></h2>
+<p>The <code>.tee</code> command duplicates the output of rsql commands to both the console (stdout) and a file or the system
+clipboard. This is useful for logging, auditing, or sharing results while still seeing them interactively.</p>
+<h3 id="usage-29"><a class="header" href="#usage-29">Usage</a></h3>
+<pre><code class="language-text">.tee [filename|clipboard]
+</code></pre>
+<h3 id="when-to-use-26"><a class="header" href="#when-to-use-26">When to use</a></h3>
+<ul>
+<li>Use <code>.tee output.txt</code> to save results to a file while also displaying them in the console.</li>
+<li>Use <code>.tee clipboard</code> to copy results to your clipboard and see them in the console (supported platforms only).</li>
+<li>Use <code>.tee</code> with no arguments to reset output to the console only.</li>
+</ul>
+<h3 id="examples-29"><a class="header" href="#examples-29">Examples</a></h3>
+<p>Redirect output to the system clipboard and the console:</p>
+<pre><code class="language-text">.tee clipboard
+</code></pre>
+<p>Redirect output to a file named <code>output.txt</code> and the console:</p>
+<pre><code class="language-text">.tee output.txt
+</code></pre>
+<p>Reset output to the console only:</p>
+<pre><code class="language-text">.tee
+</code></pre>
+<h3 id="troubleshooting-26"><a class="header" href="#troubleshooting-26">Troubleshooting</a></h3>
+<ul>
+<li>If the clipboard option does not work, ensure your platform supports clipboard integration.</li>
+<li>If the file cannot be written, check file permissions and available disk space.</li>
+</ul>
+<h3 id="related-26"><a class="header" href="#related-26">Related</a></h3>
+<ul>
+<li>For output redirection without duplication, see <a href="chapter2/tee/../output/index.html">output</a>.</li>
+<li>For changing output format, see <a href="chapter2/tee/../format/index.html">format</a>.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="timer"><a class="header" href="#timer">timer</a></h2>
+<p>The <code>.timer</code> command toggles the display of the time taken to execute each query in rsql. This is useful for performance
+monitoring, query optimization, and benchmarking different SQL statements or data sources.</p>
+<h3 id="usage-30"><a class="header" href="#usage-30">Usage</a></h3>
+<pre><code class="language-text">.timer &lt;on|off&gt;
+</code></pre>
+<h3 id="when-to-use-27"><a class="header" href="#when-to-use-27">When to use</a></h3>
+<ul>
+<li>Enable <code>.timer on</code> to see how long each query takes—helpful for tuning queries or comparing database performance.</li>
+<li>Disable <code>.timer off</code> for a cleaner output if you do not need timing information.</li>
+</ul>
+<h3 id="examples-30"><a class="header" href="#examples-30">Examples</a></h3>
+<p>Show the current timer setting:</p>
+<pre><code class="language-text">.timer
+</code></pre>
+<p>Turn on the timer:</p>
+<pre><code class="language-text">.timer on
+</code></pre>
+<p>Turn off the timer:</p>
+<pre><code class="language-text">.timer off
+</code></pre>
+<h3 id="troubleshooting-27"><a class="header" href="#troubleshooting-27">Troubleshooting</a></h3>
+<ul>
+<li>If you do not see timing information, ensure <code>.timer on</code> is set.</li>
+<li>For minimal output, use <code>.timer off</code> in combination with <code>.header off</code>, <code>.footer off</code>, and <code>.rows off</code>.</li>
+</ul>
+<h3 id="related-27"><a class="header" href="#related-27">Related</a></h3>
+<ul>
+<li>See the <code>timer</code> option in <a href="chapter2/timer/../../appendix/rsql-toml.html">rsql.toml configuration</a>.</li>
+<li>For output customization, see <a href="chapter2/timer/../format/index.html">format</a>.</li>
+</ul>
+<h3 id="demonstration-27"><a class="header" href="#demonstration-27">Demonstration</a></h3>
+<video width="640" height="480" controls>
+  <source src="./demo.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="views"><a class="header" href="#views">views</a></h2>
+<p>The <code>.views</code> command lists all views available in the current schema or data source. This is useful for data
+exploration, understanding database structure, and identifying available views for querying.</p>
+<h3 id="usage-31"><a class="header" href="#usage-31">Usage</a></h3>
+<pre><code class="language-text">.views
+</code></pre>
+<h3 id="when-to-use-28"><a class="header" href="#when-to-use-28">When to use</a></h3>
+<ul>
+<li>Use <code>.views</code> to discover available views before writing queries.</li>
+<li>Helpful for exploring unfamiliar databases, verifying schema changes, or understanding the logical data model.</li>
+</ul>
+<h3 id="examples-31"><a class="header" href="#examples-31">Examples</a></h3>
+<p>List all views in the current schema:</p>
+<pre><code class="language-text">.views
+</code></pre>
+<h3 id="troubleshooting-28"><a class="header" href="#troubleshooting-28">Troubleshooting</a></h3>
+<ul>
+<li>If no views are listed, ensure you are connected to the correct schema and have the necessary permissions.</li>
+<li>Some data sources may require you to set the schema context first.</li>
+<li>Not all data sources support views. For example, file-based data sources and DynamoDB do not have views.</li>
+</ul>
+<h3 id="related-28"><a class="header" href="#related-28">Related</a></h3>
+<ul>
+<li><a href="chapter2/views/../tables/index.html">tables</a> for listing tables</li>
+<li><a href="chapter2/views/../schemas/index.html">schemas</a> for schema selection</li>
+<li><a href="chapter2/views/../describe/index.html">describe</a> for view or table details</li>
+</ul>
+<h3 id="demonstration-28"><a class="header" href="#demonstration-28">Demonstration</a></h3>
+<video width="640" height="480" controls>
+  <source src="./demo.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="appendix"><a class="header" href="#appendix">Appendix</a></h1>
+<h2 id="faq--tips--tricks"><a class="header" href="#faq--tips--tricks">FAQ &amp; Tips &amp; Tricks</a></h2>
+<h3 id="frequently-asked-questions"><a class="header" href="#frequently-asked-questions">Frequently Asked Questions</a></h3>
+<p><strong>Q: rsql fails to connect to my database. What should I check?</strong></p>
+<ul>
+<li>Ensure your connection string (URL) is correct and credentials are valid.</li>
+<li>Check that the database server is running and accessible from your machine.</li>
+<li>Verify that the required driver is installed and supported (see <a href="appendix/../chapter2/drivers/index.html">drivers</a>).</li>
+<li>For cloud databases, ensure your IP is whitelisted and network/firewall rules allow access.</li>
+</ul>
+<p><strong>Q: How do I change the output format (CSV, JSON, etc.)?</strong></p>
+<ul>
+<li>Use the <code>.format</code> command or set the <code>format</code> option in your <code>rsql.toml</code> (<a href="appendix/./rsql-toml.html">see configuration</a>).</li>
+</ul>
+<p><strong>Q: How do I set or change my locale?</strong></p>
+<ul>
+<li>Use the <code>.locale</code> command (see <a href="appendix/../chapter2/locale/index.html">locale command</a>) or set the <code>locale</code> option in your
+<code>rsql.toml</code>.</li>
+</ul>
+<p><strong>Q: Where is the configuration file stored?</strong></p>
+<ul>
+<li>On Unix-like systems: <code>$HOME/.rsql/rsql.toml</code></li>
+<li>On Windows: <code>%APPDATA%\rsql\rsql.toml</code></li>
+</ul>
+<p><strong>Q: How do I contribute a new translation or improve an existing one?</strong></p>
+<ul>
+<li>See <a href="appendix/./supported-locales.html#contributing-translations">Supported Locales</a> for instructions.</li>
+</ul>
+<h3 id="tips--tricks"><a class="header" href="#tips--tricks">Tips &amp; Tricks</a></h3>
+<ul>
+<li>Use command history and smart completions to speed up repetitive tasks.</li>
+<li>Use the <code>.read</code> command to execute SQL from a file.</li>
+<li>Use the <code>.output</code> command to redirect results to a file.</li>
+<li>For large result sets, use the <code>limit</code> option or <code>.limit</code> command to avoid overwhelming your terminal.</li>
+<li>Use the <code>.help</code> command to see available commands and their usage.</li>
+</ul>
+<hr />
+<p>For more troubleshooting and advanced usage, see the <a href="appendix/./rsql-toml.html">Configuration File</a>
+and <a href="appendix/../chapter2/index.html">Commands</a> sections.</p>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="configuration-file-rsqltoml"><a class="header" href="#configuration-file-rsqltoml">Configuration File (rsql.toml)</a></h2>
+<p>A default <a href="appendix/rsql-toml.html#rsqltoml-1">rsql.toml</a> file will be created on startup if one does not already exist. This file configures
+the behavior of the rsql CLI and is written to <code>$HOME/.rsql</code> on Unix-like systems and <code>%APPDATA%\rsql</code> on Windows. The
+file uses the <a href="https://toml.io/en/">TOML</a> format.</p>
+<h3 id="why-use-rsqltoml"><a class="header" href="#why-use-rsqltoml">Why use rsql.toml?</a></h3>
+<p>The configuration file allows you to customize rsql's behavior, appearance, and output to fit your workflow. Use it to
+set defaults for output format, locale, logging, themes, and more. This is especially useful for scripting, automation,
+or when working in different environments (dev, staging, prod).</p>
+<h3 id="configuration-options-summary"><a class="header" href="#configuration-options-summary">Configuration Options Summary</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Section</th><th>Option</th><th>Default</th><th>Possible Values / Description</th></tr></thead><tbody>
+<tr><td><code>[global]</code></td><td>locale</td><td>&quot;en&quot;</td><td>Any supported locale (see <a href="appendix/./supported-locales.html">Supported Locales</a>)</td></tr>
+<tr><td><code>[global]</code></td><td>bail_on_error</td><td>false</td><td>true, false</td></tr>
+<tr><td><code>[global]</code></td><td>color</td><td>true</td><td>true, false</td></tr>
+<tr><td><code>[global]</code></td><td>command_identifier</td><td>&quot;.&quot;</td><td>Any string (e.g., &quot;.&quot;, &quot;:&quot;, &quot;/&quot;)</td></tr>
+<tr><td><code>[global]</code></td><td>echo</td><td>false</td><td>true, false, prompt</td></tr>
+<tr><td><code>[log]</code></td><td>level</td><td>&quot;info&quot;</td><td>off, error, warn, info, debug, trace</td></tr>
+<tr><td><code>[log]</code></td><td>rotation</td><td>&quot;daily&quot;</td><td>minutely, hourly, daily, never</td></tr>
+<tr><td><code>[shell]</code></td><td>edit_mode</td><td>&quot;emacs&quot;</td><td>emacs, vi</td></tr>
+<tr><td><code>[shell]</code></td><td>history.enabled</td><td>true</td><td>true, false</td></tr>
+<tr><td><code>[shell]</code></td><td>history.ignore_dups</td><td>true</td><td>true, false</td></tr>
+<tr><td><code>[shell]</code></td><td>history.limit</td><td>1000</td><td>0 (no limit), or any positive integer</td></tr>
+<tr><td><code>[shell]</code></td><td>smart.completions</td><td>true</td><td>true, false</td></tr>
+<tr><td><code>[shell]</code></td><td>theme.light</td><td>Solarized (light)</td><td>See <a href="appendix/rsql-toml.html#themes">themes</a></td></tr>
+<tr><td><code>[shell]</code></td><td>theme.dark</td><td>Solarized (dark)</td><td>See <a href="appendix/rsql-toml.html#themes">themes</a></td></tr>
+<tr><td><code>[shell]</code></td><td>theme</td><td>(unset)</td><td>base16-ocean.dark, base16-ocean.light, Solarized (dark), Solarized (light)</td></tr>
+<tr><td><code>[results]</code></td><td>changes</td><td>true</td><td>true, false</td></tr>
+<tr><td><code>[results]</code></td><td>footer</td><td>true</td><td>true, false</td></tr>
+<tr><td><code>[results]</code></td><td>format</td><td>&quot;psql&quot;</td><td>ascii, csv, html, json, jsonl, markdown, plain, psql, sqlite, tsv, unicode, xml, yaml</td></tr>
+<tr><td><code>[results]</code></td><td>header</td><td>true</td><td>true, false</td></tr>
+<tr><td><code>[results]</code></td><td>limit</td><td>100</td><td>0 (no limit), or any positive integer</td></tr>
+<tr><td><code>[results]</code></td><td>rows</td><td>true</td><td>true, false</td></tr>
+<tr><td><code>[results]</code></td><td>timer</td><td>true</td><td>true, false</td></tr>
+</tbody></table>
+</div>
+<h3 id="example-rsqltoml"><a class="header" href="#example-rsqltoml">Example rsql.toml</a></h3>
+<pre><code class="language-toml">[global]
+
+# The locale to use.  If not specified, an attempt will be made to detect
+# the system locale, but if that fails, the default &quot;en&quot; (US English)
+# locale will be used.
+#locale = &quot;en&quot;
+
+# Indicate if the program should exit after the first error occurs.
+#
+# Possible values:
+#   true - exit after the first error
+#   false - continue processing after the first error
+bail_on_error = false
+
+# Indicate if color should be used in the output.
+#
+# Possible values:
+#   true - use color in the output
+#   false - don't use color in the output
+#color = true
+
+# The string used to initiate a command.
+#
+# This is used to determine if a line is a command or not. For example,
+# if the command identifier is set to &quot;.&quot;, then any line that starts with
+# a &quot;.&quot; will be considered a command.
+command_identifier = &quot;.&quot;
+
+# Indicate if executed commands should be echoed to the defined output.
+#
+# Possible values:
+#   true - echo executed commands
+#   prompt - echo prompt and executed commands 
+#   false - don't echo executed commands
+echo = false
+
+[log]
+
+# The log level to use.
+#
+# Possible values:
+#   &quot;off&quot;  - Designates that trace instrumentation should be completely
+#            disabled.
+#   &quot;error&quot; - Designates very serious errors.
+#   &quot;warn&quot; - Designates hazardous situations.
+#   &quot;info&quot; - Designates useful information.
+#   &quot;debug&quot; - Designates lower priority information.
+#   &quot;trace&quot; - Designates very low priority, often extremely verbose,
+#             information.
+level = &quot;info&quot;
+
+# The frequency to rotate the logs.
+#
+# Possible values:
+#   &quot;minutely&quot; - Rotate the logs minutely.
+#   &quot;hourly&quot; - Rotate the logs hourly.
+#   &quot;daily&quot; - Rotate the logs daily.
+#   &quot;never&quot; - Never rotate the logs.
+rotation = &quot;daily&quot;
+
+[shell]
+
+# The key binding mode to use.
+#
+# Possible values:
+#   &quot;emacs&quot; - use the Emacs key bindings
+#   &quot;vi&quot; - use the Vi key bindings
+edit_mode = &quot;emacs&quot;
+
+# Indicate if commands should be saved to the history file.
+#
+# Possible values:
+#   true - save commands to the history file
+#   false - don't save commands to the history file
+history.enabled = true
+
+# Indicate if duplicate commands should be saved to the history file.
+#
+# Possible values:
+#   true - save duplicate commands to the history file
+#   false - don't save duplicate commands to the history file
+history.ignore_dups = true
+
+# The maximum number of history entries to keep.
+#
+# 0 means no limit.
+history.limit = 1000
+
+# Indicate if smart completions should be used.
+#
+# Possible values:
+#   true - smart completions are enabled
+#   false - smart completions are disabled
+smart.completions = true
+
+# The theme to use when light mode is detected.
+theme.light = &quot;Solarized (light)&quot;
+
+# The theme to use when dark mode is detected.
+theme.dark = &quot;Solarized (dark)&quot;
+
+# The theme to use. This value overrides the light and dark mode themes
+# when set.
+#
+# Possible values:
+#   &quot;base16-ocean.dark&quot;
+#   &quot;base16-ocean.light&quot;
+#   &quot;Solarized (dark)&quot;
+#   &quot;Solarized (light)&quot;
+#theme = &quot;Solarized (dark)&quot;
+
+[results]
+
+# Indicate if changes should be displayed.
+#
+# Possible values:
+#   true - display the changes
+#   false - don't display the changes
+changes = true
+
+# Indicate if footer should be displayed when displaying results.
+#
+# Possible values:
+#   true - display the footer
+#   false - don't display the footer
+footer = true
+
+# The format to use for results.
+#
+# Possible values:
+#   &quot;ascii&quot; - ASCII characters to draw a table
+#   &quot;csv&quot; - Comma Separated Values (CSV)
+#   &quot;html&quot; - HyperText Markup Language (HTML)
+#   &quot;json&quot; - JavaScript Object Notation (JSON)
+#   &quot;jsonl&quot; - JSON Lines (JSONL)
+#   &quot;markdown&quot; - Markdown
+#   &quot;plain&quot; - Column based layout
+#   &quot;psql&quot; - PostgreSQL formatted table
+#   &quot;sqlite&quot; - SQLite formatted table
+#   &quot;tsv&quot; - Tab Separated Values (TSV)
+#   &quot;unicode&quot; - Unicode characters to draw a table
+#   &quot;xml&quot; - Extensible Markup Language (XML)
+#   &quot;yaml&quot; - YAML Ain’t Markup Language (YAML)
+format = &quot;psql&quot;
+
+# Indicate if header should be displayed when displaying results.
+#
+# Possible values:
+#   true - display the header
+#   false - don't display the header
+header = true
+
+# The maximum number of rows to display. 0 means no limit.
+limit = 100
+
+# Indicate if rows returned should be displayed.
+#
+# Possible values:
+#   true - display the rows
+#   false - don't display the rows
+rows = true
+
+# Enable timer for commands.
+#
+# Possible values:
+#   true - enable timer
+#   false - disable timer
+timer = true
+</code></pre>
+<h3 id="troubleshooting-configuration"><a class="header" href="#troubleshooting-configuration">Troubleshooting Configuration</a></h3>
+<ul>
+<li>If rsql does not pick up changes, ensure you are editing the correct <code>rsql.toml</code> file (
+see <a href="appendix/./index.html#faq--tips--tricks">FAQ</a>).</li>
+<li>Invalid TOML syntax will cause rsql to fail to start or ignore the config. Validate your file with a TOML linter.</li>
+<li>For option-specific issues, see the relevant command documentation (
+e.g., <a href="appendix/../chapter2/format/index.html">format</a>, <a href="appendix/../chapter2/locale/index.html">locale</a>).</li>
+</ul>
+<p>For more details on each option, see the <a href="appendix/../chapter2/index.html">Commands</a> section.</p>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="supported-locales"><a class="header" href="#supported-locales">Supported Locales</a></h2>
+<p>Each locale includes a <a href="https://www.iso.org/iso-639-language-code">ISO 639-1</a> language code and an
+optional <a href="https://www.iso.org/iso-3166-country-codes.html">ISO 3166-1</a> country code to specify language and regional
+settings.</p>
+<p>Locales affect the language of messages, prompts, and number formatting in rsql. You can set your preferred locale using
+the <code>.locale</code> command or by specifying the <code>locale</code> option in your <code>rsql.toml</code> configuration file. If not set, rsql will
+attempt to detect your system locale, defaulting to <code>en</code> (US English) if detection fails.</p>
+<h3 id="contributing-translations"><a class="header" href="#contributing-translations">Contributing Translations</a></h3>
+<p>Most translations are machine-generated and may be imperfect. To contribute improvements or add a new locale:</p>
+<ol>
+<li>Fork the <a href="https://github.com/theseus-rs/rsql">rsql repository</a>.</li>
+<li>Add or update the relevant translation files in the <code>locales/</code> directory.</li>
+<li>Submit a pull request with your changes.</li>
+<li>For guidance, see the project's contribution guidelines.</li>
+</ol>
+<h3 id="troubleshooting-locale-issues"><a class="header" href="#troubleshooting-locale-issues">Troubleshooting Locale Issues</a></h3>
+<ul>
+<li>If you see untranslated or garbled text, ensure your locale is supported and correctly set.</li>
+<li>If your locale is not listed, contribute a translation as described above.</li>
+<li>Some output (such as database errors) may not be localized if not supported by the driver.</li>
+</ul>
+<h3 id="available-locales"><a class="header" href="#available-locales">Available Locales</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Locale</th><th>Description</th></tr></thead><tbody>
+<tr><td>af</td><td>Afrikaans</td></tr>
+<tr><td>am</td><td>Amharic</td></tr>
+<tr><td>ar</td><td>Arabic</td></tr>
+<tr><td>az</td><td>Azerbaijani</td></tr>
+<tr><td>be</td><td>Belarusian</td></tr>
+<tr><td>bg</td><td>Bulgarian</td></tr>
+<tr><td>bn</td><td>Bengali</td></tr>
+<tr><td>bs</td><td>Bosnian</td></tr>
+<tr><td>ca</td><td>Catalan</td></tr>
+<tr><td>cs</td><td>Czech</td></tr>
+<tr><td>cy</td><td>Welsh</td></tr>
+<tr><td>da</td><td>Danish</td></tr>
+<tr><td>de</td><td>German</td></tr>
+<tr><td>el</td><td>Greek</td></tr>
+<tr><td>en</td><td>English</td></tr>
+<tr><td>en-GB</td><td>English (United Kingdom)</td></tr>
+<tr><td>eo</td><td>Esperanto</td></tr>
+<tr><td>es</td><td>Spanish</td></tr>
+<tr><td>et</td><td>Estonian</td></tr>
+<tr><td>eu</td><td>Basque</td></tr>
+<tr><td>fa</td><td>Persian</td></tr>
+<tr><td>fi</td><td>Finnish</td></tr>
+<tr><td>fr</td><td>French</td></tr>
+<tr><td>fy</td><td>Western Frisian</td></tr>
+<tr><td>ga</td><td>Irish</td></tr>
+<tr><td>gd</td><td>Scottish Gaelic</td></tr>
+<tr><td>gl</td><td>Galician</td></tr>
+<tr><td>gu</td><td>Gujarati</td></tr>
+<tr><td>ha</td><td>Hausa</td></tr>
+<tr><td>he</td><td>Hebrew</td></tr>
+<tr><td>hi</td><td>Hindi</td></tr>
+<tr><td>hr</td><td>Croatian</td></tr>
+<tr><td>ht</td><td>Haitian Creole</td></tr>
+<tr><td>hu</td><td>Hungarian</td></tr>
+<tr><td>hy</td><td>Armenian</td></tr>
+<tr><td>id</td><td>Indonesian</td></tr>
+<tr><td>ig</td><td>Igbo</td></tr>
+<tr><td>is</td><td>Icelandic</td></tr>
+<tr><td>it</td><td>Italian</td></tr>
+<tr><td>ja</td><td>Japanese</td></tr>
+<tr><td>jv</td><td>Javanese</td></tr>
+<tr><td>ka</td><td>Georgian</td></tr>
+<tr><td>kk</td><td>Kazakh</td></tr>
+<tr><td>km</td><td>Khmer</td></tr>
+<tr><td>kn</td><td>Kannada</td></tr>
+<tr><td>ko</td><td>Korean</td></tr>
+<tr><td>ku</td><td>Kurdish</td></tr>
+<tr><td>ky</td><td>Kyrgyz</td></tr>
+<tr><td>la</td><td>Latin</td></tr>
+<tr><td>lb</td><td>Luxembourgish</td></tr>
+<tr><td>lo</td><td>Lao</td></tr>
+<tr><td>lt</td><td>Lithuanian</td></tr>
+<tr><td>lv</td><td>Latvian</td></tr>
+<tr><td>mg</td><td>Malagasy</td></tr>
+<tr><td>mi</td><td>Maori</td></tr>
+<tr><td>mk</td><td>Macedonian</td></tr>
+<tr><td>ml</td><td>Malayalam</td></tr>
+<tr><td>mn</td><td>Mongolian</td></tr>
+<tr><td>mr</td><td>Marathi</td></tr>
+<tr><td>ms</td><td>Malay</td></tr>
+<tr><td>mt</td><td>Maltese</td></tr>
+<tr><td>my</td><td>Burmese</td></tr>
+<tr><td>ne</td><td>Nepali</td></tr>
+<tr><td>nl</td><td>Dutch</td></tr>
+<tr><td>no</td><td>Norwegian</td></tr>
+<tr><td>ny</td><td>Nyanja</td></tr>
+<tr><td>or</td><td>Odia</td></tr>
+<tr><td>pa</td><td>Punjabi</td></tr>
+<tr><td>pl</td><td>Polish</td></tr>
+<tr><td>ps</td><td>Pashto</td></tr>
+<tr><td>pt</td><td>Portuguese</td></tr>
+<tr><td>ro</td><td>Romanian</td></tr>
+<tr><td>ru</td><td>Russian</td></tr>
+<tr><td>rw</td><td>Kinyarwanda</td></tr>
+<tr><td>sd</td><td>Sindhi</td></tr>
+<tr><td>si</td><td>Sinhala</td></tr>
+<tr><td>sk</td><td>Slovak</td></tr>
+<tr><td>sl</td><td>Slovenian</td></tr>
+<tr><td>sm</td><td>Samoan</td></tr>
+<tr><td>sn</td><td>Shona</td></tr>
+<tr><td>so</td><td>Somali</td></tr>
+<tr><td>sq</td><td>Albanian</td></tr>
+<tr><td>sr</td><td>Serbian</td></tr>
+<tr><td>st</td><td>Southern Sotho</td></tr>
+<tr><td>su</td><td>Sundanese</td></tr>
+<tr><td>sv</td><td>Swedish</td></tr>
+<tr><td>sw</td><td>Swahili</td></tr>
+<tr><td>ta</td><td>Tamil</td></tr>
+<tr><td>te</td><td>Telugu</td></tr>
+<tr><td>tg</td><td>Tajik</td></tr>
+<tr><td>th</td><td>Thai</td></tr>
+<tr><td>tk</td><td>Turkmen</td></tr>
+<tr><td>tl</td><td>Tagalog</td></tr>
+<tr><td>tr</td><td>Turkish</td></tr>
+<tr><td>tt</td><td>Tatar</td></tr>
+<tr><td>ug</td><td>Uyghur</td></tr>
+<tr><td>uk</td><td>Ukrainian</td></tr>
+<tr><td>ur</td><td>Urdu</td></tr>
+<tr><td>uz</td><td>Uzbek</td></tr>
+<tr><td>vi</td><td>Vietnamese</td></tr>
+<tr><td>xh</td><td>Xhosa</td></tr>
+<tr><td>yi</td><td>Yiddish</td></tr>
+<tr><td>yo</td><td>Yoruba</td></tr>
+<tr><td>zh</td><td>Chinese</td></tr>
+<tr><td>zu</td><td>Zulu</td></tr>
+</tbody></table>
+</div>
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+        <script>
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+
+    </div>
+    </body>
+</html>
