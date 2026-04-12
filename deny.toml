@@ -24,7 +24,6 @@ allow = [
     "LGPL-3.0-or-later",
     "MIT",
     "MPL-2.0",
-    "OpenSSL",
     "PostgreSQL",
     "Unicode-3.0",
     "WTFPL",
@@ -40,6 +39,9 @@ ignore = [
     { id = "RUSTSEC-2025-0052", reason = "async-std: discontinued" },
     { id = "RUSTSEC-2025-0134", reason = "rustls-pemfile: unmaintained" },
     { id = "RUSTSEC-2025-0141", reason = "bincode: unmaintained" },
+    { id = "RUSTSEC-2026-0049", reason = "rustls-webpki: CRL Distribution Point matching logic; constrained by transitive dependencies at 0.102.x" },
+    { id = "RUSTSEC-2026-0066", reason = "astral-tokio-tar: Insufficient validation of PAX extensions; constrained by testcontainers" },
+    { id = "RUSTSEC-2026-0097", reason = "rand: unsound with custom logger using rand::rng(); constrained by transitive dependencies at 0.8.x" },
 ]
 
 # https://embarkstudios.github.io/cargo-deny/checks/bans/cfg.html

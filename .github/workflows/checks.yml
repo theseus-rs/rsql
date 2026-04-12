@@ -25,9 +25,13 @@ jobs:
             --ignore RUSTSEC-2023-0071 \
             --ignore RUSTSEC-2024-0320 \
             --ignore RUSTSEC-2024-0363 \
-            --ignore RUSTSEC-2024-0376 \
-            --ignore RUSTSEC-2024-0384 \
-            --ignore RUSTSEC-2024-0436
+            --ignore RUSTSEC-2024-0436 \
+            --ignore RUSTSEC-2025-0052 \
+            --ignore RUSTSEC-2025-0134 \
+            --ignore RUSTSEC-2025-0141 \
+            --ignore RUSTSEC-2026-0049 \
+            --ignore RUSTSEC-2026-0066 \
+            --ignore RUSTSEC-2026-0097
 
   check:
     runs-on: ubuntu-24.04
