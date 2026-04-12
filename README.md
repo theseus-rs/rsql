@@ -131,7 +131,7 @@ Automatically handles: Gzip, Brotli, Bzip2, LZ4, XZ, Zstd
 rsql --url "postgresql://user:pass@localhost/mydb"
 
 # Use embedded PostgreSQL (no external setup required)
-rsql --url "postgresql://user@localhost/mydb?embedded=true"
+rsql --url "postgresql://?embedded=true"
 
 # SQLite file
 rsql --url "sqlite://database.db"
