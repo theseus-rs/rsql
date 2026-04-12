@@ -150,7 +150,7 @@ impl Shell {
                 program_name = self.configuration.program_name,
             );
 
-            let loop_condition = match editor.readline(&prompt) {
+            let loop_condition = match editor.readline(prompt.as_ref()) {
                 Ok(line) => {
                     let loop_condition = match &self
                         .evaluate(connection, editor.history(), line.clone())

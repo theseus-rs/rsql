@@ -30,7 +30,6 @@ jobs:
             --ignore RUSTSEC-2025-0134 \
             --ignore RUSTSEC-2025-0141 \
             --ignore RUSTSEC-2026-0049 \
-            --ignore RUSTSEC-2026-0066 \
             --ignore RUSTSEC-2026-0097
 
   check:

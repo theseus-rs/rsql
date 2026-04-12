@@ -519,7 +519,7 @@ fn get_locale(config: &Config) -> String {
 
     for i in (0..parts.len()).rev() {
         let locale = parts[0..=i].join("-");
-        if available_locales!().contains(&locale.as_str()) {
+        if available_locales!().iter().any(|l| l == &locale) {
             return locale;
         }
     }
