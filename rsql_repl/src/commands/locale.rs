@@ -33,7 +33,7 @@ impl ShellCommand for Command {
 
         let new_locale = options.input[1].as_str();
 
-        if !available_locales!().contains(&new_locale) {
+        if !available_locales!().iter().any(|l| l == new_locale) {
             return Err(InvalidOption {
                 command_name: self.name(locale).to_string(),
                 option: locale.to_string(),
