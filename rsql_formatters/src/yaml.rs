@@ -60,7 +60,7 @@ pub(crate) async fn format_yaml(
         rows += 1;
     }
 
-    let yaml = serde_yaml::to_string(&yaml_rows)?;
+    let yaml = serde_saphyr::to_string(&yaml_rows)?;
     let highlighter = Highlighter::new(options, "yaml");
     write!(output, "{}", highlighter.highlight(yaml.as_str())?)?;
 

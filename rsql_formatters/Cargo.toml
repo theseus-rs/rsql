@@ -25,7 +25,7 @@ quick-xml = { workspace = true, features = ["serialize"], optional = true }
 rsql_drivers = { path = "../rsql_drivers", version = "0.19.3" }
 rust-i18n = { workspace = true }
 serde_json = { workspace = true, features = ["preserve_order"], optional = true }
-serde_yaml = { workspace = true, optional = true }
+serde-saphyr = { workspace = true, optional = true }
 tabled = { workspace = true, features = ["ansi"], optional = true }
 tempfile = { workspace = true }
 thiserror = { workspace = true }
@@ -71,4 +71,4 @@ sqlite = ["dep:csv"]
 tsv = ["dep:csv"]
 unicode = ["dep:tabled"]
 xml = ["dep:quick-xml"]
-yaml = ["dep:serde_yaml"]
+yaml = ["dep:serde-saphyr"]

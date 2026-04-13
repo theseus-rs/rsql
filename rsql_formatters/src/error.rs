@@ -44,9 +44,17 @@ impl From<serde_json::Error> for Error {
 }
 
 #[cfg(feature = "yaml")]
-/// Converts a [`serde_yaml::Error`] into an [`IoError`](Error::IoError)
-impl From<serde_yaml::Error> for Error {
-    fn from(error: serde_yaml::Error) -> Self {
+/// Converts a [`serde_saphyr::Error`] into an [`IoError`](Error::IoError)
+impl From<serde_saphyr::Error> for Error {
+    fn from(error: serde_saphyr::Error) -> Self {
+        Error::IoError(error.into())
+    }
+}
+
+#[cfg(feature = "yaml")]
+/// Converts a [`serde_saphyr::ser::Error`] into an [`IoError`](Error::IoError)
+impl From<serde_saphyr::ser::Error> for Error {
+    fn from(error: serde_saphyr::ser::Error) -> Self {
         Error::IoError(error.into())
     }
 }
@@ -108,12 +116,13 @@ mod tests {
 
     #[cfg(feature = "yaml")]
     #[test]
-    fn test_serde_yaml_error() {
-        let serde_yaml_error = serde_yaml::from_str::<String>(">\n@").unwrap_err();
-        let io_error = Error::from(serde_yaml_error);
-        assert_eq!(
-            io_error.to_string(),
-            "found character that cannot start any token at line 2 column 1, while scanning for the next token"
+    fn test_serde_saphyr_error() {
+        let serde_saphyr_error = serde_saphyr::from_str::<String>(">\n@").unwrap_err();
+        let io_error = Error::from(serde_saphyr_error);
+        let message = io_error.to_string();
+        assert!(
+            message.contains("folded block scalars must indent their content"),
+            "unexpected error message: {message}"
         );
     }
 
