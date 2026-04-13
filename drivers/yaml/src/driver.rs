@@ -6,7 +6,6 @@ use polars_sql::SQLContext;
 use rsql_driver::Error::{ConversionError, IoError};
 use rsql_driver::{Result, UrlExtension};
 use rsql_driver_polars::Connection;
-use serde_json::json;
 use std::collections::HashMap;
 use std::io::Cursor;
 use std::num::NonZeroUsize;
@@ -32,10 +31,9 @@ impl rsql_driver::Driver for Driver {
             let yaml = std::fs::read_to_string(&file_name)?;
             #[cfg(not(target_family = "wasm"))]
             let yaml = tokio::fs::read_to_string(&file_name).await?;
-            let yaml_value: serde_yaml::Value =
-                serde_yaml::from_str(&yaml).map_err(|error| IoError(error.to_string()))?;
-            let value = json!(yaml_value);
-            serde_json::to_string(&value).map_err(|error| IoError(error.to_string()))?
+            let yaml_value: serde_json::Value =
+                serde_saphyr::from_str(&yaml).map_err(|error| IoError(error.to_string()))?;
+            serde_json::to_string(&yaml_value).map_err(|error| IoError(error.to_string()))?
         };
 
         let ignore_errors = query_parameters

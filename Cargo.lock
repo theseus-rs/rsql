@@ -156,6 +156,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4b46cbb362ab8752921c97e041f5e366ee6297bd428a31275b9fcf1e380f7299"
 
 [[package]]
+name = "annotate-snippets"
+version = "0.12.15"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "92570a3f9c98e7e84df84b71d0965ac99b1871fcd75a3773a3bd1bad13f64cf7"
+dependencies = [
+ "anstyle",
+ "memchr",
+ "unicode-width 0.2.2",
+]
+
+[[package]]
 name = "ansi-str"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3232,6 +3243,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "encoding_rs_io"
+version = "0.1.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1cc3c5651fb62ab8aa3103998dade57efdd028544bd300516baa31840c252a83"
+dependencies = [
+ "encoding_rs",
+]
+
+[[package]]
 name = "endi"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5849,6 +5869,12 @@ dependencies = [
  "cfg_aliases",
  "libc",
 ]
+
+[[package]]
+name = "nohash-hasher"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2bf50223579dc7cdcfb3bfcacf7069ff68243f8c363f62ffa99cf000a6b9c451"
 
 [[package]]
 name = "nom"
@@ -9154,8 +9180,8 @@ dependencies = [
  "rsql_driver",
  "rsql_driver_polars",
  "rsql_driver_test_utils",
+ "serde-saphyr",
  "serde_json",
- "serde_yaml",
  "tokio",
  "url",
 ]
@@ -9246,8 +9272,8 @@ dependencies = [
  "quick-xml 0.39.2",
  "rsql_drivers",
  "rust-i18n",
+ "serde-saphyr",
  "serde_json",
- "serde_yaml",
  "supports-color",
  "syntect",
  "tabled",
@@ -9634,6 +9660,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "saphyr-parser-bw"
+version = "0.0.611"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "67dec0c833db75dc98957956b303fe447ffc5eb13f2325ef4c2350f7f3aa69e3"
+dependencies = [
+ "arraydeque",
+ "smallvec",
+ "thiserror 2.0.18",
+]
+
+[[package]]
 name = "schannel"
 version = "0.1.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -9765,6 +9802,26 @@ checksum = "9a8e94ea7f378bd32cbbd37198a4a91436180c5bb472411e48b5ec2e2124ae9e"
 dependencies = [
  "serde_core",
  "serde_derive",
+]
+
+[[package]]
+name = "serde-saphyr"
+version = "0.0.23"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "09fbdfe7a27a1b1633dfc0c4c8e65940b8d819c5ddb9cca48ebc3223b00c8b14"
+dependencies = [
+ "ahash 0.8.12",
+ "annotate-snippets",
+ "base64 0.21.7",
+ "encoding_rs_io",
+ "getrandom 0.3.3",
+ "nohash-hasher",
+ "num-traits",
+ "regex",
+ "saphyr-parser-bw",
+ "serde",
+ "smallvec",
+ "zmij",
 ]
 
 [[package]]
@@ -10854,7 +10911,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "32497e9a4c7b38532efcdebeef879707aa9f794296a4f0244f6f69e9bc8574bd"
 dependencies = [
  "fastrand",
- "getrandom 0.3.3",
+ "getrandom 0.4.2",
  "once_cell",
  "rustix 1.1.4",
  "windows-sys 0.61.2",

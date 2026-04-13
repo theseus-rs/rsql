@@ -18,7 +18,7 @@ polars-sql = { workspace = true }
 rsql_driver = { path = "../../rsql_driver", version = "0.19.3" }
 rsql_driver_polars = { path = "../polars", version = "0.19.3" }
 serde_json = { workspace = true, features = ["preserve_order"] }
-serde_yaml = { workspace = true }
+serde-saphyr = { workspace = true }
 tokio = { workspace = true }
 url = { workspace = true }
 
