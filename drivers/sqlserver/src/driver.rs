@@ -43,43 +43,97 @@ pub struct Connection {
 impl Connection {
     pub(crate) async fn new(url: &str, password: Option<String>) -> Result<Connection> {
         let parsed_url = Url::parse(url)?;
-        let mut params: HashMap<String, String> = parsed_url.query_pairs().into_owned().collect();
-        let trust_server_certificate = params
-            .remove("TrustServerCertificate")
-            .is_some_and(|value| value == "true");
-        let encryption = params
-            .remove("encryption")
-            .unwrap_or("required".to_string());
+        let mut params: HashMap<String, String> = parsed_url
+            .query_pairs()
+            .map(|(key, value)| (key.to_ascii_lowercase(), value.into_owned()))
+            .collect();
 
-        let host = parsed_url.host_str().unwrap_or("localhost");
-        let port = parsed_url.port().unwrap_or(1433);
-        let database = parsed_url.path().replace('/', "");
-        let username = parsed_url.username();
+        let mut host = parsed_url.host_str().unwrap_or("localhost").to_string();
+        let mut port = parsed_url.port().unwrap_or(1433);
+        let mut database = parsed_url.path().replace('/', "");
+        let mut username = parsed_url.username().to_string();
+        let mut password = password;
+
+        if let Some(server) = take_first(&mut params, &["server"]) {
+            let (server_host, server_port) = parse_server(&server);
+            host = server_host;
+            if let Some(server_port) = server_port {
+                port = server_port;
+            }
+        }
+        if let Some(database_param) = take_first(&mut params, &["database"]) {
+            database = database_param;
+        }
+        if let Some(user_param) = take_first(&mut params, &["uid", "username", "user", "user id"]) {
+            username = user_param;
+        }
+        if let Some(password_param) = take_first(&mut params, &["password", "pwd"]) {
+            password = Some(password_param);
+        }
+
+        let integrated_security = take_first(&mut params, &["integratedsecurity"])
+            .map(|value| parse_bool(&value, "IntegratedSecurity"))
+            .transpose()?
+            .unwrap_or(false);
+        let trust_server_certificate = take_first(&mut params, &["trustservercertificate"])
+            .map(|value| parse_bool(&value, "TrustServerCertificate"))
+            .transpose()?
+            .unwrap_or(false);
+        let trust_server_certificate_ca = take_first(&mut params, &["trustservercertificateca"]);
+        let encrypt = take_first(&mut params, &["encrypt"]);
+        let legacy_encryption = take_first(&mut params, &["encryption"]);
+        let application_name = take_first(&mut params, &["application name", "applicationname"]);
+
+        if trust_server_certificate && trust_server_certificate_ca.is_some() {
+            return Err(InvalidUrl(
+                "TrustServerCertificate and TrustServerCertificateCA are mutually exclusive"
+                    .to_string(),
+            ));
+        }
 
         let mut config = Config::new();
-        config.host(host);
+        config.host(&host);
         config.port(port);
 
         if !database.is_empty() {
             config.database(database);
         }
 
-        if !username.is_empty() {
+        if integrated_security {
+            #[cfg(windows)]
+            {
+                config.authentication(AuthMethod::Integrated);
+            }
+            #[cfg(not(windows))]
+            {
+                return Err(InvalidUrl(
+                    "IntegratedSecurity is only supported on Windows builds".to_string(),
+                ));
+            }
+        } else if !username.is_empty() {
             config.authentication(AuthMethod::sql_server(
-                username,
-                password.expect("password is required"),
+                &username,
+                password.as_deref().unwrap_or(""),
             ));
         }
 
         if trust_server_certificate {
             config.trust_cert();
+        } else if let Some(ca_path) = trust_server_certificate_ca {
+            config.trust_cert_ca(ca_path);
         }
 
-        match encryption.as_str() {
-            "off" => config.encryption(EncryptionLevel::Off),
-            "on" => config.encryption(EncryptionLevel::On),
-            "not_supported" => config.encryption(EncryptionLevel::NotSupported),
-            _ => config.encryption(EncryptionLevel::Required),
+        let encryption_level = if let Some(value) = encrypt {
+            parse_encrypt(&value)?
+        } else if let Some(value) = legacy_encryption {
+            parse_legacy_encryption(&value)?
+        } else {
+            EncryptionLevel::Required
+        };
+        config.encryption(encryption_level);
+
+        if let Some(name) = application_name {
+            config.application_name(name);
         }
 
         let tcp = TcpStream::connect(config.get_addr()).await?;
@@ -95,6 +149,61 @@ impl Connection {
 
         Ok(connection)
     }
+}
+
+fn take_first(params: &mut HashMap<String, String>, keys: &[&str]) -> Option<String> {
+    let mut found = None;
+    for key in keys {
+        if let Some(value) = params.remove(*key)
+            && found.is_none()
+        {
+            found = Some(value);
+        }
+    }
+    found
+}
+
+fn parse_bool(value: &str, name: &str) -> Result<bool> {
+    match value.to_ascii_lowercase().as_str() {
+        "true" | "yes" => Ok(true),
+        "false" | "no" => Ok(false),
+        other => Err(InvalidUrl(format!(
+            "invalid value '{other}' for {name}; expected true, false, yes, or no"
+        ))),
+    }
+}
+
+fn parse_encrypt(value: &str) -> Result<EncryptionLevel> {
+    if value.eq_ignore_ascii_case("DANGER_PLAINTEXT") {
+        return Ok(EncryptionLevel::NotSupported);
+    }
+    Ok(if parse_bool(value, "encrypt")? {
+        EncryptionLevel::Required
+    } else {
+        EncryptionLevel::Off
+    })
+}
+
+fn parse_legacy_encryption(value: &str) -> Result<EncryptionLevel> {
+    match value.to_ascii_lowercase().as_str() {
+        "off" => Ok(EncryptionLevel::Off),
+        "on" => Ok(EncryptionLevel::On),
+        "not_supported" => Ok(EncryptionLevel::NotSupported),
+        "required" => Ok(EncryptionLevel::Required),
+        other => Err(InvalidUrl(format!(
+            "invalid value '{other}' for encryption; expected off, on, not_supported, or required"
+        ))),
+    }
+}
+
+fn parse_server(server: &str) -> (String, Option<u16>) {
+    let trimmed = server.strip_prefix("tcp:").unwrap_or(server);
+    if let Some((host, port)) = trimmed.rsplit_once(',')
+        && let Ok(port) = port.trim().parse::<u16>()
+    {
+        return (host.trim().to_string(), Some(port));
+    }
+    (trimmed.to_string(), None)
 }
 
 #[async_trait]

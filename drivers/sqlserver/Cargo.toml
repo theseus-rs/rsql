@@ -29,9 +29,22 @@ default-features = false
 features = ["bigdecimal", "chrono", "rust_decimal", "tds73", "time"]
 workspace = true
 
-[target.'cfg(not(target_os = "macos"))'.dependencies.tiberius]
+[target.'cfg(all(not(target_os = "macos"), not(windows)))'.dependencies.tiberius]
 default-features = false
 features = ["bigdecimal", "chrono", "rust_decimal", "tds73", "time", "vendored-openssl"]
+workspace = true
+
+[target.'cfg(windows)'.dependencies.tiberius]
+default-features = false
+features = [
+    "bigdecimal",
+    "chrono",
+    "rust_decimal",
+    "tds73",
+    "time",
+    "vendored-openssl",
+    "winauth",
+]
 workspace = true
 
 [dev-dependencies]
