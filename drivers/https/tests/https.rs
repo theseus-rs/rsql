@@ -1,15 +1,29 @@
 use rsql_driver::{Driver, DriverManager, Result, Value};
 use std::sync::Arc;
+use wiremock::matchers::{method, path};
+use wiremock::{Mock, MockServer, ResponseTemplate};
 
-fn database_url() -> String {
-    "https://raw.githubusercontent.com/theseus-rs/rsql/refs/heads/main/datasets/users.csv"
-        .to_string()
+const USERS_CSV: &str = "id,name\n1,John Doe\n2,Jane Smith\n";
+
+async fn mock_database_url() -> (MockServer, String) {
+    let server = MockServer::start().await;
+    Mock::given(method("GET"))
+        .and(path("/users.csv"))
+        .respond_with(
+            ResponseTemplate::new(200)
+                .insert_header("content-type", "text/csv")
+                .set_body_string(USERS_CSV),
+        )
+        .mount(&server)
+        .await;
+    let database_url = format!("{}/users.csv", server.uri());
+    (server, database_url)
 }
 
 #[tokio::test(flavor = "multi_thread")]
 async fn test_driver_connect() -> Result<()> {
     DriverManager::add(Arc::new(rsql_driver_csv::Driver))?;
-    let database_url = database_url();
+    let (_server, database_url) = mock_database_url().await;
     let driver = rsql_driver_https::Driver;
     let mut connection = driver.connect(&database_url).await?;
     assert!(connection.url().contains("separator=%2C"));
@@ -20,7 +34,7 @@ async fn test_driver_connect() -> Result<()> {
 #[tokio::test(flavor = "multi_thread")]
 async fn test_connection_interface() -> Result<()> {
     DriverManager::add(Arc::new(rsql_driver_csv::Driver))?;
-    let database_url = database_url();
+    let (_server, database_url) = mock_database_url().await;
     let driver = rsql_driver_https::Driver;
     let mut connection = driver.connect(&database_url).await?;
 
