@@ -10,6 +10,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## `rsql_cli` - [0.19.4](https://github.com/theseus-rs/rsql/compare/v0.19.3...v0.19.4) - 2026-05-18
 
 ### Added
+- update sqlserver driver url options
+- add additional language localization
+- add views command
+
+### Other
+- rsql-v0.19.4
+
+## `rsql_cli` - [0.19.4](https://github.com/theseus-rs/rsql/compare/v0.19.3...v0.19.4) - 2026-05-18
+
+### Added
 - add additional language localization
 - add views command
 - update sqlserver driver url options
