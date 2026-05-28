@@ -34,10 +34,10 @@ allow = [
 ignore = [
     { id = "RUSTSEC-2023-0071", reason = "rsa: potential key recovery through timing sidechannels" },
     { id = "RUSTSEC-2024-0320", reason = "yaml-rust: unmaintained" },
-    { id = "RUSTSEC-2024-0363", reason = "sqlx: Binary Protocol Misinterpretation caused by Truncating or Overflowing Casts" },
     { id = "RUSTSEC-2024-0436", reason = "paste: unmaintained" },
     { id = "RUSTSEC-2025-0052", reason = "async-std: discontinued" },
     { id = "RUSTSEC-2025-0141", reason = "bincode: unmaintained" },
+    { id = "RUSTSEC-2026-0097", reason = "rand: safe code using the public API can cause Undefined Behaviour" },
 ]
 
 # https://embarkstudios.github.io/cargo-deny/checks/bans/cfg.html

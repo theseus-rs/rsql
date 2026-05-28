@@ -12,7 +12,7 @@ version.workspace = true
 
 [dependencies]
 async-trait = { workspace = true }
-bit-vec = { workspace = true }
+bit-vec = "0.8.0"
 chrono = { workspace = true }
 file_type = { workspace = true }
 indoc = { workspace = true }
