@@ -6,7 +6,7 @@ use rsql_driver::Error::{InvalidUrl, IoError};
 use rsql_driver::{Metadata, QueryResult, Result, ToSql, Value};
 use sqlparser::dialect::{Dialect, MySqlDialect};
 use sqlx::mysql::{MySqlArguments, MySqlConnectOptions};
-use sqlx::{Column, MySql, MySqlPool, Row};
+use sqlx::{AssertSqlSafe, Column, MySql, MySqlPool, Row};
 use std::str::FromStr;
 use std::string::ToString;
 use url::Url;
@@ -62,7 +62,7 @@ impl rsql_driver::Connection for Connection {
 
     async fn execute(&mut self, sql: &str, params: &[&dyn ToSql]) -> Result<u64> {
         let values = rsql_driver::to_values(params);
-        let mut query = sqlx::query(sql);
+        let mut query = sqlx::query(AssertSqlSafe(sql));
         for value in &values {
             query = bind_mysql_value(query, value);
         }
@@ -76,7 +76,7 @@ impl rsql_driver::Connection for Connection {
 
     async fn query(&mut self, sql: &str, params: &[&dyn ToSql]) -> Result<Box<dyn QueryResult>> {
         let values = rsql_driver::to_values(params);
-        let mut query = sqlx::query(sql);
+        let mut query = sqlx::query(AssertSqlSafe(sql));
         for value in &values {
             query = bind_mysql_value(query, value);
         }

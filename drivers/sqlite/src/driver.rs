@@ -7,7 +7,7 @@ use rsql_driver::{Metadata, QueryResult, Result, StatementMetadata, ToSql, UrlEx
 use sqlparser::ast::Statement;
 use sqlparser::dialect::{Dialect, SQLiteDialect};
 use sqlx::sqlite::{SqliteArguments, SqliteAutoVacuum, SqliteConnectOptions};
-use sqlx::{Column, Row, Sqlite, SqlitePool};
+use sqlx::{AssertSqlSafe, Column, Row, Sqlite, SqlitePool};
 use std::collections::HashMap;
 use std::str::FromStr;
 use url::{Url, form_urlencoded};
@@ -77,7 +77,7 @@ impl rsql_driver::Connection for Connection {
 
     async fn execute(&mut self, sql: &str, params: &[&dyn ToSql]) -> Result<u64> {
         let values = rsql_driver::to_values(params);
-        let mut query = sqlx::query(sql);
+        let mut query = sqlx::query(AssertSqlSafe(sql));
         for value in &values {
             query = bind_sqlite_value(query, value);
         }
@@ -91,7 +91,7 @@ impl rsql_driver::Connection for Connection {
 
     async fn query(&mut self, sql: &str, params: &[&dyn ToSql]) -> Result<Box<dyn QueryResult>> {
         let values = rsql_driver::to_values(params);
-        let mut query = sqlx::query(sql);
+        let mut query = sqlx::query(AssertSqlSafe(sql));
         for value in &values {
             query = bind_sqlite_value(query, value);
         }
@@ -142,9 +142,9 @@ impl rsql_driver::Connection for Connection {
 }
 
 fn bind_sqlite_value<'q>(
-    query: sqlx::query::Query<'q, Sqlite, SqliteArguments<'q>>,
+    query: sqlx::query::Query<'q, Sqlite, SqliteArguments>,
     value: &'q Value,
-) -> sqlx::query::Query<'q, Sqlite, SqliteArguments<'q>> {
+) -> sqlx::query::Query<'q, Sqlite, SqliteArguments> {
     match value {
         Value::Null => query.bind(None::<String>),
         Value::Bool(v) => query.bind(*v),

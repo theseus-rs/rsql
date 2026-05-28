@@ -9,7 +9,7 @@ use rsql_driver::{ToSql, Value, convert_to_numbered_placeholders};
 use sqlparser::ast::Statement;
 use sqlparser::dialect::{Dialect, PostgreSqlDialect};
 use sqlx::postgres::{PgArguments, PgConnectOptions};
-use sqlx::{Column, PgPool, Postgres, Row};
+use sqlx::{AssertSqlSafe, Column, PgPool, Postgres, Row};
 use std::collections::HashMap;
 use std::path::PathBuf;
 use std::str::FromStr;
@@ -125,7 +125,7 @@ impl rsql_driver::Connection for Connection {
     async fn execute(&mut self, sql: &str, params: &[&dyn ToSql]) -> Result<u64> {
         let sql = convert_to_numbered_placeholders(sql);
         let values = rsql_driver::to_values(params);
-        let mut query = sqlx::query(&sql);
+        let mut query = sqlx::query(AssertSqlSafe(sql));
         for value in &values {
             query = bind_pg_value(query, value);
         }
@@ -140,7 +140,7 @@ impl rsql_driver::Connection for Connection {
     async fn query(&mut self, sql: &str, params: &[&dyn ToSql]) -> Result<Box<dyn QueryResult>> {
         let sql = convert_to_numbered_placeholders(sql);
         let values = rsql_driver::to_values(params);
-        let mut query = sqlx::query(&sql);
+        let mut query = sqlx::query(AssertSqlSafe(sql));
         for value in &values {
             query = bind_pg_value(query, value);
         }
