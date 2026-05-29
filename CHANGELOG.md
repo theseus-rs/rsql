@@ -7,6 +7,107 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## `rsql_cli` - [0.19.5](https://github.com/theseus-rs/rsql/compare/v0.19.4...v0.19.5) - 2026-05-29
+
+### Other
+- update Cargo.toml dependencies
+- update to sqlx=0.9.0
+
+## `rsql_formatters` - [0.19.5](https://github.com/theseus-rs/rsql/compare/rsql_formatters-v0.19.4...rsql_formatters-v0.19.5) - 2026-05-29
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_yaml` - [0.19.5](https://github.com/theseus-rs/rsql/compare/rsql_driver_yaml-v0.19.4...rsql_driver_yaml-v0.19.5) - 2026-05-29
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_xml` - [0.19.5](https://github.com/theseus-rs/rsql/compare/rsql_driver_xml-v0.19.4...rsql_driver_xml-v0.19.5) - 2026-05-29
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_sqlserver` - [0.19.5](https://github.com/theseus-rs/rsql/compare/rsql_driver_sqlserver-v0.19.4...rsql_driver_sqlserver-v0.19.5) - 2026-05-29
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_snowflake` - [0.19.5](https://github.com/theseus-rs/rsql/compare/rsql_driver_snowflake-v0.19.4...rsql_driver_snowflake-v0.19.5) - 2026-05-29
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_s3` - [0.19.5](https://github.com/theseus-rs/rsql/compare/rsql_driver_s3-v0.19.4...rsql_driver_s3-v0.19.5) - 2026-05-29
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_rusqlite` - [0.19.5](https://github.com/theseus-rs/rsql/compare/rsql_driver_rusqlite-v0.19.4...rsql_driver_rusqlite-v0.19.5) - 2026-05-29
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_sqlite` - [0.19.5](https://github.com/theseus-rs/rsql/compare/rsql_driver_sqlite-v0.19.4...rsql_driver_sqlite-v0.19.5) - 2026-05-29
+
+### Other
+- update to sqlx=0.9.0
+
+## `rsql_driver_postgres` - [0.19.5](https://github.com/theseus-rs/rsql/compare/rsql_driver_postgres-v0.19.4...rsql_driver_postgres-v0.19.5) - 2026-05-29
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_mysql` - [0.19.5](https://github.com/theseus-rs/rsql/compare/rsql_driver_mysql-v0.19.4...rsql_driver_mysql-v0.19.5) - 2026-05-29
+
+### Other
+- update to sqlx=0.9.0
+
+## `rsql_driver_https` - [0.19.5](https://github.com/theseus-rs/rsql/compare/rsql_driver_https-v0.19.4...rsql_driver_https-v0.19.5) - 2026-05-29
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_flightsql` - [0.19.5](https://github.com/theseus-rs/rsql/compare/rsql_driver_flightsql-v0.19.4...rsql_driver_flightsql-v0.19.5) - 2026-05-29
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_excel` - [0.19.5](https://github.com/theseus-rs/rsql/compare/rsql_driver_excel-v0.19.4...rsql_driver_excel-v0.19.5) - 2026-05-29
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_dynamodb` - [0.19.5](https://github.com/theseus-rs/rsql/compare/rsql_driver_dynamodb-v0.19.4...rsql_driver_dynamodb-v0.19.5) - 2026-05-29
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_duckdb` - [0.19.5](https://github.com/theseus-rs/rsql/compare/rsql_driver_duckdb-v0.19.4...rsql_driver_duckdb-v0.19.5) - 2026-05-29
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_postgresql` - [0.19.5](https://github.com/theseus-rs/rsql/compare/rsql_driver_postgresql-v0.19.4...rsql_driver_postgresql-v0.19.5) - 2026-05-29
+
+### Other
+- update to sqlx=0.9.0
+
+## `rsql_driver_clickhouse` - [0.19.5](https://github.com/theseus-rs/rsql/compare/rsql_driver_clickhouse-v0.19.4...rsql_driver_clickhouse-v0.19.5) - 2026-05-29
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_polars` - [0.19.5](https://github.com/theseus-rs/rsql/compare/rsql_driver_polars-v0.19.4...rsql_driver_polars-v0.19.5) - 2026-05-29
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver` - [0.19.5](https://github.com/theseus-rs/rsql/compare/rsql_driver-v0.19.4...rsql_driver-v0.19.5) - 2026-05-29
+
+### Other
+- update Cargo.toml dependencies
+
 ## `rsql_cli` - [0.19.4](https://github.com/theseus-rs/rsql/compare/v0.19.3...v0.19.4) - 2026-05-18
 
 ### Added
