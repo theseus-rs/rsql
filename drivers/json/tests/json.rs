@@ -1,3 +1,8 @@
+#![expect(
+    clippy::panic_in_result_fn,
+    reason = "test assertions intentionally panic when verification fails"
+)]
+
 use rsql_driver::{Driver, Result, Value};
 use std::path;
 use std::path::PathBuf;
@@ -41,10 +46,10 @@ async fn test_json_metadata() -> Result<()> {
 
     let mut query_result = connection
         .query(
-            r#"
+            r"
             SELECT type
               FROM cheyenne
-        "#,
+        ",
             &[],
         )
         .await?;

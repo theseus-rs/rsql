@@ -6,7 +6,9 @@ use rsql_repl::shell::{Result, ShellArgs, ShellBuilder};
 
 pub fn rusqlite_benchmark(criterion: &mut Criterion) {
     criterion.bench_function("rusqlite", |bencher| {
-        let runtime = Runtime::new().expect("Failed to create Tokio runtime");
+        let Ok(runtime) = Runtime::new() else {
+            return;
+        };
         bencher
             .to_async(runtime)
             .iter(|| async { rusqlite().await });

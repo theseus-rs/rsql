@@ -27,6 +27,9 @@ anyhow = { workspace = true }
 static_vcruntime = { version = "2.0" }
 winres = { version = "0.1" }
 
+[lints]
+workspace = true
+
 [dependencies]
 anyhow = { workspace = true }
 axoupdater = { workspace = true }

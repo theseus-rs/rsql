@@ -223,7 +223,7 @@ impl rsql_driver::Connection for Connection {
             .execute(&mut self.client)
             .await
             .map_err(|error| IoError(error.to_string()))?;
-        let rows = result.rows_affected()[0];
+        let rows = result.rows_affected().first().copied().unwrap_or_default();
         Ok(rows)
     }
 
@@ -283,7 +283,7 @@ fn bind_tiberius_value<'a>(query: &mut Query<'a>, value: &'a Value) {
         Value::U8(v) => query.bind(*v),
         Value::U16(v) => query.bind(i32::from(*v)),
         Value::U32(v) => query.bind(i64::from(*v)),
-        Value::U64(v) => query.bind(*v as i64),
+        Value::U64(v) => query.bind((*v).cast_signed()),
         Value::F32(v) => query.bind(*v),
         Value::F64(v) => query.bind(*v),
         Value::String(v) => query.bind(v.as_str()),

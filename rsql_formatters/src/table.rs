@@ -64,7 +64,7 @@ async fn process_data(
         raw_rows.push(row.clone());
     }
 
-    let value_formatter = ValueFormatter::new(options.locale.as_str());
+    let value_formatter = ValueFormatter::new(options.locale.as_str())?;
     for row in &raw_rows {
         let mut row_data = Vec::new();
 

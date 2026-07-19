@@ -10,7 +10,7 @@ pub trait ToSql: Send + Sync {
 /// [`Connection::execute`](crate::Connection::execute) and
 /// [`Connection::query`](crate::Connection::query).
 pub fn to_values(params: &[&dyn ToSql]) -> Vec<Value> {
-    params.iter().map(|p| p.to_value()).collect()
+    params.iter().copied().map(ToSql::to_value).collect()
 }
 
 impl ToSql for Value {

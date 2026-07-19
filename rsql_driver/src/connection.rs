@@ -1,4 +1,4 @@
-use crate::error::Result;
+use crate::error::{Error, Result};
 use crate::{Metadata, ToSql, Value};
 use async_trait::async_trait;
 use sqlparser::ast::Statement;
@@ -315,6 +315,7 @@ impl Debug for MockConnection {
 }
 
 /// Builder for setting an execute expectation on [`MockConnection`].
+#[derive(Debug)]
 pub struct MockExecuteExpectation<'a> {
     mock: &'a mut MockConnection,
     sql: Option<String>,
@@ -339,6 +340,7 @@ impl MockExecuteExpectation<'_> {
 }
 
 /// Builder for setting a query expectation on [`MockConnection`].
+#[derive(Debug)]
 pub struct MockQueryExpectation<'a> {
     mock: &'a mut MockConnection,
 }
@@ -354,6 +356,7 @@ impl MockQueryExpectation<'_> {
 }
 
 /// Builder for setting a close expectation on [`MockConnection`].
+#[derive(Debug)]
 pub struct MockCloseExpectation<'a> {
     mock: &'a mut MockConnection,
 }
@@ -369,6 +372,7 @@ impl MockCloseExpectation<'_> {
 }
 
 /// Builder for setting a metadata expectation on [`MockConnection`].
+#[derive(Debug)]
 pub struct MockMetadataExpectation<'a> {
     mock: &'a mut MockConnection,
 }
@@ -389,7 +393,8 @@ impl MockMetadataExpectation<'_> {
     }
 }
 
-/// Builder for setting a parse_sql expectation on [`MockConnection`].
+/// Builder for setting a `parse_sql` expectation on [`MockConnection`].
+#[derive(Debug)]
 pub struct MockParseSqlExpectation<'a> {
     mock: &'a mut MockConnection,
 }
@@ -406,7 +411,12 @@ impl MockParseSqlExpectation<'_> {
     where
         F: FnMut(&str) -> StatementMetadata + Send + Sync + 'static,
     {
-        *self.mock.parse_sql_fn.lock().unwrap() = Some(Box::new(f));
+        let mut parse_sql_fn = self
+            .mock
+            .parse_sql_fn
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        *parse_sql_fn = Some(Box::new(f));
     }
 }
 
@@ -467,23 +477,25 @@ impl Connection for MockConnection {
     }
 
     async fn execute(&mut self, sql: &str, params: &[&dyn ToSql]) -> Result<u64> {
-        let values: Vec<Value> = params.iter().map(|p| p.to_value()).collect();
-        if let Some(expected_sql) = &self.execute_sql {
-            assert_eq!(sql, expected_sql, "MockConnection: unexpected SQL");
+        let values: Vec<Value> = params.iter().copied().map(ToSql::to_value).collect();
+        if let Some(expected_sql) = &self.execute_sql
+            && sql != expected_sql
+        {
+            return Err(Error::ConversionError(format!(
+                "MockConnection: expected SQL [{expected_sql}], received [{sql}]"
+            )));
         }
-        let f = self
-            .execute_fn
-            .as_mut()
-            .expect("MockConnection: execute called without expectation");
+        let f = self.execute_fn.as_mut().ok_or_else(|| {
+            Error::ConversionError("MockConnection: execute called without expectation".to_string())
+        })?;
         f(sql, &values)
     }
 
     async fn query(&mut self, sql: &str, params: &[&dyn ToSql]) -> Result<Box<dyn QueryResult>> {
-        let values: Vec<Value> = params.iter().map(|p| p.to_value()).collect();
-        let f = self
-            .query_fn
-            .as_mut()
-            .expect("MockConnection: query called without expectation");
+        let values: Vec<Value> = params.iter().copied().map(ToSql::to_value).collect();
+        let f = self.query_fn.as_mut().ok_or_else(|| {
+            Error::ConversionError("MockConnection: query called without expectation".to_string())
+        })?;
         f(sql, &values)
     }
 
@@ -506,16 +518,21 @@ impl Connection for MockConnection {
     }
 
     fn parse_sql(&self, sql: &str) -> StatementMetadata {
-        if let Some(f) = self.parse_sql_fn.lock().unwrap().as_mut() {
+        let mut parse_sql_fn = self
+            .parse_sql_fn
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        if let Some(f) = parse_sql_fn.as_mut() {
             return f(sql);
         }
+        drop(parse_sql_fn);
 
         let statements = Parser::parse_sql(self.dialect().as_ref(), sql).unwrap_or_default();
 
         if let Some(statement) = statements.first() {
             self.match_statement(statement)
         } else {
-            let command = if sql.len() > 6 { &sql[..6] } else { "" };
+            let command = sql.get(..6).unwrap_or("");
             if command.to_lowercase() == "select" {
                 StatementMetadata::Query
             } else {
@@ -590,6 +607,17 @@ mod test {
         }
 
         assert_eq!(data, ["1".to_string()]);
+    }
+
+    #[tokio::test]
+    async fn test_mock_connection_missing_expectations() {
+        let mut connection = MockConnection::new();
+        assert!(connection.execute("SELECT 1", &[]).await.is_err());
+        assert!(connection.query("SELECT 1", &[]).await.is_err());
+        assert!(matches!(
+            connection.parse_sql("sel"),
+            StatementMetadata::Unknown
+        ));
     }
 
     #[derive(Debug, PartialEq)]

@@ -49,7 +49,10 @@ impl ShellCommand for Command {
             return Ok(LoopCondition::Continue);
         }
 
-        let argument = options.input[1].to_lowercase();
+        let argument = options
+            .input
+            .get(1)
+            .map_or_else(String::new, |argument| argument.to_lowercase());
         let echo = if argument == on {
             EchoMode::On
         } else if argument == prompt {
@@ -58,8 +61,8 @@ impl ShellCommand for Command {
             EchoMode::Off
         } else {
             return Err(InvalidOption {
-                command_name: self.name(locale).to_string(),
-                option: argument.to_string(),
+                command_name: self.name(locale),
+                option: argument,
             });
         };
 

@@ -1,3 +1,8 @@
+#![expect(
+    clippy::panic_in_result_fn,
+    reason = "test assertions intentionally panic when verification fails"
+)]
+
 use aws_config::Region;
 use aws_credential_types::Credentials;
 use aws_sdk_s3::Client;
@@ -30,26 +35,30 @@ async fn test_s3_driver_local_stack() -> Result<()> {
     }
 
     DriverManager::add(Arc::new(rsql_driver_csv::Driver))?;
+    let aws_config_directive = "aws_config=trace"
+        .parse()
+        .map_err(|error| IoError(format!("Invalid tracing directive: {error}")))?;
+    let s3_directive = "aws_sdk_s3=trace"
+        .parse()
+        .map_err(|error| IoError(format!("Invalid tracing directive: {error}")))?;
     let subscriber = tracing_subscriber::fmt()
         .with_env_filter(
             EnvFilter::new("trace")
-                .add_directive("aws_config=trace".parse().expect("Invalid directive"))
-                .add_directive("aws_sdk_s3=trace".parse().expect("Invalid directive")),
+                .add_directive(aws_config_directive)
+                .add_directive(s3_directive),
         )
         .with_test_writer()
         .compact()
         .finish();
     let _guard = tracing::subscriber::set_default(subscriber);
 
-    let host = Host::Addr(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)));
+    let host = Host::Addr(IpAddr::V4(Ipv4Addr::LOCALHOST));
     let container = LocalStackPro::with_auth_token(Option::<&str>::None)
         .with_env_var("SERVICES", "s3")
         .with_host(HOST, host)
         .with_log_consumer(|frame: &LogFrame| {
-            let mut msg = std::str::from_utf8(frame.bytes()).expect("Failed to parse log message");
-            if msg.ends_with('\n') {
-                msg = &msg[..msg.len() - 1];
-            }
+            let message = String::from_utf8_lossy(frame.bytes());
+            let msg = message.strip_suffix('\n').unwrap_or(&message);
             info!("{msg}");
         })
         .start()

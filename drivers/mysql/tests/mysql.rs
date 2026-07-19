@@ -1,3 +1,11 @@
+#![cfg_attr(
+    target_os = "linux",
+    expect(
+        clippy::panic_in_result_fn,
+        reason = "test assertions intentionally panic when verification fails"
+    )
+)]
+
 #[cfg(target_os = "linux")]
 use indoc::indoc;
 #[cfg(target_os = "linux")]
@@ -53,8 +61,12 @@ async fn test_connection_interface(connection: &mut dyn Connection) -> anyhow::R
     assert!(query_result.next().await.is_none());
 
     let metadata = connection.metadata().await?;
-    let catalog = metadata.current_catalog().expect("catalog");
-    let schema = catalog.current_schema().expect("schema");
+    let catalog = metadata
+        .current_catalog()
+        .ok_or_else(|| anyhow::anyhow!("catalog"))?;
+    let schema = catalog
+        .current_schema()
+        .ok_or_else(|| anyhow::anyhow!("schema"))?;
     assert!(schema.tables().iter().any(|table| table.name() == "person"));
 
     Ok(())
@@ -126,7 +138,7 @@ async fn test_data_types(connection: &mut dyn Connection) -> anyhow::Result<()> 
             Value::I32(2_147_483_647),
             Value::I64(9_223_372_036_854_775_807),
             Value::U64(18_446_744_073_709_551_615),
-            Value::Decimal(rust_decimal::Decimal::from_str("123.45").expect("invalid decimal")),
+            Value::Decimal(rust_decimal::Decimal::from_str("123.45")?),
             Value::F32(123.0),
             Value::F32(123.0),
             Value::Date(civil::date(2022, 1, 1)),
@@ -177,45 +189,65 @@ async fn test_schema(connection: &mut dyn Connection) -> anyhow::Result<()> {
         .await?;
 
     let metadata = connection.metadata().await?;
-    let catalog = metadata.current_catalog().expect("catalog");
-    let schema = catalog.current_schema().expect("schema");
+    let catalog = metadata
+        .current_catalog()
+        .ok_or_else(|| anyhow::anyhow!("catalog"))?;
+    let schema = catalog
+        .current_schema()
+        .ok_or_else(|| anyhow::anyhow!("schema"))?;
 
-    let contacts_table = schema.get("contacts").expect("contacts table");
+    let contacts_table = schema
+        .get("contacts")
+        .ok_or_else(|| anyhow::anyhow!("contacts table"))?;
     assert_eq!(contacts_table.name(), "contacts");
     assert_eq!(contacts_table.columns().len(), 2);
-    let id_column = contacts_table.get_column("id").expect("id column");
+    let id_column = contacts_table
+        .get_column("id")
+        .ok_or_else(|| anyhow::anyhow!("id column"))?;
     assert_eq!(id_column.name(), "id");
     assert_eq!(id_column.data_type(), "int");
     assert!(id_column.not_null());
     assert_eq!(id_column.default(), None);
-    let email_column = contacts_table.get_column("email").expect("email column");
+    let email_column = contacts_table
+        .get_column("email")
+        .ok_or_else(|| anyhow::anyhow!("email column"))?;
     assert_eq!(email_column.name(), "email");
     assert_eq!(email_column.data_type(), "varchar(20)");
     assert!(!email_column.not_null());
     assert_eq!(email_column.default(), None);
 
     assert_eq!(contacts_table.indexes().len(), 1);
-    let primary_key_index = contacts_table.get_index("PRIMARY").expect("index");
+    let primary_key_index = contacts_table
+        .get_index("PRIMARY")
+        .ok_or_else(|| anyhow::anyhow!("index"))?;
     assert_eq!(primary_key_index.name(), "PRIMARY");
     assert_eq!(primary_key_index.columns(), ["id"]);
     assert!(primary_key_index.unique());
 
-    let users_table = schema.get("users").expect("users table");
+    let users_table = schema
+        .get("users")
+        .ok_or_else(|| anyhow::anyhow!("users table"))?;
     assert_eq!(users_table.name(), "users");
     assert_eq!(users_table.columns().len(), 2);
-    let id_column = users_table.get_column("id").expect("id column");
+    let id_column = users_table
+        .get_column("id")
+        .ok_or_else(|| anyhow::anyhow!("id column"))?;
     assert_eq!(id_column.name(), "id");
     assert_eq!(id_column.data_type(), "int");
     assert!(id_column.not_null());
     assert_eq!(id_column.default(), None);
-    let email_column = users_table.get_column("email").expect("email column");
+    let email_column = users_table
+        .get_column("email")
+        .ok_or_else(|| anyhow::anyhow!("email column"))?;
     assert_eq!(email_column.name(), "email");
     assert_eq!(email_column.data_type(), "varchar(20)");
     assert!(!email_column.not_null());
     assert_eq!(email_column.default(), None);
 
     assert_eq!(users_table.indexes().len(), 1);
-    let primary_key_index = users_table.get_index("PRIMARY").expect("index");
+    let primary_key_index = users_table
+        .get_index("PRIMARY")
+        .ok_or_else(|| anyhow::anyhow!("index"))?;
     assert_eq!(primary_key_index.name(), "PRIMARY");
     assert_eq!(primary_key_index.columns(), ["id"]);
     assert!(primary_key_index.unique());

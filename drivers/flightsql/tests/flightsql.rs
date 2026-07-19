@@ -1,3 +1,11 @@
+#![cfg_attr(
+    target_os = "linux",
+    expect(
+        clippy::panic_in_result_fn,
+        reason = "test assertions intentionally panic when verification fails"
+    )
+)]
+
 #[cfg(target_os = "linux")]
 use rsql_driver::{Connection, Driver, Value};
 #[cfg(target_os = "linux")]
@@ -46,7 +54,9 @@ async fn test_connection_interface(connection: &mut dyn Connection) -> anyhow::R
 
     let metadata = connection.metadata().await?;
     assert_eq!(metadata.catalogs().len(), 3);
-    let catalog = metadata.current_catalog().expect("catalog");
+    let catalog = metadata
+        .current_catalog()
+        .ok_or_else(|| anyhow::anyhow!("catalog"))?;
     assert_eq!(catalog.schemas().len(), 3);
     // TODO: Check the current schema to see if it contains the "person" table
     //let schema = catalog.current_schema().expect("schema");
@@ -97,8 +107,11 @@ async fn test_data_types(connection: &mut dyn Connection) -> anyhow::Result<()> 
         ]
     );
 
-    let row = query_result.next().await.expect("no row");
-    let values = row.to_vec();
+    let row = query_result
+        .next()
+        .await
+        .ok_or_else(|| anyhow::anyhow!("no row"))?;
+    let values = row.clone();
     assert_eq!(
         values,
         vec![

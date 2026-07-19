@@ -54,10 +54,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Setup
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: dtolnay/rust-toolchain@stable
+      - name: Install Rust toolchain
+        run: rustup toolchain install --no-self-update
       - uses: swatinem/rust-cache@v2
 
       # If you use any mdbook plugins, here's the place to install them!

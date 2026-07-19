@@ -23,6 +23,10 @@ impl ShellCommand for Command {
         t!("describe_description", locale = locale).to_string()
     }
 
+    #[expect(
+        clippy::too_many_lines,
+        reason = "describing an object assembles several related metadata result sets"
+    )]
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
         let configuration = options.configuration;
         let output = options.output;
@@ -30,13 +34,13 @@ impl ShellCommand for Command {
 
         if options.input.len() <= 1 {
             return Err(MissingArguments {
-                command_name: self.name(locale).to_string(),
-                arguments: self.args(locale).to_string(),
+                command_name: self.name(locale),
+                arguments: self.args(locale),
             });
         }
 
         let metadata = options.connection.metadata().await?;
-        let object_name = &options.input[1];
+        let object_name = options.input.get(1).map_or("", String::as_str);
 
         let column_label = t!("describe_column", locale = locale).to_string();
         let type_label = t!("describe_type", locale = locale).to_string();
@@ -92,7 +96,7 @@ impl ShellCommand for Command {
             view.columns()
         } else {
             return Err(InvalidOption {
-                command_name: self.name(locale).to_string(),
+                command_name: self.name(locale),
                 option: object_name.to_string(),
             });
         };
@@ -129,10 +133,7 @@ impl ShellCommand for Command {
                 indexes_column_rows.push(row);
             }
 
-            let list_delimiter_fk = t!("list_delimiter", locale = locale);
-
             if let Some(pk) = table.primary_key() {
-                let list_delimiter_pk = t!("list_delimiter", locale = locale);
                 let inferred = if pk.inferred() {
                     t!("yes", locale = locale).to_string()
                 } else {
@@ -140,7 +141,7 @@ impl ShellCommand for Command {
                 };
                 let row = vec![
                     Value::String(pk.name().to_string()),
-                    Value::String(pk.columns().join(&*list_delimiter_pk)),
+                    Value::String(pk.columns().join(&*list_delimiter)),
                     Value::String(inferred),
                 ];
                 pk_rows.push(row);
@@ -154,9 +155,9 @@ impl ShellCommand for Command {
                 };
                 let row = vec![
                     Value::String(fk.name().to_string()),
-                    Value::String(fk.columns().join(&*list_delimiter_fk)),
+                    Value::String(fk.columns().join(&*list_delimiter)),
                     Value::String(fk.referenced_table().to_string()),
-                    Value::String(fk.referenced_columns().join(&*list_delimiter_fk)),
+                    Value::String(fk.referenced_columns().join(&*list_delimiter)),
                     Value::String(inferred),
                 ];
                 fk_rows.push(row);
@@ -170,7 +171,7 @@ impl ShellCommand for Command {
         let result_format = &configuration.results_format;
         let formatter = options.formatter_manager.get(result_format).ok_or(
             rsql_formatters::Error::UnknownFormat {
-                format: result_format.to_string(),
+                format: result_format.clone(),
             },
         )?;
 
@@ -366,12 +367,8 @@ mod tests {
              --------------+---------+------------------+--------------------+----------
               fk_users_org | org_id  | organizations    | id                 | No       
         "};
-        let normalize = |s: &str| -> String {
-            s.lines()
-                .map(|line| line.trim_end())
-                .collect::<Vec<_>>()
-                .join("\n")
-        };
+        let normalize =
+            |s: &str| -> String { s.lines().map(str::trim_end).collect::<Vec<_>>().join("\n") };
         assert_eq!(normalize(&contents), normalize(expected));
 
         Ok(())

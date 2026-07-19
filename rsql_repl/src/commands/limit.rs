@@ -25,14 +25,18 @@ impl ShellCommand for Command {
         let locale = options.configuration.locale.as_str();
 
         if options.input.len() <= 1 {
-            let value_formatter = ValueFormatter::new(locale);
+            let value_formatter = ValueFormatter::new(locale)?;
             let limit = value_formatter.format_integer(options.configuration.results_limit);
             let limit_setting = t!("limit_setting", locale = locale, limit = limit).to_string();
             writeln!(options.output, "{limit_setting}")?;
             return Ok(LoopCondition::Continue);
         }
 
-        options.configuration.results_limit = options.input[1].parse::<usize>()?;
+        options.configuration.results_limit = options
+            .input
+            .get(1)
+            .map_or("", String::as_str)
+            .parse::<usize>()?;
 
         Ok(LoopCondition::Continue)
     }

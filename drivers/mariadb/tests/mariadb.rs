@@ -1,3 +1,11 @@
+#![cfg_attr(
+    target_os = "linux",
+    expect(
+        clippy::panic_in_result_fn,
+        reason = "test assertions intentionally panic when verification fails"
+    )
+)]
+
 #[cfg(target_os = "linux")]
 use rsql_driver::Driver;
 #[cfg(target_os = "linux")]
@@ -40,8 +48,12 @@ async fn test_schema(connection: &mut dyn rsql_driver::Connection) -> anyhow::Re
         .await?;
 
     let metadata = connection.metadata().await?;
-    let catalog = metadata.current_catalog().expect("catalog");
-    let schema = catalog.current_schema().expect("schema");
+    let catalog = metadata
+        .current_catalog()
+        .ok_or_else(|| anyhow::anyhow!("catalog"))?;
+    let schema = catalog
+        .current_schema()
+        .ok_or_else(|| anyhow::anyhow!("schema"))?;
     let tables = schema
         .tables()
         .iter()
@@ -50,7 +62,9 @@ async fn test_schema(connection: &mut dyn rsql_driver::Connection) -> anyhow::Re
     assert!(tables.contains(&"contacts"));
     assert!(tables.contains(&"users"));
 
-    let contacts_table = schema.get("contacts").expect("contacts table");
+    let contacts_table = schema
+        .get("contacts")
+        .ok_or_else(|| anyhow::anyhow!("contacts table"))?;
     let contacts_indexes = contacts_table
         .indexes()
         .iter()
@@ -58,7 +72,9 @@ async fn test_schema(connection: &mut dyn rsql_driver::Connection) -> anyhow::Re
         .collect::<Vec<_>>();
     assert_eq!(contacts_indexes, vec!["PRIMARY"]);
 
-    let user_table = schema.get("users").expect("users table");
+    let user_table = schema
+        .get("users")
+        .ok_or_else(|| anyhow::anyhow!("users table"))?;
     let user_indexes = user_table
         .indexes()
         .iter()

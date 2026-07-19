@@ -1,3 +1,11 @@
+#![cfg_attr(
+    target_os = "linux",
+    expect(
+        clippy::panic_in_result_fn,
+        reason = "test assertions intentionally panic when verification fails"
+    )
+)]
+
 #[cfg(target_os = "linux")]
 use rsql_driver::{Driver, Value};
 #[cfg(target_os = "linux")]

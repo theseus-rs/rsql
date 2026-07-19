@@ -6,14 +6,17 @@ use std::io::{Result, Write};
 use std::string::FromUtf8Error;
 
 pub struct ClipboardWriter {
-    clipboard: Clipboard,
+    clipboard: Option<Clipboard>,
     buffer: Vec<u8>,
 }
 
 impl ClipboardWriter {
     #[must_use]
     pub fn new(clipboard: Clipboard, buffer: Vec<u8>) -> Self {
-        Self { clipboard, buffer }
+        Self {
+            clipboard: Some(clipboard),
+            buffer,
+        }
     }
 
     #[must_use]
@@ -33,10 +36,10 @@ impl ClipboardWriter {
 
 impl Default for ClipboardWriter {
     fn default() -> Self {
-        Self::new(
-            Clipboard::new().expect("Failed to create clipboard"),
-            Vec::new(),
-        )
+        Self {
+            clipboard: Clipboard::new().ok(),
+            buffer: Vec::new(),
+        }
     }
 }
 
@@ -45,14 +48,14 @@ impl Debug for ClipboardWriter {
         write!(
             f,
             "ClipboardWriter: {}",
-            self.as_utf8().expect("Invalid UTF-8")
+            String::from_utf8_lossy(&self.buffer)
         )
     }
 }
 
 impl Display for ClipboardWriter {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.as_utf8().expect("Invalid UTF-8"))
+        write!(f, "{}", String::from_utf8_lossy(&self.buffer))
     }
 }
 
@@ -67,6 +70,8 @@ impl Write for ClipboardWriter {
             io::Error::new(io::ErrorKind::InvalidData, "Failed to convert to UTF-8")
         })?;
         self.clipboard
+            .as_mut()
+            .ok_or_else(|| io::Error::other("Clipboard is unavailable"))?
             .set_text(data)
             .map_err(|_| io::Error::other("Failed to set clipboard text"))?;
         Ok(())
@@ -75,11 +80,37 @@ impl Write for ClipboardWriter {
 
 impl Writer for ClipboardWriter {}
 
-#[cfg(not(target_os = "linux"))]
 #[cfg(test)]
 mod tests {
     use super::*;
 
+    #[test]
+    fn test_unavailable_clipboard() {
+        let mut writer = ClipboardWriter {
+            clipboard: None,
+            buffer: vec![0xff],
+        };
+        assert_eq!(format!("{writer:?}"), "ClipboardWriter: �");
+        assert_eq!(writer.to_string(), "�");
+        assert_eq!(
+            writer.flush().map_err(|error| error.kind()),
+            Err(io::ErrorKind::InvalidData)
+        );
+
+        let mut writer = ClipboardWriter {
+            clipboard: None,
+            buffer: b"text".to_vec(),
+        };
+        assert_eq!(
+            writer.flush().map_err(|error| error.kind()),
+            Err(io::ErrorKind::Other)
+        );
+
+        let default_writer = ClipboardWriter::default();
+        assert!(default_writer.as_slice().is_empty());
+    }
+
+    #[cfg(not(target_os = "linux"))]
     #[test]
     fn test_writer() -> anyhow::Result<()> {
         let data = "Hello, world!";

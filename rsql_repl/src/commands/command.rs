@@ -97,14 +97,17 @@ impl<T: ToggleShellCommand> ShellCommand for T {
             return Ok(LoopCondition::Continue);
         }
 
-        let argument = options.input[1].to_lowercase().to_string();
+        let argument = options
+            .input
+            .get(1)
+            .map_or_else(String::new, |argument| argument.to_lowercase());
         let new_setting = if argument == on {
             true
         } else if argument == off {
             false
         } else {
             return Err(InvalidOption {
-                command_name: self.name(locale).to_string(),
+                command_name: self.name(locale),
                 option: argument,
             });
         };

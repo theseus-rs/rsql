@@ -114,7 +114,7 @@ async fn get_columns(
     while let Some(row) = result.next().await {
         if let Some(Value::String(name)) = row.first() {
             let data_type = match row.get(1) {
-                Some(Value::String(type_string)) => type_string.to_string(),
+                Some(Value::String(type_string)) => type_string.clone(),
                 _ => "String".to_string(),
             };
             let is_nullable = data_type.starts_with("Nullable(");
@@ -168,7 +168,7 @@ async fn get_primary_key(
 
     let columns: Vec<&str> = primary_key_expr
         .split(',')
-        .map(|column| column.trim())
+        .map(str::trim)
         .filter(|s| !s.is_empty())
         .collect();
     Ok(Index::new("PRIMARY", columns, true))

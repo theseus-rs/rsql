@@ -31,7 +31,7 @@ impl MemoryWriter {
 
 impl Display for MemoryWriter {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.as_utf8().expect("Invalid UTF-8"))
+        write!(f, "{}", String::from_utf8_lossy(&self.buffer))
     }
 }
 

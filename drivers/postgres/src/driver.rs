@@ -18,6 +18,7 @@ use tracing::debug;
 use url::Url;
 
 const POSTGRESQL_EMBEDDED_VERSION: &str = "=18.3.0";
+static POSTGRESQL_SETUP_MUTEX: tokio::sync::Mutex<()> = tokio::sync::Mutex::const_new(());
 
 #[derive(Debug)]
 pub struct Driver;
@@ -74,10 +75,13 @@ impl Connection {
             }
 
             let mut postgresql = PostgreSQL::new(settings);
-            postgresql
-                .setup()
-                .await
-                .map_err(|error| IoError(error.to_string()))?;
+            {
+                let _setup_guard = POSTGRESQL_SETUP_MUTEX.lock().await;
+                postgresql
+                    .setup()
+                    .await
+                    .map_err(|error| IoError(error.to_string()))?;
+            }
             let version = postgresql.settings().version.clone();
             debug!("Starting embedded PostgreSQL {version} server");
             postgresql
@@ -216,7 +220,7 @@ fn values_to_pg_params(
                     Value::U8(v) => Box::new(i16::from(*v)),
                     Value::U16(v) => Box::new(i32::from(*v)),
                     Value::U32(v) => Box::new(*v),
-                    Value::U64(v) => Box::new(*v as i64),
+                    Value::U64(v) => Box::new((*v).cast_signed()),
                     Value::F32(v) => Box::new(*v),
                     Value::F64(v) => Box::new(*v),
                     Value::String(v) => Box::new(v.clone()),
@@ -233,7 +237,8 @@ fn values_to_pg_params(
         .collect()
 }
 
-#[cfg(test)]
+// postgresql_embedded does not publish a PostgreSQL asset for Windows ARM.
+#[cfg(all(test, not(all(target_os = "windows", target_arch = "aarch64"))))]
 mod test {
     use super::*;
     use jiff::Timestamp;
@@ -245,7 +250,7 @@ mod test {
 
     #[tokio::test]
     async fn test_driver_connect() -> Result<()> {
-        let driver = crate::Driver;
+        let driver = Driver;
         let mut connection = driver.connect(DATABASE_URL).await?;
         assert_eq!(DATABASE_URL, connection.url());
         connection.close().await?;
@@ -254,7 +259,7 @@ mod test {
 
     #[tokio::test]
     async fn test_connection_interface() -> Result<()> {
-        let driver = crate::Driver;
+        let driver = Driver;
         let mut connection = driver.connect(DATABASE_URL).await?;
 
         let _ = connection
@@ -284,7 +289,7 @@ mod test {
     }
 
     async fn test_data_type(sql: &str) -> Result<Option<Value>> {
-        let driver = crate::Driver;
+        let driver = Driver;
         let mut connection = driver.connect(DATABASE_URL).await?;
 
         let mut query_result = connection.query(sql, &[]).await?;

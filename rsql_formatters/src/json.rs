@@ -51,8 +51,7 @@ pub(crate) async fn format_json(
             writeln!(output)?;
         }
 
-        for (c, data) in row.iter().enumerate() {
-            let column = columns.get(c).expect("column not found");
+        for (column, data) in columns.iter().zip(row) {
             if let Value::Bytes(_bytes) = data {
                 let value = Value::String(data.to_string());
                 json_row.insert(column, value);

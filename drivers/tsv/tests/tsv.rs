@@ -1,3 +1,8 @@
+#![expect(
+    clippy::panic_in_result_fn,
+    reason = "test assertions intentionally panic when verification fails"
+)]
+
 use rsql_driver::{Driver, Result, Value};
 use rsql_driver_test_utils::dataset_url;
 

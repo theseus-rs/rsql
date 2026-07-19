@@ -654,7 +654,7 @@ impl Index {
     }
 }
 
-/// PrimaryKey contains the definition for a primary key constraint on a table.
+/// `PrimaryKey` contains the definition for a primary key constraint on a table.
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct PrimaryKey {
     name: String,
@@ -663,7 +663,7 @@ pub struct PrimaryKey {
 }
 
 impl PrimaryKey {
-    /// Creates a new PrimaryKey instance.
+    /// Creates a new `PrimaryKey` instance.
     pub fn new<S: Into<String>>(name: S, columns: Vec<S>, inferred: bool) -> Self {
         Self {
             name: name.into(),
@@ -691,7 +691,7 @@ impl PrimaryKey {
     }
 }
 
-/// ForeignKey contains the definition for a foreign key constraint on a table.
+/// `ForeignKey` contains the definition for a foreign key constraint on a table.
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct ForeignKey {
     name: String,
@@ -702,7 +702,7 @@ pub struct ForeignKey {
 }
 
 impl ForeignKey {
-    /// Creates a new ForeignKey instance.
+    /// Creates a new `ForeignKey` instance.
     pub fn new<S: Into<String>>(
         name: S,
         columns: Vec<S>,

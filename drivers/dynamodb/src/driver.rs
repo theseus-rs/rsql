@@ -87,7 +87,7 @@ impl Driver {
     fn region(parameters: &HashMap<String, String>) -> Option<Region> {
         parameters
             .get("region")
-            .map(|region| Region::new(region.to_string()))
+            .map(|region| Region::new(region.clone()))
     }
 
     /// Extracts the endpoint URL from the URL and returns it as a string.
@@ -188,7 +188,7 @@ impl rsql_driver::Connection for Connection {
             for item in result.items() {
                 if columns.is_empty() {
                     for column_name in item.keys() {
-                        columns.push(column_name.to_string());
+                        columns.push(column_name.clone());
                     }
                 }
                 items.push(item.clone());

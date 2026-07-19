@@ -25,7 +25,7 @@ impl ShellCommand for Command {
         let exit_code = if options.input.len() == 1 {
             0
         } else {
-            options.input[1].parse()?
+            options.input.get(1).map_or("", String::as_str).parse()?
         };
 
         options.connection.close().await?;

@@ -4,7 +4,7 @@ use rsql_driver::{QueryResult, Result, Value};
 use sqlx::sqlite::{SqliteColumn, SqliteRow};
 use sqlx::{Column, Row, TypeInfo};
 
-/// Query result that converts SQLite rows to values on demand
+/// Query result that converts `SQLite` rows to values on demand
 pub(crate) struct SqliteQueryResult {
     columns: Vec<String>,
     rows: Vec<SqliteRow>,
@@ -18,6 +18,7 @@ impl std::fmt::Debug for SqliteQueryResult {
             .field("columns", &self.columns)
             .field("row_index", &self.row_index)
             .field("row_count", &self.rows.len())
+            .field("row_buffer", &self.row_buffer)
             .finish()
     }
 }

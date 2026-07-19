@@ -10,6 +10,9 @@ repository.workspace = true
 rust-version.workspace = true
 version.workspace = true
 
+[lints]
+workspace = true
+
 [dependencies]
 file_type = { workspace = true }
 rsql_driver = { path = "../rsql_driver", version = "0.19.4" }
@@ -213,8 +216,6 @@ rustls = [
     "rsql_driver_sqlite/rustls",
 ]
 
-[lints.clippy]
-unwrap_used = "deny"
 
 [package.metadata.docs.rs]
 features = []

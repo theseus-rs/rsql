@@ -4,7 +4,6 @@ use std::fs::File;
 use std::io::{Result, Write};
 use std::path::Path;
 use std::str::FromStr;
-use tempfile::NamedTempFile;
 
 #[derive(Debug)]
 pub struct FileWriter {
@@ -62,24 +61,18 @@ impl Write for FileWriter {
 
 impl Writer for FileWriter {}
 
-impl Default for FileWriter {
-    fn default() -> Self {
-        let file = NamedTempFile::new().expect("Failed to create temporary file");
-        FileWriter::new(file.into_file())
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
+    use tempfile::NamedTempFile;
 
     #[test]
     fn test_writer() -> anyhow::Result<()> {
-        let mut writer = FileWriter::default();
+        let mut writer = FileWriter::new(NamedTempFile::new()?.into_file());
         writer.write_all(b"Hello, world!")?;
         writer.flush()?;
 
-        let file = NamedTempFile::new().expect("Failed to create temporary file");
+        let file = NamedTempFile::new()?;
         let path = file.as_ref().to_string_lossy().to_string();
         let writer = FileWriter::from_str(path.as_str())?;
         assert!(writer.to_string().contains("File"));

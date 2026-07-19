@@ -147,7 +147,7 @@ fn to_libsql_params(values: &[Value]) -> Vec<libsql::Value> {
             Value::U8(v) => libsql::Value::Integer(i64::from(*v)),
             Value::U16(v) => libsql::Value::Integer(i64::from(*v)),
             Value::U32(v) => libsql::Value::Integer(i64::from(*v)),
-            Value::U64(v) => libsql::Value::Integer(*v as i64),
+            Value::U64(v) => libsql::Value::Integer((*v).cast_signed()),
             Value::F32(v) => libsql::Value::Real(f64::from(*v)),
             Value::F64(v) => libsql::Value::Real(*v),
             Value::String(v) => libsql::Value::Text(v.clone()),
@@ -174,7 +174,7 @@ mod test {
 
     #[tokio::test]
     async fn test_debug() -> Result<()> {
-        let driver = crate::Driver;
+        let driver = Driver;
         let connection = driver.connect(DATABASE_URL).await?;
 
         assert!(format!("{connection:?}").contains("Connection"));
@@ -184,7 +184,7 @@ mod test {
 
     #[tokio::test]
     async fn test_driver_connect() -> Result<()> {
-        let driver = crate::Driver;
+        let driver = Driver;
         let mut connection = driver.connect(DATABASE_URL).await?;
         assert_eq!(DATABASE_URL, connection.url());
         connection.close().await?;
@@ -193,7 +193,7 @@ mod test {
 
     #[tokio::test]
     async fn test_connection_interface() -> Result<()> {
-        let driver = crate::Driver;
+        let driver = Driver;
         let mut connection = driver.connect(DATABASE_URL).await?;
 
         let _ = connection
@@ -220,7 +220,7 @@ mod test {
     /// Reference: <https://www.sqlite.org/datatype3.html>
     #[tokio::test]
     async fn test_table_data_types() -> Result<()> {
-        let driver = crate::Driver;
+        let driver = Driver;
         let mut connection = driver.connect(DATABASE_URL).await?;
 
         let _ = connection
@@ -259,7 +259,7 @@ mod test {
     }
 
     async fn test_data_type(sql: &str) -> Result<Option<Value>> {
-        let driver = crate::Driver;
+        let driver = Driver;
         let mut connection = driver.connect(DATABASE_URL).await?;
         let mut query_result = connection.query(sql, &[]).await?;
         let mut value: Option<Value> = None;
@@ -315,7 +315,7 @@ mod test {
 
     #[tokio::test]
     async fn test_execute_with_params() -> Result<()> {
-        let driver = crate::Driver;
+        let driver = Driver;
         let mut connection = driver.connect(DATABASE_URL).await?;
 
         let _ = connection

@@ -32,10 +32,10 @@ impl ShellCommand for Command {
 
         if options.input.len() <= 1 {
             let history = if options.configuration.history {
-                let value_formatter = ValueFormatter::new(locale);
+                let value_formatter = ValueFormatter::new(locale)?;
                 for (i, entry) in options.history.iter().enumerate() {
                     let index = value_formatter.format_integer(i + 1);
-                    let mut entry = entry.to_string();
+                    let mut entry = entry.clone();
                     if options.configuration.color {
                         entry = entry.dimmed().to_string();
                     }
@@ -61,14 +61,17 @@ impl ShellCommand for Command {
             return Ok(LoopCondition::Continue);
         }
 
-        let argument = options.input[1].to_lowercase().to_string();
+        let argument = options
+            .input
+            .get(1)
+            .map_or_else(String::new, |argument| argument.to_lowercase());
         let history = if argument == on {
             true
         } else if argument == off {
             false
         } else {
             return Err(InvalidOption {
-                command_name: self.name(locale).to_string(),
+                command_name: self.name(locale),
                 option: argument,
             });
         };

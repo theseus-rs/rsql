@@ -43,7 +43,7 @@ impl QueryResult for DuckDbQueryResult {
 /// Convert a duckdb row value at the given column index to an rsql Value
 pub(crate) fn convert_to_value(
     row: &duckdb::Row,
-    column_name: &String,
+    column_name: &str,
     column_index: usize,
 ) -> Result<Value> {
     let value_ref = row
@@ -101,7 +101,7 @@ pub(crate) fn convert_to_value(
         _ => {
             let data_type = value_ref.data_type();
             return Err(UnsupportedColumnType {
-                column_name: column_name.to_string(),
+                column_name: column_name.to_owned(),
                 column_type: data_type.to_string(),
             });
         }

@@ -1,4 +1,5 @@
 [package]
+autobenches = false
 authors.workspace = true
 categories.workspace = true
 description = "rsql library for creating a REPL command line SQL interface"
@@ -9,6 +10,9 @@ name = "rsql_repl"
 repository.workspace = true
 rust-version.workspace = true
 version.workspace = true
+
+[lints]
+workspace = true
 
 [dependencies]
 anyhow = { workspace = true }
@@ -166,8 +170,6 @@ format-yaml = ["rsql_formatters/yaml"]
 native-tls = ["rsql_drivers/native-tls"]
 rustls = ["rsql_drivers/rustls"]
 
-[lints.clippy]
-unwrap_used = "deny"
 
 [package.metadata.docs.rs]
 features = []

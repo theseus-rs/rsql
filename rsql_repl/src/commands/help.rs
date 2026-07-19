@@ -109,7 +109,7 @@ mod tests {
             formatter_manager: &FormatterManager::default(),
             connection: &mut MockConnection::new(),
             history: &DefaultHistory::new(),
-            input: vec![command.to_string()],
+            input: vec![command.clone()],
             output: &mut output,
         };
 

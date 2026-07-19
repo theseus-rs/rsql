@@ -73,20 +73,12 @@ pub async fn check_for_newer_version(
             placeholder: Some(&*update_version_prompt_placeholder),
             help_message: None,
             formatter: &|answer| {
-                if answer {
-                    yes.to_string()
-                } else {
-                    no.to_string()
-                }
+                if answer { yes.clone() } else { no.clone() }
             },
             parser: &|answer| Ok(answer == yes),
             error_message: update_version_prompt_error.to_string(),
             default_value_formatter: &|default| {
-                if default {
-                    yes.to_string()
-                } else {
-                    no.to_string()
-                }
+                if default { yes.clone() } else { no.clone() }
             },
             render_config: RenderConfig::default(),
         };

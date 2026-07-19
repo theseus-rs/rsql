@@ -7,7 +7,9 @@ use rsql_repl::shell::{Result, ShellArgs, ShellBuilder};
 
 pub fn postgres_benchmark(criterion: &mut Criterion) {
     criterion.bench_function("postgres-embedded", |bencher| {
-        let runtime = Runtime::new().expect("Failed to create Tokio runtime");
+        let Ok(runtime) = Runtime::new() else {
+            return;
+        };
         bencher
             .to_async(runtime)
             .iter(|| async { postgres().await });

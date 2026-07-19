@@ -9,7 +9,7 @@ use sqlx::postgres::{PgColumn, PgRow};
 use sqlx::{Column, ColumnIndex, Decode, Row, Type};
 use uuid::Uuid;
 
-/// Query result that converts PostgreSQL rows to values on demand
+/// Query result that converts `PostgreSQL` rows to values on demand
 pub(crate) struct PostgreSqlQueryResult {
     columns: Vec<String>,
     rows: Vec<PgRow>,
@@ -23,6 +23,7 @@ impl std::fmt::Debug for PostgreSqlQueryResult {
             .field("columns", &self.columns)
             .field("row_index", &self.row_index)
             .field("row_count", &self.rows.len())
+            .field("row_buffer", &self.row_buffer)
             .finish()
     }
 }
@@ -75,7 +76,7 @@ pub(crate) fn convert_to_value(row: &PgRow, column: &PgColumn) -> Result<Value> 
     let Some(column_type_first_part) = column_type_parts.first() else {
         return Err(UnsupportedColumnType {
             column_name: column.name().to_string(),
-            column_type: column_type.to_string(),
+            column_type: column_type.clone(),
         });
     };
 
@@ -216,7 +217,7 @@ pub(crate) fn convert_to_value(row: &PgRow, column: &PgColumn) -> Result<Value> 
         _ => {
             return Err(UnsupportedColumnType {
                 column_name: column.name().to_string(),
-                column_type: column_type.to_string(),
+                column_type: column_type.clone(),
             });
         }
     };

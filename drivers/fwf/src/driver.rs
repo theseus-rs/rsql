@@ -57,19 +57,24 @@ impl rsql_driver::Driver for Driver {
         let mut columns = vec![Vec::<String>::new(); widths.len()];
 
         for line in lines {
-            let mut data = widths
-                .iter()
-                .scan(0, |start, &width| {
-                    let end = *start + width as usize;
-                    let value = &line[*start..end];
-                    *start = end;
-                    Some(value.trim().to_string())
-                })
-                .collect::<Vec<String>>();
+            let mut start = 0;
+            let mut data = Vec::with_capacity(widths.len());
+            for &width in &widths {
+                let end = start + usize::from(width);
+                let value = line.get(start..end).ok_or_else(|| {
+                    IoError(format!(
+                        "Fixed-width row is shorter than the configured widths: {line}"
+                    ))
+                })?;
+                data.push(value.trim().to_string());
+                start = end;
+            }
 
             data.reverse();
             for column in &mut columns {
-                let column_data = data.pop().expect("data");
+                let column_data = data
+                    .pop()
+                    .ok_or_else(|| IoError("Fixed-width row is missing column data".to_string()))?;
                 column.push(column_data);
             }
         }
@@ -112,4 +117,27 @@ fn column_name(mut column: usize) -> String {
         column /= 26;
     }
     name
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::io::Write;
+
+    #[tokio::test]
+    #[expect(
+        clippy::panic_in_result_fn,
+        reason = "test assertions intentionally panic when verification fails"
+    )]
+    async fn test_short_row_returns_error() -> Result<()> {
+        let mut file = tempfile::NamedTempFile::new()?;
+        file.write_all(b"abc\n")?;
+        let mut url = Url::from_file_path(file.path())
+            .map_err(|()| IoError("failed to create file URL".to_string()))?;
+        url.set_query(Some("widths=2,2"));
+
+        let result = rsql_driver::Driver::connect(&Driver, url.as_str()).await;
+        assert!(matches!(result, Err(IoError(message)) if message.contains("shorter")));
+        Ok(())
+    }
 }

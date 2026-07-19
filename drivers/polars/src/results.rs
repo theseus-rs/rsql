@@ -4,7 +4,7 @@ use polars::frame::DataFrame;
 use rsql_driver::QueryResult;
 use std::fmt::{Debug, Formatter};
 
-/// Query result that converts Polars DataFrame rows to values on demand
+/// Query result that converts Polars `DataFrame` rows to values on demand
 pub(crate) struct PolarsQueryResult {
     columns: Vec<String>,
     data_frame: DataFrame,
@@ -18,6 +18,7 @@ impl Debug for PolarsQueryResult {
             .field("columns", &self.columns)
             .field("row_index", &self.row_index)
             .field("row_count", &self.data_frame.height())
+            .field("row_buffer", &self.row_buffer)
             .finish()
     }
 }
@@ -47,7 +48,7 @@ impl QueryResult for PolarsQueryResult {
         self.row_index += 1;
         self.row_buffer.clear();
         self.row_buffer
-            .extend(row_values.iter().map(|v| v.to_value()));
+            .extend(row_values.iter().map(ToValue::to_value));
         Some(&self.row_buffer)
     }
 }

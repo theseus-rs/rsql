@@ -34,14 +34,14 @@ impl ShellCommand for Command {
                     Ok(millis) => (millis * 1000.0) as u64,
                     Err(error) => {
                         return Err(InvalidOption {
-                            command_name: self.name(locale).to_string(),
+                            command_name: self.name(locale).clone(),
                             option: format!("{error:?}"),
                         });
                     }
                 };
                 Duration::from_millis(millis)
             }
-            None => Duration::from_millis(1000),
+            None => Duration::from_secs(1),
         };
 
         sleep(duration);

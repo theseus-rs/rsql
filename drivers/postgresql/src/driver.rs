@@ -211,7 +211,7 @@ fn bind_pg_value<'q>(
         Value::U8(v) => query.bind(i16::from(*v)),
         Value::U16(v) => query.bind(i32::from(*v)),
         Value::U32(v) => query.bind(i64::from(*v)),
-        Value::U64(v) => query.bind(*v as i64),
+        Value::U64(v) => query.bind((*v).cast_signed()),
         Value::F32(v) => query.bind(*v),
         Value::F64(v) => query.bind(*v),
         Value::String(v) => query.bind(v.as_str()),
@@ -221,7 +221,8 @@ fn bind_pg_value<'q>(
     }
 }
 
-#[cfg(test)]
+// postgresql_embedded does not publish a PostgreSQL asset for Windows ARM.
+#[cfg(all(test, not(all(target_os = "windows", target_arch = "aarch64"))))]
 mod test {
     use super::*;
     use jiff::tz::Offset;
@@ -233,7 +234,7 @@ mod test {
 
     #[tokio::test]
     async fn test_driver_connect() -> Result<()> {
-        let driver = crate::Driver;
+        let driver = Driver;
         let mut connection = driver.connect(DATABASE_URL).await?;
         assert_eq!(DATABASE_URL, connection.url());
         connection.close().await?;
@@ -242,7 +243,7 @@ mod test {
 
     #[tokio::test]
     async fn test_connection_interface() -> Result<()> {
-        let driver = crate::Driver;
+        let driver = Driver;
         let mut connection = driver.connect(DATABASE_URL).await?;
 
         let _ = connection
@@ -272,7 +273,7 @@ mod test {
     }
 
     async fn test_data_type(sql: &str) -> Result<Option<Value>> {
-        let driver = crate::Driver;
+        let driver = Driver;
         let mut connection = driver.connect(DATABASE_URL).await?;
 
         let mut query_result = connection.query(sql, &[]).await?;

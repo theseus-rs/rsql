@@ -83,15 +83,17 @@ impl rsql_driver::Connection for Connection {
         let mut query_rows = statement
             .query(duckdb::params_from_iter(duckdb_params.iter()))
             .map_err(|error| IoError(error.to_string()))?;
-        let columns = query_rows.as_ref().expect("no rows").column_names();
+        let columns = query_rows
+            .as_ref()
+            .map(duckdb::Statement::column_names)
+            .ok_or_else(|| IoError("DuckDB query did not return row metadata".to_string()))?;
         let mut rows = Vec::new();
         while let Some(query_row) = query_rows
             .next()
             .map_err(|error| IoError(error.to_string()))?
         {
             let mut row = Vec::new();
-            for (index, _column_name) in columns.iter().enumerate() {
-                let column_name = columns.get(index).expect("no column");
+            for (index, column_name) in columns.iter().enumerate() {
                 let value = crate::results::convert_to_value(query_row, column_name, index)?;
                 row.push(value);
             }
@@ -163,7 +165,7 @@ mod test {
 
     #[tokio::test]
     async fn test_driver_connect() -> Result<()> {
-        let driver = crate::Driver;
+        let driver = Driver;
         let mut connection = driver.connect(DATABASE_URL).await?;
         assert_eq!(DATABASE_URL, connection.url());
         connection.close().await?;
@@ -173,7 +175,7 @@ mod test {
     #[tokio::test]
     async fn test_connection_interface() -> Result<()> {
         let database_url = dataset_url("duckdb", "users.duckdb");
-        let driver = crate::Driver;
+        let driver = Driver;
         let mut connection = driver.connect(&database_url).await?;
 
         let mut query_result = connection
@@ -198,7 +200,7 @@ mod test {
     /// Reference: <https://duckdb.org/docs/sql/data_types/overview.html>
     #[tokio::test]
     async fn test_table_data_types() -> Result<()> {
-        let driver = crate::Driver;
+        let driver = Driver;
         let mut connection = driver.connect(DATABASE_URL).await?;
         let sql = indoc! {r"
             CREATE TABLE data_types (
@@ -295,7 +297,7 @@ mod test {
 
     #[tokio::test]
     async fn test_dialect() -> Result<()> {
-        let driver = crate::Driver;
+        let driver = Driver;
         let connection = driver.connect(DATABASE_URL).await?;
         let dialect = connection.dialect();
 
@@ -308,7 +310,7 @@ mod test {
     }
     #[tokio::test]
     async fn test_parse_sql() -> Result<()> {
-        let driver = crate::Driver;
+        let driver = Driver;
         let connection = driver.connect(DATABASE_URL).await?;
 
         let ddl_sql_statements = [
@@ -329,7 +331,7 @@ mod test {
 
     #[tokio::test]
     async fn test_execute_with_params() -> Result<()> {
-        let driver = crate::Driver;
+        let driver = Driver;
         let mut connection = driver.connect(DATABASE_URL).await?;
 
         let _ = connection

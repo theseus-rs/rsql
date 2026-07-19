@@ -33,7 +33,9 @@ impl rsql_driver::Driver for Driver {
         let reader = ArrowReaderBuilder::try_new(file)
             .map_err(|error| IoError(format!("{error:?}")))?
             .build();
-        let batches = reader.collect::<Result<Vec<_>, _>>().unwrap();
+        let batches = reader
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(|error| IoError(format!("{error:?}")))?;
         let mut columns = Vec::<Column>::new();
 
         for batch in batches {

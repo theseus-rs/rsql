@@ -48,13 +48,16 @@ impl ShellCommand for Command {
             return Ok(LoopCondition::Continue);
         }
 
-        let formatter_identifier = options.input[1].to_lowercase();
+        let formatter_identifier = options
+            .input
+            .get(1)
+            .map_or_else(String::new, |identifier| identifier.to_lowercase());
         match formatter_manager.get(formatter_identifier.as_str()) {
             Some(_) => options.configuration.results_format = formatter_identifier,
             None => {
                 return Err(InvalidOption {
-                    command_name: self.name(locale).to_string(),
-                    option: formatter_identifier.to_string(),
+                    command_name: self.name(locale),
+                    option: formatter_identifier,
                 });
             }
         }

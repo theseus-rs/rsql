@@ -2,6 +2,9 @@ pub type Result<T, E = Error> = core::result::Result<T, E>;
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
+    /// Driver error
+    #[error(transparent)]
+    DriverError(#[from] rsql_drivers::Error),
     /// IO error
     #[error(transparent)]
     IoError(anyhow::Error),

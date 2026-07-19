@@ -10,6 +10,9 @@ repository.workspace = true
 rust-version.workspace = true
 version.workspace = true
 
+[lints]
+workspace = true
+
 [dependencies]
 async-trait = { workspace = true }
 file_type = { workspace = true }
@@ -25,4 +28,5 @@ tokio = { workspace = true, features = ["fs"] }
 
 [dev-dependencies]
 rsql_driver_test_utils = { path = "../test_utils", version = "0.19.4" }
+tempfile = { workspace = true }
 tokio = { workspace = true, features = ["macros", "rt", "rt-multi-thread"] }

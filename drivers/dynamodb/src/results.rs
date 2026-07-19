@@ -5,7 +5,7 @@ use rsql_driver::Error::{IoError, UnsupportedColumnType};
 use rsql_driver::{QueryResult, Result, Value};
 use std::collections::HashMap;
 
-/// Query result that converts DynamoDB items to values on demand
+/// Query result that converts `DynamoDB` items to values on demand
 #[derive(Debug)]
 pub(crate) struct DynamoDbQueryResult {
     columns: Vec<String>,
@@ -74,7 +74,7 @@ fn convert_to_value(column_name: &str, attribute: &AttributeValue) -> Result<Val
         AttributeValue::M(values) => {
             let mut items = IndexMap::new();
             for (key, value) in values {
-                let key = Value::String(key.to_string());
+                let key = Value::String(key.clone());
                 let value = convert_to_value(column_name, value)?;
                 items.insert(key, value);
             }
@@ -112,11 +112,11 @@ fn convert_to_value(column_name: &str, attribute: &AttributeValue) -> Result<Val
             Value::Array(items)
         }
         AttributeValue::Null(_value) => Value::Null,
-        AttributeValue::S(value) => Value::String(value.to_string()),
+        AttributeValue::S(value) => Value::String(value.clone()),
         AttributeValue::Ss(values) => {
             let values = values
                 .iter()
-                .map(|value| Value::String(value.to_string()))
+                .map(|value| Value::String(value.clone()))
                 .collect::<Vec<Value>>();
             Value::Array(values)
         }
@@ -128,4 +128,32 @@ fn convert_to_value(column_name: &str, attribute: &AttributeValue) -> Result<Val
         }
     };
     Ok(value)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    #[expect(
+        clippy::panic_in_result_fn,
+        reason = "test assertions intentionally panic when verification fails"
+    )]
+    fn test_string_collections() -> Result<()> {
+        let map = AttributeValue::M(HashMap::from([(
+            "key".to_string(),
+            AttributeValue::S("value".to_string()),
+        )]));
+        let strings = AttributeValue::Ss(vec!["one".to_string(), "two".to_string()]);
+
+        assert!(matches!(convert_to_value("map", &map)?, Value::Map(_)));
+        assert_eq!(
+            convert_to_value("strings", &strings)?,
+            Value::Array(vec![
+                Value::String("one".to_string()),
+                Value::String("two".to_string())
+            ])
+        );
+        Ok(())
+    }
 }
