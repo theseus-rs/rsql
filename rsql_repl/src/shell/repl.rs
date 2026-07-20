@@ -89,7 +89,7 @@ impl Shell {
 
         let exit_code = if let Some(input) = input {
             match &self
-                .evaluate(connection, &DefaultHistory::new(), input.to_string())
+                .evaluate(connection, &DefaultHistory::new(), input.clone())
                 .await?
             {
                 LoopCondition::Continue => 0,

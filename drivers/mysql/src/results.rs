@@ -6,7 +6,7 @@ use sqlx::mysql::{MySqlColumn, MySqlRow};
 use sqlx::types::time::OffsetDateTime;
 use sqlx::{Column, Row};
 
-/// Query result that converts MySQL rows to values on demand
+/// Query result that converts `MySQL` rows to values on demand
 pub(crate) struct MySqlQueryResult {
     columns: Vec<String>,
     rows: Vec<MySqlRow>,
@@ -20,6 +20,7 @@ impl std::fmt::Debug for MySqlQueryResult {
             .field("columns", &self.columns)
             .field("row_index", &self.row_index)
             .field("row_count", &self.rows.len())
+            .field("row_buffer", &self.row_buffer)
             .finish()
     }
 }

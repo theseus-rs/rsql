@@ -1,3 +1,8 @@
+#![expect(
+    clippy::panic_in_result_fn,
+    reason = "test assertions intentionally panic when verification fails"
+)]
+
 use indoc::indoc;
 use rsql_core::configuration::Configuration;
 use rsql_repl::shell::{ShellArgs, ShellBuilder};
@@ -16,9 +21,9 @@ async fn test_execute_command() -> anyhow::Result<()> {
     let _ = shell.execute(&args).await?;
 
     let command_output = shell.output.to_string();
-    let expected = indoc! {r#"
+    let expected = indoc! {r"
             Locale: en
-        "#};
+        "};
     assert_eq!(command_output, expected);
     Ok(())
 }

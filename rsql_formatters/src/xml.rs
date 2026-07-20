@@ -47,9 +47,7 @@ pub(crate) async fn format_xml(
 
     while let Some(row) = query_result.next().await {
         writer.write_event(Event::Start(BytesStart::new("row")))?;
-        for (c, data) in row.iter().enumerate() {
-            let column = columns.get(c).expect("column not found");
-
+        for (column, data) in columns.iter().zip(row) {
             if data.is_null() {
                 writer.write_event(Event::Empty(BytesStart::new(column)))?;
             } else {

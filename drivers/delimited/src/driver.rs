@@ -121,7 +121,7 @@ fn string_to_ascii_char(value: &String) -> Result<u8> {
             "Invalid character length; expected 1 character: {value}"
         )));
     }
-    let char = chars[0];
+    let char = chars.into_iter().next().unwrap_or_default();
     if !char.is_ascii() {
         return Err(ConversionError(format!("Invalid character: {char}")));
     }

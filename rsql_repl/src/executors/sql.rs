@@ -41,7 +41,7 @@ impl<'a> SqlExecutor<'a> {
         let result_format = &self.configuration.results_format;
         let Some(formatter) = self.formatter_manager.get(result_format) else {
             return Err(rsql_formatters::Error::UnknownFormat {
-                format: result_format.to_string(),
+                format: result_format.clone(),
             }
             .into());
         };
@@ -150,7 +150,7 @@ mod tests {
         connection
             .expect_parse_sql()
             .with(sql)
-            .returning(|_| rsql_drivers::StatementMetadata::Unknown);
+            .returning(|_| StatementMetadata::Unknown);
         let connection = &mut connection as &mut dyn Connection;
         let mut output = Output::default();
 
@@ -175,7 +175,7 @@ mod tests {
         connection
             .expect_parse_sql()
             .with(sql)
-            .returning(|_| rsql_drivers::StatementMetadata::Query);
+            .returning(|_| StatementMetadata::Query);
         connection
             .expect_query()
             .returning(|_, _| Ok(Box::<MemoryQueryResult>::default()));
@@ -199,7 +199,7 @@ mod tests {
         connection
             .expect_parse_sql()
             .with(sql)
-            .returning(|_| rsql_drivers::StatementMetadata::DML);
+            .returning(|_| StatementMetadata::DML);
         connection
             .expect_execute()
             .with(sql, vec![])

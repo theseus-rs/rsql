@@ -28,7 +28,7 @@ pub async fn write_footer(
         Query(_query_result) => (options.rows, query_rows),
     };
     let locale = &options.locale;
-    let value_formatter = ValueFormatter::new(locale);
+    let value_formatter = ValueFormatter::new(locale)?;
     let rows = value_formatter.format_integer(rows_affected);
     let rows_label = if !display_rows {
         String::new()

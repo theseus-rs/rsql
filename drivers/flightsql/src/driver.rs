@@ -179,10 +179,14 @@ pub(crate) async fn convert_flight_info_to_query_result(
     let columns = schema
         .fields
         .iter()
-        .map(|field| field.name().to_string())
+        .map(|field| field.name().clone())
         .collect::<Vec<_>>();
 
-    let Some(ticket) = flight_info.endpoint[0].ticket.clone() else {
+    let Some(ticket) = flight_info
+        .endpoint
+        .first()
+        .and_then(|endpoint| endpoint.ticket.clone())
+    else {
         return Err(IoError("Ticket not present".to_string()));
     };
 

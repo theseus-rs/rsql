@@ -48,7 +48,7 @@ impl ConfigurationBuilder {
     #[must_use]
     pub fn with_config(self) -> Self {
         let home_dir = home_dir().unwrap_or_else(|| env::current_dir().unwrap_or_default());
-        let config_dir = home_dir.join(format!(".{}", &self.configuration.program_name));
+        let config_dir = home_dir.join(format!(".{}", self.configuration.program_name));
         self.with_config_dir(config_dir)
     }
 
@@ -60,18 +60,15 @@ impl ConfigurationBuilder {
     ///
     /// If the configuration file does not exist, it is created with the default configuration.
     ///
-    /// # Panics
-    ///
-    /// Panics if the configuration file cannot be loaded.
     #[must_use]
     pub fn with_config_dir<P: Into<PathBuf>>(mut self, config_dir: P) -> Self {
         let config_dir = config_dir.into();
         self.configuration.config_dir = Some(config_dir.clone());
-        let config_file =
-            ConfigFile::new(&self.configuration.program_name, &config_dir).expect("config file");
-        config_file
-            .load_configuration(&mut self.configuration)
-            .expect("load configuration");
+        if let Err(error) = ConfigFile::new(&self.configuration.program_name, &config_dir)
+            .and_then(|config_file| config_file.load_configuration(&mut self.configuration))
+        {
+            warn!("Unable to load configuration: {error}");
+        }
         self
     }
 
@@ -230,18 +227,16 @@ impl ConfigurationBuilder {
 
     /// Build a [Configuration] instance.
     ///
-    /// # Panics
-    ///
-    /// Panics if the log file appender cannot be created.
     #[must_use]
     pub fn build(self) -> Configuration {
         let configuration = &self.configuration;
         let log_level = configuration.log_level;
         let registry = tracing_subscriber::registry();
-        let progress_style =
-            ProgressStyle::with_template("{span_child_prefix}{spinner} {span_name} [{elapsed_precise}] [{wide_bar}] {bytes}/{total_bytes} ({bytes_per_sec}, {eta})")
-                .expect("progress style")
-                .progress_chars("=> ");
+        let progress_style = ProgressStyle::with_template(
+            "{span_child_prefix}{spinner} {span_name} [{elapsed_precise}] [{wide_bar}] {bytes}/{total_bytes} ({bytes_per_sec}, {eta})",
+        )
+        .unwrap_or_else(|_| ProgressStyle::default_bar())
+        .progress_chars("=> ");
 
         if log_level == LevelFilter::OFF {
             #[cfg(not(test))]
@@ -252,19 +247,34 @@ impl ConfigurationBuilder {
         } else {
             let log_dir = configuration.log_dir.clone().unwrap_or_default();
             let log_rotation = configuration.log_rotation.clone();
-            let level = log_level.into_level().expect("log level");
-            let file_appender = RollingFileAppender::builder()
-                .rotation(log_rotation)
-                .filename_prefix(&configuration.program_name)
-                .build(log_dir)
-                .expect("log file appender")
-                .with_max_level(level);
-            let indicatif_layer = IndicatifLayer::new().with_progress_style(progress_style);
-
-            registry
-                .with(tracing_subscriber::fmt::layer().with_writer(file_appender))
-                .with(indicatif_layer)
-                .init();
+            if let Some(level) = log_level.into_level() {
+                match RollingFileAppender::builder()
+                    .rotation(log_rotation)
+                    .filename_prefix(&configuration.program_name)
+                    .build(log_dir)
+                {
+                    Ok(file_appender) => {
+                        let indicatif_layer =
+                            IndicatifLayer::new().with_progress_style(progress_style);
+                        registry
+                            .with(
+                                tracing_subscriber::fmt::layer()
+                                    .with_writer(file_appender.with_max_level(level)),
+                            )
+                            .with(indicatif_layer)
+                            .init();
+                    }
+                    Err(error) => {
+                        warn!("Unable to create log file appender: {error}");
+                        let indicatif_layer =
+                            IndicatifLayer::new().with_progress_style(progress_style);
+                        registry.with(indicatif_layer).init();
+                    }
+                }
+            } else {
+                let indicatif_layer = IndicatifLayer::new().with_progress_style(progress_style);
+                registry.with(indicatif_layer).init();
+            }
         }
 
         self.configuration
@@ -408,7 +418,7 @@ impl ConfigFile {
             file.write_all(DEFAULT_CONFIG.as_bytes())?;
         }
 
-        let conf_file = configuration_file.to_str().expect("config file");
+        let conf_file = configuration_file.to_string_lossy();
         debug!("Configuration file: {conf_file}");
 
         let prefix = program_name.to_uppercase().replace('-', "_");
@@ -416,7 +426,7 @@ impl ConfigFile {
 
         let config = Config::builder()
             .add_source(config::File::from_str(DEFAULT_CONFIG, FileFormat::Toml))
-            .add_source(config::File::new(conf_file, FileFormat::Toml))
+            .add_source(config::File::new(&conf_file, FileFormat::Toml))
             .add_source(config::Environment::with_prefix(prefix.as_str()).separator("_"))
             .build()?;
 
@@ -469,7 +479,7 @@ impl ConfigFile {
         if let Ok(history) = config.get("shell.history.enabled") {
             configuration.history = history;
         }
-        let history_file = config_dir.join(format!("{}.history", &self.program_name));
+        let history_file = config_dir.join(format!("{}.history", self.program_name));
         configuration.history_file = Some(history_file);
         if let Ok(history_limit) = config.get("shell.history.limit") {
             configuration.history_limit = history_limit;
@@ -518,9 +528,11 @@ fn get_locale(config: &Config) -> String {
         .collect();
 
     for i in (0..parts.len()).rev() {
-        let locale = parts[0..=i].join("-");
-        if available_locales!().iter().any(|l| l == &locale) {
-            return locale;
+        if let Some(locale_parts) = parts.get(..=i) {
+            let locale = locale_parts.join("-");
+            if available_locales!().iter().any(|l| l == &locale) {
+                return locale;
+            }
         }
     }
 
@@ -664,5 +676,43 @@ mod test {
         assert_eq!(configuration.results_limit, 100);
         assert!(configuration.results_rows);
         assert!(configuration.results_timer);
+    }
+
+    #[test]
+    #[expect(
+        clippy::panic_in_result_fn,
+        reason = "test assertions intentionally panic when verification fails"
+    )]
+    fn test_configuration_file_and_logging() -> Result<()> {
+        let config_dir = tempfile::tempdir()?;
+        let configuration = ConfigurationBuilder::new("rsql-test", "1.0.0")
+            .with_config_dir(config_dir.path())
+            .build();
+
+        assert_eq!(configuration.log_level, LevelFilter::INFO);
+        assert_eq!(configuration.log_dir, Some(config_dir.path().join("logs")));
+        assert_eq!(
+            configuration.history_file,
+            Some(config_dir.path().join("rsql-test.history"))
+        );
+        assert!(config_dir.path().join("rsql-test.toml").exists());
+        Ok(())
+    }
+
+    #[test]
+    #[expect(
+        clippy::panic_in_result_fn,
+        reason = "test assertions intentionally panic when verification fails"
+    )]
+    fn test_invalid_configuration_directory_is_ignored() -> Result<()> {
+        let file = tempfile::NamedTempFile::new()?;
+        let configuration =
+            ConfigurationBuilder::new("rsql-test", "1.0.0").with_config_dir(file.path());
+
+        assert_eq!(
+            configuration.configuration.config_dir,
+            Some(file.path().to_path_buf())
+        );
+        Ok(())
     }
 }

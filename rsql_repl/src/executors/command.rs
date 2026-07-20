@@ -41,14 +41,18 @@ impl<'a> CommandExecutor<'a> {
 
     /// Execute the command and return the loop condition.
     pub(crate) async fn execute(&mut self, command: &str) -> Result<LoopCondition> {
-        let input = split_string(command);
+        let input = split_string(command)?;
         let command_identifier = &self.configuration.command_identifier;
-        let command_name = &input[0][command_identifier.len()..input[0].len()];
+        let command_name = input
+            .first()
+            .and_then(|command| command.strip_prefix(command_identifier))
+            .unwrap_or_default()
+            .to_string();
         let locale = &self.configuration.locale;
 
         let loop_condition = match &self
             .command_manager
-            .get_starts_with(locale.as_str(), command_name)
+            .get_starts_with(locale.as_str(), &command_name)
         {
             Some(command) => {
                 let options = CommandOptions {
@@ -64,7 +68,7 @@ impl<'a> CommandExecutor<'a> {
             }
             None => {
                 return Err(Error::InvalidCommand {
-                    command_name: command_name.to_string(),
+                    command_name: command_name.clone(),
                 });
             }
         };
@@ -84,12 +88,15 @@ impl Debug for CommandExecutor<'_> {
     }
 }
 
-fn split_string(input: &str) -> Vec<String> {
-    let pattern = Regex::new(r#"'[^']*'|"[^"]*"|\S+"#).expect("Invalid regex");
+fn split_string(input: &str) -> Result<Vec<String>> {
+    let pattern = Regex::new(r#"'[^']*'|"[^"]*"|\S+"#)?;
     let mut result = Vec::new();
 
     for cap in pattern.captures_iter(input) {
-        let mut segment = cap[0].to_string();
+        let Some(capture) = cap.get(0) else {
+            continue;
+        };
+        let mut segment = capture.as_str().to_string();
 
         if segment.starts_with('"') || segment.starts_with('\'') {
             segment.pop();
@@ -99,7 +106,7 @@ fn split_string(input: &str) -> Vec<String> {
         result.push(segment.replace("\\ ", " "));
     }
 
-    result
+    Ok(result)
 }
 
 #[cfg(test)]
@@ -198,7 +205,10 @@ mod tests {
     }
 
     fn assert_split(input: &str, expected: &[&str]) {
-        assert_eq!(split_string(input), expected);
+        assert_eq!(
+            split_string(input).expect("the static command regex is valid"),
+            expected
+        );
     }
 
     #[test]

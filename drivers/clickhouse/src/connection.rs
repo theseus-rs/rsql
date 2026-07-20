@@ -17,7 +17,11 @@ pub struct Connection {
 }
 
 impl Connection {
-    pub async fn new(url: &str) -> Result<Self> {
+    /// Create a connection from a `ClickHouse` URL.
+    ///
+    /// # Errors
+    /// Returns an error if the URL or a connection parameter is invalid.
+    pub fn new(url: &str) -> Result<Self> {
         let parsed_url = Url::parse(url).map_err(|error| InvalidUrl(error.to_string()))?;
         let parameters: HashMap<String, String> = parsed_url.query_pairs().into_owned().collect();
 
@@ -31,7 +35,7 @@ impl Connection {
             .get("scheme")
             .cloned()
             .unwrap_or("https".to_string());
-        let client_url = format!("{scheme}://{}:{}", host, port);
+        let client_url = format!("{scheme}://{host}:{port}");
 
         let mut client = Client::default()
             .with_product_info(PACKAGE_NAME, PACKAGE_VERSION)
@@ -166,5 +170,23 @@ impl std::fmt::Debug for Connection {
             .field("url", &self.url)
             .field("client", &"<ClickHouse Client>")
             .finish()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use rsql_driver::Connection as _;
+
+    #[test]
+    #[expect(
+        clippy::panic_in_result_fn,
+        reason = "test assertions intentionally panic when verification fails"
+    )]
+    fn test_connection_new() -> Result<()> {
+        let url = "clickhouse://user:password@localhost:8123/database?scheme=http";
+        let connection = Connection::new(url)?;
+        assert_eq!(connection.url(), url);
+        Ok(())
     }
 }

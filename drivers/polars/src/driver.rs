@@ -4,6 +4,7 @@ use async_trait::async_trait;
 use polars_sql::SQLContext;
 use rsql_driver::Error::{InvalidUrl, IoError};
 use rsql_driver::{Metadata, QueryResult, Result, ToSql, Value};
+use std::fmt::Write;
 use std::fmt::{Debug, Formatter};
 use std::path::Path;
 use std::sync::Arc;
@@ -125,8 +126,8 @@ fn substitute_params(sql: &str, params: &[&dyn ToSql]) -> String {
                 }
             }
             '?' => {
-                if param_index < values.len() {
-                    result.push_str(&format_value_inline(&values[param_index]));
+                if let Some(value) = values.get(param_index) {
+                    result.push_str(&format_value_inline(value));
                     param_index += 1;
                 } else {
                     result.push(ch);
@@ -143,12 +144,17 @@ fn format_value_inline(value: &Value) -> String {
         Value::Null => "NULL".to_string(),
         Value::Bool(v) => if *v { "TRUE" } else { "FALSE" }.to_string(),
         Value::String(v) => format!("'{}'", v.replace('\'', "''")),
-        Value::Bytes(v) => format!(
-            "X'{}'",
-            v.iter().map(|b| format!("{b:02x}")).collect::<String>()
-        ),
+        Value::Bytes(v) => format!("X'{}'", format_bytes(v)),
         _ => value.to_string(),
     }
+}
+
+fn format_bytes(bytes: &[u8]) -> String {
+    let mut output = String::with_capacity(bytes.len() * 2);
+    for byte in bytes {
+        write!(&mut output, "{byte:02x}").unwrap_or_default();
+    }
+    output
 }
 
 #[expect(clippy::missing_fields_in_debug)]
@@ -254,5 +260,12 @@ mod test {
         let val: Option<String> = None;
         let result = substitute_params("SELECT * FROM t WHERE x = ?", &[&val]);
         assert_eq!(result, "SELECT * FROM t WHERE x = NULL");
+    }
+
+    #[test]
+    fn test_substitute_params_bytes() {
+        let bytes = vec![0x00_u8, 0xab, 0xff];
+        let result = substitute_params("SELECT ?", &[&bytes]);
+        assert_eq!(result, "SELECT X'00abff'");
     }
 }

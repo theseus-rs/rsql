@@ -35,8 +35,8 @@ impl crate::Formatter for Formatter {
             data.push(query_result.columns().to_vec());
             rows = process_data(options, query_result, &mut data).await?;
             let locale = options.locale.clone();
+            let value_formatter = ValueFormatter::new(&locale)?;
             let table = ExtendedTable::from(data).template(move |index| {
-                let value_formatter = ValueFormatter::new(&locale);
                 let record = value_formatter.format_integer(index + 1);
                 t!("expanded_record", locale = &locale, record = record).to_string()
             });
@@ -59,7 +59,7 @@ async fn process_data(
         raw_rows.push(row.clone());
     }
 
-    let value_formatter = ValueFormatter::new(options.locale.as_str());
+    let value_formatter = ValueFormatter::new(options.locale.as_str())?;
     let mut rows: u64 = 0;
     for row in raw_rows {
         let mut row_data = Vec::new();

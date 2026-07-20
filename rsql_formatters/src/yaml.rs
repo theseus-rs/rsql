@@ -46,8 +46,7 @@ pub(crate) async fn format_yaml(
     while let Some(row) = query_result.next().await {
         let mut yaml_row: IndexMap<&String, Value> = IndexMap::new();
 
-        for (c, data) in row.iter().enumerate() {
-            let column = columns.get(c).expect("column not found");
+        for (column, data) in columns.iter().zip(row) {
             if let Value::Bytes(_bytes) = data {
                 let value = Value::String(data.to_string());
                 yaml_row.insert(column, value);

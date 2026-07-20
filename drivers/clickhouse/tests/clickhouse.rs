@@ -1,3 +1,8 @@
+#![expect(
+    clippy::panic_in_result_fn,
+    reason = "test assertions intentionally panic when verification fails"
+)]
+
 use jiff::civil::{Date, DateTime};
 use rsql_driver::{Driver, Value};
 use std::time::Duration;
@@ -10,7 +15,7 @@ async fn test_clickhouse_driver() -> anyhow::Result<()> {
     let image = testcontainers::ContainerRequest::from(
         testcontainers_modules::clickhouse::ClickHouse::default(),
     )
-    .with_startup_timeout(Duration::from_secs(120));
+    .with_startup_timeout(Duration::from_mins(2));
     let container = image.start().await?;
     let port = container.get_host_port_ipv4(8123).await?;
 
@@ -36,7 +41,7 @@ async fn test_clickhouse_types() -> anyhow::Result<()> {
     let image = testcontainers::ContainerRequest::from(
         testcontainers_modules::clickhouse::ClickHouse::default(),
     )
-    .with_startup_timeout(Duration::from_secs(120));
+    .with_startup_timeout(Duration::from_mins(2));
     let container = image.start().await?;
     let port = container.get_host_port_ipv4(8123).await?;
 
@@ -55,7 +60,7 @@ async fn test_clickhouse_types() -> anyhow::Result<()> {
         ("SELECT toInt64(9223372036854775807)", Value::I64(i64::MAX)),
         (
             "SELECT toInt128(9223372036854775807)",
-            Value::I128(i64::MAX as i128),
+            Value::I128(i128::from(i64::MAX)),
         ),
         ("SELECT toUInt8(255)", Value::U8(u8::MAX)),
         ("SELECT toUInt16(65535)", Value::U16(u16::MAX)),
@@ -66,7 +71,7 @@ async fn test_clickhouse_types() -> anyhow::Result<()> {
         ),
         (
             "SELECT toUInt128(18446744073709551615)",
-            Value::U128(u64::MAX as u128),
+            Value::U128(u128::from(u64::MAX)),
         ),
         ("SELECT toFloat32(1.23)", Value::F32(1.23)),
         ("SELECT toFloat64(1.23)", Value::F64(1.23)),
@@ -80,7 +85,7 @@ async fn test_clickhouse_types() -> anyhow::Result<()> {
             "SELECT 'ClickHouse Test'",
             Value::String("ClickHouse Test".to_string()),
         ),
-        ("SELECT ''", Value::String("".to_string())),
+        ("SELECT ''", Value::String(String::new())),
         (
             "SELECT toDate('2023-12-25')",
             Value::Date(Date::constant(2023, 12, 25)),
@@ -126,7 +131,7 @@ async fn test_clickhouse_multiple_columns() -> anyhow::Result<()> {
     let image = testcontainers::ContainerRequest::from(
         testcontainers_modules::clickhouse::ClickHouse::default(),
     )
-    .with_startup_timeout(Duration::from_secs(120));
+    .with_startup_timeout(Duration::from_mins(2));
     let container = image.start().await?;
     let port = container.get_host_port_ipv4(8123).await?;
 
@@ -163,7 +168,7 @@ async fn test_clickhouse_dynamic_queries() -> anyhow::Result<()> {
     let image = testcontainers::ContainerRequest::from(
         testcontainers_modules::clickhouse::ClickHouse::default(),
     )
-    .with_startup_timeout(Duration::from_secs(120));
+    .with_startup_timeout(Duration::from_mins(2));
     let container = image.start().await?;
     let port = container.get_host_port_ipv4(8123).await?;
 
@@ -231,11 +236,15 @@ async fn test_clickhouse_dynamic_queries() -> anyhow::Result<()> {
 
 #[tokio::test]
 #[ignore = "fails with: container is not ready: container startup timeout"]
+#[expect(
+    clippy::too_many_lines,
+    reason = "the metadata integration test validates one connected schema fixture"
+)]
 async fn test_clickhouse_metadata() -> anyhow::Result<()> {
     let image = testcontainers::ContainerRequest::from(
         testcontainers_modules::clickhouse::ClickHouse::default(),
     )
-    .with_startup_timeout(Duration::from_secs(120));
+    .with_startup_timeout(Duration::from_mins(2));
     let container = image.start().await?;
     let port = container.get_host_port_ipv4(8123).await?;
 

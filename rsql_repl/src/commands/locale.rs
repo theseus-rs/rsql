@@ -31,12 +31,12 @@ impl ShellCommand for Command {
             return Ok(LoopCondition::Continue);
         }
 
-        let new_locale = options.input[1].as_str();
+        let new_locale = options.input.get(1).map_or("", String::as_str);
 
         if !available_locales!().iter().any(|l| l == new_locale) {
             return Err(InvalidOption {
-                command_name: self.name(locale).to_string(),
-                option: locale.to_string(),
+                command_name: self.name(locale),
+                option: new_locale.to_string(),
             });
         }
         options.configuration.locale = new_locale.to_string();

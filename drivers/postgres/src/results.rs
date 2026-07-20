@@ -23,6 +23,7 @@ impl std::fmt::Debug for PostgresQueryResult {
             .field("columns", &self.columns)
             .field("row_index", &self.row_index)
             .field("row_count", &self.rows.len())
+            .field("row_buffer", &self.row_buffer)
             .finish()
     }
 }

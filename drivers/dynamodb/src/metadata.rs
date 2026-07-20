@@ -58,17 +58,17 @@ async fn retrieve_tables(client: &Client, schema: &mut Schema) -> Result<()> {
             let mut table = Table::new(table_name);
 
             for attribute in description.attribute_definitions() {
-                let name = attribute.attribute_name.to_string();
+                let name = attribute.attribute_name.clone();
                 let data_type = attribute.attribute_type.to_string();
                 let column = Column::new(name, data_type, false, None);
                 table.add_column(column);
             }
 
             for key in description.key_schema() {
-                let key_name = key.attribute_name.to_string();
+                let key_name = key.attribute_name.clone();
                 let key_type = key.key_type.to_string();
                 let unique = key_type == "HASH";
-                let index = Index::new(key_name.to_string(), vec![key_name], unique);
+                let index = Index::new(key_name.clone(), vec![key_name], unique);
                 table.add_index(index);
             }
 

@@ -5,7 +5,7 @@ use rsql_driver::{QueryResult, Result, Value};
 use serde_json::Value as JsonValue;
 use uuid::Uuid;
 
-/// Query result that converts ClickHouse JSON rows to values on demand
+/// Query result that converts `ClickHouse` JSON rows to values on demand
 #[derive(Debug)]
 pub(crate) struct ClickHouseQueryResult {
     columns: Vec<String>,
@@ -62,13 +62,17 @@ pub(crate) fn parse_column_type(column_type: &str) -> (Option<&str>, &str) {
     if let Some(start) = column_type.find('(')
         && let Some(end) = column_type.rfind(')')
     {
-        let container = &column_type[..start];
-        let inner = &column_type[start + 1..end];
+        let container = column_type.get(..start).unwrap_or_default();
+        let inner = column_type.get(start + 1..end).unwrap_or_default();
         return (Some(container), inner);
     }
     (None, column_type)
 }
 
+#[expect(
+    clippy::too_many_lines,
+    reason = "the match intentionally enumerates every supported ClickHouse type"
+)]
 fn convert_json_to_value(
     column_type: &(Option<&str>, &str),
     json_value: &JsonValue,
@@ -98,21 +102,21 @@ fn convert_json_to_value(
         }
         (_, "Int8") => {
             if let Some(i) = json_value.as_i64() {
-                Value::I8(i as i8)
+                Value::I8(i8::try_from(i)?)
             } else {
                 Value::Null
             }
         }
         (_, "Int16") => {
             if let Some(i) = json_value.as_i64() {
-                Value::I16(i as i16)
+                Value::I16(i16::try_from(i)?)
             } else {
                 Value::Null
             }
         }
         (_, "Int32") => {
             if let Some(i) = json_value.as_i64() {
-                Value::I32(i as i32)
+                Value::I32(i32::try_from(i)?)
             } else {
                 Value::Null
             }
@@ -139,21 +143,21 @@ fn convert_json_to_value(
         }
         (_, "UInt8") => {
             if let Some(i) = json_value.as_u64() {
-                Value::U8(i as u8)
+                Value::U8(u8::try_from(i)?)
             } else {
                 Value::Null
             }
         }
         (_, "UInt16") => {
             if let Some(i) = json_value.as_u64() {
-                Value::U16(i as u16)
+                Value::U16(u16::try_from(i)?)
             } else {
                 Value::Null
             }
         }
         (_, "UInt32") => {
             if let Some(i) = json_value.as_u64() {
-                Value::U32(i as u32)
+                Value::U32(u32::try_from(i)?)
             } else {
                 Value::Null
             }
@@ -180,7 +184,12 @@ fn convert_json_to_value(
         }
         (_, "Float32") => {
             if let Some(f) = json_value.as_f64() {
-                Value::F32(f as f32)
+                #[expect(
+                    clippy::cast_possible_truncation,
+                    reason = "ClickHouse Float32 values are represented as f64 in JSON"
+                )]
+                let value = f as f32;
+                Value::F32(value)
             } else {
                 Value::Null
             }
@@ -230,4 +239,34 @@ fn convert_json_to_value(
         }
     };
     Ok(value)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    #[expect(
+        clippy::panic_in_result_fn,
+        reason = "test assertions intentionally panic when verification fails"
+    )]
+    fn test_numeric_conversions() -> Result<()> {
+        assert_eq!(parse_column_type("Array(Int8)"), (Some("Array"), "Int8"));
+
+        let cases = [
+            ((None, "Int8"), json!(i8::MAX), Value::I8(i8::MAX)),
+            ((None, "Int16"), json!(i16::MAX), Value::I16(i16::MAX)),
+            ((None, "Int32"), json!(i32::MAX), Value::I32(i32::MAX)),
+            ((None, "UInt8"), json!(u8::MAX), Value::U8(u8::MAX)),
+            ((None, "UInt16"), json!(u16::MAX), Value::U16(u16::MAX)),
+            ((None, "UInt32"), json!(u32::MAX), Value::U32(u32::MAX)),
+            ((None, "Float32"), json!(1.25), Value::F32(1.25)),
+        ];
+
+        for (column_type, json_value, expected) in cases {
+            assert_eq!(convert_json_to_value(&column_type, &json_value)?, expected);
+        }
+        Ok(())
+    }
 }

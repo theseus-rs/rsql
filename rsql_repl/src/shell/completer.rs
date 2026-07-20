@@ -223,19 +223,24 @@ impl ReplCompleter {
             .collect();
         let table_aliases: Vec<_> = tokens_no_location
             .windows(3)
-            .filter_map(|window| match (window[0], window[1], window[2]) {
-                (Token::Word(table), Token::Word(as_keyword), Token::Word(alias))
-                    if as_keyword.keyword == Keyword::AS =>
-                {
-                    Some((table.value.as_str(), alias.value.as_str()))
+            .filter_map(|window| {
+                let [first, second, third] = window else {
+                    return None;
+                };
+                match (*first, *second, *third) {
+                    (Token::Word(table), Token::Word(as_keyword), Token::Word(alias))
+                        if as_keyword.keyword == Keyword::AS =>
+                    {
+                        Some((table.value.as_str(), alias.value.as_str()))
+                    }
+                    (Token::Word(table), Token::Word(alias), _)
+                        if alias.keyword == Keyword::NoKeyword
+                            && table.keyword == Keyword::NoKeyword =>
+                    {
+                        Some((table.value.as_str(), alias.value.as_str()))
+                    }
+                    _ => None,
                 }
-                (Token::Word(table), Token::Word(alias), _)
-                    if alias.keyword == Keyword::NoKeyword
-                        && table.keyword == Keyword::NoKeyword =>
-                {
-                    Some((table.value.as_str(), alias.value.as_str()))
-                }
-                _ => None,
             })
             .collect();
 
@@ -358,8 +363,8 @@ impl ReplCompleter {
                 | Keyword::WHERE
                 | Keyword::ORDER
                 | Keyword::GROUP => {
-                    if tables.len() == 1 {
-                        Suggestion::TableColumn(tables[0].0.name().to_string())
+                    if let Some((table, _)) = tables.first().filter(|_| tables.len() == 1) {
+                        Suggestion::TableColumn(table.name().to_string())
                     } else if let Some((table, _)) = tables.iter().find(|(t, a)| {
                         t.name() == word.value || a.as_ref().is_some_and(|a| a == &word.value)
                     }) {
@@ -425,7 +430,7 @@ impl ReplCompleter {
                 .iter()
                 .flat_map(|(table, alias)| {
                     if let Some(alias) = alias {
-                        vec![alias.to_string(), table.name().to_string()]
+                        vec![alias.clone(), table.name().to_string()]
                     } else {
                         vec![table.name().to_string()]
                     }
@@ -474,10 +479,11 @@ impl Completer for ReplCompleter {
         _ctx: &Context,
     ) -> Result<(usize, Vec<Self::Candidate>), rustyline::error::ReadlineError> {
         if !self.smart_completions {
-            let start = line[..pos]
+            let line_before_cursor = line.get(..pos).unwrap_or(line);
+            let start = line_before_cursor
                 .rfind(|c: char| c.is_whitespace())
                 .map_or(0, |p| p + 1);
-            let word = &line[start..pos];
+            let word = line.get(start..pos).unwrap_or_default();
             let candidates = CANDIDATES
                 .iter()
                 .filter(|c| c.replacement().starts_with(word))
@@ -562,6 +568,19 @@ mod test {
 
         assert_eq!(start, 0);
         assert!(candidates.iter().any(|c| c.replacement() == "SELECT"));
+    }
+
+    #[test]
+    fn test_basic_completion_past_end_of_line() {
+        let metadata = create_mock_metadata();
+        let mut completer = ReplCompleter::new(metadata);
+        completer.smart_completions = false;
+        let (start, candidates) = completer
+            .complete("SEL", 10, &Context::new(&DefaultHistory::new()))
+            .expect("completion should tolerate a cursor past the end of the line");
+
+        assert_eq!(start, 0);
+        assert_eq!(candidates.len(), CANDIDATES.len());
     }
 
     #[test]

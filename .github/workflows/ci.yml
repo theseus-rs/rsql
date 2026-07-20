@@ -20,25 +20,29 @@ jobs:
     name: ${{ matrix.platform }}
     needs: [ checks ]
     runs-on: ${{ matrix.os }}
+    env:
+      CARGO_INCREMENTAL: 0
+      CARGO_PROFILE_TEST_DEBUG: 0
     strategy:
       fail-fast: false
       matrix:
         platform:
-          # - linux-arm
+          - linux-arm
           - linux-x64
           - macos-arm
           - macos-x64
-          # - windows-arm
+          - windows-arm
           - windows-x64
           # - wasm32-unknown
           # - wasm32-wasi
 
         include:
-          # - platform: linux-arm
-          #   os: ubuntu-24.04-arm
-          #   target: aarch64-unknown-linux-gnu
+          - platform: linux-arm
+            os: ubuntu-24.04-arm
+            rustflags: "-C link-arg=-fuse-ld=lld"
+            target: aarch64-unknown-linux-gnu
           - platform: linux-x64
-            os: [ self-hosted, Linux, X64 ]
+            os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
           - platform: macos-arm
             os: macos-26
@@ -46,11 +50,13 @@ jobs:
           - platform: macos-x64
             os: macos-26-intel
             target: x86_64-apple-darwin
-          # - platform: windows-arm
-          #   os: windows-11-arm
-          #   target: aarch64-pc-windows-msvc
+          - platform: windows-arm
+            os: windows-11-arm
+            rustflags: "-C link-arg=/ignore:4099"
+            target: aarch64-pc-windows-msvc
           - platform: windows-x64
             os: windows-latest
+            rustflags: "-C link-arg=/ignore:4099"
             target: x86_64-pc-windows-msvc
           # - platform: wasm32-unknown
           #   os: ubuntu-latest
@@ -61,17 +67,23 @@ jobs:
 
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Install Rust
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: stable
+        run: rustup toolchain install --no-self-update
 
       # aws-lc-rs requires nasm: https://github.com/rustls/rustls/issues/1913
       - name: Install NASM
         if: ${{ startsWith(matrix.platform, 'windows-') }}
-        uses: ilammy/setup-nasm@v1
+        run: choco install nasm --yes --no-progress
+
+      # GNU ld can exceed the AArch64 branch range when linking the all-features
+      # test binary. LLD inserts the necessary range-extension thunks.
+      - name: Install LLVM linker
+        if: ${{ matrix.platform == 'linux-arm' }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes lld
 
       - name: Install cargo-llvm-cov
         uses: taiki-e/install-action@main
@@ -98,15 +110,16 @@ jobs:
 
       - name: Test
         if: ${{ matrix.platform != 'linux-x64' && !startsWith(matrix.platform, 'wasm') }}
-        timeout-minutes: 120
+        timeout-minutes: ${{ matrix.platform == 'windows-arm' && 360 || 120 }}
         env:
           CARGO_TERM_COLOR: always
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
           RUST_BACKTRACE: 1
           RUST_LOG: "info"
           RUST_LOG_SPAN_EVENTS: full
+          RUSTFLAGS: ${{ matrix.rustflags || '' }}
         run: |
-          cargo test --workspace --features all
+          cargo test --workspace --features all --jobs 2
 
       - name: Test
         if: ${{ matrix.platform == 'linux-x64' }}
@@ -118,7 +131,7 @@ jobs:
           RUST_LOG: "info"
           RUST_LOG_SPAN_EVENTS: full
         run: |
-          cargo llvm-cov --workspace --lcov --jobs 2 --output-path lcov.info
+          cargo llvm-cov --workspace --lcov --jobs 1 --output-path lcov.info
 
       - name: Upload to codecov.io
         if: ${{ matrix.platform == 'linux-x64' }}

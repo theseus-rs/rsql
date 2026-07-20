@@ -1,6 +1,6 @@
-//! ClickHouse driver for rsql
+//! `ClickHouse` driver for rsql
 //!
-//! This driver provides connectivity to ClickHouse databases.
+//! This driver provides connectivity to `ClickHouse` databases.
 
 mod connection;
 mod driver;

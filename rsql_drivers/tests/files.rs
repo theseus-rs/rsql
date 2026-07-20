@@ -1,7 +1,28 @@
-#[allow(unused_imports)]
+#[cfg(feature = "driver-xml")]
 use indoc::indoc;
 use rsql_driver::{Driver, Result, Value};
-#[allow(unused_imports)]
+#[cfg(any(
+    feature = "driver-arrow",
+    feature = "driver-avro",
+    feature = "driver-brotli",
+    feature = "driver-bzip2",
+    feature = "driver-csv",
+    feature = "driver-duckdb",
+    feature = "driver-excel",
+    feature = "driver-gzip",
+    feature = "driver-json",
+    feature = "driver-jsonl",
+    feature = "driver-lz4",
+    feature = "driver-ods",
+    feature = "driver-orc",
+    feature = "driver-parquet",
+    feature = "driver-sqlite",
+    feature = "driver-tsv",
+    feature = "driver-xml",
+    feature = "driver-xz",
+    feature = "driver-yaml",
+    feature = "driver-zstd"
+))]
 use rsql_driver_test_utils::dataset_url;
 use rsql_drivers::DriverManager;
 

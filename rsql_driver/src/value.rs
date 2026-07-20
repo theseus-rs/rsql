@@ -1,3 +1,4 @@
+use crate::error::{Error, Result};
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
 use icu::calendar::Date as IcuDate;
@@ -5,7 +6,9 @@ use icu::datetime::DateTimeFormatter;
 use icu::datetime::fieldsets;
 use icu::decimal::DecimalFormatter;
 use icu::decimal::input::Decimal as IcuDecimal;
+use icu::decimal::options::DecimalFormatterOptions;
 use icu::locale::Locale as IcuLocale;
+use icu::locale::locale;
 use icu::time::DateTime as IcuDateTime;
 use icu::time::Time as IcuTime;
 use indexmap::IndexMap;
@@ -31,30 +34,33 @@ pub struct ValueFormatter {
 impl ValueFormatter {
     /// Create a new `ValueFormatter` for the given locale string (e.g. "en", "de", "fr").
     /// Falls back to "en" if the locale cannot be parsed.
-    pub fn new(locale: &str) -> Self {
-        let icu_locale = IcuLocale::from_str(locale)
-            .unwrap_or_else(|_| IcuLocale::from_str("en").expect("en locale should always parse"));
+    ///
+    /// # Errors
+    /// Returns an error if ICU cannot construct a formatter for the locale.
+    pub fn new(locale: &str) -> Result<Self> {
+        let icu_locale = IcuLocale::from_str(locale).unwrap_or(locale!("en"));
         let locale_name = locale.to_string();
 
-        let decimal_formatter = DecimalFormatter::try_new((&icu_locale).into(), Default::default())
-            .expect("decimal formatter should be created");
+        let decimal_formatter =
+            DecimalFormatter::try_new((&icu_locale).into(), DecimalFormatterOptions::default())
+                .map_err(|error| Error::ConversionError(error.to_string()))?;
         let date_formatter =
             DateTimeFormatter::try_new((&icu_locale).into(), fieldsets::YMD::medium())
-                .expect("date formatter should be created");
+                .map_err(|error| Error::ConversionError(error.to_string()))?;
         let time_formatter =
             DateTimeFormatter::try_new((&icu_locale).into(), fieldsets::T::medium())
-                .expect("time formatter should be created");
+                .map_err(|error| Error::ConversionError(error.to_string()))?;
         let datetime_formatter =
             DateTimeFormatter::try_new((&icu_locale).into(), fieldsets::YMDT::medium())
-                .expect("datetime formatter should be created");
+                .map_err(|error| Error::ConversionError(error.to_string()))?;
 
-        Self {
+        Ok(Self {
             locale_name,
             decimal_formatter,
             date_formatter,
             time_formatter,
             datetime_formatter,
-        }
+        })
     }
 
     /// Get the locale name string.
@@ -83,7 +89,7 @@ impl ValueFormatter {
         self.time_formatter.format(&icu_time).to_string()
     }
 
-    /// Format a jiff DateTime using the cached datetime formatter.
+    /// Format a jiff `DateTime` using the cached datetime formatter.
     #[must_use]
     pub fn format_datetime(&self, value: &DateTime) -> String {
         let icu_dt = IcuDateTime::convert_from(*value);
@@ -137,7 +143,7 @@ impl Value {
             Value::U128(value) => formatter.format_integer(*value),
             Value::F32(value) => value.to_string(),
             Value::F64(value) => value.to_string(),
-            Value::String(value) => value.to_string(),
+            Value::String(value) => value.clone(),
             Value::Decimal(value) => value.to_string(),
             Value::Date(value) => {
                 // TODO: add localized date formatting
@@ -219,7 +225,7 @@ impl fmt::Display for Value {
             Value::U128(value) => value.to_string(),
             Value::F32(value) => value.to_string(),
             Value::F64(value) => value.to_string(),
-            Value::String(value) => value.to_string(),
+            Value::String(value) => value.clone(),
             Value::Decimal(value) => value.to_string(),
             Value::Date(value) => value.to_string(),
             Value::Time(value) => value.to_string(),
@@ -552,7 +558,7 @@ mod tests {
     use uuid::Uuid;
 
     fn en_formatter() -> ValueFormatter {
-        ValueFormatter::new("en")
+        ValueFormatter::new("en").expect("English value formatter")
     }
 
     #[test]
@@ -803,7 +809,7 @@ mod tests {
     #[test]
     fn test_decimal() {
         let fmt = en_formatter();
-        let decimal = rust_decimal::Decimal::from_str("12345.6789").expect("Invalid decimal");
+        let decimal = Decimal::from_str("12345.6789").expect("Invalid decimal");
         assert!(!Value::Decimal(decimal).is_null());
         assert!(Value::Decimal(decimal).is_numeric());
         assert_eq!(
@@ -820,7 +826,7 @@ mod tests {
     #[test]
     fn test_date() {
         let fmt = en_formatter();
-        let date = jiff::civil::date(2000, 12, 31);
+        let date = civil::date(2000, 12, 31);
         assert!(!Value::Date(date).is_null());
         assert!(!Value::Date(date).is_numeric());
         assert_eq!(Value::Date(date).to_formatted_string(&fmt), "2000-12-31");
@@ -831,7 +837,7 @@ mod tests {
     #[test]
     fn test_time() {
         let fmt = en_formatter();
-        let time = jiff::civil::time(12, 13, 14, 15);
+        let time = civil::time(12, 13, 14, 15);
         assert!(!Value::Time(time).is_null());
         assert!(!Value::Time(time).is_numeric());
         assert_eq!(
@@ -898,9 +904,9 @@ mod tests {
             Value::F32(9.1),
             Value::F64(10.42),
             Value::String("foo".to_string()),
-            Value::Date(jiff::civil::date(2000, 12, 31)),
-            Value::Time(jiff::civil::time(12, 13, 14, 15)),
-            Value::DateTime(jiff::civil::datetime(2000, 12, 31, 12, 13, 14, 15)),
+            Value::Date(civil::date(2000, 12, 31)),
+            Value::Time(civil::time(12, 13, 14, 15)),
+            Value::DateTime(civil::datetime(2000, 12, 31, 12, 13, 14, 15)),
             Value::Uuid(Uuid::from_str("acf5b3e3-4099-4f34-81c7-5803cbc87a2d")?),
         ];
         assert_eq!(
@@ -1034,25 +1040,25 @@ mod tests {
 
     #[test]
     fn test_from_decimal() {
-        let decimal = rust_decimal::Decimal::from_str("42.1").expect("Invalid decimal");
+        let decimal = Decimal::from_str("42.1").expect("Invalid decimal");
         assert_eq!(Value::from(decimal), Value::Decimal(decimal));
     }
 
     #[test]
     fn test_from_date() {
-        let date = jiff::civil::date(2000, 12, 31);
+        let date = civil::date(2000, 12, 31);
         assert_eq!(Value::from(date), Value::Date(date));
     }
 
     #[test]
     fn test_from_time() {
-        let time = jiff::civil::time(12, 13, 14, 15);
+        let time = civil::time(12, 13, 14, 15);
         assert_eq!(Value::from(time), Value::Time(time));
     }
 
     #[test]
     fn test_from_date_time() {
-        let date_time = jiff::civil::datetime(2000, 12, 31, 12, 13, 14, 15);
+        let date_time = civil::datetime(2000, 12, 31, 12, 13, 14, 15);
         assert_eq!(Value::from(date_time), Value::DateTime(date_time));
     }
 

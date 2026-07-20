@@ -1,3 +1,8 @@
+#![expect(
+    clippy::panic_in_result_fn,
+    reason = "test assertions intentionally panic when verification fails"
+)]
+
 use aws_config::Region;
 use aws_credential_types::Credentials;
 use aws_sdk_s3::Client;
@@ -27,11 +32,17 @@ async fn test_s3_driver_minio() -> Result<()> {
     }
 
     DriverManager::add(Arc::new(rsql_driver_csv::Driver))?;
+    let aws_config_directive = "aws_config=trace"
+        .parse()
+        .map_err(|error| IoError(format!("Invalid tracing directive: {error}")))?;
+    let s3_directive = "aws_sdk_s3=trace"
+        .parse()
+        .map_err(|error| IoError(format!("Invalid tracing directive: {error}")))?;
     let subscriber = tracing_subscriber::fmt()
         .with_env_filter(
             EnvFilter::new("trace")
-                .add_directive("aws_config=trace".parse().expect("Invalid directive"))
-                .add_directive("aws_sdk_s3=trace".parse().expect("Invalid directive")),
+                .add_directive(aws_config_directive)
+                .add_directive(s3_directive),
         )
         .with_test_writer()
         .compact()

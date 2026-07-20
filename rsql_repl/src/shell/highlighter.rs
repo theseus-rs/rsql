@@ -4,7 +4,9 @@ use std::borrow::Cow;
 
 impl Highlighter for ReplHelper {
     fn highlight<'l>(&self, line: &'l str, _pos: usize) -> Cow<'l, str> {
-        self.highlighter.highlight(line).expect("highlight")
+        self.highlighter
+            .highlight(line)
+            .unwrap_or(Cow::Borrowed(line))
     }
 
     fn highlight_char(&self, line: &str, pos: usize, _kind: CmdKind) -> bool {

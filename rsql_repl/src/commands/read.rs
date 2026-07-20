@@ -25,12 +25,12 @@ impl ShellCommand for Command {
 
     async fn execute<'a>(&self, options: CommandOptions<'a>) -> Result<LoopCondition> {
         let locale = options.configuration.locale.as_str();
-        let file = options.input.get(1).unwrap_or(&String::new()).to_string();
+        let file = options.input.get(1).cloned().unwrap_or_default();
         let contents = fs::read_to_string(file);
 
         if let Err(error) = contents {
             return Err(InvalidOption {
-                command_name: self.name(locale).to_string(),
+                command_name: self.name(locale),
                 option: error.to_string(),
             });
         }

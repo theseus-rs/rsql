@@ -1,3 +1,8 @@
+#![expect(
+    clippy::panic_in_result_fn,
+    reason = "test assertions intentionally panic when verification fails"
+)]
+
 use aws_config::BehaviorVersion;
 use aws_credential_types::Credentials;
 use aws_sdk_dynamodb::Client;
@@ -28,11 +33,17 @@ async fn test_dynamodb_driver() -> Result<()> {
         return Ok(());
     }
 
+    let aws_config_directive = "aws_config=trace"
+        .parse()
+        .map_err(|error| IoError(format!("Invalid tracing directive: {error}")))?;
+    let dynamodb_directive = "aws_sdk_dynamodb=trace"
+        .parse()
+        .map_err(|error| IoError(format!("Invalid tracing directive: {error}")))?;
     let subscriber = tracing_subscriber::fmt()
         .with_env_filter(
             EnvFilter::new("trace")
-                .add_directive("aws_config=trace".parse().expect("Invalid directive"))
-                .add_directive("aws_sdk_dynamodb=trace".parse().expect("Invalid directive")),
+                .add_directive(aws_config_directive)
+                .add_directive(dynamodb_directive),
         )
         .with_test_writer()
         .compact()
@@ -41,10 +52,8 @@ async fn test_dynamodb_driver() -> Result<()> {
 
     let container = DynamoDb::default()
         .with_log_consumer(|frame: &LogFrame| {
-            let mut msg = std::str::from_utf8(frame.bytes()).expect("Failed to parse log message");
-            if msg.ends_with('\n') {
-                msg = &msg[..msg.len() - 1];
-            }
+            let message = String::from_utf8_lossy(frame.bytes());
+            let msg = message.strip_suffix('\n').unwrap_or(&message);
             info!("{msg}");
         })
         .start()
@@ -62,7 +71,11 @@ async fn test_dynamodb_driver() -> Result<()> {
     assert!(columns.contains(&"id".to_string()));
     assert!(columns.contains(&"name".to_string()));
 
-    let row = query_result.next().await.expect("No row found").to_vec();
+    let row = query_result
+        .next()
+        .await
+        .cloned()
+        .ok_or_else(|| IoError("No row found".to_string()))?;
     assert!(row.contains(&Value::I128(1)));
     assert!(row.contains(&Value::String("John Doe".to_string())));
     assert!(query_result.next().await.is_none());
@@ -75,8 +88,12 @@ async fn test_dynamodb_driver() -> Result<()> {
 
 async fn test_schema(connection: &mut dyn rsql_driver::Connection) -> Result<()> {
     let metadata = connection.metadata().await?;
-    let catalog = metadata.current_catalog().expect("catalog");
-    let schema = catalog.current_schema().expect("schema");
+    let catalog = metadata
+        .current_catalog()
+        .ok_or_else(|| IoError("No current catalog".to_string()))?;
+    let schema = catalog
+        .current_schema()
+        .ok_or_else(|| IoError("No current schema".to_string()))?;
     let tables = schema
         .tables()
         .iter()
@@ -84,7 +101,9 @@ async fn test_schema(connection: &mut dyn rsql_driver::Connection) -> Result<()>
         .collect::<Vec<_>>();
     assert!(tables.contains(&"users"));
 
-    let user_table = schema.get("users").expect("users table");
+    let user_table = schema
+        .get("users")
+        .ok_or_else(|| IoError("Missing users table".to_string()))?;
     let user_indexes = user_table
         .indexes()
         .iter()

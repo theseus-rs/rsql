@@ -14,6 +14,7 @@ use serde_json::json;
 use sha2::{Digest, Sha256};
 use sqlparser::dialect::{Dialect, SnowflakeDialect};
 use std::collections::HashMap;
+use std::fmt::Write;
 use url::Url;
 
 const DATE_FORMATS: (&str, &str) = ("YYYY-MM-DD", "%Y-%m-%d");
@@ -91,12 +92,12 @@ impl SnowflakeConnection {
                 .get("private_key_file")
                 .ok_or(SnowflakeError::MissingPrivateKey)
                 .map_err(|error| IoError(error.to_string()))?
-                .to_string();
+                .clone();
             let public_key_file = query_params
                 .get("public_key_file")
                 .ok_or(SnowflakeError::MissingPublicKey)
                 .map_err(|error| IoError(error.to_string()))?
-                .to_string();
+                .clone();
 
             let private_key = std::fs::read_to_string(private_key_file)
                 .map_err(|_| SnowflakeError::MissingPrivateKey)
@@ -247,7 +248,9 @@ impl SnowflakeConnection {
             }
         });
         if !bindings.is_null() {
-            body["bindings"] = bindings.clone();
+            body.as_object_mut()
+                .ok_or_else(|| IoError("Snowflake request body is not a JSON object".to_string()))?
+                .insert("bindings".to_string(), bindings.clone());
         }
         self.client
             .post(&self.base_url)
@@ -260,8 +263,9 @@ impl SnowflakeConnection {
 
     /// Extract raw JSON row data from snowflake response
     fn extract_data_rows(result_data: &serde_json::Value) -> Result<Vec<serde_json::Value>> {
-        let data = result_data["data"]
-            .as_array()
+        let data = result_data
+            .get("data")
+            .and_then(serde_json::Value::as_array)
             .ok_or(SnowflakeError::ResponseContent(
                 "Snowflake Response missing row data".into(),
             ))
@@ -325,8 +329,13 @@ impl rsql_driver::Connection for SnowflakeConnection {
             .await
             .map_err(SnowflakeError::Response)
             .map_err(|error| IoError(error.to_string()))?;
-        let row_count = response_json["data"][0][0]
-            .as_str()
+        let row_count = response_json
+            .get("data")
+            .and_then(serde_json::Value::as_array)
+            .and_then(|rows| rows.first())
+            .and_then(serde_json::Value::as_array)
+            .and_then(|row| row.first())
+            .and_then(serde_json::Value::as_str)
             .ok_or(SnowflakeError::ResponseContent(
                 "Query executed: row count not found".into(),
             ))
@@ -356,20 +365,29 @@ impl rsql_driver::Connection for SnowflakeConnection {
             .map_err(|e| SnowflakeError::ResponseContent(format!("Error parsing Response: {e}")))
             .map_err(|error| IoError(error.to_string()))?;
 
-        let handle = response_json["statementHandle"]
-            .as_str()
+        let handle = response_json
+            .get("statementHandle")
+            .and_then(serde_json::Value::as_str)
             .ok_or(SnowflakeError::ResponseContent(
                 "No handle in Response".into(),
             ))
             .map_err(|error| IoError(error.to_string()))?;
-        let partitions = response_json["resultSetMetaData"]["partitionInfo"]
-            .as_array()
+        let result_set_metadata = response_json
+            .get("resultSetMetaData")
+            .ok_or(SnowflakeError::ResponseContent(
+                "No result-set metadata in response".into(),
+            ))
+            .map_err(|error| IoError(error.to_string()))?;
+        let partitions = result_set_metadata
+            .get("partitionInfo")
+            .and_then(serde_json::Value::as_array)
             .ok_or(SnowflakeError::ResponseContent(
                 "No partition data in response".into(),
             ))
             .map_err(|error| IoError(error.to_string()))?;
-        let column_definitions: Vec<_> = response_json["resultSetMetaData"]["rowType"]
-            .as_array()
+        let column_definitions: Vec<_> = result_set_metadata
+            .get("rowType")
+            .and_then(serde_json::Value::as_array)
             .ok_or(SnowflakeError::ResponseContent(
                 "No ResultSet row type info in response".into(),
             ))
@@ -441,7 +459,10 @@ fn to_snowflake_bindings(values: &[Value]) -> serde_json::Value {
             Value::F64(v) => ("REAL", json!(v.to_string())),
             Value::String(v) => ("TEXT", json!(v)),
             Value::Bytes(v) => {
-                let hex_str: String = v.iter().map(|b| format!("{b:02x}")).collect();
+                let mut hex_str = String::with_capacity(v.len() * 2);
+                for byte in v {
+                    write!(&mut hex_str, "{byte:02x}").unwrap_or_default();
+                }
                 ("BINARY", json!(hex_str))
             }
             Value::Decimal(v) => ("FIXED", json!(v.to_string())),
@@ -638,9 +659,10 @@ mod test {
         assert_eq!(database_url, connection.url().as_str());
         connection.set_base_url(&mock.uri());
 
+        let bytes = vec![0x00_u8, 0xab, 0xff];
         let mut result = connection
             .query(
-                "SELECT Int, Float, Boolean, Time, Date, DateTimeNTZ, DateTimeTZ, FROM table LIMIT 2", &[]
+                "SELECT Int, Float, Boolean, Time, Date, DateTimeNTZ, DateTimeTZ, FROM table LIMIT 2", &[&bytes]
             )
             .await?;
         assert_eq!(
@@ -680,6 +702,54 @@ mod test {
             ])
         );
         Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_execute_against_mock() -> Result<()> {
+        let mock = MockServer::start().await;
+        Mock::given(method("POST"))
+            .and(path("/api/v2/statements"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({"data": [["3"]]})))
+            .mount(&mock)
+            .await;
+
+        let database_url = "snowflake://abc123.snowflakecomputing.com/?user=test";
+        let mut connection =
+            SnowflakeConnection::new(database_url, Some("auth_token".to_string()))?;
+        connection.set_base_url(&mock.uri());
+
+        assert_eq!(connection.execute("DELETE FROM table", &[]).await?, 3);
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_query_missing_metadata() -> Result<()> {
+        let mock = MockServer::start().await;
+        Mock::given(method("POST"))
+            .and(path("/api/v2/statements"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+                "statementHandle": "handle",
+                "data": []
+            })))
+            .mount(&mock)
+            .await;
+
+        let database_url = "snowflake://abc123.snowflakecomputing.com/?user=test";
+        let mut connection =
+            SnowflakeConnection::new(database_url, Some("auth_token".to_string()))?;
+        connection.set_base_url(&mock.uri());
+
+        assert!(connection.query("SELECT 1", &[]).await.is_err());
+        Ok(())
+    }
+
+    #[test]
+    fn test_private_key_paths_are_parsed_before_loading() {
+        let result = SnowflakeConnection::new(
+            "snowflake://abc123.snowflakecomputing.com/?user=test&private_key_file=missing-private.pem&public_key_file=missing-public.pem",
+            None,
+        );
+        assert!(result.is_err());
     }
 
     #[test]
@@ -929,6 +999,7 @@ mod test {
             Value::Null,
             Value::F64(1.5),
             Value::Bool(true),
+            Value::Bytes(vec![0x00, 0xab, 0xff]),
         ];
         let result = to_snowflake_bindings(&values);
         assert_eq!(result["1"]["type"], "FIXED");
@@ -941,5 +1012,7 @@ mod test {
         assert_eq!(result["4"]["value"], "1.5");
         assert_eq!(result["5"]["type"], "BOOLEAN");
         assert_eq!(result["5"]["value"], "true");
+        assert_eq!(result["6"]["type"], "BINARY");
+        assert_eq!(result["6"]["value"], "00abff");
     }
 }

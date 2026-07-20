@@ -5,6 +5,9 @@ publish = false
 license.workspace = true
 version.workspace = true
 
+[lints]
+workspace = true
+
 [dependencies]
 rsql_drivers = { path = "../../rsql_drivers", features = ["driver-sqlite"] }
 tokio = { workspace = true, features = ["full"] }

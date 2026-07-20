@@ -38,6 +38,9 @@ ignore = [
     { id = "RUSTSEC-2025-0052", reason = "async-std: discontinued" },
     { id = "RUSTSEC-2025-0141", reason = "bincode: unmaintained" },
     { id = "RUSTSEC-2026-0097", reason = "rand: safe code using the public API can cause Undefined Behaviour" },
+    { id = "RUSTSEC-2026-0173", reason = "proc-macro-error2: unmaintained" },
+    { id = "RUSTSEC-2026-0194", reason = "quick-xml: quadratic run time when checking a start tag for duplicate attribute names" },
+    { id = "RUSTSEC-2026-0195", reason = "quick-xml: unbounded namespace-declaration allocation in NsReader enables memory-exhaustion denial of service" },
 ]
 
 # https://embarkstudios.github.io/cargo-deny/checks/bans/cfg.html

@@ -83,7 +83,7 @@ impl ShellCommand for Command {
         let result_format = &configuration.results_format;
         let formatter = options.formatter_manager.get(result_format).ok_or(
             rsql_formatters::Error::UnknownFormat {
-                format: result_format.to_string(),
+                format: result_format.clone(),
             },
         )?;
 

@@ -80,7 +80,7 @@ mod test {
     #[tokio::test(flavor = "multi_thread")]
     async fn test_driver_connect() -> Result<()> {
         let database_url = database_url();
-        let driver_manager = crate::Driver;
+        let driver_manager = Driver;
         let mut connection = driver_manager.connect(&database_url).await?;
         assert_eq!(&database_url, connection.url());
         connection.close().await?;
@@ -90,7 +90,7 @@ mod test {
     #[tokio::test(flavor = "multi_thread")]
     async fn test_connection_interface() -> Result<()> {
         let database_url = database_url();
-        let driver_manager = crate::Driver;
+        let driver_manager = Driver;
         let mut connection = driver_manager.connect(&database_url).await?;
 
         let mut query_result = connection

@@ -177,7 +177,7 @@ impl Driver {
     fn region(parameters: &HashMap<String, String>) -> Option<Region> {
         parameters
             .get("region")
-            .map(|region| Region::new(region.to_string()))
+            .map(|region| Region::new(region.clone()))
     }
 
     /// Extracts the endpoint URL from the URL and returns it as a string.

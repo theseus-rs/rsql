@@ -10,6 +10,9 @@ repository.workspace = true
 rust-version.workspace = true
 version.workspace = true
 
+[lints]
+workspace = true
+
 [dependencies]
 anyhow = { workspace = true }
 config = { workspace = true }
@@ -30,3 +33,6 @@ tracing-subscriber = { workspace = true, features = [
 
 [target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dependencies]
 getrandom = { workspace = true, features = ["wasm_js"] }
+
+[dev-dependencies]
+tempfile = { workspace = true }

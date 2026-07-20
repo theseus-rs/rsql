@@ -13,7 +13,7 @@ impl rsql_driver::Driver for Driver {
     }
 
     async fn connect(&self, url: &str) -> Result<Box<dyn rsql_driver::Connection>> {
-        let connection = Connection::new(url).await?;
+        let connection = Connection::new(url)?;
         Ok(Box::new(connection))
     }
 
