@@ -17,7 +17,14 @@ workspace = true
 async-trait = { workspace = true }
 file_type = { workspace = true }
 futures-util = { workspace = true }
-reqwest = { workspace = true, default-features = false, features = ["gzip", "json", "stream"] }
+reqwest = { workspace = true, default-features = false, features = [
+    "charset",
+    "gzip",
+    "http2",
+    "json",
+    "stream",
+    "system-proxy",
+] }
 rsql_driver = { path = "../../rsql_driver", version = "0.19.4" }
 tempfile = { workspace = true }
 tracing = { workspace = true }
