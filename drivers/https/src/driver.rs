@@ -12,6 +12,11 @@ use tokio::io::AsyncWriteExt;
 use tracing::debug;
 use url::Url;
 
+#[cfg(all(feature = "tls-rustls-ring", not(target_family = "wasm")))]
+fn install_rustls_ring_provider() {
+    let _install_result = rustls::crypto::ring::default_provider().install_default();
+}
+
 #[derive(Debug)]
 pub struct Driver;
 
@@ -109,6 +114,8 @@ impl Driver {
         let header_map: HeaderMap = (&request_headers)
             .try_into()
             .map_err(|_| ConversionError("MalformedHeaders".into()))?;
+        #[cfg(all(feature = "tls-rustls-ring", not(target_family = "wasm")))]
+        install_rustls_ring_provider();
         let client = reqwest::ClientBuilder::new()
             .default_headers(header_map)
             .build()

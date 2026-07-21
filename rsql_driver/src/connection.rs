@@ -5,7 +5,7 @@ use sqlparser::ast::Statement;
 use sqlparser::dialect::{Dialect, GenericDialect};
 use sqlparser::parser::Parser;
 
-use i18n_inflector::language_rules;
+use i18n_inflector::language_profile;
 use jiff::civil::DateTime;
 use jiff::tz::Offset;
 use jiff::{Timestamp, ToSpan};
@@ -261,13 +261,13 @@ impl Connection for CachedMetadataConnection {
             Ok(metadata.clone())
         } else {
             let mut metadata = self.connection.metadata().await?;
-            let language_rules = match language_rules(&self.locale) {
-                Ok(rules) => rules,
-                Err(_) => language_rules("en")?,
+            let language_profile = match language_profile(&self.locale) {
+                Ok(profile) => profile,
+                Err(_) => language_profile("en")?,
             };
 
-            metadata.infer_primary_keys(language_rules);
-            metadata.infer_foreign_keys(language_rules);
+            metadata.infer_primary_keys(language_profile);
+            metadata.infer_foreign_keys(language_profile);
             self.metadata = Some(metadata.clone());
             Ok(metadata)
         }

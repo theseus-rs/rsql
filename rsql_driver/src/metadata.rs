@@ -1,4 +1,4 @@
-use i18n_inflector::{LanguageRuleSet, LanguageRules};
+use i18n_inflector::{InflectionRequest, LanguageProfile, LexicalClassId};
 use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
 use sqlparser::dialect::{self, Dialect};
@@ -114,19 +114,19 @@ impl Metadata {
     }
 
     /// Infers primary keys for all schemas in all catalogs.
-    pub fn infer_primary_keys(&mut self, language_rules: &LanguageRuleSet) {
+    pub fn infer_primary_keys(&mut self, language_profile: &LanguageProfile) {
         for catalog in self.catalogs.values_mut() {
             for schema in catalog.schemas.values_mut() {
-                schema.infer_primary_keys(language_rules);
+                schema.infer_primary_keys(language_profile);
             }
         }
     }
 
     /// Infers foreign keys for all schemas in all catalogs.
-    pub fn infer_foreign_keys(&mut self, language_rules: &LanguageRuleSet) {
+    pub fn infer_foreign_keys(&mut self, language_profile: &LanguageProfile) {
         for catalog in self.catalogs.values_mut() {
             for schema in catalog.schemas.values_mut() {
-                schema.infer_foreign_keys(language_rules);
+                schema.infer_foreign_keys(language_profile);
             }
         }
     }
@@ -291,7 +291,7 @@ impl Schema {
     /// 2. A NOT NULL column named `<table_name>_id` (e.g., `user_id` for table `users`)
     ///
     /// If found, an inferred primary key is created with `inferred: true`.
-    pub fn infer_primary_keys(&mut self, language_rules: &LanguageRuleSet) {
+    pub fn infer_primary_keys(&mut self, language_profile: &LanguageProfile) {
         let table_names: Vec<String> = self.tables.keys().cloned().collect();
 
         for table_name in &table_names {
@@ -313,12 +313,17 @@ impl Schema {
                 }
 
                 // Second, try to find a NOT NULL column named "<singular_table_name>_id"
-                let singular_name = language_rules.singularize(table_name);
-                let pk_column_name = format!("{singular_name}_id");
-
-                if let Some(column) = table.find_column_case_insensitive(&pk_column_name)
-                    && column.not_null()
-                {
+                if let Some(column) = table.columns.values().find(|column| {
+                    column.not_null()
+                        && column
+                            .name()
+                            .to_ascii_lowercase()
+                            .strip_suffix("_id")
+                            .is_some_and(|prefix| {
+                                prefix.eq_ignore_ascii_case(table_name)
+                                    || is_plural_of(language_profile, prefix, table_name)
+                            })
+                }) {
                     let pk_name = format!("inferred_{table_name}_pk");
                     let pk = PrimaryKey::new(pk_name, vec![column.name().to_string()], true);
                     if let Some(table) = self.tables.get_mut(table_name) {
@@ -335,7 +340,7 @@ impl Schema {
     /// `<name>` or a plural form of `<name>` in the same schema. If a match is found and the
     /// referenced table has a column named `id`, an inferred foreign key is created. Columns
     /// that already have a declared foreign key are skipped.
-    pub fn infer_foreign_keys(&mut self, language_rules: &LanguageRuleSet) {
+    pub fn infer_foreign_keys(&mut self, language_profile: &LanguageProfile) {
         let table_names: Vec<String> = self.tables.keys().cloned().collect();
 
         for table_name in &table_names {
@@ -362,30 +367,33 @@ impl Schema {
 
                     let col_name_lower = column_name.to_ascii_lowercase();
                     let prefix = &col_name_lower[..col_name_lower.len() - 3];
-                    let candidates = language_rules.pluralize(prefix);
+                    let eligible_table = |candidate: &&Table| {
+                        !candidate.name().eq_ignore_ascii_case(table_name)
+                            && candidate.find_column_case_insensitive("id").is_some()
+                    };
+                    let ref_table = self
+                        .tables
+                        .values()
+                        .filter(eligible_table)
+                        .find(|candidate| candidate.name().eq_ignore_ascii_case(prefix))
+                        .or_else(|| {
+                            self.tables
+                                .values()
+                                .filter(eligible_table)
+                                .find(|candidate| {
+                                    is_plural_of(language_profile, prefix, candidate.name())
+                                })
+                        });
 
-                    for candidate in &candidates {
-                        if candidate.eq_ignore_ascii_case(table_name) {
-                            continue;
-                        }
-                        let ref_table = self
-                            .tables
-                            .iter()
-                            .find(|(k, _)| k.eq_ignore_ascii_case(candidate.as_ref()))
-                            .map(|(_, v)| v);
-                        if let Some(ref_table) = ref_table
-                            && ref_table.find_column_case_insensitive("id").is_some()
-                        {
-                            let fk_name = format!("inferred_{table_name}_{column_name}_fk");
-                            inferred_fks.push(ForeignKey::new(
-                                fk_name,
-                                vec![column_name.to_string()],
-                                ref_table.name().to_string(),
-                                vec!["id".to_string()],
-                                true,
-                            ));
-                            break;
-                        }
+                    if let Some(ref_table) = ref_table {
+                        let fk_name = format!("inferred_{table_name}_{column_name}_fk");
+                        inferred_fks.push(ForeignKey::new(
+                            fk_name,
+                            vec![column_name.to_string()],
+                            ref_table.name().to_string(),
+                            vec!["id".to_string()],
+                            true,
+                        ));
                     }
                 }
             }
@@ -397,6 +405,26 @@ impl Schema {
             }
         }
     }
+}
+
+/// Returns true if `name` is a plural form of `lemma` according to the provided `language_profile`.
+fn is_plural_of(language_profile: &LanguageProfile, lemma: &str, name: &str) -> bool {
+    let inflects_to_name = |request| {
+        language_profile
+            .inflect(request)
+            .is_ok_and(|forms| forms.iter().any(|form| form.eq_ignore_ascii_case(name)))
+    };
+
+    inflects_to_name(InflectionRequest::plural(lemma))
+        || language_profile
+            .capabilities()
+            .lexical_classes()
+            .iter()
+            .any(|class| {
+                inflects_to_name(
+                    InflectionRequest::plural(lemma).lexical_class(LexicalClassId::new(class.id())),
+                )
+            })
 }
 
 /// Table contains the column, index, primary key, and foreign key definitions for a table
@@ -807,7 +835,7 @@ impl From<MetadataDialect> for Box<dyn Dialect> {
 #[cfg(test)]
 mod test {
     use super::*;
-    use i18n_inflector::language_rules;
+    use i18n_inflector::language_profile as language_rules;
 
     #[test]
     fn test_metadata() {

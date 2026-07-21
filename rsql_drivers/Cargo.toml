@@ -193,29 +193,40 @@ driver-xml = ["dep:rsql_driver_xml"]
 driver-xz = ["dep:rsql_driver_xz"]
 driver-yaml = ["dep:rsql_driver_yaml"]
 driver-zstd = ["dep:rsql_driver_zstd"]
-native-tls = [
-    "rsql_driver_cockroachdb/native-tls",
-    "rsql_driver_cratedb/native-tls",
-    "rsql_driver_https/native-tls",
-    "rsql_driver_mariadb/native-tls",
-    "rsql_driver_mysql/native-tls",
-    "rsql_driver_postgres/native-tls",
-    "rsql_driver_postgresql/native-tls",
-    "rsql_driver_redshift/native-tls",
-    "rsql_driver_sqlite/native-tls",
+tls-native-tls = [
+    "rsql_driver_cockroachdb/tls-native-tls",
+    "rsql_driver_cratedb/tls-native-tls",
+    "rsql_driver_https/tls-native-tls",
+    "rsql_driver_mariadb/tls-native-tls",
+    "rsql_driver_mysql/tls-native-tls",
+    "rsql_driver_postgres/tls-native-tls",
+    "rsql_driver_postgresql/tls-native-tls",
+    "rsql_driver_redshift/tls-native-tls",
+    "rsql_driver_sqlite/tls-native-tls",
 ]
-rustls = [
-    "rsql_driver_cockroachdb/rustls",
-    "rsql_driver_cratedb/rustls",
-    "rsql_driver_https/rustls",
-    "rsql_driver_mariadb/rustls",
-    "rsql_driver_mysql/rustls",
-    "rsql_driver_postgres/rustls",
-    "rsql_driver_postgresql/rustls",
-    "rsql_driver_redshift/rustls",
-    "rsql_driver_sqlite/rustls",
+tls-rustls = ["tls-rustls-ring"]
+tls-rustls-aws-lc-rs = [
+    "rsql_driver_cockroachdb/tls-rustls-aws-lc-rs",
+    "rsql_driver_cratedb/tls-rustls-aws-lc-rs",
+    "rsql_driver_https/tls-rustls-aws-lc-rs",
+    "rsql_driver_mariadb/tls-rustls-aws-lc-rs",
+    "rsql_driver_mysql/tls-rustls-aws-lc-rs",
+    "rsql_driver_postgres/tls-rustls-aws-lc-rs",
+    "rsql_driver_postgresql/tls-rustls-aws-lc-rs",
+    "rsql_driver_redshift/tls-rustls-aws-lc-rs",
+    "rsql_driver_sqlite/tls-rustls-aws-lc-rs",
 ]
-
+tls-rustls-ring = [
+    "rsql_driver_cockroachdb/tls-rustls-ring",
+    "rsql_driver_cratedb/tls-rustls-ring",
+    "rsql_driver_https/tls-rustls-ring",
+    "rsql_driver_mariadb/tls-rustls-ring",
+    "rsql_driver_mysql/tls-rustls-ring",
+    "rsql_driver_postgres/tls-rustls-ring",
+    "rsql_driver_postgresql/tls-rustls-ring",
+    "rsql_driver_redshift/tls-rustls-ring",
+    "rsql_driver_sqlite/tls-rustls-ring",
+]
 
 [package.metadata.docs.rs]
 features = []

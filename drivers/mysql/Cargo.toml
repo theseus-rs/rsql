@@ -33,6 +33,7 @@ testcontainers-modules = { workspace = true, features = ["mysql"] }
 tokio = { workspace = true, features = ["macros", "rt"] }
 
 [features]
-default = ["native-tls"]
-native-tls = ["sqlx/tls-native-tls"]
-rustls = ["sqlx/tls-rustls"]
+default = ["tls-native-tls"]
+tls-native-tls = ["sqlx/tls-native-tls"]
+tls-rustls-aws-lc-rs = ["sqlx/tls-rustls-aws-lc-rs"]
+tls-rustls-ring = ["sqlx/tls-rustls-ring"]

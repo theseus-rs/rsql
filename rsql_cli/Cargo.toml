@@ -52,16 +52,12 @@ tempfile = { workspace = true }
 tokio = { workspace = true }
 
 [features]
-default = ["repl-native-tls"]
+default = ["repl", "tls-native-tls"]
 repl = []
-repl-native-tls = [
-    "repl",
-    "rsql_repl/native-tls",
-]
-repl-rustls = [
-    "repl",
-    "rsql_repl/rustls",
-]
+tls-native-tls = ["rsql_repl/tls-native-tls"]
+tls-repl-rustls = ["rsql_repl/tls-rustls"]
+tls-repl-rustls-aws-lc-rs = ["rsql_repl/tls-rustls-aws-lc-rs"]
+tls-repl-rustls-ring = ["rsql_repl/tls-rustls-ring"]
 
 [[bin]]
 name = "rsql"
