@@ -62,6 +62,12 @@ rsql --url "redshift://<user[:password]>@<host>[:<port>]/<database>" -- "SELECT 
 rsql --url "rusqlite://" -- "SELECT sqlite_version();"
 ```
 
+### ScyllaDB
+
+```shell
+rsql --url "scylladb://<user>:<password>@<host>:9042/<keyspace>" -- "SELECT release_version FROM system.local;"
+```
+
 ### Snowflake
 
 ```shell
@@ -88,4 +94,3 @@ rsql --url "sqlite://" -- "SELECT sqlite_version();"
 - Use the `--format` option or `.format` command to change output format (e.g., CSV, JSON).
 - Use `.help` for a list of available commands.
 - For more advanced examples, see the [FAQ & Tips](../appendix/index.md#tips--tricks).
-

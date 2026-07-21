@@ -143,6 +143,8 @@ mod tests {
             "rusqlite",
             #[cfg(feature = "driver-s3")]
             "s3",
+            #[cfg(feature = "driver-scylladb")]
+            "scylladb",
             #[cfg(feature = "driver-snowflake")]
             "snowflake",
             #[cfg(feature = "driver-sqlite")]

@@ -94,6 +94,7 @@ rsql --url "parquet://data.parquet" -- "SELECT column1, COUNT(*) FROM table GROU
 - **MySQL** / **MariaDB** (`mysql://` / `mariadb://`)
 - **PostgreSQL** (`postgresql://` / `postgres://`) - Including embedded PostgreSQL
 - **Redshift** (`redshift://`)
+- **ScyllaDB** (`scylladb://`) - Including Scylla Cloud TLS and private Client Routes
 - **Snowflake** (`snowflake://`)
 - **SQL Server** (`sqlserver://`)
 - **SQLite** (`sqlite://` / `rusqlite://`)
@@ -135,6 +136,9 @@ rsql --url "postgresql://?embedded=true"
 
 # SQLite file
 rsql --url "sqlite://database.db"
+
+# ScyllaDB keyspace
+rsql --url "scylladb://localhost:9042/my_keyspace"
 ```
 
 ### File Analysis
@@ -235,7 +239,7 @@ rsql --url "mysql://user:pass@localhost/db?charset=utf8mb4"
 
 | Feature               | Description                                                                                                                                                                                                                                  |
 |-----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Data Sources          | Arrow, Avro, ClickHouse, CockroachDB, CrateDB, CSV, Delimited, DuckDB, DynamoDB, Excel, FlightSQL, FWF, JSON, JSONL, LibSQL (Turso), MariaDB, MySQL, ODS, ORC, Parquet, PostgreSQL, Redshift, Snowflake, SQLite3, SQL Server, TSV, XML, YAML |
+| Data Sources          | Arrow, Avro, ClickHouse, CockroachDB, CrateDB, CSV, Delimited, DuckDB, DynamoDB, Excel, FlightSQL, FWF, JSON, JSONL, LibSQL (Turso), MariaDB, MySQL, ODS, ORC, Parquet, PostgreSQL, Redshift, ScyllaDB, Snowflake, SQLite3, SQL Server, TSV, XML, YAML |
 | Compression           | Brotli, Bzip2, Gzip, LZ4, XZ, Zstd                                                                                                                                                                                                           |
 | Syntax Highlighting   | ✅ Full SQL syntax highlighting                                                                                                                                                                                                               |
 | Result Highlighting   | ✅ Color output for better readability                                                                                                                                                                                                        |
@@ -285,6 +289,7 @@ rsql --url "mysql://user:pass@localhost/db?charset=utf8mb4"
 | redshift (sqlx)    | `redshift://<user>[:<password>]@<host>[:<port>]/<database>`                                                                                                                                                                                                                |
 | rusqlite           | `rusqlite://[<file>]`                                                                                                                                                                                                                                                      |
 | s3¹                | `s3://[<access_key_id>:<secret_access_key>@]<host>[:<port>]/<bucket>/<object>[?region=<region>][&session_token=<token>][&force_path_style=(true\|false)][&scheme=<http\|https>]`                                                                                           |
+| scylladb           | `scylladb://[<user>:<password>@]<host>[:<port>]/[<keyspace>][?node=<host>:<port>][&datacenter=<dc>][&sslmode=<disable\|verify-full>][&ssl_ca=<pem-file>][&ssl_cert=<pem-file>&ssl_key=<pem-file>][&client_route=<connection-id>]git`                                       |
 | snowflake          | `snowflake://<user>[:<token>]@<account>.snowflakecomputing.com/[?private_key_file=pkey_file&public_key_file=pubkey_file]`                                                                                                                                                  |
 | sqlite (sqlx)      | `sqlite://[<file>]`                                                                                                                                                                                                                                                        |
 | sqlserver          | `sqlserver://[<user>[:<password>]@]<host>[:<port>][/<database>][?ApplicationName=<name>][&encrypt=(true\|false\|yes\|no\|DANGER_PLAINTEXT)][&TrustServerCertificate=(true\|false\|yes\|no)][&TrustServerCertificateCA=<path>][&IntegratedSecurity=(true\|false\|yes\|no)]` |

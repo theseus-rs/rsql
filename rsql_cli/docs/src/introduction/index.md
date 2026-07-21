@@ -7,7 +7,7 @@ exploring data fast and productive.
 ## What is rsql?
 
 `rsql` is a cross-platform CLI tool that connects to many different databases and file formats, including relational
-databases (PostgreSQL, MySQL, MariaDB, SQL Server, CockroachDB, Redshift, Snowflake, DuckDB, LibSQL, SQLite, and more),
+databases (PostgreSQL, MySQL, MariaDB, SQL Server, CockroachDB, Redshift, ScyllaDB, Snowflake, DuckDB, SQLite, and more),
 as well as data files (CSV, JSON, Parquet, Arrow, Avro, Excel, XML, YAML, and others). It supports both local and remote
 data sources.
 
