@@ -34,12 +34,16 @@ uuid = { workspace = true, features = ["serde", "v4"] }
 tokio = { workspace = true, features = ["macros", "rt"] }
 
 [features]
-default = ["native-tls"]
-native-tls = [
-    "postgresql_embedded/native-tls",
+default = ["tls-native-tls"]
+tls-native-tls = [
+    "postgresql_embedded/tls-native-tls",
     "sqlx/tls-native-tls",
 ]
-rustls = [
-    "postgresql_embedded/rustls",
-    "sqlx/tls-rustls",
+tls-rustls-aws-lc-rs = [
+    "postgresql_embedded/tls-rustls-aws-lc-rs",
+    "sqlx/tls-rustls-aws-lc-rs",
+]
+tls-rustls-ring = [
+    "postgresql_embedded/tls-rustls-ring",
+    "sqlx/tls-rustls-ring",
 ]

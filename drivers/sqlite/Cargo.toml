@@ -28,6 +28,7 @@ rsql_driver_test_utils = { path = "../test_utils", version = "0.19.4" }
 tokio = { workspace = true, features = ["macros", "rt"] }
 
 [features]
-default = ["native-tls"]
-native-tls = ["sqlx/tls-native-tls"]
-rustls = ["sqlx/tls-rustls"]
+default = ["tls-native-tls"]
+tls-native-tls = ["sqlx/tls-native-tls"]
+tls-rustls-aws-lc-rs = ["sqlx/tls-rustls-aws-lc-rs"]
+tls-rustls-ring = ["sqlx/tls-rustls-ring"]

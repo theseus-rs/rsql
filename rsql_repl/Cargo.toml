@@ -96,7 +96,7 @@ all-drivers = [
     "driver-yaml",
     "driver-zstd",
 ]
-default = ["native-tls"]
+default = ["tls-native-tls"]
 driver-arrow = ["rsql_drivers/driver-arrow"]
 driver-avro = ["rsql_drivers/driver-avro"]
 driver-brotli = ["rsql_drivers/driver-brotli"]
@@ -167,9 +167,10 @@ format-tsv = ["rsql_formatters/tsv"]
 format-unicode = ["rsql_formatters/unicode"]
 format-xml = ["rsql_formatters/xml"]
 format-yaml = ["rsql_formatters/yaml"]
-native-tls = ["rsql_drivers/native-tls"]
-rustls = ["rsql_drivers/rustls"]
-
+tls-native-tls = ["rsql_drivers/tls-native-tls"]
+tls-rustls = ["rsql_drivers/tls-rustls"]
+tls-rustls-aws-lc-rs = ["rsql_drivers/tls-rustls-aws-lc-rs"]
+tls-rustls-ring = ["rsql_drivers/tls-rustls-ring"]
 
 [package.metadata.docs.rs]
 features = []
