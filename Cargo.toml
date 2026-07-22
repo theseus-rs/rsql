@@ -67,7 +67,7 @@ flate2 = "1.1.9"
 form_urlencoded = "1.2.2"
 futures-util = "0.3.33"
 getrandom = "0.4.3"
-i18n_inflector = "0.4.0"
+i18n_inflector = "0.4.1"
 icu = "2.2.0"
 jiff-icu = "0.2.2"
 indexmap = "2.14.0"
@@ -84,7 +84,7 @@ orc-rust = { version = "0.8.0", default-features = false }
 os_info = "3.15.0"
 polars = { version = "0.54.4", default-features = false, features = ["dtype-categorical"] }
 polars-sql = "0.54.4"
-postgresql_embedded = "0.21.0"
+postgresql_embedded = { version = "0.21.0", default-features = false, features = ["theseus"] }
 quick-xml = "0.41.0"
 regex = "1.13.1"
 reqwest = { version = "0.13.4", default-features = false }
@@ -112,7 +112,7 @@ thiserror = "2.0.19"
 tiberius = { version = "0.12.3", default-features = false }
 tokio = "1.53.1"
 tokio-postgres = "0.7.18"
-tokio-util = "0.7.18"
+tokio-util = "0.7.19"
 tonic = "0.14.6"
 tracing = "0.1.44"
 tracing-appender = "0.2.5"
