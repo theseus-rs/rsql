@@ -48,6 +48,7 @@ rsql_driver_postgresql = { path = "../drivers/postgresql", default-features = fa
 rsql_driver_redshift = { path = "../drivers/redshift", default-features = false, optional = true, version = "0.19.4" }
 rsql_driver_rusqlite = { path = "../drivers/rusqlite", optional = true, version = "0.19.4" }
 rsql_driver_s3 = { path = "../drivers/s3", optional = true, version = "0.19.4" }
+rsql_driver_scylladb = { path = "../drivers/scylladb", optional = true, default-features = false, version = "0.19.4" }
 rsql_driver_snowflake = { path = "../drivers/snowflake", optional = true, version = "0.19.4" }
 rsql_driver_sqlite = { path = "../drivers/sqlite", default-features = false, optional = true, version = "0.19.4" }
 rsql_driver_sqlserver = { path = "../drivers/sqlserver", optional = true, version = "0.19.4" }
@@ -102,6 +103,7 @@ all = [
     "driver-redshift",
     "driver-rusqlite",
     "driver-s3",
+    "driver-scylladb",
     "driver-snowflake",
     "driver-sqlite",
     "driver-sqlserver",
@@ -143,6 +145,7 @@ all-wasm = [
     # "driver-redshift",
     # "driver-rusqlite",
     # "driver-s3",
+    # "driver-scylladb",
     # "driver-snowflake",
     # "driver-sqlite",
     # "driver-sqlserver",
@@ -185,6 +188,7 @@ driver-postgresql = ["dep:rsql_driver_postgresql"]
 driver-redshift = ["dep:rsql_driver_redshift"]
 driver-rusqlite = ["dep:rsql_driver_rusqlite"]
 driver-s3 = ["dep:rsql_driver_s3"]
+driver-scylladb = ["dep:rsql_driver_scylladb"]
 driver-snowflake = ["dep:rsql_driver_snowflake"]
 driver-sqlite = ["dep:rsql_driver_sqlite"]
 driver-sqlserver = ["dep:rsql_driver_sqlserver"]
@@ -202,6 +206,7 @@ tls-native-tls = [
     "rsql_driver_postgres/tls-native-tls",
     "rsql_driver_postgresql/tls-native-tls",
     "rsql_driver_redshift/tls-native-tls",
+    "rsql_driver_scylladb/tls-native-tls",
     "rsql_driver_sqlite/tls-native-tls",
 ]
 tls-rustls = ["tls-rustls-ring"]
@@ -214,6 +219,7 @@ tls-rustls-aws-lc-rs = [
     "rsql_driver_postgres/tls-rustls-aws-lc-rs",
     "rsql_driver_postgresql/tls-rustls-aws-lc-rs",
     "rsql_driver_redshift/tls-rustls-aws-lc-rs",
+    "rsql_driver_scylladb/tls-rustls-aws-lc-rs",
     "rsql_driver_sqlite/tls-rustls-aws-lc-rs",
 ]
 tls-rustls-ring = [
@@ -225,6 +231,7 @@ tls-rustls-ring = [
     "rsql_driver_postgres/tls-rustls-ring",
     "rsql_driver_postgresql/tls-rustls-ring",
     "rsql_driver_redshift/tls-rustls-ring",
+    "rsql_driver_scylladb/tls-rustls-ring",
     "rsql_driver_sqlite/tls-rustls-ring",
 ]
 

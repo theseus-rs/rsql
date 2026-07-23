@@ -43,6 +43,7 @@ changelog_include = [
     "rsql_driver_redshift",
     "rsql_driver_rusqlite",
     "rsql_driver_s3",
+    "rsql_driver_scylladb",
     "rsql_driver_snowflake",
     "rsql_driver_sqlite",
     "rsql_driver_sqlserver",

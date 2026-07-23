@@ -1,0 +1,47 @@
+[package]
+authors.workspace = true
+categories.workspace = true
+description = "rsql ScyllaDB driver"
+edition.workspace = true
+keywords.workspace = true
+license.workspace = true
+name = "rsql_driver_scylladb"
+repository.workspace = true
+rust-version.workspace = true
+version.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+async-trait = { workspace = true }
+bigdecimal = { workspace = true }
+chrono = { workspace = true }
+file_type = { workspace = true }
+futures-util = { workspace = true }
+percent-encoding = { workspace = true }
+rsql_driver = { path = "../../rsql_driver", version = "0.19.4" }
+rust_decimal = { workspace = true }
+rustls = { workspace = true, features = ["std", "tls12"] }
+rustls-native-certs = { workspace = true }
+scylla = { workspace = true }
+url = { workspace = true }
+uuid = { workspace = true }
+
+[dev-dependencies]
+anyhow = { workspace = true }
+rcgen = { workspace = true }
+tempfile = { workspace = true }
+testcontainers = { workspace = true }
+testcontainers-modules = { workspace = true, features = ["scylladb"] }
+tokio = { workspace = true, features = ["macros", "rt", "rt-multi-thread"] }
+
+[features]
+default = ["tls-native-tls"]
+tls-native-tls = ["tls-rustls-aws-lc-rs"]
+tls-rustls-aws-lc-rs = ["rustls/aws_lc_rs"]
+tls-rustls-ring = ["rustls/ring"]
+
+[package.metadata.docs.rs]
+features = []
+targets = ["x86_64-unknown-linux-gnu"]

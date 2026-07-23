@@ -119,6 +119,8 @@ impl DriverManager {
         Self::add(Arc::new(rsql_driver_rusqlite::Driver))?;
         #[cfg(feature = "driver-s3")]
         Self::add(Arc::new(rsql_driver_s3::Driver))?;
+        #[cfg(feature = "driver-scylladb")]
+        Self::add(Arc::new(rsql_driver_scylladb::Driver))?;
         #[cfg(feature = "driver-snowflake")]
         Self::add(Arc::new(rsql_driver_snowflake::Driver))?;
         #[cfg(feature = "driver-sqlite")]
@@ -249,6 +251,8 @@ mod tests {
         #[cfg(feature = "driver-rusqlite")]
         let driver_count = driver_count + 1;
         #[cfg(feature = "driver-s3")]
+        let driver_count = driver_count + 1;
+        #[cfg(feature = "driver-scylladb")]
         let driver_count = driver_count + 1;
         #[cfg(feature = "driver-snowflake")]
         let driver_count = driver_count + 1;
