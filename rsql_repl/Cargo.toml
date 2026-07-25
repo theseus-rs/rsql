@@ -53,6 +53,9 @@ mockall = { workspace = true }
 test-log = { workspace = true }
 tokio = { workspace = true }
 
+[target.'cfg(unix)'.dev-dependencies]
+expectrl = { workspace = true }
+
 [features]
 all = ["all-drivers", "all-formats"]
 all-drivers = [

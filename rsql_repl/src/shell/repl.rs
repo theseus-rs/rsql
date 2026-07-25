@@ -168,31 +168,37 @@ impl Shell {
 
                     loop_condition
                 }
-                Err(ReadlineError::Interrupted) => LoopCondition::Continue,
-                Err(error) => {
-                    let mut error_string = t!("error", locale = locale).to_string();
-                    let error_message = format!("{error:?}");
-                    if self.configuration.color {
-                        error_string = error_string.red().to_string();
-                    }
-                    eprintln!(
-                        "{}",
-                        t!(
-                            "error_format",
-                            locale = locale,
-                            error = error_string.red(),
-                            message = error_message,
-                        )
-                    );
-                    error!(error_message);
-                    LoopCondition::Exit(1)
-                }
+                Err(error) => self.handle_readline_error(&error),
             };
 
             if let LoopCondition::Exit(exit_code) = loop_condition {
                 return Ok(exit_code);
             }
         }
+    }
+
+    fn handle_readline_error(&self, error: &ReadlineError) -> LoopCondition {
+        if matches!(error, ReadlineError::Interrupted) {
+            return LoopCondition::Exit(0);
+        }
+
+        let locale = self.configuration.locale.as_str();
+        let mut error_string = t!("error", locale = locale).to_string();
+        let error_message = format!("{error:?}");
+        if self.configuration.color {
+            error_string = error_string.red().to_string();
+        }
+        eprintln!(
+            "{}",
+            t!(
+                "error_format",
+                locale = locale,
+                error = error_string.red(),
+                message = error_message,
+            )
+        );
+        error!(error_message);
+        LoopCondition::Exit(1)
     }
 
     /// Evaluate the input line and return the loop condition.
@@ -329,6 +335,16 @@ mod test {
         assert!(debug.contains("configuration"));
         assert!(debug.contains("command_manager"));
         assert!(debug.contains("formatter_manager"));
+    }
+
+    #[test]
+    fn test_handle_readline_interrupted() {
+        let shell = ShellBuilder::default().build();
+
+        assert_eq!(
+            shell.handle_readline_error(&ReadlineError::Interrupted),
+            LoopCondition::Exit(0)
+        );
     }
 
     #[tokio::test]
