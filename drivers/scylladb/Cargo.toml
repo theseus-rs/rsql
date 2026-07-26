@@ -20,7 +20,7 @@ chrono = { workspace = true }
 file_type = { workspace = true }
 futures-util = { workspace = true }
 percent-encoding = { workspace = true }
-rsql_driver = { path = "../../rsql_driver", version = "0.19.4" }
+rsql_driver = { path = "../../rsql_driver", version = "0.20.0" }
 rust_decimal = { workspace = true }
 rustls = { workspace = true, features = ["std", "tls12"] }
 rustls-native-certs = { workspace = true }
