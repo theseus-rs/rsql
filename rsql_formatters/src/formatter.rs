@@ -74,18 +74,15 @@ pub struct FormatterManager {
 }
 
 impl FormatterManager {
-    /// Create a new instance of the `FormatterManager`
+    /// Create a new instance of the `FormatterManager` with the specified formatters
     #[must_use]
-    pub fn new() -> Self {
+    pub fn new<const N: usize>(formatters: [Box<dyn Formatter>; N]) -> Self {
         FormatterManager {
-            formats: BTreeMap::new(),
+            formats: formatters
+                .into_iter()
+                .map(|formatter| (formatter.identifier(), formatter))
+                .collect(),
         }
-    }
-
-    /// Add a new format to the list of available formatters
-    fn add(&mut self, format: Box<dyn Formatter>) {
-        let identifier = format.identifier();
-        let _ = &self.formats.insert(identifier, format);
     }
 
     /// Get a formatters by name
@@ -103,38 +100,36 @@ impl FormatterManager {
 /// Default implementation for the `FormatterManager`
 impl Default for FormatterManager {
     fn default() -> Self {
-        let mut formatter_manager = FormatterManager::new();
-
-        #[cfg(feature = "ascii")]
-        formatter_manager.add(Box::new(crate::ascii::Formatter));
-        #[cfg(feature = "csv")]
-        formatter_manager.add(Box::new(crate::csv::Formatter));
-        #[cfg(feature = "expanded")]
-        formatter_manager.add(Box::new(crate::expanded::Formatter));
-        #[cfg(feature = "html")]
-        formatter_manager.add(Box::new(crate::html::Formatter));
-        #[cfg(feature = "json")]
-        formatter_manager.add(Box::new(crate::json::Formatter));
-        #[cfg(feature = "jsonl")]
-        formatter_manager.add(Box::new(crate::jsonl::Formatter));
-        #[cfg(feature = "markdown")]
-        formatter_manager.add(Box::new(crate::markdown::Formatter));
-        #[cfg(feature = "plain")]
-        formatter_manager.add(Box::new(crate::plain::Formatter));
-        #[cfg(feature = "psql")]
-        formatter_manager.add(Box::new(crate::psql::Formatter));
-        #[cfg(feature = "sqlite")]
-        formatter_manager.add(Box::new(crate::sqlite::Formatter));
-        #[cfg(feature = "tsv")]
-        formatter_manager.add(Box::new(crate::tsv::Formatter));
-        #[cfg(feature = "unicode")]
-        formatter_manager.add(Box::new(crate::unicode::Formatter));
-        #[cfg(feature = "xml")]
-        formatter_manager.add(Box::new(crate::xml::Formatter));
-        #[cfg(feature = "yaml")]
-        formatter_manager.add(Box::new(crate::yaml::Formatter));
-
-        formatter_manager
+        FormatterManager::new([
+            #[cfg(feature = "ascii")]
+            Box::new(crate::ascii::Formatter),
+            #[cfg(feature = "csv")]
+            Box::new(crate::csv::Formatter),
+            #[cfg(feature = "expanded")]
+            Box::new(crate::expanded::Formatter),
+            #[cfg(feature = "html")]
+            Box::new(crate::html::Formatter),
+            #[cfg(feature = "json")]
+            Box::new(crate::json::Formatter),
+            #[cfg(feature = "jsonl")]
+            Box::new(crate::jsonl::Formatter),
+            #[cfg(feature = "markdown")]
+            Box::new(crate::markdown::Formatter),
+            #[cfg(feature = "plain")]
+            Box::new(crate::plain::Formatter),
+            #[cfg(feature = "psql")]
+            Box::new(crate::psql::Formatter),
+            #[cfg(feature = "sqlite")]
+            Box::new(crate::sqlite::Formatter),
+            #[cfg(feature = "tsv")]
+            Box::new(crate::tsv::Formatter),
+            #[cfg(feature = "unicode")]
+            Box::new(crate::unicode::Formatter),
+            #[cfg(feature = "xml")]
+            Box::new(crate::xml::Formatter),
+            #[cfg(feature = "yaml")]
+            Box::new(crate::yaml::Formatter),
+        ])
     }
 }
 
@@ -158,10 +153,7 @@ mod tests {
     fn test_format_manager() {
         let formatter = crate::unicode::Formatter;
 
-        let mut formatter_manager = FormatterManager::new();
-        assert_eq!(formatter_manager.formats.len(), 0);
-
-        formatter_manager.add(Box::new(formatter));
+        let formatter_manager = FormatterManager::new([Box::new(formatter)]);
 
         assert_eq!(formatter_manager.formats.len(), 1);
         let result = formatter_manager.get("unicode");
