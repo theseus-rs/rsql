@@ -9,15 +9,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## `rsql_cli` - [0.20.0](https://github.com/theseus-rs/rsql/compare/v0.19.4...v0.20.0) - 2026-07-22
 
+### Added
+- implement ScyllaDB driver
+
 ### Fixed
+- correct repl ctrl+c/cmd+c
 - remove default tls config from dependant drivers
 
 ### Other
+- update README.md
 - update file_type, i18n_inflector and postgresql_embedded
 - update to Rust 1.97.1
 - update to sqlx=0.9.0
 
 ## `rsql_repl` - [0.20.0](https://github.com/theseus-rs/rsql/compare/rsql_repl-v0.19.4...rsql_repl-v0.20.0) - 2026-07-22
+
+### Added
+- implement ScyllaDB driver
+
+### Fixed
+- correct repl ctrl+c/cmd+c
 
 ### Other
 - update file_type, i18n_inflector and postgresql_embedded
@@ -34,6 +45,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - update to Rust 1.97.1
 
 ## `rsql_drivers` - [0.20.0](https://github.com/theseus-rs/rsql/compare/rsql_drivers-v0.19.4...rsql_drivers-v0.20.0) - 2026-07-22
+
+### Added
+- implement ScyllaDB driver
 
 ### Fixed
 - remove default tls config from dependant drivers
@@ -82,6 +96,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Other
 - update to Rust 1.97.1
+
+## `rsql_driver_scylladb` - [0.20.0](https://github.com/theseus-rs/rsql/releases/tag/rsql_driver_scylladb-v0.20.0) - 2026-07-22
+
+### Added
+- implement ScyllaDB driver
 
 ## `rsql_driver_rusqlite` - [0.20.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_rusqlite-v0.19.4...rsql_driver_rusqlite-v0.20.0) - 2026-07-22
 
