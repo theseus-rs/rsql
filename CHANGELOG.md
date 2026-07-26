@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## `rsql_cli` - [0.21.0](https://github.com/theseus-rs/rsql/compare/v0.20.0...v0.21.0) - 2026-07-26
+
+### Other
+- refactor FormatterManager initialization
+
+## `rsql_repl` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_repl-v0.20.0...rsql_repl-v0.21.0) - 2026-07-26
+
+### Other
+- refactor FormatterManager initialization
+
+## `rsql_formatters` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_formatters-v0.20.0...rsql_formatters-v0.21.0) - 2026-07-26
+
+### Other
+- refactor FormatterManager initialization
+
 ## `rsql_cli` - [0.20.0](https://github.com/theseus-rs/rsql/compare/v0.19.4...v0.20.0) - 2026-07-22
 
 ### Added
