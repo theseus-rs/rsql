@@ -313,7 +313,7 @@ mod test {
             ..Default::default()
         };
         let command_manager = CommandManager::new();
-        let formatter_manager = FormatterManager::new();
+        let formatter_manager = FormatterManager::new([]);
         let output = Output::default();
         let shell = ShellBuilder::default()
             .with_configuration(configuration)
