@@ -90,7 +90,6 @@ rsql --url "parquet://data.parquet" -- "SELECT column1, COUNT(*) FROM table GROU
 - **CrateDB** (`cratedb://`)
 - **DuckDB** (`duckdb://`) - High-performance analytics
 - **DynamoDB** (`dynamodb://`)
-- **LibSQL/Turso** (`libsql://`)
 - **MySQL** / **MariaDB** (`mysql://` / `mariadb://`)
 - **PostgreSQL** (`postgresql://` / `postgres://`) - Including embedded PostgreSQL
 - **Redshift** (`redshift://`)
@@ -239,7 +238,7 @@ rsql --url "mysql://user:pass@localhost/db?charset=utf8mb4"
 
 | Feature               | Description                                                                                                                                                                                                                                  |
 |-----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Data Sources          | Arrow, Avro, ClickHouse, CockroachDB, CrateDB, CSV, Delimited, DuckDB, DynamoDB, Excel, FlightSQL, FWF, JSON, JSONL, LibSQL (Turso), MariaDB, MySQL, ODS, ORC, Parquet, PostgreSQL, Redshift, ScyllaDB, Snowflake, SQLite3, SQL Server, TSV, XML, YAML |
+| Data Sources          | Arrow, Avro, ClickHouse, CockroachDB, CrateDB, CSV, Delimited, DuckDB, DynamoDB, Excel, FlightSQL, FWF, JSON, JSONL, MariaDB, MySQL, ODS, ORC, Parquet, PostgreSQL, Redshift, ScyllaDB, Snowflake, SQLite3, SQL Server, TSV, XML, YAML |
 | Compression           | Brotli, Bzip2, Gzip, LZ4, XZ, Zstd                                                                                                                                                                                                           |
 | Syntax Highlighting   | ✅ Full SQL syntax highlighting                                                                                                                                                                                                               |
 | Result Highlighting   | ✅ Color output for better readability                                                                                                                                                                                                        |
@@ -277,7 +276,6 @@ rsql --url "mysql://user:pass@localhost/db?charset=utf8mb4"
 | https¹             | `https://<path>[?_headers=<headers>]`                                                                                                                                                                                                                                      |
 | json (polars)      | `json://<file>`                                                                                                                                                                                                                                                            |
 | jsonl (polars)     | `jsonl://<file>`                                                                                                                                                                                                                                                           |
-| libsql²            | `libsql://<host>?[<memory=true>][&file=<database_file>][&auth_token=<token>]`                                                                                                                                                                                              |
 | lz4¹               | `lz4://<file>`                                                                                                                                                                                                                                                             |
 | mariadb (sqlx)     | `mariadb://<user>[:<password>]@<host>[:<port>]/<database>`                                                                                                                                                                                                                 |
 | mysql (sqlx)       | `mysql://<user>[:<password>]@<host>[:<port>]/<database>`                                                                                                                                                                                                                   |
@@ -300,8 +298,6 @@ rsql --url "mysql://user:pass@localhost/db?charset=utf8mb4"
 | zstd¹              | `zstd://<file>`                                                                                                                                                                                                                                                            |
 
 ¹ the driver will attempt to detect the type of file and automatically use the appropriate driver.  
-² `libsql` needs to be enabled with the `libsql` feature flag; it is disabled by default as it conflicts
-with `rusqlite`.
 
 ## License
 

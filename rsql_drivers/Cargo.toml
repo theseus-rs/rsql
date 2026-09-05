@@ -36,7 +36,6 @@ rsql_driver_http = { path = "../drivers/http", optional = true, version = "0.20.
 rsql_driver_https = { path = "../drivers/https", default-features = false, optional = true, version = "0.20.0" }
 rsql_driver_json = { path = "../drivers/json", optional = true, version = "0.20.0" }
 rsql_driver_jsonl = { path = "../drivers/jsonl", optional = true, version = "0.20.0" }
-rsql_driver_libsql = { path = "../drivers/libsql", optional = true, version = "0.20.0" }
 rsql_driver_lz4 = { path = "../drivers/lz4", optional = true, version = "0.20.0" }
 rsql_driver_mariadb = { path = "../drivers/mariadb", default-features = false, optional = true, version = "0.20.0" }
 rsql_driver_mysql = { path = "../drivers/mysql", default-features = false, optional = true, version = "0.20.0" }
@@ -91,7 +90,6 @@ all = [
     "driver-https",
     "driver-json",
     "driver-jsonl",
-    # "driver-libsql",
     "driver-lz4",
     "driver-mariadb",
     "driver-mysql",
@@ -133,7 +131,6 @@ all-wasm = [
     # "driver-https",
     "driver-json",
     "driver-jsonl",
-    # "driver-libsql",
     "driver-lz4",
     # "driver-mariadb",
     # "driver-mysql",
@@ -176,7 +173,6 @@ driver-http = ["dep:rsql_driver_http"]
 driver-https = ["dep:rsql_driver_https"]
 driver-json = ["dep:rsql_driver_json"]
 driver-jsonl = ["dep:rsql_driver_jsonl"]
-driver-libsql = ["dep:rsql_driver_libsql"]
 driver-lz4 = ["dep:rsql_driver_lz4"]
 driver-mariadb = ["dep:rsql_driver_mariadb"]
 driver-mysql = ["dep:rsql_driver_mysql"]

@@ -31,7 +31,6 @@ changelog_include = [
     "rsql_driver_https",
     "rsql_driver_json",
     "rsql_driver_jsonl",
-    "rsql_driver_libsql",
     "rsql_driver_mariadb",
     "rsql_driver_mysql",
     "rsql_driver_ods",

@@ -18,12 +18,6 @@ rsql --url "duckdb://" -- "SELECT version();"
 rsql --url "duckdb:///path/to/file.duckdb" -- "SELECT COUNT(*) FROM my_table;"
 ```
 
-### LibSQL (in-memory)
-
-```shell
-rsql --url "libsql://?memory=true" -- "SELECT sqlite_version();"
-```
-
 ### MariaDB
 
 ```shell

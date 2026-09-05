@@ -119,8 +119,6 @@ mod tests {
             "json",
             #[cfg(feature = "driver-jsonl")]
             "jsonl",
-            #[cfg(feature = "driver-libsql")]
-            "libsql",
             #[cfg(feature = "driver-lz4")]
             "lz4",
             #[cfg(feature = "driver-mariadb")]
