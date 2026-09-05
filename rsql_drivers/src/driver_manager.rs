@@ -95,8 +95,6 @@ impl DriverManager {
         Self::add(Arc::new(rsql_driver_json::Driver))?;
         #[cfg(feature = "driver-jsonl")]
         Self::add(Arc::new(rsql_driver_jsonl::Driver))?;
-        #[cfg(feature = "driver-libsql")]
-        Self::add(Arc::new(rsql_driver_libsql::Driver))?;
         #[cfg(feature = "driver-lz4")]
         Self::add(Arc::new(rsql_driver_lz4::Driver))?;
         #[cfg(feature = "driver-mariadb")]
@@ -227,8 +225,6 @@ mod tests {
         #[cfg(feature = "driver-json")]
         let driver_count = driver_count + 1;
         #[cfg(feature = "driver-jsonl")]
-        let driver_count = driver_count + 1;
-        #[cfg(feature = "driver-libsql")]
         let driver_count = driver_count + 1;
         #[cfg(feature = "driver-lz4")]
         let driver_count = driver_count + 1;

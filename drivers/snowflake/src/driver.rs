@@ -763,7 +763,7 @@ mod test {
             public_key_fingerprint(&public_cert).expect("cannot generate thumbprint");
         let (issuer, subject) = get_issuer_and_subject(&public_cert, "abc123", "test")
             .expect("Failed to get issuer and subject");
-        assert_eq!(subject, format!("abc123.test"));
+        assert_eq!(subject, "abc123.test");
         assert_eq!(issuer, format!("abc123.test.SHA256:{expected_thumbprint}"));
     }
 

@@ -21,12 +21,11 @@ impl Connection {
     ///
     /// # Errors
     /// if the URL is invalid
-    #[expect(clippy::unused_async)]
-    pub async fn new(url: &str, context: SQLContext) -> Result<Self> {
-        Ok(Self {
+    pub fn new(url: &str, context: SQLContext) -> impl Future<Output = Result<Self>> {
+        std::future::ready(Ok(Self {
             url: url.to_string(),
             context: Arc::new(Mutex::new(context)),
-        })
+        }))
     }
 }
 

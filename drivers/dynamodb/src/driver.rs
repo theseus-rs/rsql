@@ -54,7 +54,7 @@ impl rsql_driver::Driver for Driver {
         let config = config_builder.build();
         let client = Client::from_conf(config);
 
-        let connection = Connection::new(url, client).await?;
+        let connection = Connection::new(url, client);
         Ok(Box::new(connection))
     }
 
@@ -113,13 +113,11 @@ pub struct Connection {
 }
 
 impl Connection {
-    #[expect(clippy::unused_async)]
-    pub(crate) async fn new(url: &str, client: Client) -> Result<Connection> {
-        let connection = Connection {
+    pub(crate) fn new(url: &str, client: Client) -> Connection {
+        Connection {
             url: url.to_string(),
             client,
-        };
-        Ok(connection)
+        }
     }
 }
 

@@ -14,6 +14,7 @@ targets = [
 [licenses]
 allow = [
     "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
     "BSD-2-Clause",
     "BSD-3-Clause",
     "BSL-1.0",
@@ -37,8 +38,6 @@ ignore = [
     { id = "RUSTSEC-2024-0436", reason = "paste: unmaintained" },
     { id = "RUSTSEC-2025-0052", reason = "async-std: discontinued" },
     { id = "RUSTSEC-2025-0141", reason = "bincode: unmaintained" },
-    { id = "RUSTSEC-2026-0097", reason = "rand: safe code using the public API can cause Undefined Behaviour" },
-    { id = "RUSTSEC-2026-0173", reason = "proc-macro-error2: unmaintained" },
     { id = "RUSTSEC-2026-0194", reason = "quick-xml: quadratic run time when checking a start tag for duplicate attribute names" },
     { id = "RUSTSEC-2026-0195", reason = "quick-xml: unbounded namespace-declaration allocation in NsReader enables memory-exhaustion denial of service" },
 ]

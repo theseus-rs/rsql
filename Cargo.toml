@@ -79,7 +79,6 @@ inquire = "0.9.4"
 jiff = "0.2.34"
 jwt-simple = { version = "0.12.17", default-features = false }
 liblzma = "0.4.7"
-libsql = { version = "0.9.30", default-features = false, features = ["core", "remote", "replication", "sync"] }
 lz4 = "1.28.1"
 mockall = "0.15.0"
 orc-rust = { version = "0.8.0", default-features = false }

@@ -18,7 +18,7 @@ impl rsql_driver::Driver for Driver {
     }
 
     async fn connect(&self, url: &str) -> Result<Box<dyn rsql_driver::Connection>> {
-        let connection = Connection::new(url).await?;
+        let connection = Connection::new(url)?;
         Ok(Box::new(connection))
     }
 
@@ -34,8 +34,7 @@ pub struct Connection {
 }
 
 impl Connection {
-    #[expect(clippy::unused_async)]
-    pub(crate) async fn new(url: &str) -> Result<Connection> {
+    pub(crate) fn new(url: &str) -> Result<Connection> {
         let parsed_url = Url::parse(url)?;
         let connection = if let Ok(file_name) = parsed_url.to_file() {
             duckdb::Connection::open(file_name).map_err(|error| IoError(error.to_string()))?
