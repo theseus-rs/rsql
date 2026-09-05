@@ -7,6 +7,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## `rsql_cli` - [0.21.0](https://github.com/theseus-rs/rsql/compare/v0.20.0...v0.21.0) - 2026-09-05
+
+### Other
+- update to Rust 1.98.1
+- refactor FormatterManager initialization
+
+## `rsql_repl` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_repl-v0.20.0...rsql_repl-v0.21.0) - 2026-09-05
+
+### Other
+- update to Rust 1.98.1
+- refactor FormatterManager initialization
+
+## `rsql_formatters` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_formatters-v0.20.0...rsql_formatters-v0.21.0) - 2026-09-05
+
+### Other
+- refactor FormatterManager initialization
+
+## `rsql_drivers` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_drivers-v0.20.0...rsql_drivers-v0.21.0) - 2026-09-05
+
+### Other
+- update to Rust 1.98.1
+
+## `rsql_driver_snowflake` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_snowflake-v0.20.0...rsql_driver_snowflake-v0.21.0) - 2026-09-05
+
+### Other
+- update to Rust 1.98.1
+
+## `rsql_driver_rusqlite` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_rusqlite-v0.20.0...rsql_driver_rusqlite-v0.21.0) - 2026-09-05
+
+### Other
+- update to Rust 1.98.1
+
+## `rsql_driver_dynamodb` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_dynamodb-v0.20.0...rsql_driver_dynamodb-v0.21.0) - 2026-09-05
+
+### Other
+- update to Rust 1.98.1
+
+## `rsql_driver_duckdb` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_duckdb-v0.20.0...rsql_driver_duckdb-v0.21.0) - 2026-09-05
+
+### Other
+- update to Rust 1.98.1
+
+## `rsql_driver_polars` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_polars-v0.20.0...rsql_driver_polars-v0.21.0) - 2026-09-05
+
+### Other
+- update to Rust 1.98.1
+
 ## `rsql_cli` - [0.20.0](https://github.com/theseus-rs/rsql/compare/v0.19.4...v0.20.0) - 2026-07-22
 
 ### Added
