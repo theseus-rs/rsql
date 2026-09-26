@@ -29,4 +29,4 @@ url = { workspace = true }
 rsql_driver_csv = { path = "../csv", version = "0.20.0" }
 testcontainers-modules = { workspace = true, features = ["localstack", "minio"] }
 tokio = { workspace = true, features = ["macros", "rt", "rt-multi-thread"] }
-tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
+tracing-subscriber = { workspace = true, features = ["env-filter"] }

@@ -88,16 +88,14 @@ pub fn xml_to_json(xml: &str) -> Result<Value> {
     loop {
         match reader.read_event_into(&mut buffer) {
             Ok(Event::Start(e)) => {
-                let name = String::from_utf8_lossy(e.name().as_ref()).to_string();
+                let name = e.name().as_ref().to_owned();
                 let mut element = IndexMap::new();
                 // Store all attributes as key-value pairs where the name is prefixed with '@'
                 for attribute in e.attributes() {
                     match attribute {
                         Ok(attribute) => {
-                            let name = String::from_utf8_lossy(attribute.key.as_ref()).to_string();
-                            let text =
-                                String::from_utf8_lossy(attribute.value.as_ref()).to_string();
-                            let value = infer_value(&text);
+                            let name = attribute.key.as_ref();
+                            let value = infer_value(attribute.value.as_ref());
                             element.insert(format!("@{name}"), value);
                         }
                         Err(error) => return Err(IoError(error.to_string())),
@@ -106,16 +104,11 @@ pub fn xml_to_json(xml: &str) -> Result<Value> {
                 stack.push((name, element));
             }
             Ok(Event::Text(e)) => {
-                if let Some((_, map)) = stack.last_mut() {
-                    let text = reader
-                        .decoder()
-                        .decode(e.as_ref())
-                        .unwrap_or_default()
-                        .into_owned();
-                    if !text.is_empty() {
-                        let value = infer_value(&text);
-                        map.insert("#text".to_string(), value);
-                    }
+                if let Some((_, map)) = stack.last_mut()
+                    && !e.is_empty()
+                {
+                    let value = infer_value(&e);
+                    map.insert("#text".to_string(), value);
                 }
             }
             Ok(Event::End(_)) => {

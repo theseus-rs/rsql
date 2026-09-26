@@ -15,6 +15,7 @@ workspace = true
 
 [dependencies]
 async-trait = { workspace = true }
+# Match sqlx-postgres 0.9's bit-vec integration.
 bit-vec = "0.8.0"
 chrono = { workspace = true }
 file_type = { workspace = true }

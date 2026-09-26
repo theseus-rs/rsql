@@ -120,13 +120,11 @@ mod tests {
     #[cfg(feature = "yaml")]
     #[test]
     fn test_serde_saphyr_error() {
-        let serde_saphyr_error = serde_saphyr::from_str::<String>(">\n@").unwrap_err();
+        let serde_saphyr_error = serde_saphyr::from_str::<String>("\"unterminated").unwrap_err();
+        let message = serde_saphyr_error.to_string();
         let io_error = Error::from(serde_saphyr_error);
-        let message = io_error.to_string();
-        assert!(
-            message.contains("folded block scalars must indent their content"),
-            "unexpected error message: {message}"
-        );
+        assert!(matches!(io_error, Error::IoError(_)));
+        assert_eq!(io_error.to_string(), message);
     }
 
     #[test]
