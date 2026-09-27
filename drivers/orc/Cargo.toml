@@ -14,7 +14,8 @@ version.workspace = true
 workspace = true
 
 [dependencies]
-arrow-array = { workspace = true }
+# Match the Arrow types returned by orc-rust 0.9.
+arrow-array = "59.3.0"
 async-trait = { workspace = true }
 file_type = { workspace = true }
 orc-rust = { workspace = true }

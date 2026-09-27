@@ -24,8 +24,8 @@ eula = false
 anyhow = { workspace = true }
 
 [target."cfg(windows)".build-dependencies]
-static_vcruntime = { version = "2.0" }
-winres = { version = "0.1" }
+static_vcruntime = { workspace = true }
+winres = { workspace = true }
 
 [lints]
 workspace = true
