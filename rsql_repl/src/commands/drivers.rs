@@ -111,10 +111,14 @@ mod tests {
             "fwf",
             #[cfg(feature = "driver-gzip")]
             "gzip",
+            #[cfg(feature = "driver-h2")]
+            "h2",
             #[cfg(feature = "driver-http")]
             "http",
             #[cfg(feature = "driver-https")]
             "https",
+            #[cfg(feature = "driver-jdbc")]
+            "jdbc",
             #[cfg(feature = "driver-json")]
             "json",
             #[cfg(feature = "driver-jsonl")]

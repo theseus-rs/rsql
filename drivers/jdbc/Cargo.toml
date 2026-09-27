@@ -1,0 +1,47 @@
+[package]
+authors.workspace = true
+categories.workspace = true
+description = "rsql JDBC driver"
+edition.workspace = true
+keywords.workspace = true
+license.workspace = true
+name = "rsql_driver_jdbc"
+repository.workspace = true
+rust-version.workspace = true
+version.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+async-trait = { workspace = true }
+file_type = { workspace = true }
+ristretto_resolver = { workspace = true }
+ristretto_vm = { workspace = true }
+rsql_driver = { path = "../../rsql_driver", version = "0.20.0", features = ["json"] }
+rust_decimal = { workspace = true }
+serde_json = { workspace = true }
+sqlparser = { workspace = true }
+url = { workspace = true }
+
+[target.'cfg(not(target_family = "wasm"))'.dependencies]
+dirs = { workspace = true }
+tokio = { workspace = true, features = ["fs", "rt"] }
+
+[target.'cfg(target_family = "wasm")'.dependencies]
+send_wrapper = { workspace = true, features = ["futures"] }
+
+[dev-dependencies]
+anyhow = { workspace = true }
+postgresql_embedded = { workspace = true, features = ["tls-rustls-ring"] }
+rustls = { workspace = true, features = ["ring"] }
+tempfile = { workspace = true }
+test-log = { workspace = true, features = ["trace"] }
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
+wiremock = { workspace = true }
+
+[features]
+default = ["tls-rustls-ring"]
+tls-native-tls = ["ristretto_resolver/tls-native-tls", "ristretto_vm/tls-native-tls"]
+tls-rustls-aws-lc-rs = ["ristretto_resolver/tls-rustls-aws-lc-rs", "ristretto_vm/tls-rustls-aws-lc-rs"]
+tls-rustls-ring = ["ristretto_resolver/tls-rustls-ring", "ristretto_vm/tls-rustls-ring"]

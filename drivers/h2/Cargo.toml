@@ -1,0 +1,31 @@
+[package]
+authors.workspace = true
+categories.workspace = true
+description = "rsql H2 driver"
+edition.workspace = true
+keywords.workspace = true
+license.workspace = true
+name = "rsql_driver_h2"
+repository.workspace = true
+rust-version.workspace = true
+version.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+async-trait = { workspace = true }
+file_type = { workspace = true }
+rsql_driver = { path = "../../rsql_driver", version = "0.20.0" }
+rsql_driver_jdbc = { path = "../jdbc", version = "0.20.0", default-features = false }
+
+[dev-dependencies]
+anyhow = { workspace = true }
+tempfile = { workspace = true }
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
+
+[features]
+default = ["tls-rustls-ring"]
+tls-native-tls = ["rsql_driver_jdbc/tls-native-tls"]
+tls-rustls-aws-lc-rs = ["rsql_driver_jdbc/tls-rustls-aws-lc-rs"]
+tls-rustls-ring = ["rsql_driver_jdbc/tls-rustls-ring"]

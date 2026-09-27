@@ -32,8 +32,10 @@ rsql_driver_file = { path = "../drivers/file", optional = true, version = "0.20.
 rsql_driver_flightsql = { path = "../drivers/flightsql", optional = true, version = "0.20.0" }
 rsql_driver_fwf = { path = "../drivers/fwf", optional = true, version = "0.20.0" }
 rsql_driver_gzip = { path = "../drivers/gzip", optional = true, version = "0.20.0" }
+rsql_driver_h2 = { path = "../drivers/h2", default-features = false, optional = true, version = "0.20.0" }
 rsql_driver_http = { path = "../drivers/http", optional = true, version = "0.20.0" }
 rsql_driver_https = { path = "../drivers/https", default-features = false, optional = true, version = "0.20.0" }
+rsql_driver_jdbc = { path = "../drivers/jdbc", default-features = false, optional = true, version = "0.20.0" }
 rsql_driver_json = { path = "../drivers/json", optional = true, version = "0.20.0" }
 rsql_driver_jsonl = { path = "../drivers/jsonl", optional = true, version = "0.20.0" }
 rsql_driver_lz4 = { path = "../drivers/lz4", optional = true, version = "0.20.0" }
@@ -86,8 +88,10 @@ all = [
     "driver-flightsql",
     "driver-fwf",
     "driver-gzip",
+    "driver-h2",
     "driver-http",
     "driver-https",
+    "driver-jdbc",
     "driver-json",
     "driver-jsonl",
     "driver-lz4",
@@ -127,8 +131,10 @@ all-wasm = [
     #"driver-flightsql",
     "driver-fwf",
     "driver-gzip",
+    "driver-h2",
     # "driver-http",
     # "driver-https",
+    "driver-jdbc",
     "driver-json",
     "driver-jsonl",
     "driver-lz4",
@@ -169,8 +175,10 @@ driver-file = ["dep:rsql_driver_file"]
 driver-flightsql = ["dep:rsql_driver_flightsql"]
 driver-fwf = ["dep:rsql_driver_fwf"]
 driver-gzip = ["dep:rsql_driver_gzip"]
+driver-h2 = ["dep:rsql_driver_h2"]
 driver-http = ["dep:rsql_driver_http"]
 driver-https = ["dep:rsql_driver_https"]
+driver-jdbc = ["dep:rsql_driver_jdbc"]
 driver-json = ["dep:rsql_driver_json"]
 driver-jsonl = ["dep:rsql_driver_jsonl"]
 driver-lz4 = ["dep:rsql_driver_lz4"]
@@ -194,41 +202,47 @@ driver-xz = ["dep:rsql_driver_xz"]
 driver-yaml = ["dep:rsql_driver_yaml"]
 driver-zstd = ["dep:rsql_driver_zstd"]
 tls-native-tls = [
-    "rsql_driver_cockroachdb/tls-native-tls",
-    "rsql_driver_cratedb/tls-native-tls",
-    "rsql_driver_https/tls-native-tls",
-    "rsql_driver_mariadb/tls-native-tls",
-    "rsql_driver_mysql/tls-native-tls",
-    "rsql_driver_postgres/tls-native-tls",
-    "rsql_driver_postgresql/tls-native-tls",
-    "rsql_driver_redshift/tls-native-tls",
-    "rsql_driver_scylladb/tls-native-tls",
-    "rsql_driver_sqlite/tls-native-tls",
+    "rsql_driver_cockroachdb?/tls-native-tls",
+    "rsql_driver_cratedb?/tls-native-tls",
+    "rsql_driver_h2?/tls-native-tls",
+    "rsql_driver_jdbc?/tls-native-tls",
+    "rsql_driver_https?/tls-native-tls",
+    "rsql_driver_mariadb?/tls-native-tls",
+    "rsql_driver_mysql?/tls-native-tls",
+    "rsql_driver_postgres?/tls-native-tls",
+    "rsql_driver_postgresql?/tls-native-tls",
+    "rsql_driver_redshift?/tls-native-tls",
+    "rsql_driver_scylladb?/tls-native-tls",
+    "rsql_driver_sqlite?/tls-native-tls",
 ]
 tls-rustls = ["tls-rustls-ring"]
 tls-rustls-aws-lc-rs = [
-    "rsql_driver_cockroachdb/tls-rustls-aws-lc-rs",
-    "rsql_driver_cratedb/tls-rustls-aws-lc-rs",
-    "rsql_driver_https/tls-rustls-aws-lc-rs",
-    "rsql_driver_mariadb/tls-rustls-aws-lc-rs",
-    "rsql_driver_mysql/tls-rustls-aws-lc-rs",
-    "rsql_driver_postgres/tls-rustls-aws-lc-rs",
-    "rsql_driver_postgresql/tls-rustls-aws-lc-rs",
-    "rsql_driver_redshift/tls-rustls-aws-lc-rs",
-    "rsql_driver_scylladb/tls-rustls-aws-lc-rs",
-    "rsql_driver_sqlite/tls-rustls-aws-lc-rs",
+    "rsql_driver_cockroachdb?/tls-rustls-aws-lc-rs",
+    "rsql_driver_cratedb?/tls-rustls-aws-lc-rs",
+    "rsql_driver_h2?/tls-rustls-aws-lc-rs",
+    "rsql_driver_jdbc?/tls-rustls-aws-lc-rs",
+    "rsql_driver_https?/tls-rustls-aws-lc-rs",
+    "rsql_driver_mariadb?/tls-rustls-aws-lc-rs",
+    "rsql_driver_mysql?/tls-rustls-aws-lc-rs",
+    "rsql_driver_postgres?/tls-rustls-aws-lc-rs",
+    "rsql_driver_postgresql?/tls-rustls-aws-lc-rs",
+    "rsql_driver_redshift?/tls-rustls-aws-lc-rs",
+    "rsql_driver_scylladb?/tls-rustls-aws-lc-rs",
+    "rsql_driver_sqlite?/tls-rustls-aws-lc-rs",
 ]
 tls-rustls-ring = [
-    "rsql_driver_cockroachdb/tls-rustls-ring",
-    "rsql_driver_cratedb/tls-rustls-ring",
-    "rsql_driver_https/tls-rustls-ring",
-    "rsql_driver_mariadb/tls-rustls-ring",
-    "rsql_driver_mysql/tls-rustls-ring",
-    "rsql_driver_postgres/tls-rustls-ring",
-    "rsql_driver_postgresql/tls-rustls-ring",
-    "rsql_driver_redshift/tls-rustls-ring",
-    "rsql_driver_scylladb/tls-rustls-ring",
-    "rsql_driver_sqlite/tls-rustls-ring",
+    "rsql_driver_cockroachdb?/tls-rustls-ring",
+    "rsql_driver_cratedb?/tls-rustls-ring",
+    "rsql_driver_h2?/tls-rustls-ring",
+    "rsql_driver_jdbc?/tls-rustls-ring",
+    "rsql_driver_https?/tls-rustls-ring",
+    "rsql_driver_mariadb?/tls-rustls-ring",
+    "rsql_driver_mysql?/tls-rustls-ring",
+    "rsql_driver_postgres?/tls-rustls-ring",
+    "rsql_driver_postgresql?/tls-rustls-ring",
+    "rsql_driver_redshift?/tls-rustls-ring",
+    "rsql_driver_scylladb?/tls-rustls-ring",
+    "rsql_driver_sqlite?/tls-rustls-ring",
 ]
 
 [package.metadata.docs.rs]
