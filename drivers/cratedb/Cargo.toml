@@ -16,8 +16,8 @@ workspace = true
 [dependencies]
 async-trait = { workspace = true }
 file_type = { workspace = true }
-rsql_driver = { path = "../../rsql_driver", version = "0.20.0" }
-rsql_driver_postgresql = { path = "../postgresql", default-features = false, version = "0.20.0" }
+rsql_driver = { path = "../../rsql_driver", version = "0.21.0" }
+rsql_driver_postgresql = { path = "../postgresql", default-features = false, version = "0.21.0" }
 url = { workspace = true }
 
 [dev-dependencies]

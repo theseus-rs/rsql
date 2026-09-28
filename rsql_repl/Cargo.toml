@@ -25,10 +25,10 @@ icu = { workspace = true }
 indicatif = { workspace = true }
 indoc = { workspace = true }
 regex = { workspace = true }
-rsql_core = { path = "../rsql_core", version = "0.20.0" }
-rsql_driver = { path = "../rsql_driver", version = "0.20.0" }
-rsql_drivers = { path = "../rsql_drivers", version = "0.20.0" }
-rsql_formatters = { path = "../rsql_formatters", version = "0.20.0" }
+rsql_core = { path = "../rsql_core", version = "0.21.0" }
+rsql_driver = { path = "../rsql_driver", version = "0.21.0" }
+rsql_drivers = { path = "../rsql_drivers", version = "0.21.0" }
+rsql_formatters = { path = "../rsql_formatters", version = "0.21.0" }
 rust-i18n = { workspace = true }
 rustyline = { workspace = true }
 sqlparser = { workspace = true }

@@ -18,7 +18,7 @@ async-trait = { workspace = true }
 file_type = { workspace = true }
 ristretto_resolver = { workspace = true }
 ristretto_vm = { workspace = true }
-rsql_driver = { path = "../../rsql_driver", version = "0.20.0", features = ["json"] }
+rsql_driver = { path = "../../rsql_driver", version = "0.21.0", features = ["json"] }
 rust_decimal = { workspace = true }
 serde_json = { workspace = true }
 sqlparser = { workspace = true }
