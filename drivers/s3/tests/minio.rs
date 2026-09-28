@@ -14,8 +14,9 @@ use std::io::Read;
 use std::path::PathBuf;
 use std::sync::Arc;
 use testcontainers_modules::minio::MinIO;
-use testcontainers_modules::testcontainers::ContainerAsync;
+use testcontainers_modules::testcontainers::core::Mount;
 use testcontainers_modules::testcontainers::runners::AsyncRunner;
+use testcontainers_modules::testcontainers::{ContainerAsync, ImageExt};
 use tracing_subscriber::EnvFilter;
 
 static HOST: &str = "localhost";
@@ -49,7 +50,12 @@ async fn test_s3_driver_minio() -> Result<()> {
         .finish();
     let _guard = tracing::subscriber::set_default(subscriber);
 
-    let minio = MinIO::default();
+    // The original MinIO repositories no longer allow anonymous pulls.
+    let minio = MinIO::default()
+        .with_name("quay.io/thanos/minio")
+        .with_tag("RELEASE.2025-09-07T16-13-09Z")
+        // Keep the small fixture independent of Docker's disk free-space threshold.
+        .with_mount(Mount::tmpfs_mount("/data").with_size("2g"));
     let container = minio
         .start()
         .await

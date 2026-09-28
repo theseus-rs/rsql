@@ -17,7 +17,7 @@ use tokio_postgres::{Client, NoTls};
 use tracing::debug;
 use url::Url;
 
-const POSTGRESQL_EMBEDDED_VERSION: &str = "=18.3.0";
+const POSTGRESQL_EMBEDDED_VERSION: &str = "=18.6.0";
 static POSTGRESQL_SETUP_MUTEX: tokio::sync::Mutex<()> = tokio::sync::Mutex::const_new(());
 
 #[derive(Debug)]

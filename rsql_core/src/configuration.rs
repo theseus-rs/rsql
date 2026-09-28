@@ -13,7 +13,9 @@ use tracing::level_filters::LevelFilter;
 use tracing::{debug, warn};
 use tracing_appender::rolling::{RollingFileAppender, Rotation};
 use tracing_indicatif::IndicatifLayer;
-use tracing_subscriber::fmt::writer::MakeWriterExt;
+use tracing_indicatif::filter::IndicatifFilter;
+use tracing_subscriber::Layer;
+use tracing_subscriber::filter::filter_fn;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
 
@@ -229,56 +231,58 @@ impl ConfigurationBuilder {
     ///
     #[must_use]
     pub fn build(self) -> Configuration {
-        let configuration = &self.configuration;
-        let log_level = configuration.log_level;
-        let registry = tracing_subscriber::registry();
-        let progress_style = ProgressStyle::with_template(
-            "{span_child_prefix}{spinner} {span_name} [{elapsed_precise}] [{wide_bar}] {bytes}/{total_bytes} ({bytes_per_sec}, {eta})",
-        )
-        .unwrap_or_else(|_| ProgressStyle::default_bar())
-        .progress_chars("=> ");
-
-        if log_level == LevelFilter::OFF {
-            #[cfg(not(test))]
-            {
-                let indicatif_layer = IndicatifLayer::new().with_progress_style(progress_style);
-                registry.with(indicatif_layer).init();
-            }
-        } else {
-            let log_dir = configuration.log_dir.clone().unwrap_or_default();
-            let log_rotation = configuration.log_rotation.clone();
-            if let Some(level) = log_level.into_level() {
-                match RollingFileAppender::builder()
-                    .rotation(log_rotation)
-                    .filename_prefix(&configuration.program_name)
-                    .build(log_dir)
-                {
-                    Ok(file_appender) => {
-                        let indicatif_layer =
-                            IndicatifLayer::new().with_progress_style(progress_style);
-                        registry
-                            .with(
-                                tracing_subscriber::fmt::layer()
-                                    .with_writer(file_appender.with_max_level(level)),
-                            )
-                            .with(indicatif_layer)
-                            .init();
-                    }
-                    Err(error) => {
-                        warn!("Unable to create log file appender: {error}");
-                        let indicatif_layer =
-                            IndicatifLayer::new().with_progress_style(progress_style);
-                        registry.with(indicatif_layer).init();
-                    }
-                }
-            } else {
-                let indicatif_layer = IndicatifLayer::new().with_progress_style(progress_style);
-                registry.with(indicatif_layer).init();
-            }
+        if !cfg!(test) || self.configuration.log_level != LevelFilter::OFF {
+            create_subscriber(&self.configuration).init();
         }
-
         self.configuration
     }
+}
+
+fn create_subscriber(
+    configuration: &Configuration,
+) -> impl tracing::Subscriber + Send + Sync + use<> {
+    let progress_style = ProgressStyle::with_template(
+        "{span_child_prefix}{spinner} {span_name} [{elapsed_precise}] [{wide_bar}] {bytes}/{total_bytes} ({bytes_per_sec}, {eta})",
+    )
+    .unwrap_or_else(|_| ProgressStyle::default_bar())
+    .progress_chars("=> ");
+    let file_appender = if configuration.log_level == LevelFilter::OFF {
+        None
+    } else {
+        match RollingFileAppender::builder()
+            .rotation(configuration.log_rotation.clone())
+            .filename_prefix(&configuration.program_name)
+            .build(configuration.log_dir.clone().unwrap_or_default())
+        {
+            Ok(appender) => Some(appender),
+            Err(error) => {
+                warn!("Unable to create log file appender: {error}");
+                None
+            }
+        }
+    };
+    let log_level = if file_appender.is_some() {
+        configuration.log_level
+    } else {
+        LevelFilter::OFF
+    };
+    let log_layer = file_appender
+        .map(|appender| tracing_subscriber::fmt::layer().with_writer(appender))
+        // Filter before formatting, including spans enabled only for progress bars.
+        .with_filter(log_level);
+    let indicatif_layer = IndicatifLayer::new()
+        .with_progress_style(progress_style)
+        // Progress bars consume spans, not events. Enabling events here would activate
+        // expensive dependency diagnostics, including Ristretto's per-instruction tracing.
+        .with_filter(IndicatifFilter::new(true));
+    tracing_subscriber::registry()
+        .with(log_layer)
+        .with(indicatif_layer)
+        // Per-layer filters can still return a positive event_enabled! hint. Apply the
+        // event level globally as well so disabled diagnostics do no preparatory work.
+        .with(filter_fn(move |metadata| {
+            metadata.is_span() || log_level >= *metadata.level()
+        }))
 }
 
 /// The echo mode for the application.
@@ -563,6 +567,46 @@ fn theme(config: &Config) -> Result<String> {
 #[cfg(test)]
 mod test {
     use super::*;
+
+    #[test]
+    fn test_subscriber_filters_events_and_preserves_progress_spans() {
+        let directory = tempfile::tempdir().expect("unable to create tempdir");
+        for level in [LevelFilter::OFF, LevelFilter::INFO, LevelFilter::DEBUG] {
+            let configuration = Configuration {
+                program_name: "tracing-test".into(),
+                log_dir: Some(directory.path().to_path_buf()),
+                log_level: level,
+                ..Configuration::default()
+            };
+            tracing::subscriber::with_default(create_subscriber(&configuration), || {
+                assert_eq!(
+                    tracing::event_enabled!(tracing::Level::INFO),
+                    level >= LevelFilter::INFO
+                );
+                assert_eq!(
+                    tracing::event_enabled!(tracing::Level::DEBUG),
+                    level >= LevelFilter::DEBUG
+                );
+                assert!(!tracing::event_enabled!(tracing::Level::TRACE));
+                assert!(!tracing::info_span!("connect").is_disabled());
+            });
+        }
+    }
+
+    #[test]
+    fn test_subscriber_filters_events_when_log_file_cannot_be_created() {
+        let file = tempfile::NamedTempFile::new().expect("unable to create tempfile");
+        let configuration = Configuration {
+            program_name: "tracing-test".into(),
+            log_dir: Some(file.path().to_path_buf()),
+            log_level: LevelFilter::INFO,
+            ..Configuration::default()
+        };
+        tracing::subscriber::with_default(create_subscriber(&configuration), || {
+            assert!(!tracing::event_enabled!(tracing::Level::DEBUG));
+            assert!(!tracing::info_span!("connect").is_disabled());
+        });
+    }
 
     #[test]
     fn test_configuration_builder() {

@@ -1,7 +1,8 @@
 ## First Query
 
-The following examples show how to run a simple query using the `rsql` CLI tool for different data sources. Replace
-placeholders (e.g., `<user>`, `<host>`, `<database>`) with your actual connection details.
+The following examples show how to run a simple query using the `rsql` CLI tool for different data
+sources. Replace placeholders (e.g., `<user>`, `<host>`, `<database>` ) with your actual connection
+details.
 
 ### CockroachDB
 
@@ -17,6 +18,28 @@ rsql --url "duckdb://" -- "SELECT version();"
 # File-based
 rsql --url "duckdb:///path/to/file.duckdb" -- "SELECT COUNT(*) FROM my_table;"
 ```
+
+### H2 (in-memory or file)
+
+```shell
+rsql --url "h2://" -- "SELECT H2VERSION();"
+rsql --url "h2:./example" -- "SELECT 42;"
+```
+
+The H2 driver downloads and caches H2 2.5.252 and its runtime dependencies from Maven Central.
+`h2://` creates a private in-memory database; a file URL retains data between sessions. See the [H2
+guide](../chapter3/h2.md) for options.
+
+### JDBC
+
+Resolve the JDBC driver and its runtime dependencies from Maven Central:
+
+```shell
+rsql --url "jdbc:postgresql://localhost/example?user=postgres&dependency=org.postgresql:postgresql:42.7.13&driver=org.postgresql.Driver" -- "SELECT version();"
+```
+
+Omit `driver` to use JDBC service discovery. See [JDBC](../chapter3/jdbc.md) and
+[H2](../chapter3/h2.md) for URL options, Java runtime setup, and offline caching.
 
 ### MariaDB
 

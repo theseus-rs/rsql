@@ -12,18 +12,19 @@
 
 > A modern, feature-rich command line SQL interface for data
 
-`rsql` is a powerful and user-friendly command line SQL client that works with over 20 different data sources and
-formats. Whether you're working with databases, files, or cloud services, `rsql` provides a consistent and intuitive
-interface for all your data querying needs.
+`rsql` is a powerful and user-friendly command line SQL client that works with over 20 different
+data sources and formats. Whether you're working with databases, files, or cloud services, `rsql`
+provides a consistent and intuitive interface for all your data querying needs.
 
 ## Highlights
 
 - **Universal SQL Interface**: Query databases, files, and cloud services with standard SQL
 - **Rich Interactive Experience**: Syntax highlighting, auto-completion, and command history
 - **Multiple Output Formats**: ASCII tables, JSON, CSV, HTML, and more
-- **Extensive Data Source Support**: PostgreSQL, MySQL, SQLite, DuckDB, Parquet, CSV, Excel, and many more
+- **Extensive Data Source Support**: PostgreSQL, MySQL, SQLite, DuckDB, H2, JDBC, Parquet, CSV,
+  Excel, and many more
 - **Compression Support**: Automatically handles compressed files (gzip, brotli, etc.)
-- **Embedded Database**: Run PostgreSQL queries without external setup
+- **Embedded Databases**: Run H2 or PostgreSQL queries without an external database server
 - **Multilingual**: Interface available in 40+ languages
 
 [demo.webm](https://github.com/user-attachments/assets/613fdefb-753a-4bb2-acd2-66539d4f2068)
@@ -90,6 +91,8 @@ rsql --url "parquet://data.parquet" -- "SELECT column1, COUNT(*) FROM table GROU
 - **CrateDB** (`cratedb://`)
 - **DuckDB** (`duckdb://`) - High-performance analytics
 - **DynamoDB** (`dynamodb://`)
+- **H2** (`h2://`) - H2 2.5.252 with automatic caching and an in-memory default
+- **JDBC** (`jdbc:<subprotocol>:<database>`) - JDBC drivers running in [Ristretto](https://github.com/theseus-rs/ristretto)
 - **MySQL** / **MariaDB** (`mysql://` / `mariadb://`)
 - **PostgreSQL** (`postgresql://` / `postgres://`) - Including embedded PostgreSQL
 - **Redshift** (`redshift://`)
@@ -139,6 +142,24 @@ rsql --url "sqlite://database.db"
 # ScyllaDB keyspace
 rsql --url "scylladb://localhost:9042/my_keyspace"
 ```
+
+### JDBC and H2
+
+```shell
+# H2 in memory; downloads and caches the driver automatically
+rsql --url "h2://" -- "SELECT H2VERSION();"
+
+# H2 database persisted on disk
+rsql --url "h2:./example"
+
+# PostgreSQL through a JDBC driver resolved from Maven Central
+rsql --url "jdbc:postgresql://localhost/example?user=postgres&dependency=org.postgresql:postgresql:42.7.13&driver=org.postgresql.Driver" -- "SELECT version();"
+```
+
+H2 resolves `com.h2database:h2:2.5.252` and its runtime dependencies from Maven Central.
+JDBC accepts repeatable `dependency` coordinates, local `classpath` entries, and an
+optional `driver` (or `driver_class` ); omitting the class uses JDBC service discovery.
+Ristretto downloads and caches its default Java runtime libraries.
 
 ### File Analysis
 
@@ -238,7 +259,7 @@ rsql --url "mysql://user:pass@localhost/db?charset=utf8mb4"
 
 | Feature               | Description                                                                                                                                                                                                                                  |
 |-----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Data Sources          | Arrow, Avro, ClickHouse, CockroachDB, CrateDB, CSV, Delimited, DuckDB, DynamoDB, Excel, FlightSQL, FWF, JSON, JSONL, MariaDB, MySQL, ODS, ORC, Parquet, PostgreSQL, Redshift, ScyllaDB, Snowflake, SQLite3, SQL Server, TSV, XML, YAML |
+| Data Sources          | Arrow, Avro, ClickHouse, CockroachDB, CrateDB, CSV, Delimited, DuckDB, DynamoDB, Excel, FlightSQL, FWF, H2, JDBC, JSON, JSONL, MariaDB, MySQL, ODS, ORC, Parquet, PostgreSQL, Redshift, ScyllaDB, Snowflake, SQLite3, SQL Server, TSV, XML, YAML |
 | Compression           | Brotli, Bzip2, Gzip, LZ4, XZ, Zstd                                                                                                                                                                                                           |
 | Syntax Highlighting   | ✅ Full SQL syntax highlighting                                                                                                                                                                                                               |
 | Result Highlighting   | ✅ Color output for better readability                                                                                                                                                                                                        |
@@ -272,8 +293,10 @@ rsql --url "mysql://user:pass@localhost/db?charset=utf8mb4"
 | flightsql          | `flightsql://<user[:password>]@<host>[:<port>][?scheme=<http\|https>]`                                                                                                                                                                                                     |
 | fwf                | `fwf://<file>?widths=<widths>[&headers=<headers>]`                                                                                                                                                                                                                         |
 | gzip¹              | `gzip://<file>`                                                                                                                                                                                                                                                            |
+| h2 (JDBC)          | `h2:[<database>]` (defaults to in-memory                                                                                                                                                                                                                                   |
 | http¹              | `http://<path>[?_headers=<headers>]`                                                                                                                                                                                                                                       |
 | https¹             | `https://<path>[?_headers=<headers>]`                                                                                                                                                                                                                                      |
+| jdbc               | `jdbc:<subprotocol>:<database>[?classpath=<paths>&driver=<class>]`                                                                                                                                                                                                         |
 | json (polars)      | `json://<file>`                                                                                                                                                                                                                                                            |
 | jsonl (polars)     | `jsonl://<file>`                                                                                                                                                                                                                                                           |
 | lz4¹               | `lz4://<file>`                                                                                                                                                                                                                                                             |
@@ -297,7 +320,7 @@ rsql --url "mysql://user:pass@localhost/db?charset=utf8mb4"
 | yaml               | `yaml://<file>`                                                                                                                                                                                                                                                            |
 | zstd¹              | `zstd://<file>`                                                                                                                                                                                                                                                            |
 
-¹ the driver will attempt to detect the type of file and automatically use the appropriate driver.  
+¹ the driver will attempt to detect the type of file and automatically use the appropriate driver.
 
 ## License
 

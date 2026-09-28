@@ -87,10 +87,14 @@ impl DriverManager {
         Self::add(Arc::new(rsql_driver_fwf::Driver))?;
         #[cfg(feature = "driver-gzip")]
         Self::add(Arc::new(rsql_driver_gzip::Driver))?;
+        #[cfg(feature = "driver-h2")]
+        Self::add(Arc::new(rsql_driver_h2::Driver))?;
         #[cfg(feature = "driver-http")]
         Self::add(Arc::new(rsql_driver_http::Driver))?;
         #[cfg(feature = "driver-https")]
         Self::add(Arc::new(rsql_driver_https::Driver))?;
+        #[cfg(feature = "driver-jdbc")]
+        Self::add(Arc::new(rsql_driver_jdbc::Driver))?;
         #[cfg(feature = "driver-json")]
         Self::add(Arc::new(rsql_driver_json::Driver))?;
         #[cfg(feature = "driver-jsonl")]
@@ -218,9 +222,13 @@ mod tests {
         let driver_count = driver_count + 1;
         #[cfg(feature = "driver-gzip")]
         let driver_count = driver_count + 1;
+        #[cfg(feature = "driver-h2")]
+        let driver_count = driver_count + 1;
         #[cfg(feature = "driver-http")]
         let driver_count = driver_count + 1;
         #[cfg(feature = "driver-https")]
+        let driver_count = driver_count + 1;
+        #[cfg(feature = "driver-jdbc")]
         let driver_count = driver_count + 1;
         #[cfg(feature = "driver-json")]
         let driver_count = driver_count + 1;
