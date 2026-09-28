@@ -7,6 +7,275 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## `rsql_cli` - [0.21.0](https://github.com/theseus-rs/rsql/compare/v0.20.0...v0.21.0) - 2026-09-28
+
+### Added
+- add jdbc and h2 drivers
+
+### Other
+- update dependencies
+- update to Rust 1.98.1
+- update Cargo.toml dependencies
+- refactor FormatterManager initialization
+
+## `rsql_repl` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_repl-v0.20.0...rsql_repl-v0.21.0) - 2026-09-28
+
+### Added
+- add jdbc and h2 drivers
+
+### Other
+- update to Rust 1.98.1
+- refactor FormatterManager initialization
+
+## `rsql_core` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_core-v0.20.0...rsql_core-v0.21.0) - 2026-09-28
+
+### Added
+- add jdbc and h2 drivers
+
+## `rsql_formatters` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_formatters-v0.20.0...rsql_formatters-v0.21.0) - 2026-09-28
+
+### Other
+- update dependencies
+- refactor FormatterManager initialization
+
+## `rsql_drivers` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_drivers-v0.20.0...rsql_drivers-v0.21.0) - 2026-09-28
+
+### Added
+- add jdbc and h2 drivers
+
+### Other
+- update to Rust 1.98.1
+
+## `rsql_driver_zstd` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_zstd-v0.20.0...rsql_driver_zstd-v0.21.0) - 2026-09-28
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_yaml` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_yaml-v0.20.0...rsql_driver_yaml-v0.21.0) - 2026-09-28
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_xz` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_xz-v0.20.0...rsql_driver_xz-v0.21.0) - 2026-09-28
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_xml` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_xml-v0.20.0...rsql_driver_xml-v0.21.0) - 2026-09-28
+
+### Other
+- update dependencies
+
+## `rsql_driver_tsv` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_tsv-v0.20.0...rsql_driver_tsv-v0.21.0) - 2026-09-28
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_sqlserver` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_sqlserver-v0.20.0...rsql_driver_sqlserver-v0.21.0) - 2026-09-28
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_snowflake` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_snowflake-v0.20.0...rsql_driver_snowflake-v0.21.0) - 2026-09-28
+
+### Other
+- update to Rust 1.98.1
+
+## `rsql_driver_scylladb` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_scylladb-v0.20.0...rsql_driver_scylladb-v0.21.0) - 2026-09-28
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_s3` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_s3-v0.20.0...rsql_driver_s3-v0.21.0) - 2026-09-28
+
+### Added
+- add jdbc and h2 drivers
+
+### Other
+- update dependencies
+
+## `rsql_driver_rusqlite` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_rusqlite-v0.20.0...rsql_driver_rusqlite-v0.21.0) - 2026-09-28
+
+### Other
+- update to Rust 1.98.1
+
+## `rsql_driver_sqlite` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_sqlite-v0.20.0...rsql_driver_sqlite-v0.21.0) - 2026-09-28
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_redshift` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_redshift-v0.20.0...rsql_driver_redshift-v0.21.0) - 2026-09-28
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_postgres` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_postgres-v0.20.0...rsql_driver_postgres-v0.21.0) - 2026-09-28
+
+### Added
+- add jdbc and h2 drivers
+
+### Other
+- update dependencies
+
+## `rsql_driver_parquet` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_parquet-v0.20.0...rsql_driver_parquet-v0.21.0) - 2026-09-28
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_orc` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_orc-v0.20.0...rsql_driver_orc-v0.21.0) - 2026-09-28
+
+### Other
+- update dependencies
+
+## `rsql_driver_ods` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_ods-v0.20.0...rsql_driver_ods-v0.21.0) - 2026-09-28
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_mariadb` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_mariadb-v0.20.0...rsql_driver_mariadb-v0.21.0) - 2026-09-28
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_mysql` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_mysql-v0.20.0...rsql_driver_mysql-v0.21.0) - 2026-09-28
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_lz4` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_lz4-v0.20.0...rsql_driver_lz4-v0.21.0) - 2026-09-28
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_jsonl` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_jsonl-v0.20.0...rsql_driver_jsonl-v0.21.0) - 2026-09-28
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_json` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_json-v0.20.0...rsql_driver_json-v0.21.0) - 2026-09-28
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_http` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_http-v0.20.0...rsql_driver_http-v0.21.0) - 2026-09-28
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_https` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_https-v0.20.0...rsql_driver_https-v0.21.0) - 2026-09-28
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_h2` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_h2-v0.20.0...rsql_driver_h2-v0.21.0) - 2026-09-28
+
+### Added
+- add jdbc and h2 drivers
+
+## `rsql_driver_jdbc` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_jdbc-v0.20.0...rsql_driver_jdbc-v0.21.0) - 2026-09-28
+
+### Added
+- add jdbc and h2 drivers
+
+## `rsql_driver_gzip` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_gzip-v0.20.0...rsql_driver_gzip-v0.21.0) - 2026-09-28
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_fwf` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_fwf-v0.20.0...rsql_driver_fwf-v0.21.0) - 2026-09-28
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_flightsql` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_flightsql-v0.20.0...rsql_driver_flightsql-v0.21.0) - 2026-09-28
+
+### Other
+- update dependencies
+
+## `rsql_driver_file` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_file-v0.20.0...rsql_driver_file-v0.21.0) - 2026-09-28
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_excel` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_excel-v0.20.0...rsql_driver_excel-v0.21.0) - 2026-09-28
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_dynamodb` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_dynamodb-v0.20.0...rsql_driver_dynamodb-v0.21.0) - 2026-09-28
+
+### Other
+- update dependencies
+- update to Rust 1.98.1
+
+## `rsql_driver_duckdb` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_duckdb-v0.20.0...rsql_driver_duckdb-v0.21.0) - 2026-09-28
+
+### Other
+- update to Rust 1.98.1
+
+## `rsql_driver_cratedb` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_cratedb-v0.20.0...rsql_driver_cratedb-v0.21.0) - 2026-09-28
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_cockroachdb` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_cockroachdb-v0.20.0...rsql_driver_cockroachdb-v0.21.0) - 2026-09-28
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_postgresql` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_postgresql-v0.20.0...rsql_driver_postgresql-v0.21.0) - 2026-09-28
+
+### Added
+- add jdbc and h2 drivers
+
+### Other
+- update dependencies
+
+## `rsql_driver_clickhouse` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_clickhouse-v0.20.0...rsql_driver_clickhouse-v0.21.0) - 2026-09-28
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_bzip2` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_bzip2-v0.20.0...rsql_driver_bzip2-v0.21.0) - 2026-09-28
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_csv` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_csv-v0.20.0...rsql_driver_csv-v0.21.0) - 2026-09-28
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_delimited` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_delimited-v0.20.0...rsql_driver_delimited-v0.21.0) - 2026-09-28
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_brotli` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_brotli-v0.20.0...rsql_driver_brotli-v0.21.0) - 2026-09-28
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_avro` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_avro-v0.20.0...rsql_driver_avro-v0.21.0) - 2026-09-28
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_arrow` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_arrow-v0.20.0...rsql_driver_arrow-v0.21.0) - 2026-09-28
+
+### Other
+- update Cargo.toml dependencies
+
+## `rsql_driver_polars` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_polars-v0.20.0...rsql_driver_polars-v0.21.0) - 2026-09-28
+
+### Other
+- update to Rust 1.98.1
+
+## `rsql_driver` - [0.21.0](https://github.com/theseus-rs/rsql/compare/rsql_driver-v0.20.0...rsql_driver-v0.21.0) - 2026-09-28
+
+### Other
+- update Cargo.toml dependencies
+
 ## `rsql_cli` - [0.20.0](https://github.com/theseus-rs/rsql/compare/v0.19.4...v0.20.0) - 2026-07-22
 
 ### Added

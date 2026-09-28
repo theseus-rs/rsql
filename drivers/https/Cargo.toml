@@ -25,7 +25,7 @@ reqwest = { workspace = true, default-features = false, features = [
     "stream",
     "system-proxy",
 ] }
-rsql_driver = { path = "../../rsql_driver", version = "0.20.0" }
+rsql_driver = { path = "../../rsql_driver", version = "0.21.0" }
 tempfile = { workspace = true }
 tracing = { workspace = true }
 tokio = { workspace = true }
@@ -36,7 +36,7 @@ rustls = { workspace = true, features = ["ring"], optional = true }
 tokio = { workspace = true, features = ["fs"] }
 
 [dev-dependencies]
-rsql_driver_csv = { path = "../csv", version = "0.20.0" }
+rsql_driver_csv = { path = "../csv", version = "0.21.0" }
 tokio = { workspace = true, features = ["macros", "rt", "rt-multi-thread"] }
 wiremock = { workspace = true }
 
