@@ -7,6 +7,256 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## `rsql_cli` - [0.22.0](https://github.com/theseus-rs/rsql/compare/v0.21.0...v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_repl` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_repl-v0.21.0...rsql_repl-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_core` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_core-v0.21.0...rsql_core-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_formatters` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_formatters-v0.21.0...rsql_formatters-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_drivers` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_drivers-v0.21.0...rsql_drivers-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_zstd` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_zstd-v0.21.0...rsql_driver_zstd-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_yaml` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_yaml-v0.21.0...rsql_driver_yaml-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_xz` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_xz-v0.21.0...rsql_driver_xz-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_xml` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_xml-v0.21.0...rsql_driver_xml-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_tsv` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_tsv-v0.21.0...rsql_driver_tsv-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_sqlserver` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_sqlserver-v0.21.0...rsql_driver_sqlserver-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_snowflake` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_snowflake-v0.21.0...rsql_driver_snowflake-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_scylladb` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_scylladb-v0.21.0...rsql_driver_scylladb-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_s3` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_s3-v0.21.0...rsql_driver_s3-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_rusqlite` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_rusqlite-v0.21.0...rsql_driver_rusqlite-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_sqlite` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_sqlite-v0.21.0...rsql_driver_sqlite-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_redshift` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_redshift-v0.21.0...rsql_driver_redshift-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_postgres` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_postgres-v0.21.0...rsql_driver_postgres-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_parquet` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_parquet-v0.21.0...rsql_driver_parquet-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_orc` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_orc-v0.21.0...rsql_driver_orc-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_ods` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_ods-v0.21.0...rsql_driver_ods-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_mariadb` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_mariadb-v0.21.0...rsql_driver_mariadb-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_mysql` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_mysql-v0.21.0...rsql_driver_mysql-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_lz4` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_lz4-v0.21.0...rsql_driver_lz4-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_jsonl` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_jsonl-v0.21.0...rsql_driver_jsonl-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_json` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_json-v0.21.0...rsql_driver_json-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_http` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_http-v0.21.0...rsql_driver_http-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_https` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_https-v0.21.0...rsql_driver_https-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_h2` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_h2-v0.21.0...rsql_driver_h2-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_jdbc` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_jdbc-v0.21.0...rsql_driver_jdbc-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_gzip` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_gzip-v0.21.0...rsql_driver_gzip-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_fwf` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_fwf-v0.21.0...rsql_driver_fwf-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_flightsql` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_flightsql-v0.21.0...rsql_driver_flightsql-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_file` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_file-v0.21.0...rsql_driver_file-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_excel` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_excel-v0.21.0...rsql_driver_excel-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_dynamodb` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_dynamodb-v0.21.0...rsql_driver_dynamodb-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_duckdb` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_duckdb-v0.21.0...rsql_driver_duckdb-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_cratedb` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_cratedb-v0.21.0...rsql_driver_cratedb-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_cockroachdb` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_cockroachdb-v0.21.0...rsql_driver_cockroachdb-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_postgresql` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_postgresql-v0.21.0...rsql_driver_postgresql-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_clickhouse` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_clickhouse-v0.21.0...rsql_driver_clickhouse-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_bzip2` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_bzip2-v0.21.0...rsql_driver_bzip2-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_csv` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_csv-v0.21.0...rsql_driver_csv-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_delimited` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_delimited-v0.21.0...rsql_driver_delimited-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_brotli` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_brotli-v0.21.0...rsql_driver_brotli-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_avro` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_avro-v0.21.0...rsql_driver_avro-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_test_utils` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_test_utils-v0.21.0...rsql_driver_test_utils-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_arrow` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_arrow-v0.21.0...rsql_driver_arrow-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver_polars` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver_polars-v0.21.0...rsql_driver_polars-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
+## `rsql_driver` - [0.22.0](https://github.com/theseus-rs/rsql/compare/rsql_driver-v0.21.0...rsql_driver-v0.22.0) - 2026-09-29
+
+### Other
+- update crate documentation
+
 ## `rsql_cli` - [0.21.0](https://github.com/theseus-rs/rsql/compare/v0.20.0...v0.21.0) - 2026-09-28
 
 ### Added
