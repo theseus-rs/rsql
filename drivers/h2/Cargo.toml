@@ -25,7 +25,7 @@ tempfile = { workspace = true }
 tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
 
 [features]
-default = ["tls-rustls-ring"]
+default = ["tls-native-tls"]
 tls-native-tls = ["rsql_driver_jdbc/tls-native-tls"]
 tls-rustls-aws-lc-rs = ["rsql_driver_jdbc/tls-rustls-aws-lc-rs"]
 tls-rustls-ring = ["rsql_driver_jdbc/tls-rustls-ring"]

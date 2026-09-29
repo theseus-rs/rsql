@@ -1,4 +1,4 @@
-# rsql_driver_jdbc
+# `rsql_driver_jdbc`
 
 `rsql_driver_jdbc` runs JDBC drivers inside [Ristretto](https://github.com/theseus-rs/ristretto).
 Ristretto runs the Java code in-process.
@@ -20,7 +20,7 @@ rsql --url 'jdbc:postgresql://localhost/example?user=postgres&dependency=org.pos
 ```
 
 Repeat `dependency` for additional Maven artifacts, or supply local JARs with `classpath`. The [H2
-driver](../h2/README.md) supplies its pinned Maven dependency and driver class through this same
+driver](https://github.com/theseus-rs/rsql/blob/main/drivers/h2/README.md) supplies its pinned Maven dependency and driver class through this same
 JDBC implementation.
 
 ## URL options
@@ -57,16 +57,6 @@ Release entries are reused across sessions, including offline when all dependenc
 libraries are already cached. Coordinates also accept `group:artifact:extension:version` and
 `group:artifact:extension:classifier:version`.
 
-## WebAssembly
-
-The driver is included in `all-wasm`. WASM execution requires a host that provides filesystem
-access, such as WASI, and preloaded JDBC JARs and Java runtime files. Supply the JARs using
-`classpath` and make the runtime available to Ristretto through the host environment.
-Automatic Maven downloads are native-only; `dependency` returns an explanatory error on WASM.
-Browser-only `wasm32-unknown-unknown` builds compile, but cannot open
-filesystem-backed JARs without host support. Database networking also depends on the host and JVM
-APIs.
-
 ## Queries and metadata
 
 The driver supports prepared parameters, affected-row counts, result labels, NULLs, numeric and
@@ -76,17 +66,10 @@ without an rsql value representation are returned as strings to preserve their t
 and timestamps retain their offsets as strings. Results are materialized in memory; statements and
 result sets are closed on success and error. Call `close()` when finished with a connection.
 
-Metadata uses JDBC's `DatabaseMetaData`: catalogs, schemas, and the current schema's tables, views,
-columns, indexes, primary keys, and foreign keys. Transactions use the database's SQL syntax, such
-as `BEGIN`, `COMMIT`, `ROLLBACK`, and savepoints in PostgreSQL. JDBC drivers run within Ristretto,
-so compatibility also depends on the Java APIs that Ristretto supports.
+## Features
 
-## Cargo features
-
-When using `rsql_drivers`, select `driver-jdbc` and a TLS backend for Java runtime downloads.
-`rsql_repl` exposes the same driver feature. The standalone `rsql_driver_jdbc` crate defaults to
-`tls-rustls-ring`; alternatives are `tls-native-tls` and `tls-rustls-aws-lc-rs` with default
-features disabled.
-
-These TLS features configure Maven and Ristretto runtime downloads. Database connection security is
-configured through the JDBC driver's own URL options.
+| Feature                | Description                                                               | Enabled by default |
+|------------------------|---------------------------------------------------------------------------|--------------------|
+| `tls-native-tls`       | Use platform-native TLS for Maven and Java runtime downloads.             | Yes                |
+| `tls-rustls-aws-lc-rs` | Use Rustls with the AWS-LC provider for Maven and Java runtime downloads. | No                 |
+| `tls-rustls-ring`      | Use Rustls with the `ring` provider for Maven and Java runtime downloads. | No                 |

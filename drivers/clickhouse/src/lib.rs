@@ -1,6 +1,4 @@
-//! `ClickHouse` driver for rsql
-//!
-//! This driver provides connectivity to `ClickHouse` databases.
+#![doc = include_str!("../README.md")]
 
 mod connection;
 mod driver;

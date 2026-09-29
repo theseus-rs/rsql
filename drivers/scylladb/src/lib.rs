@@ -1,7 +1,4 @@
-//! Native CQL driver for `ScyllaDB` and Scylla Cloud.
-//!
-//! See the crate README for connection URL, TLS, and Client Routes configuration.
-
+#![doc = include_str!("../README.md")]
 #![cfg_attr(
     test,
     expect(

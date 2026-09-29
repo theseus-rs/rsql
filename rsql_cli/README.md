@@ -1,4 +1,4 @@
-# rsql_cli
+# `rsql_cli`
 
 [![Code Coverage](https://codecov.io/gh/theseus-rs/rsql/branch/main/graph/badge.svg)](https://codecov.io/gh/theseus-rs/rsql)
 [![Latest version](https://img.shields.io/crates/v/rsql_cli.svg)](https://crates.io/crates/rsql_cli)
@@ -10,20 +10,21 @@
 
 ## Getting Started
 
-Install `rsql` from https://theseus-rs.github.io/rsql/rsql_cli/
+Install `rsql` from <https://theseus-rs.github.io/rsql/rsql_cli/>
 
 <video width="640" height="480" controls>
   <source src="https://github.com/theseus-rs/rsql/blob/main/rsql_cli/resources/demo.webm" type="video/webm">
   Your browser does not support the video tag.
 </video>
 
-## Safety
+## Features
 
-These crates use `#![forbid(unsafe_code)]` to ensure everything is implemented in 100% safe Rust.
+Default status follows this crate's `default` feature, including feature aliases.
 
-## License
-
-Licensed under either of:
-
-- Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or <http://www.apache.org/licenses/LICENSE-2.0>)
-- MIT license ([LICENSE-MIT](LICENSE-MIT) or <http://opensource.org/licenses/MIT>)
+| Feature                | Description                                                                          | Enabled by default |
+|------------------------|--------------------------------------------------------------------------------------|--------------------|
+| `repl`                 | Empty feature; the interactive REPL is always included.                              | Yes                |
+| `tls-native-tls`       | Forward native TLS to enabled drivers                                                | Yes                |
+| `tls-rustls`           | Alias for selecting Rustls with the `ring` provider.                                 | No                 |
+| `tls-rustls-aws-lc-rs` | Use Rustls with the AWS-LC provider in enabled drivers that expose this TLS feature. | No                 |
+| `tls-rustls-ring`      | Use Rustls with the `ring` provider in enabled drivers that expose this TLS feature. | No                 |

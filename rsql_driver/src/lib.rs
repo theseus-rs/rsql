@@ -1,3 +1,4 @@
+#![doc = include_str!("../README.md")]
 #![cfg_attr(
     test,
     expect(
@@ -5,11 +6,6 @@
         reason = "test assertions intentionally panic when verification fails"
     )
 )]
-
-//! # RSQL Driver
-//!
-//! The RSQL driver library provides interfaces for connecting to different data
-//! sources and executing SQL queries.
 
 #[macro_use]
 extern crate rust_i18n;

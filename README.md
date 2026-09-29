@@ -91,7 +91,7 @@ rsql --url "parquet://data.parquet" -- "SELECT column1, COUNT(*) FROM table GROU
 - **CrateDB** (`cratedb://`)
 - **DuckDB** (`duckdb://`) - High-performance analytics
 - **DynamoDB** (`dynamodb://`)
-- **H2** (`h2://`) - H2 2.5.252 with automatic caching and an in-memory default
+- **H2** (`h2://`)
 - **JDBC** (`jdbc:<subprotocol>:<database>`) - JDBC drivers running in [Ristretto](https://github.com/theseus-rs/ristretto)
 - **MySQL** / **MariaDB** (`mysql://` / `mariadb://`)
 - **PostgreSQL** (`postgresql://` / `postgres://`) - Including embedded PostgreSQL
@@ -155,11 +155,6 @@ rsql --url "h2:./example"
 # PostgreSQL through a JDBC driver resolved from Maven Central
 rsql --url "jdbc:postgresql://localhost/example?user=postgres&dependency=org.postgresql:postgresql:42.7.13&driver=org.postgresql.Driver" -- "SELECT version();"
 ```
-
-H2 resolves `com.h2database:h2:2.5.252` and its runtime dependencies from Maven Central.
-JDBC accepts repeatable `dependency` coordinates, local `classpath` entries, and an
-optional `driver` (or `driver_class` ); omitting the class uses JDBC service discovery.
-Ristretto downloads and caches its default Java runtime libraries.
 
 ### File Analysis
 
@@ -257,19 +252,19 @@ rsql --url "mysql://user:pass@localhost/db?charset=utf8mb4"
 
 ## Features
 
-| Feature               | Description                                                                                                                                                                                                                                  |
-|-----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Feature               | Description                                                                                                                                                                                                                                      |
+|-----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Data Sources          | Arrow, Avro, ClickHouse, CockroachDB, CrateDB, CSV, Delimited, DuckDB, DynamoDB, Excel, FlightSQL, FWF, H2, JDBC, JSON, JSONL, MariaDB, MySQL, ODS, ORC, Parquet, PostgreSQL, Redshift, ScyllaDB, Snowflake, SQLite3, SQL Server, TSV, XML, YAML |
-| Compression           | Brotli, Bzip2, Gzip, LZ4, XZ, Zstd                                                                                                                                                                                                           |
-| Syntax Highlighting   | ✅ Full SQL syntax highlighting                                                                                                                                                                                                               |
-| Result Highlighting   | ✅ Color output for better readability                                                                                                                                                                                                        |
-| Query Auto-completion | ✅ Smart completion for SQL keywords and table names                                                                                                                                                                                          |
-| History               | ✅ Command history with search                                                                                                                                                                                                                |
-| SQL File Execution    | ✅ Execute .sql files directly                                                                                                                                                                                                                |
-| Embedded PostgreSQL   | ✅ No external PostgreSQL installation required                                                                                                                                                                                               |
-| Output Formats        | ascii, csv, expanded, html, json, jsonl, markdown, plain, psql, sqlite, tsv, unicode, xml, yaml                                                                                                                                              |
-| Localized Interface   | 40+ languages¹                                                                                                                                                                                                                               |
-| Key Bindings          | emacs, vi                                                                                                                                                                                                                                    |
+| Compression           | Brotli, Bzip2, Gzip, LZ4, XZ, Zstd                                                                                                                                                                                                               |
+| Syntax Highlighting   | ✅ Full SQL syntax highlighting                                                                                                                                                                                                                  |
+| Result Highlighting   | ✅ Color output for better readability                                                                                                                                                                                                           |
+| Query Auto-completion | ✅ Smart completion for SQL keywords and table names                                                                                                                                                                                             |
+| History               | ✅ Command history with search                                                                                                                                                                                                                   |
+| SQL File Execution    | ✅ Execute .sql files directly                                                                                                                                                                                                                   |
+| Embedded PostgreSQL   | ✅ No external PostgreSQL installation required                                                                                                                                                                                                  |
+| Output Formats        | ascii, csv, expanded, html, json, jsonl, markdown, plain, psql, sqlite, tsv, unicode, xml, yaml                                                                                                                                                  |
+| Localized Interface   | 40+ languages¹                                                                                                                                                                                                                                   |
+| Key Bindings          | emacs, vi                                                                                                                                                                                                                                        |
 
 ¹ Computer translations; human translations welcome
 
@@ -293,7 +288,7 @@ rsql --url "mysql://user:pass@localhost/db?charset=utf8mb4"
 | flightsql          | `flightsql://<user[:password>]@<host>[:<port>][?scheme=<http\|https>]`                                                                                                                                                                                                     |
 | fwf                | `fwf://<file>?widths=<widths>[&headers=<headers>]`                                                                                                                                                                                                                         |
 | gzip¹              | `gzip://<file>`                                                                                                                                                                                                                                                            |
-| h2 (JDBC)          | `h2:[<database>]` (defaults to in-memory                                                                                                                                                                                                                                   |
+| h2 (JDBC)          | `h2:[<database>]`                                                                                                                                                                                                                                                          |
 | http¹              | `http://<path>[?_headers=<headers>]`                                                                                                                                                                                                                                       |
 | https¹             | `https://<path>[?_headers=<headers>]`                                                                                                                                                                                                                                      |
 | jdbc               | `jdbc:<subprotocol>:<database>[?classpath=<paths>&driver=<class>]`                                                                                                                                                                                                         |
@@ -321,13 +316,6 @@ rsql --url "mysql://user:pass@localhost/db?charset=utf8mb4"
 | zstd¹              | `zstd://<file>`                                                                                                                                                                                                                                                            |
 
 ¹ the driver will attempt to detect the type of file and automatically use the appropriate driver.
-
-## License
-
-Licensed under either of:
-
-- Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or <http://www.apache.org/licenses/LICENSE-2.0>)
-- MIT license ([LICENSE-MIT](LICENSE-MIT) or <http://opensource.org/licenses/MIT>)
 
 ## Contributing
 

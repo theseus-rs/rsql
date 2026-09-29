@@ -1,4 +1,4 @@
-# rsql_drivers
+# `rsql_drivers`
 
 [![Documentation](https://docs.rs/rsql_drivers/badge.svg)](https://docs.rs/rsql_drivers)
 [![Code Coverage](https://codecov.io/gh/theseus-rs/rsql/branch/main/graph/badge.svg)](https://codecov.io/gh/theseus-rs/rsql)
@@ -8,11 +8,11 @@
 
 `rsql_drivers` is a collection of SQL based data drivers crate.
 
-## Driver features
+## Features
 
 Enable individual `driver-*` features to register the corresponding URL schemes. The default feature
 set is empty. `all` includes every driver below; `all-wasm` includes the drivers marked Yes in the
-WASM column.
+last column.
 
 WASM support depends on the host's filesystem and runtime facilities. Inclusion in `all-wasm` does
 not imply that local files or network databases are accessible in a browser. JDBC and H2 require
@@ -21,93 +21,102 @@ downloads are native-only.
 
 Each guide documents the URL format, connection options, defaults, and examples.
 
-| Feature | Driver guide | WASM |
-| --- | --- | --- |
-| `driver-arrow` | [Arrow IPC][arrow] | Yes |
-| `driver-avro` | [Avro][avro] | Yes |
-| `driver-brotli` | [Brotli][brotli] | Yes |
-| `driver-bzip2` | [Bzip2][bzip2] | Yes |
-| `driver-clickhouse` | [ClickHouse][clickhouse] | No |
-| `driver-cockroachdb` | [CockroachDB][cockroachdb] | No |
-| `driver-cratedb` | [CrateDB][cratedb] | No |
-| `driver-csv` | [CSV][csv] | Yes |
-| `driver-delimited` | [Delimited text][delimited] | Yes |
-| `driver-duckdb` | [DuckDB][duckdb] | No |
-| `driver-dynamodb` | [DynamoDB][dynamodb] | No |
-| `driver-excel` | [Excel][excel] | Yes |
-| `driver-file` | [File detection][file] | Yes |
-| `driver-flightsql` | [FlightSQL][flightsql] | No |
-| `driver-fwf` | [Fixed-width text][fwf] | Yes |
-| `driver-gzip` | [Gzip][gzip] | Yes |
-| `driver-h2` | [H2][h2] | Yes (builds; see limits) |
-| `driver-http` | [HTTP][http] | No |
-| `driver-https` | [HTTPS][https] | No |
-| `driver-jdbc` | [JDBC][jdbc] | Yes (builds; see limits) |
-| `driver-json` | [JSON][json] | Yes |
-| `driver-jsonl` | [JSON Lines][jsonl] | Yes |
-| `driver-lz4` | [LZ4][lz4] | Yes |
-| `driver-mariadb` | [MariaDB][mariadb] | No |
-| `driver-mysql` | [MySQL][mysql] | No |
-| `driver-ods` | [OpenDocument Spreadsheet][ods] | Yes |
-| `driver-orc` | [ORC][orc] | Yes |
-| `driver-parquet` | [Parquet][parquet] | Yes |
-| `driver-postgres` | [PostgreSQL (rust-postgres)][postgres] | No |
-| `driver-postgresql` | [PostgreSQL (SQLx)][postgresql] | No |
-| `driver-redshift` | [Amazon Redshift][redshift] | No |
-| `driver-rusqlite` | [SQLite (Rusqlite)][rusqlite] | No |
-| `driver-s3` | [S3][s3] | No |
-| `driver-scylladb` | [ScyllaDB][scylladb] | No |
-| `driver-snowflake` | [Snowflake][snowflake] | No |
-| `driver-sqlite` | [SQLite (SQLx)][sqlite] | No |
-| `driver-sqlserver` | [SQL Server][sqlserver] | No |
-| `driver-tsv` | [TSV][tsv] | Yes |
-| `driver-xml` | [XML][xml] | Yes |
-| `driver-xz` | [XZ][xz] | Yes |
-| `driver-yaml` | [YAML][yaml] | Yes |
-| `driver-zstd` | [Zstandard][zstd] | Yes |
+Default status follows this crate's `default` feature, including feature aliases.
 
-[arrow]: ../rsql_cli/docs/src/chapter3/arrow.md
-[avro]: ../rsql_cli/docs/src/chapter3/avro.md
-[brotli]: ../rsql_cli/docs/src/chapter3/brotli.md
-[bzip2]: ../rsql_cli/docs/src/chapter3/bzip2.md
-[clickhouse]: ../rsql_cli/docs/src/chapter3/clickhouse.md
-[cockroachdb]: ../rsql_cli/docs/src/chapter3/cockroachdb.md
-[cratedb]: ../rsql_cli/docs/src/chapter3/cratedb.md
-[csv]: ../rsql_cli/docs/src/chapter3/csv.md
-[delimited]: ../rsql_cli/docs/src/chapter3/delimited.md
-[duckdb]: ../rsql_cli/docs/src/chapter3/duckdb.md
-[dynamodb]: ../rsql_cli/docs/src/chapter3/dynamodb.md
-[excel]: ../rsql_cli/docs/src/chapter3/excel.md
-[file]: ../rsql_cli/docs/src/chapter3/file.md
-[flightsql]: ../rsql_cli/docs/src/chapter3/flightsql.md
-[fwf]: ../rsql_cli/docs/src/chapter3/fwf.md
-[gzip]: ../rsql_cli/docs/src/chapter3/gzip.md
-[h2]: ../rsql_cli/docs/src/chapter3/h2.md
-[http]: ../rsql_cli/docs/src/chapter3/http.md
-[https]: ../rsql_cli/docs/src/chapter3/https.md
-[jdbc]: ../rsql_cli/docs/src/chapter3/jdbc.md
-[json]: ../rsql_cli/docs/src/chapter3/json.md
-[jsonl]: ../rsql_cli/docs/src/chapter3/jsonl.md
-[lz4]: ../rsql_cli/docs/src/chapter3/lz4.md
-[mariadb]: ../rsql_cli/docs/src/chapter3/mariadb.md
-[mysql]: ../rsql_cli/docs/src/chapter3/mysql.md
-[ods]: ../rsql_cli/docs/src/chapter3/ods.md
-[orc]: ../rsql_cli/docs/src/chapter3/orc.md
-[parquet]: ../rsql_cli/docs/src/chapter3/parquet.md
-[postgres]: ../rsql_cli/docs/src/chapter3/postgres.md
-[postgresql]: ../rsql_cli/docs/src/chapter3/postgresql.md
-[redshift]: ../rsql_cli/docs/src/chapter3/redshift.md
-[rusqlite]: ../rsql_cli/docs/src/chapter3/rusqlite.md
-[s3]: ../rsql_cli/docs/src/chapter3/s3.md
-[scylladb]: ../rsql_cli/docs/src/chapter3/scylladb.md
-[snowflake]: ../rsql_cli/docs/src/chapter3/snowflake.md
-[sqlite]: ../rsql_cli/docs/src/chapter3/sqlite.md
-[sqlserver]: ../rsql_cli/docs/src/chapter3/sqlserver.md
-[tsv]: ../rsql_cli/docs/src/chapter3/tsv.md
-[xml]: ../rsql_cli/docs/src/chapter3/xml.md
-[xz]: ../rsql_cli/docs/src/chapter3/xz.md
-[yaml]: ../rsql_cli/docs/src/chapter3/yaml.md
-[zstd]: ../rsql_cli/docs/src/chapter3/zstd.md
+| Feature                | Description                                                                                | Enabled by default | In `all-wasm`            |
+|------------------------|--------------------------------------------------------------------------------------------|--------------------|--------------------------|
+| `all`                  | Enable every driver; select a TLS backend separately.                                      | No                 | N/A                      |
+| `all-wasm`             | Enable the driver subset for WebAssembly; see the WASM build limits below.                 | No                 | N/A                      |
+| `driver-arrow`         | Query [Arrow IPC][arrow] files.                                                            | No                 | Yes                      |
+| `driver-avro`          | Query [Avro][avro] files.                                                                  | No                 | Yes                      |
+| `driver-brotli`        | Read [Brotli][brotli] compressed data.                                                     | No                 | Yes                      |
+| `driver-bzip2`         | Read [Bzip2][bzip2] compressed data.                                                       | No                 | Yes                      |
+| `driver-clickhouse`    | Connect to [`ClickHouse`][clickhouse] through its HTTP interface.                          | No                 | No                       |
+| `driver-cockroachdb`   | Connect to [`CockroachDB`][cockroachdb] through the PostgreSQL protocol.                   | No                 | No                       |
+| `driver-cratedb`       | Connect to [`CrateDB`][cratedb] through the PostgreSQL protocol.                           | No                 | No                       |
+| `driver-csv`           | Query [CSV][csv] files.                                                                    | No                 | Yes                      |
+| `driver-delimited`     | Query [Delimited text][delimited] files with a configurable delimiter.                     | No                 | Yes                      |
+| `driver-duckdb`        | Query local or in-memory [`DuckDB`][duckdb] databases.                                     | No                 | No                       |
+| `driver-dynamodb`      | Query [DynamoDB][dynamodb] through `PartiQL`.                                              | No                 | No                       |
+| `driver-excel`         | Query [Excel][excel] workbooks.                                                            | No                 | Yes                      |
+| `driver-file`          | Select a driver automatically using [File detection][file].                                | No                 | Yes                      |
+| `driver-flightsql`     | Connect to [FlightSQL][flightsql] servers.                                                 | No                 | No                       |
+| `driver-fwf`           | Query [Fixed-width text][fwf] files.                                                       | No                 | Yes                      |
+| `driver-gzip`          | Read [Gzip][gzip] compressed data.                                                         | No                 | Yes                      |
+| `driver-h2`            | Connect to [H2][h2] through the embedded JDBC implementation.                              | No                 | Yes (builds; see limits) |
+| `driver-http`          | Download and query data over [HTTP][http].                                                 | No                 | No                       |
+| `driver-https`         | Download and query data over [HTTPS][https].                                               | No                 | No                       |
+| `driver-jdbc`          | Run [JDBC][jdbc] drivers inside the embedded JVM.                                          | No                 | Yes (builds; see limits) |
+| `driver-json`          | Query [JSON][json] files.                                                                  | No                 | Yes                      |
+| `driver-jsonl`         | Query [JSON Lines][jsonl] files.                                                           | No                 | Yes                      |
+| `driver-lz4`           | Read [LZ4][lz4] compressed data.                                                           | No                 | Yes                      |
+| `driver-mariadb`       | Connect to [MariaDB][mariadb] using `SQLx`.                                                | No                 | No                       |
+| `driver-mysql`         | Connect to [MySQL][mysql] using `SQLx`.                                                    | No                 | No                       |
+| `driver-ods`           | Query [`OpenDocument` Spreadsheet][ods] files.                                             | No                 | Yes                      |
+| `driver-orc`           | Query [ORC][orc] files.                                                                    | No                 | Yes                      |
+| `driver-parquet`       | Query [Parquet][parquet] files.                                                            | No                 | Yes                      |
+| `driver-postgres`      | Connect to [PostgreSQL][postgres] using `tokio-postgres`, including managed local servers. | No                 | No                       |
+| `driver-postgresql`    | Connect to [PostgreSQL][postgresql] using `SQLx`, including managed local servers.         | No                 | No                       |
+| `driver-redshift`      | Connect to [Amazon Redshift][redshift] through the PostgreSQL protocol.                    | No                 | No                       |
+| `driver-rusqlite`      | Query [SQLite][rusqlite] databases using `rusqlite`.                                       | No                 | No                       |
+| `driver-s3`            | Download and query data from [S3][s3].                                                     | No                 | No                       |
+| `driver-scylladb`      | Connect to [`ScyllaDB`][scylladb] using native CQL.                                        | No                 | No                       |
+| `driver-snowflake`     | Connect to [Snowflake][snowflake] through its SQL API.                                     | No                 | No                       |
+| `driver-sqlite`        | Query [SQLite][sqlite] databases using `SQLx`.                                             | No                 | No                       |
+| `driver-sqlserver`     | Connect to [SQL Server][sqlserver] using Tiberius.                                         | No                 | No                       |
+| `driver-tsv`           | Query [TSV][tsv] files.                                                                    | No                 | Yes                      |
+| `driver-xml`           | Query [XML][xml] files.                                                                    | No                 | Yes                      |
+| `driver-xz`            | Read [XZ][xz] compressed data.                                                             | No                 | Yes                      |
+| `driver-yaml`          | Query [YAML][yaml] files.                                                                  | No                 | Yes                      |
+| `driver-zstd`          | Read [Zstandard][zstd] compressed data.                                                    | No                 | Yes                      |
+| `tls-native-tls`       | Forward native TLS to enabled drivers.                                                     | No                 | N/A                      |
+| `tls-rustls`           | Alias for selecting Rustls with the `ring` provider.                                       | No                 | N/A                      |
+| `tls-rustls-aws-lc-rs` | Use Rustls with the AWS-LC provider in enabled drivers that expose this TLS feature.       | No                 | N/A                      |
+| `tls-rustls-ring`      | Use Rustls with the `ring` provider in enabled drivers that expose this TLS feature.       | No                 | N/A                      |
+| `tokio`                | Enable the optional Tokio dependency with filesystem support; registers no drivers.        | No                 | N/A                      |
+
+[arrow]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/arrow.md
+[avro]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/avro.md
+[brotli]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/brotli.md
+[bzip2]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/bzip2.md
+[clickhouse]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/clickhouse.md
+[cockroachdb]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/cockroachdb.md
+[cratedb]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/cratedb.md
+[csv]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/csv.md
+[delimited]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/delimited.md
+[duckdb]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/duckdb.md
+[dynamodb]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/dynamodb.md
+[excel]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/excel.md
+[file]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/file.md
+[flightsql]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/flightsql.md
+[fwf]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/fwf.md
+[gzip]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/gzip.md
+[h2]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/h2.md
+[http]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/http.md
+[https]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/https.md
+[jdbc]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/jdbc.md
+[json]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/json.md
+[jsonl]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/jsonl.md
+[lz4]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/lz4.md
+[mariadb]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/mariadb.md
+[mysql]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/mysql.md
+[ods]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/ods.md
+[orc]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/orc.md
+[parquet]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/parquet.md
+[postgres]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/postgres.md
+[postgresql]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/postgresql.md
+[redshift]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/redshift.md
+[rusqlite]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/rusqlite.md
+[s3]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/s3.md
+[scylladb]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/scylladb.md
+[snowflake]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/snowflake.md
+[sqlite]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/sqlite.md
+[sqlserver]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/sqlserver.md
+[tsv]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/tsv.md
+[xml]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/xml.md
+[xz]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/xz.md
+[yaml]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/yaml.md
+[zstd]: https://github.com/theseus-rs/rsql/blob/main/rsql_cli/docs/src/chapter3/zstd.md
 
 ## WASM build checks
 
@@ -150,15 +159,3 @@ make a preloaded Java runtime available to Ristretto through the host environmen
 H2 omits its implicit Maven dependency on WASM. JDBC rejects explicit `dependency` options there
 because its download/cache backend is native-only. See [JDBC WASM requirements][jdbc] and [H2 WASM
 requirements][h2].
-
-## Safety
-
-These crates use `#![forbid(unsafe_code)]` to ensure everything is implemented in 100% safe Rust.
-
-## License
-
-Licensed under either of:
-
-- Apache License, Version 2.0, ([LICENSE-APACHE](../LICENSE-APACHE) or
-  <http://www.apache.org/licenses/LICENSE-2.0>)
-- MIT license ([LICENSE-MIT](../LICENSE-MIT) or <http://opensource.org/licenses/MIT>)

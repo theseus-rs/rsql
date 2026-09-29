@@ -1,10 +1,10 @@
-# rsql_driver_scylladb
+# `rsql_driver_scylladb`
 
 [![Documentation](https://docs.rs/rsql_driver_scylladb/badge.svg)](https://docs.rs/rsql_driver_scylladb)
 [![Latest version](https://img.shields.io/crates/v/rsql_driver_scylladb.svg)](https://crates.io/crates/rsql_driver_scylladb)
 [![License](https://img.shields.io/crates/l/rsql_driver_scylladb)](https://github.com/theseus-rs/rsql#license)
 
-`rsql_driver_scylladb` provides native CQL connectivity for ScyllaDB and Scylla Cloud. It is a native-only driver and
+`rsql_driver_scylladb` provides native CQL connectivity for `ScyllaDB` and Scylla Cloud. It is a native-only driver and
 is enabled by rsql's `driver-scylladb` feature.
 
 ## Connection URL
@@ -17,7 +17,7 @@ Port `9042`, plaintext transport, and no selected keyspace are the defaults. Cre
 and password. URL-encode reserved characters in credentials and file paths.
 
 Additional bootstrap nodes can be supplied by repeating `node`. The optional `datacenter` value makes matching nodes
-local and preferred by the ScyllaDB driver's load-balancing policy.
+local and preferred by the `ScyllaDB` driver's load-balancing policy.
 
 ## Direct clusters
 
@@ -55,14 +55,15 @@ All cluster nodes must be reachable through the configured routes.
 
 ## Metadata and values
 
-The ScyllaDB cluster is exposed as the current catalog and keyspaces as schemas. Metadata includes tables,
+The `ScyllaDB` cluster is exposed as the current catalog and keyspaces as schemas. Metadata includes tables,
 materialized views, columns, partition and clustering primary keys, and secondary indexes. Scalar CQL types,
 collections, vectors, tuples, and user-defined types are converted to rsql values. Values wider than rsql's native
 numeric or temporal range are preserved as strings.
 
-## License
+## Features
 
-Licensed under either of:
-
-- Apache License, Version 2.0, ([LICENSE-APACHE](../../LICENSE-APACHE) or <http://www.apache.org/licenses/LICENSE-2.0>)
-- MIT license ([LICENSE-MIT](../../LICENSE-MIT) or <http://opensource.org/licenses/MIT>)
+| Feature                | Description                                                  | Enabled by default |
+|------------------------|--------------------------------------------------------------|--------------------|
+| `tls-native-tls`       | Compatibility alias for `tls-rustls-aws-lc-rs`.              | Yes                |
+| `tls-rustls-aws-lc-rs` | Use Rustls with the AWS-LC provider for CQL TLS connections. | No                 |
+| `tls-rustls-ring`      | Use Rustls with the `ring` provider for CQL TLS connections. | No                 |

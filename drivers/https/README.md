@@ -1,4 +1,4 @@
-# rsql_driver_https
+# `rsql_driver_https`
 
 [![Documentation](https://docs.rs/rsql_driver_http/badge.svg)](https://docs.rs/rsql_driver_https)
 [![Code Coverage](https://codecov.io/gh/theseus-rs/rsql/branch/main/graph/badge.svg)](https://codecov.io/gh/theseus-rs/rsql)
@@ -12,13 +12,12 @@
 
 Driver url format: `https://<path>[?_headers=<headers>]`
 
-## Safety
+## Features
 
-These crates use `#![forbid(unsafe_code)]` to ensure everything is implemented in 100% safe Rust.
+Default status follows this crate's `default` feature, including feature aliases.
 
-## License
-
-Licensed under either of:
-
-- Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or <http://www.apache.org/licenses/LICENSE-2.0>)
-- MIT license ([LICENSE-MIT](LICENSE-MIT) or <http://opensource.org/licenses/MIT>)
+| Feature                | Description                                             | Enabled by default |
+|------------------------|---------------------------------------------------------|--------------------|
+| `tls-native-tls`       | Use platform-native TLS for HTTPS requests.             | Yes                |
+| `tls-rustls-aws-lc-rs` | Use Rustls with the AWS-LC provider for HTTPS requests. | No                 |
+| `tls-rustls-ring`      | Use Rustls with the `ring` provider for HTTPS requests. | No                 |
