@@ -16,8 +16,8 @@ workspace = true
 [dependencies]
 async-trait = { workspace = true }
 file_type = { workspace = true }
-rsql_driver = { path = "../../rsql_driver", version = "0.21.0" }
-rsql_driver_jdbc = { path = "../jdbc", version = "0.21.0", default-features = false }
+rsql_driver = { path = "../../rsql_driver", version = "0.22.0" }
+rsql_driver_jdbc = { path = "../jdbc", version = "0.22.0", default-features = false }
 
 [dev-dependencies]
 anyhow = { workspace = true }
