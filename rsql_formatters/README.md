@@ -1,4 +1,4 @@
-# rsql_formatters
+# `rsql_formatters`
 
 [![Documentation](https://docs.rs/rsql_formatters/badge.svg)](https://docs.rs/rsql_formatters)
 [![Code Coverage](https://codecov.io/gh/theseus-rs/rsql/branch/main/graph/badge.svg)](https://codecov.io/gh/theseus-rs/rsql)
@@ -8,13 +8,22 @@
 
 `rsql_formatters` is a collection of formatters for the `rsql_drivers` crate.
 
-## Safety
+## Features
 
-These crates use `#![forbid(unsafe_code)]` to ensure everything is implemented in 100% safe Rust.
-
-## License
-
-Licensed under either of:
-
-- Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or <http://www.apache.org/licenses/LICENSE-2.0>)
-- MIT license ([LICENSE-MIT](LICENSE-MIT) or <http://opensource.org/licenses/MIT>)
+| Feature    | Description                                              | Enabled by default |
+|------------|----------------------------------------------------------|--------------------|
+| `all`      | Enable every output format.                              | No                 |
+| `ascii`    | Format results as tables with ASCII borders.             | No                 |
+| `csv`      | Format results as comma-separated values.                | No                 |
+| `expanded` | Format each record vertically as field/value pairs.      | No                 |
+| `html`     | Format results as HTML tables.                           | No                 |
+| `json`     | Format results as JSON.                                  | No                 |
+| `jsonl`    | Format results as JSON Lines.                            | No                 |
+| `markdown` | Format results as Markdown tables.                       | No                 |
+| `plain`    | Format results as text tables without borders.           | No                 |
+| `psql`     | Format results as PostgreSQL `psql` tables.              | No                 |
+| `sqlite`   | Format results as SQLite-style pipe-separated values.    | No                 |
+| `tsv`      | Format results as tab-separated values.                  | No                 |
+| `unicode`  | Format results as tables with Unicode borders.           | No                 |
+| `xml`      | Format results as XML.                                   | No                 |
+| `yaml`     | Format results as YAML.                                  | No                 |

@@ -1,4 +1,4 @@
-//! H2 with automatic, versioned JDBC driver caching.
+#![doc = include_str!("../README.md")]
 #![cfg_attr(
     test,
     expect(

@@ -1,4 +1,4 @@
-# rsql_driver_gzip
+# `rsql_driver_gzip`
 
 [![Documentation](https://docs.rs/rsql_driver_http/badge.svg)](https://docs.rs/rsql_driver_gzip)
 [![Code Coverage](https://codecov.io/gh/theseus-rs/rsql/branch/main/graph/badge.svg)](https://codecov.io/gh/theseus-rs/rsql)
@@ -11,14 +11,3 @@
 ## Usage
 
 Driver url format: `gzip://<file>`
-
-## Safety
-
-These crates use `#![forbid(unsafe_code)]` to ensure everything is implemented in 100% safe Rust.
-
-## License
-
-Licensed under either of:
-
-- Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or <http://www.apache.org/licenses/LICENSE-2.0>)
-- MIT license ([LICENSE-MIT](LICENSE-MIT) or <http://opensource.org/licenses/MIT>)

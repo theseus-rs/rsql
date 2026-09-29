@@ -1,6 +1,6 @@
-# rsql_driver_h2
+# `rsql_driver_h2`
 
-`rsql_driver_h2` wraps the [JDBC driver](../jdbc/README.md).
+`rsql_driver_h2` wraps the [JDBC driver](https://github.com/theseus-rs/rsql/blob/main/drivers/jdbc/README.md).
 
 ## Usage
 
@@ -50,12 +50,14 @@ using semicolons, and JVM options using the query string:
 rsql --url 'h2:./example;MODE=PostgreSQL?classpath=/path/to/extension.jar'
 ```
 
-See the [JDBC options](../jdbc/README.md#url-options) for encoding, classpath separators, and
+See the [JDBC options](https://github.com/theseus-rs/rsql/blob/main/drivers/jdbc/README.md#url-options) for encoding, classpath separators, and
 environment-variable defaults. Query parameters, type conversion, and metadata use the [JDBC
-implementation](../jdbc/README.md#queries-and-metadata).
+implementation](https://github.com/theseus-rs/rsql/blob/main/drivers/jdbc/README.md#queries-and-metadata).
 
-## Cargo features and tests
+## Features
 
-When using `rsql_drivers`, select `driver-h2` and a TLS backend for Maven and Java runtime
-downloads. The standalone crate defaults to `tls-rustls-ring` and also supports `tls-native-tls` and
-`tls-rustls-aws-lc-rs` with default features disabled.
+| Feature                | Description                                                               | Enabled by default |
+|------------------------|---------------------------------------------------------------------------|--------------------|
+| `tls-native-tls`       | Use platform-native TLS for Maven and Java runtime downloads.             | Yes                |
+| `tls-rustls-aws-lc-rs` | Use Rustls with the AWS-LC provider for Maven and Java runtime downloads. | No                 |
+| `tls-rustls-ring`      | Use Rustls with the `ring` provider for Maven and Java runtime downloads. | No                 |

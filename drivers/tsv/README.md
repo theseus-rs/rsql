@@ -1,4 +1,4 @@
-# rsql_driver_tsv
+# `rsql_driver_tsv`
 
 [![Documentation](https://docs.rs/rsql_driver_tsv/badge.svg)](https://docs.rs/rsql_driver_tsv)
 [![Code Coverage](https://codecov.io/gh/theseus-rs/rsql/branch/main/graph/badge.svg)](https://codecov.io/gh/theseus-rs/rsql)
@@ -27,14 +27,3 @@ The driver is implemented using [Polars SQL](https://docs.pola.rs/user-guide/sql
 | `truncate_ragged_lines`  | Whether to truncate lines that are longer than the schema.                                                    | `false` |
 | `infer_schema_length`    | The number of rows to use when inferring the schema.                                                          | `100`   |
 | `ignore_errors`          | Whether to ignore errors. If `true`, errors will be ignored. If `false`, errors will cause the query to fail. | `false` |
-
-## Safety
-
-These crates use `#![forbid(unsafe_code)]` to ensure everything is implemented in 100% safe Rust.
-
-## License
-
-Licensed under either of:
-
-- Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or <http://www.apache.org/licenses/LICENSE-2.0>)
-- MIT license ([LICENSE-MIT](LICENSE-MIT) or <http://opensource.org/licenses/MIT>)

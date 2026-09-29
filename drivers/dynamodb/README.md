@@ -1,4 +1,4 @@
-# rsql_driver_dynamodb
+# `rsql_driver_dynamodb`
 
 [![Documentation](https://docs.rs/rsql_driver_dynamodb/badge.svg)](https://docs.rs/rsql_driver_dynamodb)
 [![Code Coverage](https://codecov.io/gh/theseus-rs/rsql/branch/main/graph/badge.svg)](https://codecov.io/gh/theseus-rs/rsql)
@@ -12,14 +12,3 @@
 
 Driver url format:
 `dynamodb://[<access_key_id>:<secret_access_key>@]<host>[:<port>]>[?region=<region>][&session_token=<token>][&scheme=<http|https>]`
-
-## Safety
-
-These crates use `#![forbid(unsafe_code)]` to ensure everything is implemented in 100% safe Rust.
-
-## License
-
-Licensed under either of:
-
-- Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or <http://www.apache.org/licenses/LICENSE-2.0>)
-- MIT license ([LICENSE-MIT](LICENSE-MIT) or <http://opensource.org/licenses/MIT>)

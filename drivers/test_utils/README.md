@@ -1,4 +1,4 @@
-# rsql_driver_test_utils
+# `rsql_driver_test_utils`
 
 [![Documentation](https://docs.rs/rsql_driver_test_utils/badge.svg)](https://docs.rs/rsql_driver_test_utils)
 [![Code Coverage](https://codecov.io/gh/theseus-rs/rsql/branch/main/graph/badge.svg)](https://codecov.io/gh/theseus-rs/rsql)
@@ -7,14 +7,3 @@
 [![Semantic Versioning](https://img.shields.io/badge/%E2%9A%99%EF%B8%8F_SemVer-2.0.0-blue)](https://semver.org/spec/v2.0.0.html)
 
 `rsql_driver_test_utils` contains utilities for testing the rsql drivers.
-
-## Safety
-
-These crates use `#![forbid(unsafe_code)]` to ensure everything is implemented in 100% safe Rust.
-
-## License
-
-Licensed under either of:
-
-- Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or <http://www.apache.org/licenses/LICENSE-2.0>)
-- MIT license ([LICENSE-MIT](LICENSE-MIT) or <http://opensource.org/licenses/MIT>)

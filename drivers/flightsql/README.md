@@ -1,4 +1,4 @@
-# rsql_driver_flightsql
+# `rsql_driver_flightsql`
 
 [![Documentation](https://docs.rs/rsql_driver_flightsql/badge.svg)](https://docs.rs/rsql_driver_flightsql)
 [![Code Coverage](https://codecov.io/gh/theseus-rs/rsql/branch/main/graph/badge.svg)](https://codecov.io/gh/theseus-rs/rsql)
@@ -12,14 +12,3 @@ files.
 ## Usage
 
 Driver url format: `flightsql://<user[:password>]@<host>[:<port>][?scheme=<http\|https>]`
-
-## Safety
-
-These crates use `#![forbid(unsafe_code)]` to ensure everything is implemented in 100% safe Rust.
-
-## License
-
-Licensed under either of:
-
-- Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or <http://www.apache.org/licenses/LICENSE-2.0>)
-- MIT license ([LICENSE-MIT](LICENSE-MIT) or <http://opensource.org/licenses/MIT>)

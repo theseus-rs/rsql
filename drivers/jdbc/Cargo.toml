@@ -41,7 +41,7 @@ tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
 wiremock = { workspace = true }
 
 [features]
-default = ["tls-rustls-ring"]
+default = ["tls-native-tls"]
 tls-native-tls = ["ristretto_resolver/tls-native-tls", "ristretto_vm/tls-native-tls"]
 tls-rustls-aws-lc-rs = ["ristretto_resolver/tls-rustls-aws-lc-rs", "ristretto_vm/tls-rustls-aws-lc-rs"]
 tls-rustls-ring = ["ristretto_resolver/tls-rustls-ring", "ristretto_vm/tls-rustls-ring"]

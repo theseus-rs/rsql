@@ -1,4 +1,4 @@
-# rsql_driver
+# `rsql_driver`
 
 [![Documentation](https://docs.rs/rsql_driver/badge.svg)](https://docs.rs/rsql_driver)
 [![Code Coverage](https://codecov.io/gh/theseus-rs/rsql/branch/main/graph/badge.svg)](https://codecov.io/gh/theseus-rs/rsql)
@@ -8,13 +8,8 @@
 
 `rsql_driver` is a library that provides a common interface for connecting to different data sources.
 
-## Safety
+## Features
 
-These crates use `#![forbid(unsafe_code)]` to ensure everything is implemented in 100% safe Rust.
-
-## License
-
-Licensed under either of:
-
-- Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or <http://www.apache.org/licenses/LICENSE-2.0>)
-- MIT license ([LICENSE-MIT](LICENSE-MIT) or <http://opensource.org/licenses/MIT>)
+| Feature   | Description                                                 | Enabled by default |
+|-----------|-------------------------------------------------------------|--------------------|
+| `json`    | Convert `serde_json::Value` into the driver's `Value` type. | No                 |

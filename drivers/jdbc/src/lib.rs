@@ -1,4 +1,4 @@
-//! JDBC connections executed by the embedded Ristretto JVM.
+#![doc = include_str!("../README.md")]
 #![cfg_attr(
     test,
     expect(

@@ -1,4 +1,4 @@
-# rsql_driver_fwf
+# `rsql_driver_fwf`
 
 [![Documentation](https://docs.rs/rsql_driver_fwf/badge.svg)](https://docs.rs/rsql_driver_fwf)
 [![Code Coverage](https://codecov.io/gh/theseus-rs/rsql/branch/main/graph/badge.svg)](https://codecov.io/gh/theseus-rs/rsql)
@@ -13,14 +13,3 @@
 Driver url format: `fwf://<file>?widths=<widths>[&has_header=<true|false>][&skip_rows=<n>]`
 
 The driver is implemented using [Polars SQL](https://docs.pola.rs/user-guide/sql).
-
-## Safety
-
-These crates use `#![forbid(unsafe_code)]` to ensure everything is implemented in 100% safe Rust.
-
-## License
-
-Licensed under either of:
-
-- Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or <http://www.apache.org/licenses/LICENSE-2.0>)
-- MIT license ([LICENSE-MIT](LICENSE-MIT) or <http://opensource.org/licenses/MIT>)
