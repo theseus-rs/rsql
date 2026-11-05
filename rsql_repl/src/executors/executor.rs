@@ -87,7 +87,7 @@ impl<'a> Executor<'a> {
         if input != echo_off {
             if self.configuration.echo == EchoMode::On {
                 let input = helper.highlight(input)?;
-                writeln!(&mut self.output, "{input}")?;
+                writeln!(self.output, "{input}")?;
             } else if self.configuration.echo == EchoMode::Prompt {
                 let prompt = t!(
                     "prompt",
@@ -95,7 +95,7 @@ impl<'a> Executor<'a> {
                     program_name = self.configuration.program_name,
                 );
                 let input = helper.highlight(input)?;
-                writeln!(&mut self.output, "{prompt}{input}")?;
+                writeln!(self.output, "{prompt}{input}")?;
             }
         }
 

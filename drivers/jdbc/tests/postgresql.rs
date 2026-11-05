@@ -11,7 +11,7 @@ const JDBC_VERSION: &str = "42.7.13";
 async fn postgresql_jdbc() -> Result<()> {
     let _ = rustls::crypto::ring::default_provider().install_default();
     let settings = Settings {
-        version: "=18.6.0".parse()?,
+        version: "=18.6.1".parse()?,
         timeout: Some(Duration::from_secs(60)),
         ..Settings::default()
     };

@@ -92,7 +92,7 @@ mod tests {
     #[tokio::test]
     async fn test_execute_no_args() -> anyhow::Result<()> {
         let mut output = Output::default();
-        assert!(output.to_string().is_empty());
+        assert_eq!(output.to_string(), "");
         let options = CommandOptions {
             configuration: &mut Configuration::default(),
             command_manager: &CommandManager::default(),
@@ -113,7 +113,7 @@ mod tests {
     #[tokio::test]
     async fn test_execute_set_clipboard() -> anyhow::Result<()> {
         let mut output = Output::default();
-        assert!(output.to_string().is_empty());
+        assert_eq!(output.to_string(), "");
         let options = CommandOptions {
             configuration: &mut Configuration::default(),
             command_manager: &CommandManager::default(),
@@ -134,7 +134,7 @@ mod tests {
     #[tokio::test]
     async fn test_execute_set_file() -> anyhow::Result<()> {
         let mut output = Output::default();
-        assert!(output.to_string().is_empty());
+        assert_eq!(output.to_string(), "");
         let file = NamedTempFile::new()?;
         let path = file.as_ref().to_string_lossy().to_string();
         let options = CommandOptions {

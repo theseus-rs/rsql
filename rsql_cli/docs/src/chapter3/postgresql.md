@@ -20,7 +20,7 @@ postgresql://<user>[:<password>]@<host>[:<port>]/<database>[?<options>]
 | `statement-cache-capacity`                          | Prepared-statement cache size per connection; default `100`.                                                                                      |
 | `host / hostaddr / port / dbname / user / password` | Connection fields; query values override matching URL fields.                                                                                     |
 | `embedded`                                          | Start a managed local PostgreSQL server when `true`; default `false`.                                                                             |
-| `version`                                           | Embedded PostgreSQL version requirement; default `=18.6.0`.                                                                                       |
+| `version`                                           | Embedded PostgreSQL version requirement; default `=18.6.1`.                                                                                       |
 | `installation_dir`                                  | Directory for the downloaded PostgreSQL installation.                                                                                             |
 | `data_dir`                                          | Embedded server data directory.                                                                                                                   |
 | `temporary`                                         | Remove temporary server data after use; defaults to `true`.                                                                                       |
