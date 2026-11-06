@@ -697,8 +697,8 @@ mod test {
     #[test]
     fn test_default_configuration() {
         let configuration = Configuration::default();
-        assert!(configuration.program_name.is_empty());
-        assert!(configuration.version.is_empty());
+        assert_eq!(configuration.program_name, "");
+        assert_eq!(configuration.version, "");
         assert_eq!(configuration.config_dir, None);
         assert!(!configuration.bail_on_error);
         assert!(configuration.color);
