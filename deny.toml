@@ -35,12 +35,15 @@ allow = [
 ignore = [
     { id = "RUSTSEC-2023-0071", reason = "rsa: potential key recovery through timing sidechannels" },
     { id = "RUSTSEC-2024-0320", reason = "yaml-rust: unmaintained" },
-    { id = "RUSTSEC-2024-0436", reason = "paste: unmaintained" },
-    { id = "RUSTSEC-2025-0052", reason = "async-std: discontinued" },
     { id = "RUSTSEC-2025-0141", reason = "bincode: unmaintained" },
     { id = "RUSTSEC-2026-0097", reason = "winauth requires rand 0.7" },
     { id = "RUSTSEC-2026-0194", reason = "quick-xml: quadratic run time when checking a start tag for duplicate attribute names" },
     { id = "RUSTSEC-2026-0195", reason = "quick-xml: unbounded namespace-declaration allocation in NsReader enables memory-exhaustion denial of service" },
+    { id = "RUSTSEC-2026-0370", reason = "zvariant: unmaintained" },
+    { id = "RUSTSEC-2026-0371", reason = "zbus_names: unmaintained" },
+    { id = "RUSTSEC-2026-0372", reason = "zvariant_derive: unmaintained" },
+    { id = "RUSTSEC-2026-0440", reason = "astral-tokio-tar: unmaintained" },
+    { id = "RUSTSEC-2026-0441", reason = "pin-utils: unmaintained" },
 ]
 
 # https://embarkstudios.github.io/cargo-deny/checks/bans/cfg.html

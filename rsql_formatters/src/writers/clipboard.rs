@@ -107,7 +107,7 @@ mod tests {
         );
 
         let default_writer = ClipboardWriter::default();
-        assert!(default_writer.as_slice().is_empty());
+        assert_eq!(default_writer.as_slice(), b"");
     }
 
     #[cfg(not(target_os = "linux"))]

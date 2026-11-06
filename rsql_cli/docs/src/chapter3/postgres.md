@@ -17,7 +17,7 @@ postgres://<user>[:<password>]@<host>[:<port>]/<database>[?<options>]
 | `options`                | URL-encoded server startup options.                                                                                                |
 | `sslmode`                | This driver uses `NoTls`; `disable` explicitly selects an unencrypted connection. Use the `postgresql` driver for TLS connections. |
 | `embedded`               | Start a managed local PostgreSQL server when `true`; default `false`.                                                              |
-| `version`                | Embedded PostgreSQL version requirement; default `=18.6.0`.                                                                        |
+| `version`                | Embedded PostgreSQL version requirement; default `=18.6.1`.                                                                        |
 | `installation_dir`       | Directory for the downloaded PostgreSQL installation.                                                                              |
 | `data_dir`               | Embedded server data directory.                                                                                                    |
 | `temporary`              | Remove temporary server data after use; defaults to `true`.                                                                        |
