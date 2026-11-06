@@ -269,6 +269,7 @@ impl Connection for CachedMetadataConnection {
             metadata.infer_primary_keys(language_profile);
             metadata.infer_foreign_keys(language_profile);
             self.metadata = Some(metadata.clone());
+            self.timestamp = now;
             Ok(metadata)
         }
     }
@@ -546,6 +547,8 @@ impl Connection for MockConnection {
 mod test {
     use super::*;
     use crate::Value;
+    use std::sync::Arc;
+    use std::sync::atomic::{AtomicUsize, Ordering};
 
     #[tokio::test]
     async fn test_memory_query_result_new() {
@@ -773,5 +776,50 @@ mod test {
             convert_to_at_placeholders(r#"SELECT * FROM "table?" WHERE id = ?"#),
             r#"SELECT * FROM "table?" WHERE id = @P1"#
         );
+    }
+
+    fn counting_cached_connection() -> (CachedMetadataConnection, Arc<AtomicUsize>) {
+        let fetches = Arc::new(AtomicUsize::new(0));
+        let counter = Arc::clone(&fetches);
+        let mut mock = MockConnection::new();
+        mock.expect_metadata().returning(move || {
+            counter.fetch_add(1, Ordering::SeqCst);
+            Ok(Metadata::default())
+        });
+        (CachedMetadataConnection::new(Box::new(mock)), fetches)
+    }
+
+    fn minutes_ago(minutes: i64) -> DateTime {
+        Offset::UTC
+            .to_datetime(Timestamp::now())
+            .checked_sub(minutes.minutes())
+            .expect("valid datetime")
+    }
+
+    #[tokio::test]
+    async fn test_cached_metadata_reused_after_connection_older_than_ttl() -> Result<()> {
+        let (mut connection, fetches) = counting_cached_connection();
+        // Simulate a connection that was opened longer ago than the cache TTL
+        connection.timestamp = minutes_ago(5);
+
+        let _ = connection.metadata().await?;
+        let _ = connection.metadata().await?;
+        let _ = connection.metadata().await?;
+
+        assert_eq!(fetches.load(Ordering::SeqCst), 1);
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_cached_metadata_refreshed_after_ttl() -> Result<()> {
+        let (mut connection, fetches) = counting_cached_connection();
+
+        let _ = connection.metadata().await?;
+        connection.timestamp = minutes_ago(5);
+        let _ = connection.metadata().await?;
+        let _ = connection.metadata().await?;
+
+        assert_eq!(fetches.load(Ordering::SeqCst), 2);
+        Ok(())
     }
 }
